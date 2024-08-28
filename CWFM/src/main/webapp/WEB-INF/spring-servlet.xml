@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/data/jpa
+           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <!-- Bean declaration and other configurations -->
+    <bean name="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/view/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+    <context:component-scan base-package="com.wfd.dot1.cwfm.config,com.wfd.dot1.cwfm.*" />
+    <context:annotation-config/>
+    <mvc:annotation-driven />
+  <jpa:repositories base-package="com.wfd.dot1.cwfm.repository" />
+    <!-- Resources mapping -->
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+    <bean name="ds"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+
+		<property name="driverClassName"
+			value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+
+		<property name="url"
+			value="jdbc:sqlserver://localhost:1433;instanceName=SQLEXPRESS;databaseName=WFD_CWFM;encrypt=true;trustServerCertificate=true" />
+		<property name="username" value="sa" />
+		<property name="password" value="Admin" />
+	</bean>
+
+	<bean name="factory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+
+		<property name="dataSource" ref="ds" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				 <prop key="hibernate.transaction.jta.platform">org.springframework.transaction.jta.JtaTransactionManager</prop>
+            <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext</prop>
+				<!-- <prop key="hibernate.format_Sql">true</prop> -->
+			</props>
+		</property>
+  <!-- <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/" /> 
+  <mvc:annotation-driven />  -->
+		<property name="annotatedClasses">
+			<list>
+				<value>com.wfd.dot1.cwfm.entity.Emp</value>
+				<value>com.wfd.dot1.cwfm.entity.User</value>
+				<value>com.wfd.dot1.cwfm.entity.WorkmenWage</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSPrincipalEmployer</value>
+				<value>com.wfd.dot1.cwfm.entity.State</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSWorkOrder</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSContractor</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSContractorWC</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSContrPemm</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSSubcontractor</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSMinimumWage</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSWage</value>
+				<value>com.wfd.dot1.cwfm.entity.Skill</value>
+				<value>com.wfd.dot1.cwfm.entity.Trade</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSPeState</value>
+				<!-- <value>com.wfd.dot1.cwfm.entity.WorkOrderLLWC</value> -->
+				<value>com.wfd.dot1.cwfm.entity.ReportExecutionStatus</value>
+				<value>com.wfd.dot1.cwfm.entity.ReportInfo</value>
+				<value>com.wfd.dot1.cwfm.entity.ReportPreferences</value>
+				<value>com.wfd.dot1.cwfm.entity.ReportPreferencesSelection</value>
+				<value>com.wfd.dot1.cwfm.entity.ReportProfile</value>
+				<value>com.wfd.dot1.cwfm.entity.ReportWtkSessionId</value>
+				<value>com.wfd.dot1.cwfm.entity.RptProfileMapping</value>
+				<value>com.wfd.dot1.cwfm.entity.GeneralMaster</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSGMType</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSPerson</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSPersonCustomData</value>
+				<value>com.wfd.dot1.cwfm.entity.CMSPersonCustomDataDefinition</value>
+				<value>com.wfd.dot1.cwfm.entity.UserLogin</value>
+				<!-- <value>com.wfd.project.cwfm.entity.AuditTrail</value>
+				<value>com.wfd.project.cwfm.entity.CountryStates</value>
+				<value>com.wfd.project.cwfm.entity.CustomAttributes</value>
+				<value>com.wfd.project.cwfm.entity.LoginHistory</value>
+				<value>com.wfd.project.cwfm.entity.LookupCodes</value>
+				<value>com.wfd.project.cwfm.entity.LookupTypes</value>
+				<value>com.wfd.project.cwfm.entity.RoleRights</value>
+				<value>com.wfd.project.cwfm.entity.Users</value> -->
+			</list>
+		</property>
+	</bean>
+
+	<bean name="hibernateTemplate"
+		class="org.springframework.orm.hibernate5.HibernateTemplate">
+		<property name="sessionFactory" ref="factory"></property>
+		<property name="checkWriteOperations" value="false"></property>
+	</bean>
+
+	<bean name="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="factory" />
+	</bean>
+ <!-- <resources mapping="/resources/**" location="/WEB-INF/resources/" /> -->
+<!-- <context:property-placeholder location="/messages_en.properties" /> -->
+<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:messages" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="defaultLocale" value="en" />
+		<property name="cookieName" value="myAppLocaleCookie"></property>
+		<property name="cookieMaxAge" value="3600"></property>
+	</bean> 
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!-- Set max upload size if needed -->
+    <property name="maxUploadSize" value="10000000"/> <!-- 10 MB -->
+</bean>
+	
+	<!-- <bean id="lookupCodesAddValidator"
+		class="com.wfd.project.cwfm.validations.LookupCodesValidator" />
+	<bean id="loginValidator" class="com.wfd.project.cwfm.validations.LoginValid" />
+	 <bean id="rolerightsAddValidator" class="com.wfd.project.cwfm.validations.rolerightsAddValid" />
+	<bean id="logHistoryCustListvalidator" class="com.wfd.project.cwfm.validations.LogHistoryCustList" />
+    <bean id="usersValidator" class="com.wfd.project.cwfm.validations.UsersValidator" />  -->
+	<!--<interceptors>
+		<bean
+			class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="locale" />
+		</bean>
+	</interceptors> 
+	 <mvc:annotation-driven />
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/myProfile" />
+			<bean class="com.wfd.project.cwfm.inteceptor.AuthInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+    <tx:annotation-driven />
+    </beans>
