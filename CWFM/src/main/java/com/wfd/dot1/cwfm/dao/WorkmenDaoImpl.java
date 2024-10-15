@@ -305,6 +305,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        gatePassMain.getPoliceVerificationDocName(),gatePassMain.getIdProof2DocName(),gatePassMain.getMedicalDocName(),
 	        gatePassMain.getEducationDocName(),gatePassMain.getForm11DocName(),gatePassMain.getTrainingDocName(),gatePassMain.getOtherDocName(),
 	        gatePassMain.getWorkFlowType(),
+	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        gatePassMain.getUserId()
 	    };
 	}
@@ -447,6 +448,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setOtherDocName(rs.getString("OtherDocName"));
 			dto.setTrainingDocName(rs.getString("TrainingDocName"));
 			dto.setEducationDocName(rs.getString("EducationDocName"));
+			dto.setComments(rs.getString("Comments"));
 		}
 		log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 		return dto;

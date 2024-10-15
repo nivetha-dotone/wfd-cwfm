@@ -724,21 +724,32 @@ textarea {
             		</tr>
       				</c:if>
         
-        <tr>
+        <%-- <tr>
             <td colspan="20">
                 <div>
                     <p id="p3"><b><font color="darkblue" size="3">Comments</font></b></p>
                     <hr10 style="color:rgb(0, 102, 204);">
                 </div>
             </td>
+        </tr> --%>
+        <c:if test="${ not empty GatePassObj.comments}">
+        <tr>
+        <th><label class="custom-label">Contractor Supervisor Comment</label></th>
+        <td>
+        <textarea id="comments" name="comments" readonly>${GatePassObj.comments}</textarea>
+        </td>
         </tr>
+        </c:if>
         <tr>
 				<!-- <th><label class="custom-label">Previous Comment</label></th>
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
-				 --><th><label class="custom-label">Comment</label></th>
+				 -->
+				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+				 <th><label class="custom-label">Approver Comment</label></th>
 				<td><textarea id="comments"  name="comments" placeholder="Type here..."></textarea>
 				<label id="error-comments" style="color: red;display: none;">Comments is required</label>
 				</td>
+				<% } %>
 			</tr>
 		<tr>
 		</tr>

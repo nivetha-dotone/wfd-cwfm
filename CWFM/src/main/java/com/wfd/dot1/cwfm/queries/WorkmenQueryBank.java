@@ -53,14 +53,14 @@ public interface WorkmenQueryBank {
 	 		+ " AccessAreaId, UanNumber, HealthCheckDate, BloodGroupId, Accommodation, AcademicId, Technical, IfscCode, AccountNumber,   "
 	 		+ " EmergencyContactName,EmergencyContactNumber, WorkmenWageCategoryId, BonusPayoutId, PfCap,ZoneId, Basic, DA, HRA, WashingAllowance, OtherAllowance, UniformAllowance,   "
 	 		+ " AadharDocName, PhotoName, BankDocName, PoliceVerificationDocName, IdProof2DocName, MedicalDocName, EducationDocName, Form11DocName,   "
-	 		+ " TrainingDocName, OtherDocName,WorkFlowType, UpdatedBy, UpdatedDate)   "
+	 		+ " TrainingDocName, OtherDocName,WorkFlowType,Comments, UpdatedBy, UpdatedDate)   "
 	 		+ " VALUES  "
 	 		+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?,?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  "
-	 		+ "			  ?, ?, ?, ?, ?,?, GETDATE())";
+	 		+ "			  ?, ?, ?, ?, ?,?,?, GETDATE())";
 	 
 	 String GET_ALL_GATE_PASS_FOR_CREATOR = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
 	 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
@@ -107,7 +107,7 @@ public interface WorkmenQueryBank {
 	 		+ " WorkmenWageCategoryId,BonusPayoutId "
 	 		+ " ,ZoneId,Basic,DA,HRA,WashingAllowance,OtherAllowance,UniformAllowance,PfCap,AadharDocName,PhotoName,BankDocName, "
 	 		+ " PoliceVerificationDocName,IdProof2DocName "
-	 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy   "
+	 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy,gpm.Comments   "
 	 		+ " FROM GATEPASSMAIN gpm "
 	 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID  = gpm.UnitId "
 	 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "

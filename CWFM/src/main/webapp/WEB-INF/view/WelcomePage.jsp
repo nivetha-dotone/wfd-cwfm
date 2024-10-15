@@ -647,8 +647,8 @@ table th {
                     <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
                 </a>
                 <ul class="sub-menu" id="workmen-onboarding-sub-menu">
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'Quick On-Bording List')">List</a></li>
-                    <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'Quick On-Bording Add','${sessionScope.loginuser.userId}')">QOB</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'On-Bording List')">List</a></li>
+                    <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
                     <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li>
                     <li><a href="#" onclick="loadWorkmenBlock()">Block</a></li>
                     <li><a href="#" onclick="loadWorkmenUnblock()">Unblock</a></li>

@@ -412,7 +412,7 @@ label {
     </td>
 </tr> -->
             <tr>
-    <th><label class="custom-label"><span class="required-field">*</span>Enter Aadhar</label></th>
+    <th><label class="custom-label"><span class="required-field">*</span>Aadhar Number</label></th>
     <td>
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12">
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
@@ -787,12 +787,14 @@ label {
                    <tr>
                 		<td>
                 		 	<label for="aadharFile">Upload Aadhar Card (PDF):</label>
-       					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf">
+       					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">
+       					 	  <span id="aadharFileName" style="margin-left: 10px;color:black;"></span> 
         					<div id="aadharError"></div> <!-- Error message for Aadhar file -->
                 		</td>
                 		<td>
                 			<label for="policeFile">Upload PoliceVerification Report (PDF):</label> 
-                			<input type="file"	id="policeFile" name="policeFile" accept="application/pdf">
+                			<input type="file"	id="policeFile" name="policeFile" accept="application/pdf" onchange="displayFileName1('policeFile', 'policeFileName')">
+                			  <span id="policeFileName" style="margin-left: 10px;color:black;"></span> 
 							<div id="policeError"></div> <!-- Error message for Police file -->
 						</td>
 						
@@ -816,20 +818,22 @@ label {
 				<!-- <th><label class="custom-label">Previous Comment</label></th>
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
 				 --><th><label class="custom-label">Comment</label></th>
-				<td><input type="textarea" id="comments" name="comments" style="width:220px;height:100px;text-transform: capitalize;"  cols="35" rows="7"  /></td>
+				<td><textarea id="comments"  name="comments" placeholder="Type here..." style="width: 501px; height: 70px;"></textarea>
+				</td>
 			</tr>
 		<tr>
 		</tr>
       		<tr >    	
 				<td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;"><b>
+				<input type="checkbox" name="acceptCheck" id="acceptCheck"  /> 
 				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behaviour of the persons engaged by me or our company to work or visit Adani premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of Adani Group where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per Adani Group's safety and security policy
 				</b></td>
 			</tr>
-				<tr >
+				<!-- <tr >
 				<td colspan="4"><input type="checkbox" name="acceptCheck" id="acceptCheck"  />
-				<label class="custom-label"> I accept<!-- the <u>Terms and Conditions</u> --></label> 
+				<label class="custom-label"> I acceptthe <u>Terms and Conditions</u></label> 
 				</td>
-			   </tr>
+			   </tr> -->
         <!-- Add any additional rows for Approver Comments -->
                     
                 </tbody>

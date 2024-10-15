@@ -763,6 +763,7 @@ function fileUpload(){
             uniformAllowance: $("#uniformAllowance").val().trim(),
             userId: userId,
             gatePassAction: "save",
+            comments: $("#comments").val().trim(),
         };
 
         // Serialize the JSON object to a string
@@ -858,7 +859,8 @@ for (const [key, value] of data.entries()) {
             <option value="Training">Training</option>
             <option value="Form11">Form11</option>
         </select>
-        <input type="file" accept="application/pdf" style="margin-right: 10px;">
+        <input type="file" accept="application/pdf" style="margin-right: 10px;" onchange="displayFileName(this, 'fileName-${divIndex}')">
+        <span id="fileName-${divIndex}" style="margin-right: 10px;color:black;"></span>
         <button type="button" onclick="removeDocument(${divIndex})" style="color:black;">Remove</button>
     </div>
 `);
@@ -872,6 +874,32 @@ for (const [key, value] of data.entries()) {
         $(`#document-field-${index}`).remove();
     }
    
+
+
+function displayFileName(inputElement, displayId) {
+    const displayElement = document.getElementById(displayId);
+
+    // Get the selected file's name
+    if (inputElement.files.length > 0) {
+        const fileName = inputElement.files[0].name;
+        displayElement.textContent = fileName; // Display the file name
+    } else {
+        displayElement.textContent = ''; // Clear the display if no file is selected
+    }
+}
+
+function displayFileName1(inputId, displayId) {
+    const fileInput = document.getElementById(inputId);
+    const displayElement = document.getElementById(displayId);
+
+    // Get the selected file's name
+    if (fileInput.files.length > 0) {
+        const fileName = fileInput.files[0].name;
+        displayElement.textContent = fileName; // Display the file name
+    } else {
+        displayElement.textContent = ''; // Clear the display if no file is selected
+    }
+}
 
 
 		
