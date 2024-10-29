@@ -655,7 +655,7 @@ table th {
                     <li><a href="#" onclick="loadWorkmenBlacklist()">Blacklist</a></li>
                     <li><a href="#" onclick="loadWorkmenDeBlacklist()">De-blacklist</a></li>
                     <li><a href="#" onclick="loadWorkmenCancel()">Cancel</a></li>
-                    <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li>
+                    <!-- <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li> -->
                     <li><a href="#" onclick="loadWorkmenLostDamage()">Lost or Damage</a></li>
                 </ul>
             </li>

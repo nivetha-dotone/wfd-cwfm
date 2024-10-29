@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
@@ -434,4 +435,28 @@ public class WorkmenController {
     		return "failed";
     	}
     }
+    
+    
+    @PostMapping("/gatePassAction")
+    public ResponseEntity<String> gatePassAction(@RequestBody GatePassActionDto dto,HttpServletRequest request,HttpServletResponse response) {
+    	String result=null; 
+    	try {
+             ObjectMapper objectMapper = new ObjectMapper();
+             String gatePassActionDto = objectMapper.writeValueAsString(dto);
+             log.info("Received gatePassActionDto JSON: {}", gatePassActionDto);
+         } catch (Exception e) {
+             log.error("Error converting gatePassActionDto to JSON", e);
+         }
+         try {
+        	 result = workmenService.gatePassAction(dto);
+         	if(null!=result) {
+         		return new ResponseEntity<>("contractWorkmen/list",HttpStatus.OK);
+         	}
+         	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+         } catch (Exception e) {
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                  .body("Error saving data: " + e.getMessage());
+         } 
+    }
+    
 }
