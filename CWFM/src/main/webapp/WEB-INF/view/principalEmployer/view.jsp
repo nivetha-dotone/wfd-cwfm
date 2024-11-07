@@ -78,7 +78,7 @@
 .tab-content {
     display: none;
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: white;
     border: 1px solid #ddd;
 }
 
@@ -166,56 +166,57 @@ table.ControlLayout td {
 
     <div id="principalEmployerContent">
         <div class="tabs">
-            <button class="active" data-target="tab1" onclick="showTab('tab1')">Unit Information</button>
-            <button data-target="tab2" onclick="showTab('tab2')">License Information</button>
+            <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Unit Information</button>
+            <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
         </div>
 
         <div id="tab1" class="tab-content active">
-          <form id="editForm" action="/CWFM/principalEmployer/view/${principalEmployer.UNITID}" method="post">
+          <form id="editForm" action="/CWFM/principalEmployer/view/${principalEmployer.unitId
+          }" method="post">
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Unit Name</label></th>
-                <td><input type="text" name="NAME" value="${principalEmployer.NAME}" style="height: 20px;" size="30" maxlength="30" readonly="true" /></td>
+                <td><input type="text" name="NAME" value="${principalEmployer.name}" style="height: 20px;" size="30" maxlength="30" readonly="true" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>PE Inactive</label></th>
                 <td>
                     <c:choose>
-                        <c:when test="${principalEmployer.ISACTIVE}">
-                            <input type="checkbox" name="ISACTIVE" value="1" checked="checked" style="height: 20px;" onclick="return false;"/>
+                        <c:when test="${principalEmployer.isActive == 1}}">
+                            <input type="checkbox" name="isActive" value="1" checked="checked" style="height: 20px;" onclick="return false;"/>
                         </c:when>
                         <c:otherwise>
-                            <input type="checkbox" name="ISACTIVE" value="0" style="height: 20px;" onclick="return false;"/>
+                            <input type="checkbox" name="isActive" value="0" style="height: 20px;" onclick="return false;"/>
                         </c:otherwise>
                     </c:choose>
                 </td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Unit Code</label></th>
-                <td><input type="text" name="CODE" value="${principalEmployer.CODE}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Organization</label></th>
-                <td><input type="text" name="ORGANIZATION" value="${principalEmployer.ORGANIZATION}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
-                <td><input type="text" name="ADDRESS" value="${principalEmployer.ADDRESS}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="address" value="${principalEmployer.address}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>State</label></th>
-                <td><input type="text" name="STATEID" value="${principalEmployer.STATEID}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="stateId" value="${principalEmployer.stateId}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Manager Name</label></th>
-                <td><input type="text" name="MANAGERNAME" value="${principalEmployer.MANAGERNAME}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="managerName" value="${principalEmployer.managerName}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Manager Address</label></th>
-                <td><input type="text" name="MANAGERADDRS" value="${principalEmployer.MANAGERADDRS}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="managerAddrs" value="${principalEmployer.managerAddrs}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Type of Business</label></th>
-                <td><input type="text" name="BUSINESSTYPE" value="${principalEmployer.BUSINESSTYPE}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="businessType" value="${principalEmployer.businessType}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Maximum Number of Workmen</label></th>
-                <td><input type="text" name="MAXWORKMEN" value="${principalEmployer.MAXWORKMEN}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="maxWorkmen" value="${principalEmployer.maxWorkmen}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Maximun Number of Contract Workmen</label></th>
-                <td><input type="text" name="MAXCNTRWORKMEN" value="${principalEmployer.MAXCNTRWORKMEN}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="maxCntrWorkmen" value="${principalEmployer.maxCntrWorkmen}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label">Current count of Contract Workmen</label></th>
                 <td><input type="text" name="" value="0" style="height: 20px;" size="30" maxlength="30" disabled="true" /></td>
             </tr>
@@ -231,34 +232,34 @@ table.ControlLayout td {
         </div>
         
          <div id="tab2" class="tab-content">
-            <form id="additionalForm" action="/CWFM/principalEmployer/viewAdditional/${principalEmployer.UNITID}" method="post">
+            <form id="additionalForm" action="/CWFM/principalEmployer/viewAdditional/${principalEmployer.unitId}" method="post">
                 <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
                         <!-- Additional Info Content Here -->
                       <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>BOCW License Number</label></th>
-                <td><input type="text" name="LICENSENUMBER" value="BOCW12345" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="licenseNumber" value="BOCW12345" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Coverage</label></th>
-                <td><input type="text" name="PFCODE" value="150" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="pfCode" value="150" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Validity From</label></th>
-                <td><input type="text" name="LICENSENUMBER" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="licenseNumber" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Validity To</label></th>
-                <td><input type="text" name="PFCODE" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="pfCode" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             
               <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>ISMW License Number</label></th>
-                <td><input type="text" name="LICENSENUMBER" value="ISMW12345" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="licenseNumber" value="ISMW12345" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Coverage</label></th>
-                <td><input type="text" name="PFCODE" value="100" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="pfCode" value="100" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Validity From</label></th>
-                <td><input type="text" name="LICENSENUMBER" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="licenseNumber" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>Validity To</label></th>
-                <td><input type="text" name="PFCODE" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="pfCode" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
                      <%--   <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>BOCWAct Applicability</label></th>
@@ -286,40 +287,40 @@ table.ControlLayout td {
             </tr> --%>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>License Number</label></th>
-                <td><input type="text" name="LICENSENUMBER" value="${principalEmployer.LICENSENUMBER}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="licenseNumber" value="${principalEmployer.licenseNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>PF Code</label></th>
-                <td><input type="text" name="PFCODE" value="${principalEmployer.PFCODE}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="pfCode" value="${principalEmployer.pfCode}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>WC Number</label></th>
-                <td><input type="text" name="WCNUMBER" value="${principalEmployer.WCNUMBER}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="wcNumber" value="${principalEmployer.wcNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>ESIC Number</label></th>
-                <td><input type="text" name="ESICNUMBER" value="${principalEmployer.ESICNUMBER}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="esicNumber" value="${principalEmployer.esicNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>PT Registration No.</label></th>
-                <td><input type="text" name="PTREGNO" value="${principalEmployer.PTREGNO}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="ptRegNo" value="${principalEmployer.ptRegNo}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>LWF Registration No.</label></th>
-                <td><input type="text" name="LWFREGNO" value="${principalEmployer.LWFREGNO}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="lwfRegNo" value="${principalEmployer.lwfRegNo}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>Factory Licence No</label></th>
-                <td><input type="text" name="FACTORYLICENCENUMBER" value="${principalEmployer.FACTORYLICENCENUMBER}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="factoryLicenseNumber" value="${principalEmployer.factoryLicenseNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>IS RC Applicable ?</label></th>
                 <td>
                     <c:choose>
-                        <c:when test="${principalEmployer.ISRCAPPLICABLE}">
-                            <input type="checkbox" name="ISRCAPPLICABLE" value="1" checked="checked" style="height: 20px;" onclick="return false;"/>
+                        <c:when test="${principalEmployer.isRcApplicable == 1}}">
+                            <input type="checkbox" name="isRcApplicable" value="1" checked="checked" style="height: 20px;" onclick="return false;"/>
                         </c:when>
                         <c:otherwise>
-                            <input type="checkbox" name="ISRCAPPLICABLE" value="0" style="height: 20px;" onclick="return false;"/>
+                            <input type="checkbox" name="isRcApplicable" value="0" style="height: 20px;" onclick="return false;"/>
                         </c:otherwise>
                     </c:choose>
                 </td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>RC Number</label></th>
-                <td><input type="text" name="RCNUMBER" value="${principalEmployer.RCNUMBER}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="rcNumber" value="${principalEmployer.rcNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <%-- <th><label class="custom-label"><span class="required-field">*</span>RC Validity</label></th>
                 <td><input type="text" name="RCVALIDITY" value="${principalEmployer.RCVALIDITY}" style="height: 20px;" size="30" maxlength="30" /></td>
              --%></tr>

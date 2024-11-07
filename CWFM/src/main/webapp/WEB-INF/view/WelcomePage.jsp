@@ -92,12 +92,15 @@ function checkSessionStatus() {
  // Show the Approve Reject button only on the Documents tab
     var approveButton = document.getElementById('approveButton');
     var rejectButton = document.getElementById('rejectButton');
+    var actionButton = document.getElementById('actionButton');
     if (tabId === 'tab5') { // Assuming 'tab5' is the Documents tab
     	approveButton.style.display = 'inline-block'; // Show Save button
     	rejectButton.style.display = 'inline-block'; // Show Save button
+    	actionButton.style.display = 'inline-block'; // Show Save button
     } else {
     	approveButton.style.display = 'none'; // Hide Save button
     	rejectButton.style.display = 'none'; // Hide Save button
+    	actionButton.style.display = 'none'; // Hide Save button
     }
 } 
 function validateCurrentTab() {
@@ -152,6 +155,36 @@ function showTab(tabId) {
     }
 }
 
+function showTabOther(tabId) {
+    // Check if current tab fields are valid before switching tabs
+    
+
+    // Hide all tab contents
+    var tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(function(content) {
+        content.classList.remove('active');
+    });
+
+    // Remove active class from all tabs
+    var tabs = document.querySelectorAll('.tabs button');
+    tabs.forEach(function(tab) {
+        tab.classList.remove('active');
+    });
+
+    // Show the selected tab content and add active class to the clicked tab
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
+    
+ // Show the Save button only on the Documents tab
+    var saveButton = document.getElementById('saveButton');
+ 	
+    if (tabId === 'tab5') { // Assuming 'tab5' is the Documents tab
+        saveButton.style.display = 'inline-block'; // Show Save button
+    } else {
+        saveButton.style.display = 'none'; // Hide Save button
+    }
+}
+
 
 
 
@@ -162,6 +195,7 @@ function showTab(tabId) {
     margin: 0;
     padding: 0;
     font-family: 'Titillium Web', sans-serif;
+    overflow-y: scroll; /* Adds a vertical scroll bar */
 }
 
 /* Top Navigation Bar Styles */
@@ -293,6 +327,7 @@ function showTab(tabId) {
 .main-menu .sub-menu {
     display: none;
     padding: 0;
+    padding-left:55px;
     margin: 0;
     background: #00796b;
     list-style: none;
@@ -583,6 +618,7 @@ table th {
     font-size: 24px; /* Adjust size as needed */
     color: #ffffff; /* Change color as needed */
 }
+
     </style>
 </head>
 <body>
@@ -649,14 +685,14 @@ table th {
                 <ul class="sub-menu" id="workmen-onboarding-sub-menu">
                     <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'On-Bording List')">List</a></li>
                     <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
-                    <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li>
-                    <li><a href="#" onclick="loadWorkmenBlock()">Block</a></li>
-                    <li><a href="#" onclick="loadWorkmenUnblock()">Unblock</a></li>
-                    <li><a href="#" onclick="loadWorkmenBlacklist()">Blacklist</a></li>
-                    <li><a href="#" onclick="loadWorkmenDeBlacklist()">De-blacklist</a></li>
-                    <li><a href="#" onclick="loadWorkmenCancel()">Cancel</a></li>
+                   <!--  <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li> -->
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/blockList', 'Block List')">Block</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/unblockList', 'Unblock List')">Unblock</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/blackList', 'Black List')">Blacklist</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/deblackList', 'Deblack List')">De-blacklist</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/cancel', 'Cancel List')">Cancel</a></li>
                     <!-- <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li> -->
-                    <li><a href="#" onclick="loadWorkmenLostDamage()">Lost or Damage</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractworkmen/lostordamage', 'Lost Or Damage List')">Lost or Damage</a></li>
                 </ul>
             </li>
              <li>
@@ -881,8 +917,15 @@ table th {
     }
 
     function loadLogout() {
-        console.log("Logout clicked");
-        // Add logic to handle logout
+    	console.log("Logout clicked");
+        document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        
+        // Optionally, clear any additional session storage or local storage
+        sessionStorage.clear();
+        localStorage.clear();
+        
+        // Redirect to the login page or a logout API endpoint
+        window.location.href = 'UserLogin.jsp';
     }
 
     function resetSessionTimer() {

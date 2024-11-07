@@ -17,6 +17,7 @@
     body {
         background-color: #FFFFFF; /* White background for the page */
         font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
+        overflow-y: scroll; /* Adds a vertical scroll bar */
     }
 
     .action-bar {
@@ -169,8 +170,8 @@ alert(1);
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
     </form>
     <div>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
+       <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
+        <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEView('${cmSPRINCIPALEMPLOYER.UNITID}')">View</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
     </div>
@@ -210,35 +211,35 @@ alert(1);
             <tbody>
              <c:forEach items="${cmSPRINCIPALEMPLOYERs}" var="cmSPRINCIPALEMPLOYER">
                 <tr>
-                 <td ><input type="checkbox" name="selectedUnitIds" value="${cmSPRINCIPALEMPLOYER.UNITID}"></td>
+                 <td ><input type="checkbox" name="selectedUnitIds" value="${cmSPRINCIPALEMPLOYER.unitId}"></td>
                     <%-- <td >${cmSPRINCIPALEMPLOYER.UNITID}</td> --%>
-                    <td >${cmSPRINCIPALEMPLOYER.NAME}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.ADDRESS}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.MANAGERNAME}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.MANAGERADDRS}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.BUSINESSTYPE}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.MAXWORKMEN}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.MAXCNTRWORKMEN}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.BOCWAPPLICABILITY}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.ISMWAPPLICABILITY}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.CODE}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.ORGANIZATION}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.PFCODE}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.LICENSENUMBER}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.WCNUMBER}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.ESICNUMBER}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.PTREGNO}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.LWFREGNO}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.FACTORYLICENCENUMBER}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.ISRCAPPLICABLE}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.RCNUMBER}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.ATTACHMENTNM}</td>
-                    <td >${cmSPRINCIPALEMPLOYER.STATEID}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.name}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.address}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.managerName}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.managerAddrs}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.businessType}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.maxWorkmen}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.maxCntrWorkmen}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.bocwApplicability}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.isMwApplicability}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.code}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.organization}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.pfCode}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.licenseNumber}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.wcNumber}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.esicNumber}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.ptRegNo}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.lwfRegNo}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.factoryLicenseNumber}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.isRcApplicable}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.rcNumber}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.attachmentNm}</td>
+                    <td >${cmSPRINCIPALEMPLOYER.stateId}</td>
                   <%--   <td >${cmSPRINCIPALEMPLOYER.ISACTIVE}</td> --%>
                     <%-- <td >${cmSPRINCIPALEMPLOYER.UPDATEDTM}</td>
                     <td >${cmSPRINCIPALEMPLOYER.UPDATEDBY}</td> --%>
                 </tr>
-                <input type="hidden" id="globalUnitId" value="${cmSPRINCIPALEMPLOYER.UNITID}">
+                <input type="hidden" id="globalUnitId" value="${cmSPRINCIPALEMPLOYER.unitId}">
             </c:forEach>
             </tbody>
         </table>

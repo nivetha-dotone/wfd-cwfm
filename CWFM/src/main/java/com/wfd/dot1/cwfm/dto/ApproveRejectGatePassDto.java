@@ -38,5 +38,11 @@ public class ApproveRejectGatePassDto {
 		this.gatePassId = gatePassId;
 	}
 	
-	
+	private String gatePassType;
+	public String getGatePassType() {
+		return gatePassType;
+	}
+	public void setGatePassType(String gatePassType) {
+		this.gatePassType = gatePassType;
+	}
 }

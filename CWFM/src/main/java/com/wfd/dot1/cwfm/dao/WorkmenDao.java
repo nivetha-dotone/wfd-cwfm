@@ -3,7 +3,9 @@ package com.wfd.dot1.cwfm.dao;
 import java.util.List;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
@@ -38,9 +40,9 @@ public interface WorkmenDao {
 
 	public String saveGatePass(GatePassMain gatePassMain);
 
-	public List<GatePassListingDto> getGatePassListingDetails(String userId);
+	public List<GatePassListingDto> getGatePassListingDetails(String userId, String gatePassTypeId);
 
-	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType);
+	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId);
 
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId);
 
@@ -60,6 +62,16 @@ public interface WorkmenDao {
 
 	public boolean updateGatePassMainStatus(String gatePassId, String status);
 
-	public boolean isLastApprover(String gatePassId, String approverId);
+	public boolean isLastApprover(String gatePassId, String approverId,String gatePassType);
+
+	public String gatePassAction(GatePassActionDto dto);
+
+	public void saveGatePassStatusLog(GatePassStatusLogDto dto);
+
+	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction);
+
+	public List<MasterUser> getApproversForGatePassAction(String createdBy,String gatepassAction);
+
+	boolean updateGatePassMainStatusAndType(String gatePassId, String status, String gatePassType);
 
 }

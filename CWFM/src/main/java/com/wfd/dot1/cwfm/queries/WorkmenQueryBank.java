@@ -69,7 +69,7 @@ public interface WorkmenQueryBank {
 	 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
 	 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=gpm.UnitId "
 	 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT)"
-	 		+ " where gpm.UpdatedBy=?";
+	 		+ " where gpm.UpdatedBy=? and gpm.GatePassTypeId=?";
 	 
 	 String GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
 		 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
@@ -79,8 +79,8 @@ public interface WorkmenQueryBank {
 		 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=gpm.UnitId "
 		 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT)"
 		 		+ "  join GATEPASSAPPROVERINFO gai on gai.GatePassId = gpm.GatePassId "
-		 		+ " left join  GATEPASSAPPROVALSTATUS gas ON gas.GatePassId = gpm.GatePassId AND gas.UserId = ?"
-		 		+ " where gai.UserId=? and gas.GatePassId IS NULL and gpm.GatePassStatus='3' ";
+		 		+ " left join  GATEPASSAPPROVALSTATUS gas ON gas.GatePassId = gpm.GatePassId AND gas.UserId = ? and gas.GatePassTypeId=?"
+		 		+ " where (gai.UserId=?and gai.status=?) and gas.GatePassId IS NULL and gpm.GatePassStatus='3' and gpm.GatePassTypeId=?";
 	 
 	 String GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER="select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName,  "
 	 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName,  "
@@ -90,16 +90,16 @@ public interface WorkmenQueryBank {
 	 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=gpm.UnitId  "
 	 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT) "
 	 		+ " left join GATEPASSAPPROVERINFO gai on gai.gatePassId = gpm.gatePassId "
-	 		+ " and gai.userId=? and gai.status=1 "
+	 		+ " and gai.userId=? and gai.status=? "
 	 		+ " and gai.[Index] = (select count(gas.GatePassApprovalStatusId)+1 from GATEPASSAPPROVERINFO gai1 "
-	 		+ " join GATEPASSAPPROVALSTATUS gas on gas.UserId=gai1.UserId and gas.status=4 and gpm.gatePassId=gas.gatePassId "
-	 		+ " where gai1.status in (1) and gai1.gatePassId=gpm.gatePassId) "
-	 		+ " where gai.UserId=? and  gpm.GatePassStatus='3'";
+	 		+ " join GATEPASSAPPROVALSTATUS gas on gas.UserId=gai1.UserId and gas.status=4 and gpm.gatePassId=gas.gatePassId and  gas.GatePassTypeId=?"
+	 		+ " where gai1.status in (?) and gai1.gatePassId=gpm.gatePassId) "
+	 		+ " where gai.UserId=? and  gpm.GatePassStatus='3' and gpm.GatePassTypeId=?";
 	 
 	
 	 
 	 String GET_CONTRACT_WORKMEN_DETAILS = "SELECT TransactionId,GatePassId,GatePassTypeId,GatePassStatus,AadharNumber,gpm.FirstName,gpm.LastName,DOB,Gender, "
-	 		+ " RelativeName,IdMark,MobileNumber,MaritalStatus "
+	 		+ " RelativeName,IdMark,MobileNumber,MaritalStatus,gpm.UnitId as peId "
 	 		+ " ,cpe.NAME as UnitId,cc.NAME as ContractorId,cwo.NAME as WorkorderId,ct.NAME as TradeId,cs.SKILLNM AS SkillId,DepartmentId,AreaId, "
 	 		+ " CONCAT(mu.FirstName,' ',mu.LastName) as EicId,NatureOfJob,ccwc.WC_CODE as WcEsicNo,HazardousArea, "
 	 		+ " AccessAreaId,UanNumber,HealthCheckDate "
@@ -130,19 +130,43 @@ public interface WorkmenQueryBank {
 	 String GET_APPROVERS_FOR_GATE_PASS="select mu.UserId, CONCAT(mu.FirstName, ' ',mu.LastName) AS FullName,uari.AuthorizationOn "
 	 		+ " from MASTERUSER mu  "
 	 		+ " join USERAUTHRELINFO uari on uari.AuthorizationValue=mu.UserId and uari.IsActive='A'  "
-	 		+ " WHERE uari.UserId=? ";
+	 		+ " WHERE uari.UserId=? and uari.AuthorizationOn not like '%approver' ";
+	 
+	 String GET_APPROVERS_FOR_GATE_PASS_ACTION="select mu.UserId, CONCAT(mu.FirstName, ' ',mu.LastName) AS FullName,uari.AuthorizationOn,mu.RoleName "
+		 		+ " from MASTERUSER mu  "
+		 		+ " join USERAUTHRELINFO uari on uari.AuthorizationValue=mu.UserId and uari.IsActive='A'  "
+		 		+ " WHERE uari.UserId=? and  uari.AuthorizationOn=?";
 	 
 	 String SAVE_GATE_PASS_APPROVER="INSERT INTO GATEPASSAPPROVERINFO(GatePassId,UserRole,UserId,[Index],Status,CreatedBy,CreatedDate) VALUES (?,?, ?, ?, ?,?,GETDATE())";
 
-	String SAVE_GATEPASS_APPROVAL_STATUS = "INSERT INTO GATEPASSAPPROVALSTATUS(GatePassId,UserId,UserRole,Status,Comments,LastUpdatedDate) VALUES (?,?,?,?,?,GETDATE())";
+	String SAVE_GATEPASS_APPROVAL_STATUS = "INSERT INTO GATEPASSAPPROVALSTATUS(GatePassId,UserId,UserRole,Status,Comments,GatePassTypeId,LastUpdatedDate) VALUES (?,?,?,?,?,?,GETDATE())";
 	
 	 String GET_WORKFLOW_TYPE_BY_BT ="select distinct gpwft.WorkflowType "
 		 		+ " from  GATEPASSWORKFLOWTYPE gpwft  WHERE gpwft.BusinessTypeId=?";
 	 
 	 String UPDATE_GATEPASSMAIN_STATUS="update GATEPASSMAIN SET GatePassStatus=? where GatePassId=?";
 	 
+	 String UPDATE_GATEPASSMAIN_STATUS_TYPE="update GATEPASSMAIN SET GatePassStatus=?,GatePassTypeId=? where GatePassId=?";
+	 
 	 String LAST_APPROVER = "select UserId from GATEPASSAPPROVERINFO gai where gai.gatePassId=? "
 	 		+ " and gai.UserId=? "
-	 		+ " and gai.status=1 and gai.[index] = (select max(gai1.[index]) "
-	 		+ " from GATEPASSAPPROVERINFO gai1 where gai1.gatePassId=gai.gatePassId and gai1.status=1) ";
+	 		+ " and gai.status=? and gai.[index] = (select max(gai1.[index]) "
+	 		+ " from GATEPASSAPPROVERINFO gai1 where gai1.gatePassId=gai.gatePassId and gai1.status=?) ";
+	 
+	 String UPDATE_GATE_PASS_ACTION = "update GATEPASSMAIN set GatePassTypeId=?,GatePassStatus=?,UpdatedBy=?,UpdatedDate=GETDATE(),Comments=? where GatePassId=?";
+
+	 String SAVE_GATEPASS_STATUSLOG = "INSERT INTO dbo.GATEPASSSTATUSLOG (GatePassId,GatePassType,Status,Comments,UpdatedBy,LastUpdatedDate) "
+	 		+ " VALUES (?,?,?,?,?,GETDATE())";
+	 
+	 String GET_ALL_GATE_PASS_ACTION_FOR_CREATOR = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
+		 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
+		 		+ " gpm.ContractorId as VendorCode,cpe.NAME as UnitName,gpm.GatePassStatus "
+		 		+ " from GATEPASSMAIN gpm "
+		 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
+		 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=gpm.UnitId "
+		 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT)"
+		 		+ " where gpm.UpdatedBy=? and (gpm.GatePassTypeId=? and gpm.GatePassStatus=?) or gpm.GatePassTypeId=? ";
+	 
+	 
+	 
 }

@@ -1,6 +1,5 @@
 package com.wfd.dot1.cwfm.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
+import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
@@ -78,15 +80,33 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
-				return workmenDao.saveGatePass(gatePassMain);
+				gatePassId = workmenDao.saveGatePass(gatePassMain); 
+				gatePassMain.setGatePassId(gatePassId);
+				GatePassStatusLogDto dto =new GatePassStatusLogDto();
+				dto.setGatePassId(gatePassId);
+				dto.setGatePassType(GatePassType.CREATE.getStatus());
+				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
+				dto.setComments(gatePassMain.getComments());
+				dto.setUpdatedBy(gatePassMain.getUserId());
+				workmenDao.saveGatePassStatusLog(dto);
+				return gatePassId;
 			}else {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
 				gatePassId = workmenDao.saveGatePass(gatePassMain);
+				gatePassMain.setGatePassId(gatePassId);
+				GatePassStatusLogDto dto =new GatePassStatusLogDto();
+				dto.setGatePassId(gatePassId);
+				dto.setGatePassType(GatePassType.CREATE.getStatus());
+				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
+				dto.setComments(gatePassMain.getComments());
+				dto.setUpdatedBy(gatePassMain.getUserId());
+				workmenDao.saveGatePassStatusLog(dto);
 				//get approvers for gatepass
 				List<MasterUser> approversList = workmenDao.getApproversForGatePass(gatePassMain.getCreatedBy());
 				
 				if(null!=approversList && approversList.size()>0){
 					for(MasterUser mu :approversList) {
+						mu.setStatus(GatePassType.CREATE.getStatus());
 						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
 								mu.setIndex(1);
 							
@@ -107,13 +127,13 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return gatePassId;
 	}
 	@Override
-	public List<GatePassListingDto> getGatePassListingDetails(String userId) {
-		return workmenDao.getGatePassListingDetails(userId);
+	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId) {
+		return workmenDao.getGatePassListingDetails(userId,gatePassTypeId);
 	}
 	@Override
-	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser user) {
+	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser user,String gatePassTypeId) {
 			int workFlowTypeId = workmenDao.getWorkFlowTypeForApprovers(user.getBusinessType());
-			return workmenDao.getGatePassListingForApprovers(user.getUserId(),workFlowTypeId);
+			return workmenDao.getGatePassListingForApprovers(user.getUserId(),workFlowTypeId,gatePassTypeId);
 	}
 	@Override
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId) {
@@ -125,18 +145,146 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	@Override
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto) {
-		String result = workmenDao.approveRejectGatePass(dto);
+		GatePassMain gpm = workmenDao.getIndividualContractWorkmenDetails(dto.getGatePassId());
+		String result=null;
+		//if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gpm.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus())) {
+		 result = workmenDao.approveRejectGatePass(dto);
+		GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
+		statusLog.setGatePassId(dto.getGatePassId());
+		statusLog.setGatePassType(dto.getGatePassType());
+		statusLog.setStatus(Integer.parseInt(dto.getStatus()));
+		statusLog.setComments(dto.getComments());
+		statusLog.setUpdatedBy(dto.getApproverId());
+		workmenDao.saveGatePassStatusLog(statusLog);
 		boolean status=false;
 		if(dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
+			if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus())) {
 			status = workmenDao.updateGatePassMainStatus(dto.getGatePassId(),dto.getStatus());
+			}else {
+			//rollback status and type to create
+			status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),GatePassStatus.APPROVED.getStatus(),GatePassType.CREATE.getStatus());
+			}
 		}else {
 			//check if last approver, if last approver change the status of gate pass main to approved
-			boolean isLastApprover = workmenDao.isLastApprover(dto.getGatePassId(),dto.getApproverId());
+			boolean isLastApprover = workmenDao.isLastApprover(dto.getGatePassId(),dto.getApproverId(),dto.getGatePassType());
 			if(isLastApprover) {
+				if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()) || dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
+					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
+				//rollback status and type to create
+				}else {
 				status = workmenDao.updateGatePassMainStatus(dto.getGatePassId(),dto.getStatus());
+				}
 			}
 		}
+//		}else {
+//			result="Other gatepass action performed on this gatepass";
+//		}
 		return result;
+	}
+	@Override
+	public String gatePassAction(GatePassActionDto dto) {
+	String result=null;
+		try {
+			
+			//approver logic needs to be added
+			 GatePassMain gatePassMain = workmenDao.getIndividualContractWorkmenDetails(dto.getGatePassId());
+			if((gatePassMain.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
+					||dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()) || dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())
+					) {
+				
+			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getUnitId());
+			
+			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId() || dto.getGatePassType().equalsIgnoreCase(GatePassType.LOSTORDAMAGE.getStatus())) {
+				dto.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
+				result = workmenDao.gatePassAction(dto);
+				 if(null!=result) {
+						GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
+						statusLog.setGatePassId(dto.getGatePassId());
+						statusLog.setGatePassType(dto.getGatePassType());
+						statusLog.setStatus(Integer.parseInt(dto.getGatePassStatus()));
+						statusLog.setComments(dto.getComments());
+						statusLog.setUpdatedBy(dto.getCreatedBy());
+						workmenDao.saveGatePassStatusLog(statusLog);
+					}
+			}else {
+					dto.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
+				 result = workmenDao.gatePassAction(dto);
+				//get approvers for gatepass
+				 String approverType = null;
+				 String gatePassType=null;
+				 if(dto.getGatePassType().equalsIgnoreCase(GatePassType.CANCEL.getStatus())) {
+					 approverType="cancelapprover";
+					 gatePassType=GatePassType.CANCEL.getStatus();
+				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.BLACKLIST.getStatus())) {
+					 approverType="blacklistapprover";
+					 gatePassType=GatePassType.BLACKLIST.getStatus();
+				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.BLOCK.getStatus())) {
+					 approverType="blockapprover";
+					 gatePassType=GatePassType.BLOCK.getStatus();
+				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.UNBLOCK.getStatus())) {
+					 approverType="unblockapprover";
+					 gatePassType=GatePassType.UNBLOCK.getStatus();
+				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.DEBLACKLIST.getStatus())) {
+					 approverType="deblacklistapprover";
+					 gatePassType=GatePassType.DEBLACKLIST.getStatus();
+				 }
+				List<MasterUser> approversList = workmenDao.getApproversForGatePassAction(gatePassMain.getCreatedBy(),approverType);
+				
+				if(null!=approversList && approversList.size()>0){
+					for(MasterUser mu :approversList) {
+						mu.setStatus(gatePassType);
+						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
+								mu.setIndex(1);
+								
+						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.SECURITY.getName())){
+								mu.setIndex(3);
+							
+						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.HR.getName())) {
+								mu.setIndex(2);
+							
+						}
+					}
+					workmenDao.saveGatePassApprover(dto.getGatePassId(), approversList, gatePassMain.getCreatedBy());
+					if(null!=result) {
+						GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
+						statusLog.setGatePassId(dto.getGatePassId());
+						statusLog.setGatePassType(dto.getGatePassType());
+						statusLog.setStatus(Integer.parseInt(dto.getGatePassStatus()));
+						statusLog.setComments(dto.getComments());
+						statusLog.setUpdatedBy(dto.getCreatedBy());
+						workmenDao.saveGatePassStatusLog(statusLog);
+					}
+				}  
+				 
+ 			}
+			}else {
+				//other action performed on gatepass
+				if(gatePassMain.getGatePassAction().equals(GatePassType.CANCEL.getStatus())) {
+					result="Cancellation request already initiated for gatepassid :"+dto.getGatePassId();
+				}else if(gatePassMain.getGatePassAction().equals(GatePassType.BLOCK.getStatus())) {
+					result="Block request already initiated for gatepassid :"+dto.getGatePassId();
+				}else if(gatePassMain.getGatePassAction().equals(GatePassType.UNBLOCK.getStatus())) {
+					result="Unblock request already initiated for gatepassid :"+dto.getGatePassId();
+				}else if(gatePassMain.getGatePassAction().equals(GatePassType.BLACKLIST.getStatus())) {
+					result="Blacklist request already initiated for gatepassid :"+dto.getGatePassId();
+				}else if(gatePassMain.getGatePassAction().equals(GatePassType.DEBLACKLIST.getStatus())) {
+					result="Deblacklist request already initiated for gatepassid :"+dto.getGatePassId();
+				}else if(gatePassMain.getGatePassAction().equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+					result="Lost or Damage request already initiated for gatepassid :"+dto.getGatePassId();
+				}
+				
+			}
+			
+			
+		}catch(Exception e) {
+			
+		}
+		
+		return result;
+	}
+	@Override
+	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction) {
+		return workmenDao.getGatePassActionListingDetails(userId,gatePassTypeId,previousGatePassAction);
 	}
 	
 

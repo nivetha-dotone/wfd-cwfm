@@ -342,7 +342,7 @@ console.log(formData);
             document.body.appendChild(link);
             link.click();
         }
-$(document).ready(function() {
+/*$(document).ready(function() {
     var rowsPerPage = 2;
     var currentPage = 1;
     var totalRows = $('#principalEmployerTable tbody tr').length;
@@ -374,7 +374,7 @@ $(document).ready(function() {
             console.log("endIndex page:", endIndex);
             $('#principalEmployerTable tbody tr').slice(startIndex, endIndex).show();
         }
-    });
+    });*/
     
     function updateCheckbox(checkbox) {
     if (checkbox.checked) {

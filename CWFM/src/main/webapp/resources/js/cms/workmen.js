@@ -634,20 +634,21 @@ function fileUpload(){
     
     function approveRejectGatePass(status){
 		let isValid=true;
-		 const comments = $("#comments").val().trim();
-    if (comments === "") {
-        $("#error-comments").show();
+		 const approvercomments = $("#approvercomments").val().trim();
+    if (approvercomments === "") {
+        $("#error-approvercomments").show();
         isValid = false;
     }else{
-		$("#error-comments").hide();
+		$("#error-approvercomments").hide();
 	}
 	if(isValid){
 		const data = {
 			approverId : $("#userId").val().trim(),
-			comments : $("#comments").val().trim(),
+			comments : $("#approvercomments").val().trim(),
 			status : status,
 			gatePassId : $("#gatePassId").val().trim(),
 			approverRole : $("#roleName").val().trim(),
+			gatePassType : '1',
 		};
 			  const xhr = new XMLHttpRequest();
     xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
@@ -900,6 +901,573 @@ function displayFileName1(inputId, displayId) {
         displayElement.textContent = ''; // Clear the display if no file is selected
     }
 }
+function submitCancel(userId,gatePassType){
+	let isValid=true;
+	 const comments = $("#comments").val()?.trim();
+   if (!comments ) {
+       $("#error-comments").show();
+       isValid = false;
+   }else{
+	$("#error-comments").hide();
+}
+if(isValid){
+	const data = {
+		createdBy : userId,
+		comments : $("#comments").val()?.trim(),
+		gatePassId : $("#gatePassId").val().trim(),
+		gatePassType : gatePassType,
+	};
+		  const xhr = new XMLHttpRequest();
+   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+   xhr.onload = function() {
+       if (xhr.status === 200) {
+           // Handle successful response
+           console.log("Data saved successfully:", xhr.responseText);
+		  
+         loadCommonList('/contractworkmen/cancel', 'Cancel List');
+       } else {
+           // Handle error response
+           console.error("Error saving data:", xhr.statusText);
+       }
+   };
+   
+   xhr.onerror = function() {
+       console.error("Request failed");
+   };
+   
+   // Send the data object as a JSON string
+   xhr.send(JSON.stringify(data));
+	}else{
+		//error 
+	}
+	}//eofunc
+function approveRejectCancel(status,gatePassType){
+	let isValid=true;
+	 const approvercomments = $("#approvercomments").val().trim();
+   if (approvercomments === "") {
+       $("#error-approvercomments").show();
+       isValid = false;
+   }else{
+	$("#error-approvercomments").hide();
+}
+if(isValid){
+	const data = {
+		approverId : $("#userId").val().trim(),
+		comments : $("#approvercomments").val().trim(),
+		status : status,
+		gatePassId : $("#gatePassId").val().trim(),
+		approverRole : $("#roleName").val().trim(),
+		gatePassType : gatePassType,
+	};
+		  const xhr = new XMLHttpRequest();
+   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
+   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+   xhr.onload = function() {
+       if (xhr.status === 200) {
+           // Handle successful response
+           console.log("Data saved successfully:", xhr.responseText);
+         loadCommonList('/contractworkmen/cancel', 'Cancel List');
+       } else {
+           // Handle error response
+           console.error("Error saving data:", xhr.statusText);
+       }
+   };
+   
+   xhr.onerror = function() {
+       console.error("Request failed");
+   };
+   
+   // Send the data object as a JSON string
+   xhr.send(JSON.stringify(data));
+	}else{
+		//error 
+	}
+	}//eofunc
+	function submitBlock(userId,gatePassType){
+		let isValid=true;
+		 const comments = $("#comments").val().trim();
+	   if (comments === "") {
+	       $("#error-comments").show();
+	       isValid = false;
+	   }else{
+		$("#error-comments").hide();
+	}
+	if(isValid){
+		const data = {
+			createdBy : userId,
+			comments : $("#comments").val().trim(),
+			gatePassId : $("#gatePassId").val().trim(),
+			gatePassType : gatePassType,
+		};
+			  const xhr = new XMLHttpRequest();
+	   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+	   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+	   xhr.onload = function() {
+	       if (xhr.status === 200) {
+	           // Handle successful response
+	           console.log("Data saved successfully:", xhr.responseText);
+			  
+	         loadCommonList('/contractworkmen/blockList', 'Block List');
+	       } else {
+	           // Handle error response
+	           console.error("Error saving data:", xhr.statusText);
+	       }
+	   };
+	   
+	   xhr.onerror = function() {
+	       console.error("Request failed");
+	   };
+	   
+	   // Send the data object as a JSON string
+	   xhr.send(JSON.stringify(data));
+		}else{
+			//error 
+		}
+		}//eofunc
+	function approveRejectBlock(status,gatePassType){
+		let isValid=true;
+		 const approvercomments = $("#approvercomments").val().trim();
+	   if (approvercomments === "") {
+	       $("#error-approvercomments").show();
+	       isValid = false;
+	   }else{
+		$("#error-approvercomments").hide();
+	}
+	if(isValid){
+		const data = {
+			approverId : $("#userId").val().trim(),
+			comments : $("#approvercomments").val().trim(),
+			status : status,
+			gatePassId : $("#gatePassId").val().trim(),
+			approverRole : $("#roleName").val().trim(),
+			gatePassType : gatePassType,
+		};
+			  const xhr = new XMLHttpRequest();
+	   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
+	   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+	   xhr.onload = function() {
+	       if (xhr.status === 200) {
+	           // Handle successful response
+	           console.log("Data saved successfully:", xhr.responseText);
+	         loadCommonList('/contractworkmen/blockList', 'Block List');
+	       } else {
+	           // Handle error response
+	           console.error("Error saving data:", xhr.statusText);
+	       }
+	   };
+	   
+	   xhr.onerror = function() {
+	       console.error("Request failed");
+	   };
+	   
+	   // Send the data object as a JSON string
+	   xhr.send(JSON.stringify(data));
+		}else{
+			//error 
+		}
+		}//eofunc
+		function submitUnblock(userId,gatePassType){
+				let isValid=true;
+				 const comments = $("#comments").val().trim();
+			   if (comments === "") {
+			       $("#error-comments").show();
+			       isValid = false;
+			   }else{
+				$("#error-comments").hide();
+			}
+			if(isValid){
+				const data = {
+					createdBy : userId,
+					comments : $("#comments").val().trim(),
+					gatePassId : $("#gatePassId").val().trim(),
+					gatePassType : gatePassType,
+				};
+					  const xhr = new XMLHttpRequest();
+			   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+			   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+			   xhr.onload = function() {
+			       if (xhr.status === 200) {
+			           // Handle successful response
+			           console.log("Data saved successfully:", xhr.responseText);
+					  
+			         loadCommonList('/contractworkmen/unblockList', 'Unblock List');
+			       } else {
+			           // Handle error response
+			           console.error("Error saving data:", xhr.statusText);
+			       }
+			   };
+			   
+			   xhr.onerror = function() {
+			       console.error("Request failed");
+			   };
+			   
+			   // Send the data object as a JSON string
+			   xhr.send(JSON.stringify(data));
+				}else{
+					//error 
+				}
+				}//eofunc
+		function approveRejectUnblock(status,gatePassType){
+			let isValid=true;
+			 const approvercomments = $("#approvercomments").val().trim();
+		   if (approvercomments === "") {
+		       $("#error-approvercomments").show();
+		       isValid = false;
+		   }else{
+			$("#error-approvercomments").hide();
+		}
+		if(isValid){
+			const data = {
+				approverId : $("#userId").val().trim(),
+				comments : $("#approvercomments").val().trim(),
+				status : status,
+				gatePassId : $("#gatePassId").val().trim(),
+				approverRole : $("#roleName").val().trim(),
+				gatePassType : gatePassType,
+			};
+				  const xhr = new XMLHttpRequest();
+		   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
+		   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+		   xhr.onload = function() {
+		       if (xhr.status === 200) {
+		           // Handle successful response
+		           console.log("Data saved successfully:", xhr.responseText);
+		         loadCommonList('/contractworkmen/unblockList', 'Unblock List');
+		       } else {
+		           // Handle error response
+		           console.error("Error saving data:", xhr.statusText);
+		       }
+		   };
+		   
+		   xhr.onerror = function() {
+		       console.error("Request failed");
+		   };
+		   
+		   // Send the data object as a JSON string
+		   xhr.send(JSON.stringify(data));
+			}else{
+				//error 
+			}
+			}//eofunc
+			function submitBlack(userId,gatePassType){
+							let isValid=true;
+							 const comments = $("#comments").val().trim();
+						   if (comments === "") {
+						       $("#error-comments").show();
+						       isValid = false;
+						   }else{
+							$("#error-comments").hide();
+						}
+						if(isValid){
+							const data = {
+								createdBy : userId,
+								comments : $("#comments").val().trim(),
+								gatePassId : $("#gatePassId").val().trim(),
+								gatePassType : gatePassType,
+							};
+								  const xhr = new XMLHttpRequest();
+						   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+						   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+						   xhr.onload = function() {
+						       if (xhr.status === 200) {
+						           // Handle successful response
+						           console.log("Data saved successfully:", xhr.responseText);
+								  
+						         loadCommonList('/contractworkmen/blackList', 'Black List');
+						       } else {
+						           // Handle error response
+						           console.error("Error saving data:", xhr.statusText);
+						       }
+						   };
+						   
+						   xhr.onerror = function() {
+						       console.error("Request failed");
+						   };
+						   
+						   // Send the data object as a JSON string
+						   xhr.send(JSON.stringify(data));
+							}else{
+								//error 
+							}
+							}//eofunc
+			function approveRejectBlack(status,gatePassType){
+						let isValid=true;
+						 const approvercomments = $("#approvercomments").val().trim();
+					   if (approvercomments === "") {
+					       $("#error-approvercomments").show();
+					       isValid = false;
+					   }else{
+						$("#error-approvercomments").hide();
+					}
+					if(isValid){
+						const data = {
+							approverId : $("#userId").val().trim(),
+							comments : $("#approvercomments").val().trim(),
+							status : status,
+							gatePassId : $("#gatePassId").val().trim(),
+							approverRole : $("#roleName").val().trim(),
+							gatePassType : gatePassType,
+						};
+							  const xhr = new XMLHttpRequest();
+					   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
+					   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+					   xhr.onload = function() {
+					       if (xhr.status === 200) {
+					           // Handle successful response
+					           console.log("Data saved successfully:", xhr.responseText);
+					         loadCommonList('/contractworkmen/blackList', 'Black List');
+					       } else {
+					           // Handle error response
+					           console.error("Error saving data:", xhr.statusText);
+					       }
+					   };
+					   
+					   xhr.onerror = function() {
+					       console.error("Request failed");
+					   };
+					   
+					   // Send the data object as a JSON string
+					   xhr.send(JSON.stringify(data));
+						}else{
+							//error 
+						}
+						}//eofunc
+						function submitDeblack(userId,gatePassType){
+										let isValid=true;
+										 const comments = $("#comments").val().trim();
+									   if (comments === "") {
+									       $("#error-comments").show();
+									       isValid = false;
+									   }else{
+										$("#error-comments").hide();
+									}
+									if(isValid){
+										const data = {
+											createdBy : userId,
+											comments : $("#comments").val().trim(),
+											gatePassId : $("#gatePassId").val().trim(),
+											gatePassType : gatePassType,
+										};
+											  const xhr = new XMLHttpRequest();
+									   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+									   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+									   xhr.onload = function() {
+									       if (xhr.status === 200) {
+									           // Handle successful response
+									           console.log("Data saved successfully:", xhr.responseText);
+											  
+									         loadCommonList('/contractworkmen/deblackList', 'Deblack List');
+									       } else {
+									           // Handle error response
+									           console.error("Error saving data:", xhr.statusText);
+									       }
+									   };
+									   
+									   xhr.onerror = function() {
+									       console.error("Request failed");
+									   };
+									   
+									   // Send the data object as a JSON string
+									   xhr.send(JSON.stringify(data));
+										}else{
+											//error 
+										}
+										}//eofunc
+						function approveRejectDeblacklist(status,gatePassType){
+									let isValid=true;
+									 const approvercomments = $("#approvercomments").val().trim();
+								   if (approvercomments === "") {
+								       $("#error-approvercomments").show();
+								       isValid = false;
+								   }else{
+									$("#error-approvercomments").hide();
+								}
+								if(isValid){
+									const data = {
+										approverId : $("#userId").val().trim(),
+										comments : $("#approvercomments").val().trim(),
+										status : status,
+										gatePassId : $("#gatePassId").val().trim(),
+										approverRole : $("#roleName").val().trim(),
+										gatePassType : gatePassType,
+									};
+										  const xhr = new XMLHttpRequest();
+								   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
+								   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+								   xhr.onload = function() {
+								       if (xhr.status === 200) {
+								           // Handle successful response
+								           console.log("Data saved successfully:", xhr.responseText);
+								         loadCommonList('/contractworkmen/deblackList', 'Deblack List');
+								       } else {
+								           // Handle error response
+								           console.error("Error saving data:", xhr.statusText);
+								       }
+								   };
+								   
+								   xhr.onerror = function() {
+								       console.error("Request failed");
+								   };
+								   
+								   // Send the data object as a JSON string
+								   xhr.send(JSON.stringify(data));
+									}else{
+										//error 
+									}
+									}//eofunc
+									function submitLostOrDamage(userId,gatePassType){
+let isValid=true;
+ const comments = $("#comments").val().trim();
+																		   if (comments === "") {
+																		       $("#error-comments").show();
+																		       isValid = false;
+																		   }else{
+$("#error-comments").hide();
+																		}
+																		if(isValid){
+const data = {
+	createdBy : userId,
+	comments : $("#comments").val().trim(),
+	gatePassId : $("#gatePassId").val().trim(),
+	gatePassType : gatePassType,
+};
+	  const xhr = new XMLHttpRequest();
+																		   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+																		   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+																		   xhr.onload = function() {
+																		       if (xhr.status === 200) {
+																		           // Handle successful response
+																		           console.log("Data saved successfully:", xhr.responseText);
+	  
+	   loadCommonList('/contractworkmen/lostordamage', 'Lost or Damage List');
+																		       } else {
+																		           // Handle error response
+																		           console.error("Error saving data:", xhr.statusText);
+																		       }
+																		   };
+																		   
+																		   xhr.onerror = function() {
+																		       console.error("Request failed");
+																		   };
+																		   
+																		   // Send the data object as a JSON string
+																		   xhr.send(JSON.stringify(data));
+}else{
+	//error 
+}
+}//eofunc
+function redirectToWorkmenCancelView() {
+    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    if (selectedCheckboxes.length !== 1) {
+        alert("Please select exactly one row to view.");
+        return;
+    }
+    
+    var selectedRow = selectedCheckboxes[0].closest('tr');
+    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById("mainContent").innerHTML = xhr.responseText;
+        }
+    };
+    xhr.open("GET", "/CWFM/contractworkmen/cancelview/" + gatePassId, true);
+    xhr.send();
+}
+function redirectToWorkmenBlockView() {
+ var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+ if (selectedCheckboxes.length !== 1) {
+     alert("Please select exactly one row to view.");
+     return;
+ }
+ 
+ var selectedRow = selectedCheckboxes[0].closest('tr');
+ var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 
-		
+ var xhr = new XMLHttpRequest();
+ xhr.onreadystatechange = function() {
+     if (xhr.readyState == 4 && xhr.status == 200) {
+         document.getElementById("mainContent").innerHTML = xhr.responseText;
+     }
+ };
+ xhr.open("GET", "/CWFM/contractworkmen/blockview/" + gatePassId, true);
+ xhr.send();
+ }
+ function redirectToWorkmenUnblockView() {
+  var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+  if (selectedCheckboxes.length !== 1) {
+      alert("Please select exactly one row to view.");
+      return;
+  }
+  
+  var selectedRow = selectedCheckboxes[0].closest('tr');
+  var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          document.getElementById("mainContent").innerHTML = xhr.responseText;
+      }
+  };
+  xhr.open("GET", "/CWFM/contractworkmen/unblockview/" + gatePassId, true);
+  xhr.send();
+  }
+  function redirectToWorkmenBlackView() {
+    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    if (selectedCheckboxes.length !== 1) {
+        alert("Please select exactly one row to view.");
+        return;
+    }
+    
+    var selectedRow = selectedCheckboxes[0].closest('tr');
+    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById("mainContent").innerHTML = xhr.responseText;
+        }
+    };
+    xhr.open("GET", "/CWFM/contractworkmen/blackview/" + gatePassId, true);
+    xhr.send();
+    }
+	function redirectToWorkmenDeblackView() {
+	  var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+	  if (selectedCheckboxes.length !== 1) {
+	      alert("Please select exactly one row to view.");
+	      return;
+	  }
+	  
+	  var selectedRow = selectedCheckboxes[0].closest('tr');
+	  var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+	  var xhr = new XMLHttpRequest();
+	  xhr.onreadystatechange = function() {
+	      if (xhr.readyState == 4 && xhr.status == 200) {
+	          document.getElementById("mainContent").innerHTML = xhr.responseText;
+	      }
+	  };
+	  xhr.open("GET", "/CWFM/contractworkmen/deblackview/" + gatePassId, true);
+	  xhr.send();
+	  }
+	  function redirectToWorkmenLostView() {
+	    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+	    if (selectedCheckboxes.length !== 1) {
+	        alert("Please select exactly one row to view.");
+	        return;
+	    }
+	    
+	    var selectedRow = selectedCheckboxes[0].closest('tr');
+	    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+	    var xhr = new XMLHttpRequest();
+	    xhr.onreadystatechange = function() {
+	        if (xhr.readyState == 4 && xhr.status == 200) {
+	            document.getElementById("mainContent").innerHTML = xhr.responseText;
+	        }
+	    };
+	    xhr.open("GET", "/CWFM/contractworkmen/lostordamageview/" + gatePassId, true);
+	    xhr.send();
+	    }					

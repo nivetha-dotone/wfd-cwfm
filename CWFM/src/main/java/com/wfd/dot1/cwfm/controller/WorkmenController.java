@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -263,7 +264,7 @@ public class WorkmenController {
             docTypeSetterMap.put("Education", gatePassMain::setEducationDocName);
             docTypeSetterMap.put("Training", gatePassMain::setTrainingDocName);
             docTypeSetterMap.put("Form11", gatePassMain::setForm11DocName);
-
+            if(additionalFiles.size()>0) {
             // Set document names based on additionalFiles and documentTypes
             for (int i = 0; i < additionalFiles.size(); i++) {
                 String docType = documentTypes.get(i);
@@ -273,6 +274,7 @@ public class WorkmenController {
                         setter.accept(docType);
                     }
                 }
+            }
             }
             gatePassId = workmenService.saveGatePass(gatePassMain);
 
@@ -302,9 +304,9 @@ public class WorkmenController {
     	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
     	if(null!=user) {
     		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassListingDetails(user.getUserId());
+    			listDto= workmenService.getGatePassListingDetails(user.getUserId(),GatePassType.CREATE.getStatus());
     		}else {
-    			listDto = workmenService.getGatePassListingForApprovers(user);
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.CREATE.getStatus());
     		}
     		request.setAttribute("contractorWorkmen", listDto);
     	}
@@ -351,7 +353,7 @@ public class WorkmenController {
     		log.error("Error getting workmen details ", e);
     	}
     	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
-    	return "contractWorkmen/view";
+    		return "contractWorkmen/view";
     }
     @PostMapping("/approveRejectGatePass")
     public ResponseEntity<String> approveRejectGatePass(@RequestBody ApproveRejectGatePassDto dto,HttpServletRequest request,HttpServletResponse response) {
@@ -366,7 +368,7 @@ public class WorkmenController {
          try {
         	 result = workmenService.approveRejectGatePass(dto);
          	if(null!=result) {
-         		return new ResponseEntity<>("contractWorkmen/list",HttpStatus.OK);
+         		return new ResponseEntity<>(result,HttpStatus.OK);
          	}
          	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
          } catch (Exception e) {
@@ -450,13 +452,399 @@ public class WorkmenController {
          try {
         	 result = workmenService.gatePassAction(dto);
          	if(null!=result) {
-         		return new ResponseEntity<>("contractWorkmen/list",HttpStatus.OK);
+         		
+         		if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
+            		result="contractWorkmen/view";
+            	}else if(dto.getGatePassType().equals(GatePassType.CANCEL.getStatus()))
+            	{
+            		result="contractWorkmen/cancelView";
+            	}else if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus()))
+            	{
+            		result="contractWorkmen/blockView";
+            	}else if(dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()))
+            	{
+            		result="contractWorkmen/unblockView";
+            	}else if(dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus()))
+            	{
+            		result="contractWorkmen/blackView";
+            	}else if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()))
+            	{
+            		result="contractWorkmen/deblackView";
+            	}else if(dto.getGatePassType().equals(GatePassType.LOSTORDAMAGE.getStatus()))
+            	{
+            		result="contractWorkmen/lostView";
+            	}
+         		return new ResponseEntity<>(result,HttpStatus.OK);
          	}
          	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
          } catch (Exception e) {
              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                   .body("Error saving data: " + e.getMessage());
          } 
+    }
+    
+    @GetMapping("/blockList")
+    public String blockList(HttpServletRequest request,HttpServletResponse response) {
+    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+    	if(null!=user) {
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			listDto= workmenService.getGatePassActionListingDetails(user.getUserId(),GatePassType.BLOCK.getStatus(),GatePassType.CREATE.getStatus());
+    		}else {
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.BLOCK.getStatus());
+    		}
+    		request.setAttribute("contractorWorkmen", listDto);
+    	}
+    	 
+    	return "contractWorkmen/blockListing";
+    }
+    
+    @GetMapping("/unblockList")
+    public String unblockList(HttpServletRequest request,HttpServletResponse response) {
+    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+    	if(null!=user) {
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			listDto= workmenService.getGatePassActionListingDetails(user.getUserId(),GatePassType.UNBLOCK.getStatus(),
+    					GatePassType.BLOCK.getStatus());
+    		}else {
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.UNBLOCK.getStatus());
+    		}
+    		request.setAttribute("contractorWorkmen", listDto);
+    	}
+    	 
+    	return "contractWorkmen/unblockListing";
+    }
+    
+    @GetMapping("/blackList")
+    public String blackList(HttpServletRequest request,HttpServletResponse response) {
+    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+    	if(null!=user) {
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			listDto= workmenService.getGatePassActionListingDetails(user.getUserId(),GatePassType.BLACKLIST.getStatus(),GatePassType.CREATE.getStatus());
+    		}else {
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.BLACKLIST.getStatus());
+    		}
+    		request.setAttribute("contractorWorkmen", listDto);
+    	}
+    	 
+    	return "contractWorkmen/blackListing";
+    }
+    
+    @GetMapping("/deblackList")
+    public String deblackList(HttpServletRequest request,HttpServletResponse response) {
+    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+    	if(null!=user) {
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			listDto= workmenService.getGatePassActionListingDetails(user.getUserId(),GatePassType.DEBLACKLIST.getStatus(),
+    					GatePassType.BLACKLIST.getStatus());
+    		}else {
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.DEBLACKLIST.getStatus());
+    		}
+    		request.setAttribute("contractorWorkmen", listDto);
+    	}
+    	 
+    	return "contractWorkmen/deblackListing";
+    }
+    
+    @GetMapping("/cancel")
+    public String cancel(HttpServletRequest request,HttpServletResponse response) {
+    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+    	if(null!=user) {
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			listDto= workmenService.getGatePassActionListingDetails(user.getUserId(),GatePassType.CANCEL.getStatus(),GatePassType.CREATE.getStatus());
+    		}else {
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.CANCEL.getStatus());
+    		}
+    		request.setAttribute("contractorWorkmen", listDto);
+    	}
+    	 
+    	return "contractWorkmen/cancelListing";
+    }
+    
+    @GetMapping("/lostordamage")
+    public String lostordamage(HttpServletRequest request,HttpServletResponse response) {
+    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+    	if(null!=user) {
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			listDto= workmenService.getGatePassActionListingDetails(user.getUserId(),GatePassType.LOSTORDAMAGE.getStatus(),GatePassType.CREATE.getStatus());
+    		}else {
+    			listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.LOSTORDAMAGE.getStatus());
+    		}
+    		request.setAttribute("contractorWorkmen", listDto);
+    	}
+    	 
+    	return "contractWorkmen/lostListing";
+    }
+    
+    @GetMapping("/cancelview/{gatePassId}")
+    public String cancelviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	
+    		return "contractWorkmen/cancelView";
+    	
+    }
+    @GetMapping("/blockview/{gatePassId}")
+    public String blockviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	
+    		return "contractWorkmen/blockView";
+    	
+    }
+    @GetMapping("/unblockview/{gatePassId}")
+    public String unblockviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	
+    		return "contractWorkmen/unblockView";
+    	
+    }
+    @GetMapping("/blackview/{gatePassId}")
+    public String blackviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	
+    		return "contractWorkmen/blackView";
+    	
+    }
+    
+    @GetMapping("/deblackview/{gatePassId}")
+    public String deblackviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	
+    		return "contractWorkmen/deblackView";
+    	
+    }
+    @GetMapping("/lostordamageview/{gatePassId}")
+    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	
+    		return "contractWorkmen/lostView";
+    	
     }
     
 }

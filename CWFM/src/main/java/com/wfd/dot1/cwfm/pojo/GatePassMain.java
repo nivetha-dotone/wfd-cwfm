@@ -419,4 +419,12 @@ public class GatePassMain {
 	public void setOtherDocName(String otherDocName) {
 		this.otherDocName = otherDocName;
 	}
+	
+	private String unitId;
+	public String getUnitId() {
+		return unitId;
+	}
+	public void setUnitId(String unitId) {
+		this.unitId = unitId;
+	}
 }

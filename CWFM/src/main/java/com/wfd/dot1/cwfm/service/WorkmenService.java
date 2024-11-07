@@ -3,6 +3,7 @@ package com.wfd.dot1.cwfm.service;
 import java.util.List;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -38,14 +39,19 @@ public interface WorkmenService {
 
 	public String saveGatePass(GatePassMain gatePassMain);
 
-	public List<GatePassListingDto> getGatePassListingDetails(String userId);
+	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId);
 
-	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser userId);
+	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser userId,String gatePassTypeId);
 
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId);
 
 	public List<CmsGeneralMaster> getAllGeneralMasterForGatePass(GatePassMain gatePassMainObj);
 
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto);
+
+	public String gatePassAction(GatePassActionDto dto);
+	
+	public List<GatePassListingDto> getGatePassActionListingDetails(String userId,String gatePassTypeId,String previousGatePassAction);
+
 
 }	

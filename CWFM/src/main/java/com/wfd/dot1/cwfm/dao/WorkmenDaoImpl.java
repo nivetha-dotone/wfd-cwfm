@@ -16,10 +16,11 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
-import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -311,11 +312,11 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassListingDetails(String userId) {
+	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId) {
 		log.info("Entering into getGatePassListingDetails dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		log.info("Query to getGatePassListingDetails "+WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_CREATOR);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_CREATOR,userId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_CREATOR,userId,gatePassTypeId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -328,6 +329,23 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setContractorName(rs.getString("ContractorName"));
 			dto.setVendorCode(rs.getString("VendorCode"));
 			dto.setUnitName(rs.getString("UnitName"));
+			String gatePassType = rs.getString("GatePassTypeId");
+			if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+				dto.setGatePassType("Create");
+			}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+				dto.setGatePassType("Block");
+			}
+			else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+				dto.setGatePassType("Unblock");
+			}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+				dto.setGatePassType("Blacklist");
+			}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+				dto.setGatePassType("Deblacklist");
+			}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+				dto.setGatePassType("Cancel");
+			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+				dto.setGatePassType("Lost/Damage");
+			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
 				dto.setStatus("Approval Pending");
@@ -345,16 +363,16 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType) {
+	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId) {
 		log.info("Entering into getGatePassListingForApprovers dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		SqlRowSet rs =null;
 		if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 			log.info("Query to getGatePassListingForApprovers "+WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER);
-			 rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER,userId,userId);
+			 rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER,userId,gatePassTypeId,gatePassTypeId,gatePassTypeId,userId,gatePassTypeId);
 		}else {
 			log.info("Query to getGatePassListingForApprovers "+WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER);
-			 rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER,userId,userId);
+			 rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER,userId,gatePassTypeId,userId,gatePassTypeId,gatePassTypeId);
 		}
 		
 		while(rs.next()) {
@@ -369,6 +387,23 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setContractorName(rs.getString("ContractorName"));
 			dto.setVendorCode(rs.getString("VendorCode"));
 			dto.setUnitName(rs.getString("UnitName"));
+			String gatePassType = rs.getString("GatePassTypeId");
+			if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+				dto.setGatePassType("Create");
+			}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+				dto.setGatePassType("Block");
+			}
+			else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+				dto.setGatePassType("Unblock");
+			}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+				dto.setGatePassType("Blacklist");
+			}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+				dto.setGatePassType("Deblacklist");
+			}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+				dto.setGatePassType("Cancel");
+			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+				dto.setGatePassType("Lost/Damage");
+			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
 				dto.setStatus("Approval Pending");
@@ -394,6 +429,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		if(rs.next()) {
 			dto = new GatePassMain();
 			dto.setGatePassId(rs.getString("GatePassId"));
+			dto.setUnitId(rs.getString("peId"));
 			dto.setGatePassAction(rs.getString("GatePassTypeId"));
 			dto.setGatePassStatus(rs.getString("GatePassStatus"));
 			dto.setAadhaarNumber(rs.getString("AadharNumber"));
@@ -512,7 +548,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 				ps.setString(2, approverList.get(i).getRoleName());
 				ps.setString(3, approverList.get(i).getUserId());
 				ps.setInt(4, approverList.get(i).getIndex());
-				ps.setInt(5,1);
+				ps.setInt(5,Integer.parseInt(approverList.get(i).getStatus()));
 				ps.setString(6,createdBy);
 				
 			}
@@ -528,7 +564,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		 String result = null; 
 
 
-		        Object[] parameters = new Object[] {dto.getGatePassId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments()}; 
+		        Object[] parameters = new Object[] {dto.getGatePassId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),Integer.parseInt(dto.getGatePassType())}; 
 
 		        try {
 		            int status = jdbcTemplate.update(WorkmenQueryBank.SAVE_GATEPASS_APPROVAL_STATUS, parameters);
@@ -570,17 +606,139 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		}
 		return res;
 	}
+	
+	@Override
+	public synchronized boolean updateGatePassMainStatusAndType(String gatePassId, String status,String gatePassType) {
+		boolean res=false;
+		Object[] object=new Object[]{status,gatePassType,gatePassId};
+		int i = jdbcTemplate.update(WorkmenQueryBank.UPDATE_GATEPASSMAIN_STATUS_TYPE,object);
+		if(i>0){
+			res=true;
+		}
+		return res;
+	}
 
 	@Override
-	public boolean isLastApprover(String gatePassId, String approverId) {
+	public boolean isLastApprover(String gatePassId, String approverId,String gatePassType) {
 		boolean status=false;
-		Object[] object = new Object[]{gatePassId,approverId};
+		Object[] object = new Object[]{gatePassId,approverId,gatePassType,gatePassType};
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.LAST_APPROVER,object);
 		if(rs.next()){
 			status = true;
 		}
 		log.info("exit from isLastApprover method = "+status);
 		return status; 
+	}
+
+	@Override
+	public String gatePassAction(GatePassActionDto dto) {
+		 String result = null; 
+
+
+	        Object[] parameters = new Object[] {dto.getGatePassType(),dto.getGatePassStatus(),dto.getCreatedBy(),dto.getComments(),dto.getGatePassId()}; 
+ 
+	        try {
+	            int status = jdbcTemplate.update(WorkmenQueryBank.UPDATE_GATE_PASS_ACTION, parameters);
+	            if (status > 0) {
+	                log.info("GatePass action created successfully for GatePassId: " + dto.getGatePassId());
+	                result="GatePass action created successfully";
+	            } else {
+	                log.warn("Failed to create GatePass action for GatePassId: " + dto.getGatePassId());
+	            }
+	        } catch (Exception e) {
+	            log.error("Error creating GatePass action for GatePassId: " + dto.getGatePassId(), e);
+	            return null;
+	        }
+	    
+
+	    return result;
+	}
+
+	@Override
+	public void saveGatePassStatusLog(GatePassStatusLogDto dto) {
+		log.info("Entered into saveGatePassStatusLog for gatePassId: "+dto.getGatePassId() );
+
+        Object[] parameters = new Object[] {dto.getGatePassId(),dto.getGatePassType(),dto.getStatus(),dto.getComments(),dto.getUpdatedBy()};
+
+        try {
+            int result = jdbcTemplate.update(WorkmenQueryBank.SAVE_GATEPASS_STATUSLOG,parameters );
+            if (result > 0) {
+                log.info("GatePass status log saved successfully for GatePassId: " + dto.getGatePassId());
+            } else {
+                log.warn("Failed to save GatePass status log for GatePassId: " + dto.getGatePassId());
+            }
+        } catch (Exception e) {
+            log.error("Error saving GatePass status log for GatePassId: " + dto.getGatePassId(), e);
+        }
+		log.info("Exiting from saveGatePassStatusLog for gatePassId: "+dto.getGatePassId() );
+	}
+
+	@Override
+	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction) {
+		log.info("Entering into getGatePassListingDetails dao method ");
+		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
+		log.info("Query to getGatePassListingDetails "+WorkmenQueryBank.GET_ALL_GATE_PASS_ACTION_FOR_CREATOR);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_ACTION_FOR_CREATOR,userId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+		while(rs.next()) {
+			GatePassListingDto dto = new GatePassListingDto();
+			dto.setTransactionId(rs.getString("TransactionId"));
+			dto.setGatePassId((rs.getString("GatePassId")));
+			dto.setFirstName(rs.getString("firstName"));
+			dto.setLastName(rs.getString("lastName"));
+			dto.setGender(rs.getString("GMNAME"));
+			dto.setDateOfBirth(rs.getString("DOB"));
+			dto.setAadhaarNumber(rs.getString("AadharNumber"));
+			dto.setContractorName(rs.getString("ContractorName"));
+			dto.setVendorCode(rs.getString("VendorCode"));
+			dto.setUnitName(rs.getString("UnitName"));
+			String gatePassType = rs.getString("GatePassTypeId");
+			if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+				dto.setGatePassType("Create");
+			}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+				dto.setGatePassType("Block");
+			}
+			else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+				dto.setGatePassType("Unblock");
+			}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+				dto.setGatePassType("Blacklist");
+			}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+				dto.setGatePassType("Deblacklist");
+			}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+				dto.setGatePassType("Cancel");
+			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+				dto.setGatePassType("Lost/Damage");
+			}
+			String status =rs.getString("GatePassStatus");
+			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+				dto.setStatus("Approval Pending");
+			}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+				dto.setStatus("Approved");
+			}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+				dto.setStatus("Rejected");
+			}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+				dto.setStatus("Draft");
+			}
+			listDto.add(dto);
+		}
+		log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
+		return listDto;
+	}
+	
+	@Override
+	public List<MasterUser> getApproversForGatePassAction(String createdBy,String gatepassAction) {
+		log.info("Entering into getApproversForGatePass dao method ");
+		List<MasterUser> approverList= new ArrayList<MasterUser>();
+		log.info("Query to getApproversForGatePass "+WorkmenQueryBank.GET_APPROVERS_FOR_GATE_PASS_ACTION);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVERS_FOR_GATE_PASS_ACTION,createdBy,gatepassAction);
+		while(rs.next()) {
+			MasterUser mu = new MasterUser();
+			mu.setUserId(rs.getString("UserId"));
+			mu.setFullName(rs.getString("FullName"));
+			mu.setRoleName(rs.getString("RoleName"));
+			approverList.add(mu);
+		}
+		log.info("Exiting from getApproversForGatePass dao method "+approverList.size());
+		return approverList;
 	}
 
 }

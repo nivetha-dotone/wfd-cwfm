@@ -5,7 +5,7 @@
 <head>
  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aadhar based Workmen on-boarding List</title>
+    <title>Black List</title>
       <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
@@ -17,7 +17,6 @@
     body {
         background-color: #FFFFFF; /* White background for the page */
         font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
-           overflow-y: scroll; /* Adds a vertical scroll bar */
     }
 
     .action-bar {
@@ -155,8 +154,7 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
     </form>
     <div>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenBlackView()">View</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
     </div>
 </div>
@@ -211,8 +209,10 @@
                     <th class="header-text"  onclick="sortTable(7)">Contractor Name<span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(8)">Vendor Code<span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(9)">Unit Name<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-                     <th class="header-text"  onclick="sortTable(9)">GatePass Type<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-                    <th class="header-text"  onclick="sortTable(10)">Status<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+					<th class="header-text"  onclick="sortTable(10)">GatePass Type<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+<th class="header-text"  onclick="sortTable(11)">Status<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+					
+
             </tr>
         </thead>
         <tbody>
@@ -229,7 +229,8 @@
                     <td style="border: 1px solid black;">${wo.contractorName}</td>
                     <td style="border: 1px solid black;">${wo.vendorCode}</td>
                     <td style="border: 1px solid black;">${wo.unitName}</td> 
-                     <td style="border: 1px solid black;">${wo.gatePassType}</td>
+                    
+<td style="border: 1px solid black;">${wo.gatePassType}</td> 
                     <td style="border: 1px solid black;">${wo.status}</td>
                     <%--<td style="border: 1px solid black;">${principalEmployer.NAME}</td>
                     <td style="border: 1px solid black;">${wo.status}</td> --%>
