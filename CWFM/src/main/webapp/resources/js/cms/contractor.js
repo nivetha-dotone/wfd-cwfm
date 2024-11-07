@@ -33,11 +33,11 @@
 			            tableBody.empty();
 			            if (response.length > 0) {
 			                $.each(response, function(index, contr) {
-			                    var row = '<tr>' +
-										'<td ><input type="checkbox" name="selectedContractorIds" value="' + contr.contractorId + '"></td>'+
-			                              '<td>' + contr.contractorCode + '</td>' +
-			                              '<td>' + contr.contractorName + '</td>' +
-										  '<td>' + contr.contractorAddress + '</td>' +				                             
+			                    var row = '<tr style="border: 1px solid black;">' +
+										'<td style="border: 1px solid black;"><input type="checkbox" name="selectedContractorIds" value="' + contr.contractorId + '"></td>'+
+			                              '<td style="border: 1px solid black;">' + contr.contractorCode + '</td>' +
+			                              '<td style="border: 1px solid black;">' + contr.contractorName + '</td>' +
+										  '<td style="border: 1px solid black;">' + contr.contractorAddress + '</td>' +				                             
 			                              '</tr>';
 			                    tableBody.append(row);
 			                });

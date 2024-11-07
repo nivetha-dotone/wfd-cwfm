@@ -74,4 +74,6 @@ public interface WorkmenDao {
 
 	boolean updateGatePassMainStatusAndType(String gatePassId, String status, String gatePassType);
 
+	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId);
+
 }

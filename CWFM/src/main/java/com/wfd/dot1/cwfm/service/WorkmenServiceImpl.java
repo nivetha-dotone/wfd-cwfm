@@ -286,6 +286,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction) {
 		return workmenDao.getGatePassActionListingDetails(userId,gatePassTypeId,previousGatePassAction);
 	}
+	@Override
+	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId) {
+		// TODO Auto-generated method stub
+		return workmenDao.getWorkmenDetailBasedOnId(gatePassId);
+	}
 	
 
 }

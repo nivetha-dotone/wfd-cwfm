@@ -1153,10 +1153,10 @@ if(isValid){
 			function submitBlack(userId,gatePassType){
 							let isValid=true;
 							 const comments = $("#comments").val().trim();
-						   if (comments === "") {
-						       $("#error-comments").show();
-						       isValid = false;
-						   }else{
+if (comments === "") {
+    $("#error-comments").show();
+    isValid = false;
+}else{
 							$("#error-comments").hide();
 						}
 						if(isValid){
@@ -1167,26 +1167,26 @@ if(isValid){
 								gatePassType : gatePassType,
 							};
 								  const xhr = new XMLHttpRequest();
-						   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-						   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-						   xhr.onload = function() {
-						       if (xhr.status === 200) {
-						           // Handle successful response
-						           console.log("Data saved successfully:", xhr.responseText);
+xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+xhr.onload = function() {
+    if (xhr.status === 200) {
+        // Handle successful response
+        console.log("Data saved successfully:", xhr.responseText);
 								  
-						         loadCommonList('/contractworkmen/blackList', 'Black List');
-						       } else {
-						           // Handle error response
-						           console.error("Error saving data:", xhr.statusText);
-						       }
-						   };
-						   
-						   xhr.onerror = function() {
-						       console.error("Request failed");
-						   };
-						   
-						   // Send the data object as a JSON string
-						   xhr.send(JSON.stringify(data));
+      loadCommonList('/contractworkmen/blackList', 'Black List');
+    } else {
+        // Handle error response
+        console.error("Error saving data:", xhr.statusText);
+    }
+};
+
+xhr.onerror = function() {
+    console.error("Request failed");
+};
+
+// Send the data object as a JSON string
+xhr.send(JSON.stringify(data));
 							}else{
 								//error 
 							}
@@ -1236,10 +1236,10 @@ if(isValid){
 						function submitDeblack(userId,gatePassType){
 										let isValid=true;
 										 const comments = $("#comments").val().trim();
-									   if (comments === "") {
-									       $("#error-comments").show();
-									       isValid = false;
-									   }else{
+			if (comments === "") {
+			    $("#error-comments").show();
+			    isValid = false;
+			}else{
 										$("#error-comments").hide();
 									}
 									if(isValid){
@@ -1250,26 +1250,26 @@ if(isValid){
 											gatePassType : gatePassType,
 										};
 											  const xhr = new XMLHttpRequest();
-									   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-									   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-									   xhr.onload = function() {
-									       if (xhr.status === 200) {
-									           // Handle successful response
-									           console.log("Data saved successfully:", xhr.responseText);
+			xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+			xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+			xhr.onload = function() {
+			    if (xhr.status === 200) {
+			        // Handle successful response
+			        console.log("Data saved successfully:", xhr.responseText);
 											  
-									         loadCommonList('/contractworkmen/deblackList', 'Deblack List');
-									       } else {
-									           // Handle error response
-									           console.error("Error saving data:", xhr.statusText);
-									       }
-									   };
-									   
-									   xhr.onerror = function() {
-									       console.error("Request failed");
-									   };
-									   
-									   // Send the data object as a JSON string
-									   xhr.send(JSON.stringify(data));
+			      loadCommonList('/contractworkmen/deblackList', 'Deblack List');
+			    } else {
+			        // Handle error response
+			        console.error("Error saving data:", xhr.statusText);
+			    }
+			};
+			
+			xhr.onerror = function() {
+			    console.error("Request failed");
+			};
+			
+			// Send the data object as a JSON string
+			xhr.send(JSON.stringify(data));
 										}else{
 											//error 
 										}
@@ -1277,10 +1277,10 @@ if(isValid){
 						function approveRejectDeblacklist(status,gatePassType){
 									let isValid=true;
 									 const approvercomments = $("#approvercomments").val().trim();
-								   if (approvercomments === "") {
-								       $("#error-approvercomments").show();
-								       isValid = false;
-								   }else{
+		if (approvercomments === "") {
+		    $("#error-approvercomments").show();
+		    isValid = false;
+		}else{
 									$("#error-approvercomments").hide();
 								}
 								if(isValid){
@@ -1293,25 +1293,25 @@ if(isValid){
 										gatePassType : gatePassType,
 									};
 										  const xhr = new XMLHttpRequest();
-								   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
-								   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-								   xhr.onload = function() {
-								       if (xhr.status === 200) {
-								           // Handle successful response
-								           console.log("Data saved successfully:", xhr.responseText);
-								         loadCommonList('/contractworkmen/deblackList', 'Deblack List');
-								       } else {
-								           // Handle error response
-								           console.error("Error saving data:", xhr.statusText);
-								       }
-								   };
-								   
-								   xhr.onerror = function() {
-								       console.error("Request failed");
-								   };
-								   
-								   // Send the data object as a JSON string
-								   xhr.send(JSON.stringify(data));
+		xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
+		xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+		xhr.onload = function() {
+		    if (xhr.status === 200) {
+		        // Handle successful response
+		        console.log("Data saved successfully:", xhr.responseText);
+		      loadCommonList('/contractworkmen/deblackList', 'Deblack List');
+		    } else {
+		        // Handle error response
+		        console.error("Error saving data:", xhr.statusText);
+		    }
+		};
+		
+		xhr.onerror = function() {
+		    console.error("Request failed");
+		};
+		
+		// Send the data object as a JSON string
+		xhr.send(JSON.stringify(data));
 									}else{
 										//error 
 									}
@@ -1319,10 +1319,10 @@ if(isValid){
 									function submitLostOrDamage(userId,gatePassType){
 let isValid=true;
  const comments = $("#comments").val().trim();
-																		   if (comments === "") {
-																		       $("#error-comments").show();
-																		       isValid = false;
-																		   }else{
+												if (comments === "") {
+												    $("#error-comments").show();
+												    isValid = false;
+												}else{
 $("#error-comments").hide();
 																		}
 																		if(isValid){
@@ -1333,26 +1333,26 @@ const data = {
 	gatePassType : gatePassType,
 };
 	  const xhr = new XMLHttpRequest();
-																		   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-																		   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-																		   xhr.onload = function() {
-																		       if (xhr.status === 200) {
-																		           // Handle successful response
-																		           console.log("Data saved successfully:", xhr.responseText);
+												xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+												xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+												xhr.onload = function() {
+												    if (xhr.status === 200) {
+												        // Handle successful response
+												        console.log("Data saved successfully:", xhr.responseText);
 	  
 	   loadCommonList('/contractworkmen/lostordamage', 'Lost or Damage List');
-																		       } else {
-																		           // Handle error response
-																		           console.error("Error saving data:", xhr.statusText);
-																		       }
-																		   };
-																		   
-																		   xhr.onerror = function() {
-																		       console.error("Request failed");
-																		   };
-																		   
-																		   // Send the data object as a JSON string
-																		   xhr.send(JSON.stringify(data));
+												    } else {
+												        // Handle error response
+												        console.error("Error saving data:", xhr.statusText);
+												    }
+												};
+												
+												xhr.onerror = function() {
+												    console.error("Request failed");
+												};
+												
+												// Send the data object as a JSON string
+												xhr.send(JSON.stringify(data));
 }else{
 	//error 
 }
@@ -1470,4 +1470,43 @@ function redirectToWorkmenBlockView() {
 	    };
 	    xhr.open("GET", "/CWFM/contractworkmen/lostordamageview/" + gatePassId, true);
 	    xhr.send();
-	    }					
+	    }	
+function searchWorkmenWithGatePassId(){
+ var gatePassId = $('#searchInput').val();
+
+ $.ajax({
+     url: '/CWFM/contractworkmen/getWorkmenDetailBasedOnId',
+     type: 'POST',
+     data: {
+         gatePassId: gatePassId
+     },
+     success: function(response) {
+         var tableBody = $('#workmenTable tbody');
+         tableBody.empty();
+									if (response.length > 0) {
+						             $.each(response, function(index, wo) {
+						                 var row = '<tr style="border: 1px solid black;">' +
+																			'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+						                           '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+						                           '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																			  '<td style="border: 1px solid black;">'+ wo.lastName + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.vendorCode + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.unitName + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																			  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+						                           '</tr>';
+						                 tableBody.append(row);
+						             });
+         } else {
+             tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+         }
+     },
+     error: function(xhr, status, error) {
+         console.error("Error fetching data:", error);
+     }
+ });
+						}		

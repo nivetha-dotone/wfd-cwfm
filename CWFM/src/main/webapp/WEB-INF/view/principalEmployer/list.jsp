@@ -210,7 +210,7 @@ alert(1);
             </thead>
             <tbody>
              <c:forEach items="${cmSPRINCIPALEMPLOYERs}" var="cmSPRINCIPALEMPLOYER">
-                <tr>
+                <tr style="border: 1px solid black;">
                  <td ><input type="checkbox" name="selectedUnitIds" value="${cmSPRINCIPALEMPLOYER.unitId}"></td>
                     <%-- <td >${cmSPRINCIPALEMPLOYER.UNITID}</td> --%>
                     <td >${cmSPRINCIPALEMPLOYER.name}</td>

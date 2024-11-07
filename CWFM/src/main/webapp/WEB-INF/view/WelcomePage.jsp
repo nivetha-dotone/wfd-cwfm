@@ -631,7 +631,7 @@ table th {
     <!-- Top Navigation Bar -->
     <div class="top-nav">
     
-        <img src="resources/img/Adani_2012_logo.png" alt="Company Logo" class="logo">
+        <!-- <img src="resources/img/Adani_2012_logo.png" alt="Company Logo" class="logo"> -->
         <div class="heading">Contract Labor Management System</div>
          <div class="dropdown">
              <span class="initials-icon"><c:out value="${sessionScope.userInitials}" /></span> <span><c:out value="${sessionScope.loginuser.firstName}" /><c:out value="${sessionScope.loginuser.lastName}" /></span>
@@ -658,7 +658,7 @@ table th {
         <li><a href="#" onclick="loadCommonList('/contractor/list','Contractor')">Contractor</a></li>
         <li><a href="#" onclick="loadCommonList('/workorders/list', 'Work Order')">Work Order</a></li>
        <!--  <li><a href="#" onclick="loadCommonList('/minimumWage/list', 'Minimum Wage Master')">Minimum Wage Master</a></li> -->
-        <li><a href="#" onclick="loadCommonList('/workmenDetail.jsp', 'Contract Workmen')">Contract Workmen</a></li>
+        <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'Contract Workmen List')">Contract Workmen</a></li>
         <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->
     </ul>
 </li>

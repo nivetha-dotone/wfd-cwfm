@@ -743,5 +743,56 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("Exiting from getApproversForGatePass dao method "+approverList.size());
 		return approverList;
 	}
+	
+	@Override
+	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId) {
+		log.info("Entering into getWorkmenDetailBasedOnId dao method ");
+		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
+		log.info("Query to getWorkmenDetailBasedOnId "+WorkmenQueryBank.GET_GATE_PASS_BY_ID);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_GATE_PASS_BY_ID,gatePassId);
+		while(rs.next()) {
+			GatePassListingDto dto = new GatePassListingDto();
+			dto.setTransactionId(rs.getString("TransactionId"));
+			dto.setGatePassId((rs.getString("GatePassId")));
+			dto.setFirstName(rs.getString("firstName"));
+			dto.setLastName(rs.getString("lastName"));
+			dto.setGender(rs.getString("GMNAME"));
+			dto.setDateOfBirth(rs.getString("DOB"));
+			dto.setAadhaarNumber(rs.getString("AadharNumber"));
+			dto.setContractorName(rs.getString("ContractorName"));
+			dto.setVendorCode(rs.getString("VendorCode"));
+			dto.setUnitName(rs.getString("UnitName"));
+			String gatePassType = rs.getString("GatePassTypeId");
+			if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+				dto.setGatePassType("Create");
+			}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+				dto.setGatePassType("Block");
+			}
+			else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+				dto.setGatePassType("Unblock");
+			}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+				dto.setGatePassType("Blacklist");
+			}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+				dto.setGatePassType("Deblacklist");
+			}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+				dto.setGatePassType("Cancel");
+			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+				dto.setGatePassType("Lost/Damage");
+			}
+			String status =rs.getString("GatePassStatus");
+			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+				dto.setStatus("Approval Pending");
+			}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+				dto.setStatus("Approved");
+			}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+				dto.setStatus("Rejected");
+			}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+				dto.setStatus("Draft");
+			}
+			listDto.add(dto);
+		}
+		log.info("Exiting from getWorkmenDetailBasedOnId dao method "+listDto.size());
+		return listDto;
+	}
 
 }

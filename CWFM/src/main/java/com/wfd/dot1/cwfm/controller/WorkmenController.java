@@ -314,6 +314,27 @@ public class WorkmenController {
     	return "contractWorkmen/quickOBList";
     }
     
+    @PostMapping("/getWorkmenDetailBasedOnId")
+	public ResponseEntity<List<GatePassListingDto>> getWorkmenDetailBasedOnId(
+            @RequestParam(value = "gatePassId", required = false) String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+        try {
+        	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+            MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+        
+        	  // Sample data (replace with your database queries)
+	        List<GatePassListingDto> listDto = workmenService.getWorkmenDetailBasedOnId(gatePassId);
+	        
+	        
+
+            if (listDto.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(listDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+ }
+    
     @GetMapping("/view/{gatePassId}")
     public String viewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);

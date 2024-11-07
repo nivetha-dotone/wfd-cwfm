@@ -151,8 +151,8 @@
 <body>
 <div class="page-header">
     <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
     </form>
     <div>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
@@ -195,7 +195,7 @@
 </form> --%>
      <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
                          <div class="table-container">
-    <table id="principalEmployerTable"  cellspacing="0" cellpadding="0">
+    <table id="workmenTable"  cellspacing="0" cellpadding="0">
         <thead>
 <tr>
                     <td style="border: 1px solid black;">

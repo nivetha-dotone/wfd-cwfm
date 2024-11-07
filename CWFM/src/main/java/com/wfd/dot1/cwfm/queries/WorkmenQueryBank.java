@@ -71,6 +71,16 @@ public interface WorkmenQueryBank {
 	 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT)"
 	 		+ " where gpm.UpdatedBy=? and gpm.GatePassTypeId=?";
 	 
+	 String GET_GATE_PASS_BY_ID = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
+		 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
+		 		+ " gpm.ContractorId as VendorCode,cpe.NAME as UnitName,gpm.GatePassStatus "
+		 		+ " from GATEPASSMAIN gpm "
+		 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
+		 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=gpm.UnitId "
+		 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT)"
+		 		+ " where gpm.GatePassId=?";
+	 
+	 
 	 String GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
 		 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
 		 		+ " gpm.ContractorId as VendorCode,cpe.NAME as UnitName,gpm.GatePassStatus "
