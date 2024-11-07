@@ -37,7 +37,7 @@ function redirectToWOView() {
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
     
-    var unitId = selectedRow.querySelector('[name="selectedWOs"]').value;
+    var unitId = selectedRow.querySelector('[name="selectedWorkorderIds"]').value;
     
     // Construct the URL with unit ID, principal employer ID, and contractor ID as query parameters
     var url = "/CWFM/workorders/view/" + unitId + "?principalEmployerId=" + principalEmployerId + "&contractorId=" + contractorId;
@@ -117,5 +117,82 @@ function searchWithPEContractorInWO(contextPath) {
             document.body.appendChild(link);
             link.click();
         }
+		
+		function searchWorkordersBasedOnPEAndContr() {
+					    var principalEmployerId = $('#principalEmployerId').val();
+					    var contractorId = $("#contractorId").val();
+
+					    $.ajax({
+					        url: '/CWFM/workorders/getAllWorkordersBasedOnPEAndContractor',
+					        type: 'POST',
+					        data: {
+					            principalEmployerId: principalEmployerId,
+								contractorId:contractorId
+					        },
+					        success: function(response) {
+					            var tableBody = $('#workorderTable tbody');
+					            tableBody.empty();
+								if (response.woList && response.woList.length > 0) {
+								               $.each(response.woList, function(index, wo) {
+								                   var row = '<tr>' +
+								                       '<td><input type="checkbox" name="selectedWorkorderIds" value="' + wo.workorderId + '"></td>' +
+													   '<td>' + wo.workorderId + '</td>' +
+													   '<td>' + wo.sapWorkorderNumber + '</td>' +
+								                       '<td>' + wo.typeId + '</td>' +
+								                       '<td>' + wo.secId + '</td>' +
+								                       '<td>' + wo.validFrom + '</td>' +
+								                       '<td>' + wo.validTo + '</td>' +
+								                       '<td>' + response.contractor.contractorName + '</td>' +
+													   '<td>' + response.contractor.contractorCode + '</td>' +
+								                       '<td>' + response.principalEmployer.name + '</td>' +
+								                       '<td>' + wo.status + '</td>' +
+								                     
+								                       '</tr>';
+								                   tableBody.append(row);
+								               });
+					            } else {
+					                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+					            }
+					        },
+					        error: function(xhr, status, error) {
+					            console.error("Error fetching data:", error);
+					        }
+					    });
+					}
         
- 
+					function getContractorsForWorkorder(unitId, userId) {
+					    var xhr = new XMLHttpRequest();
+					    var url = contextPath + "/contractworkmen/getAllContractors?unitId=" + unitId + "&userId=" + userId;
+					    //alert("URL: " + url);
+					    xhr.open("GET", url, true);
+
+					    xhr.onload = function() {
+					        if (xhr.status === 200) {
+					            // Parse the response as a JSON array of contractor objects
+					            var contractors = JSON.parse(xhr.responseText);
+					            console.log("Response:", contractors);
+					            
+					            // Find the contractor select element
+					            var contractorSelect = document.getElementById("contractorId");
+					            
+					            // Clear existing options
+					            contractorSelect.innerHTML = '<option value="">Please select Contractor</option>';
+					            
+					            // Populate the dropdown with the new list of contractors
+					            contractors.forEach(function(contractor) {
+					                var option = document.createElement("option");
+					                option.value = contractor.contractorId;
+					                option.text = contractor.contractorName;
+					                contractorSelect.appendChild(option);
+					            });
+					        } else {
+					            console.error("Error:", xhr.statusText);
+					        }
+					    };
+
+					    xhr.onerror = function() {
+					        console.error("Request failed");
+					    };
+
+					    xhr.send();
+					}

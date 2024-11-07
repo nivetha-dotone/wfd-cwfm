@@ -10,6 +10,50 @@ public class Workorder {
 	private String validTo;
 	private String sapWorkorderNumber;
 	private String eicNumber;
+	
+	private String typeId;
+	private String depId;
+	private String secId;
+	private String status;
+	private String glCode;
+	private String costCenter;
+	
+	public String getCostCenter() {
+		return costCenter;
+	}
+	public void setCostCenter(String costCenter) {
+		this.costCenter = costCenter;
+	}
+	public String getGlCode() {
+		return glCode;
+	}
+	public void setGlCode(String glCode) {
+		this.glCode = glCode;
+	}
+	public String getTypeId() {
+		return typeId;
+	}
+	public void setTypeId(String typeId) {
+		this.typeId = typeId;
+	}
+	public String getDepId() {
+		return depId;
+	}
+	public void setDepId(String depId) {
+		this.depId = depId;
+	}
+	public String getSecId() {
+		return secId;
+	}
+	public void setSecId(String secId) {
+		this.secId = secId;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public String getWorkorderId() {
 		return workorderId;
 	}

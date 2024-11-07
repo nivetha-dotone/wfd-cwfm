@@ -67,6 +67,9 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			Contractor cont = new Contractor();
 			cont.setContractorId(rs.getString("contractorid"));
 			cont.setContractorName(rs.getString("contractorname"));
+			cont.setUnitId(unitId);
+			cont.setContractorCode(rs.getString("contractorcode"));
+			cont.setContractorAddress(rs.getString("contractoraddress"));
 			contList.add(cont);
 		}
 		log.info("Exiting from getAllContractorBasedOnPE dao method "+contList.size());

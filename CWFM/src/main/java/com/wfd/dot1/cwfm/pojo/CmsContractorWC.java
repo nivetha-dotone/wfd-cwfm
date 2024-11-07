@@ -11,6 +11,97 @@ public class CmsContractorWC {
 	private String unitId;
 	
 	private int wcTotal;
+	
+	 private Integer natureOfId;
+	    private String wcFromDtm;
+	    private String wcToDtm;
+	    private Integer deleteSw;
+	    public Integer getNatureOfId() {
+			return natureOfId;
+		}
+
+		public void setNatureOfId(Integer natureOfId) {
+			this.natureOfId = natureOfId;
+		}
+
+		public String getWcFromDtm() {
+			return wcFromDtm;
+		}
+
+		public void setWcFromDtm(String wcFromDtm) {
+			this.wcFromDtm = wcFromDtm;
+		}
+
+		public String getWcToDtm() {
+			return wcToDtm;
+		}
+
+		public void setWcToDtm(String wcToDtm) {
+			this.wcToDtm = wcToDtm;
+		}
+
+		public Integer getDeleteSw() {
+			return deleteSw;
+		}
+
+		public void setDeleteSw(Integer deleteSw) {
+			this.deleteSw = deleteSw;
+		}
+
+		public String getLicenceType() {
+			return licenceType;
+		}
+
+		public void setLicenceType(String licenceType) {
+			this.licenceType = licenceType;
+		}
+
+		public String getIsVerified() {
+			return isVerified;
+		}
+
+		public void setIsVerified(String isVerified) {
+			this.isVerified = isVerified;
+		}
+
+		public String getAttachmentNm() {
+			return attachmentNm;
+		}
+
+		public void setAttachmentNm(String attachmentNm) {
+			this.attachmentNm = attachmentNm;
+		}
+
+		public int getExtendToSubcontractor() {
+			return extendToSubcontractor;
+		}
+
+		public void setExtendToSubcontractor(int extendToSubcontractor) {
+			this.extendToSubcontractor = extendToSubcontractor;
+		}
+
+		public String getCreatedDtm() {
+			return createdDtm;
+		}
+
+		public void setCreatedDtm(String createdDtm) {
+			this.createdDtm = createdDtm;
+		}
+
+		public String getUpStringdDtm() {
+			return upStringdDtm;
+		}
+
+		public void setUpStringdDtm(String upStringdDtm) {
+			this.upStringdDtm = upStringdDtm;
+		}
+
+		private String licenceType;
+	    private String isVerified;
+	    private String attachmentNm;
+	    private int extendToSubcontractor;
+	    private String createdDtm;
+	    private String upStringdDtm;
 
 	public String getWcId() {
 		return wcId;

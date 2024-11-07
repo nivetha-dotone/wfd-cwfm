@@ -60,14 +60,9 @@ var contextPath = '<%= request.getContextPath() %>';
 </script>
    </head>
 <body>
- <div class="page-header">
-        Workorder View Page
-        <div class="header-buttons">
-            <button type="submit" onclick="goBackToWOList(contextPath)">Back</button>
-        </div>
-    </div>
+
 <div id="principalEmployerContent">
-<form id="editForm" action="/CWFM/workorders/view/${workorder.workOrderId}" method="post">
+
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
@@ -78,29 +73,30 @@ var contextPath = '<%= request.getContextPath() %>';
                          <th><label class="custom-label"><span class="required-field">*</span>Work order Number</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="sapWorkOrderNum" value="${workorder.sapWorkOrderNum}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="sapWorkorderNumber" value="${workorder.sapWorkorderNumber}" style="height: 20px;"  size="30" maxlength="30" />
                               </div></td>
                         <th><label class="custom-label"><span class="required-field">*</span>Unit Name</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="NAME" value="${principalEmployer.NAME}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="name" value="${principalEmployer.name}" style="height: 20px;"  size="30" maxlength="30" />
                               </div></td>
+                              <td >  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','Work Order');">Cancel</button>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Contractor Name</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="name" value="${contractor.name}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="contractorname" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" />
                               </div></td>
                          <th><label class="custom-label"><span class="required-field">*</span>Contractor Code</label></th>
-                            <td><input type="text" name="code" value="${contractor.code}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><input type="text" name="contractorcode" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" /></td>
                        
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Valid From</label></th>
                             <td><input type="text" name="validFrom" value="${workorder.validFrom}" style="height: 20px;"  size="30" maxlength="30" /></td>
                         <th><label class="custom-label"><span class="required-field">*</span>Valid To</label></th>
-                            <td><input type="text" name="validDt" value="${workorder.validDt}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><input type="text" name="validTo" value="${workorder.validTo}" style="height: 20px;"  size="30" maxlength="30" /></td>
                        
                         </tr>
                         
@@ -181,6 +177,5 @@ var contextPath = '<%= request.getContextPath() %>';
 	</tbody>
 </table>
 </div>
-    </form>
 </div>
 

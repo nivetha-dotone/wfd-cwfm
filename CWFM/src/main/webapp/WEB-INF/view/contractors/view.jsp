@@ -17,7 +17,7 @@
      #principalEmployerContent {
         padding: 20px;
         box-sizing: border-box;
-        overflow-y: auto;
+        
         height: calc(100vh - 20px);
     } 
 th label {
@@ -51,13 +51,15 @@ var contextPath = '<%= request.getContextPath() %>';
 </script>
    </head>
 <body>
- <div class="page-header">
-        Contractor View Page
-        <div class="header-buttons">
-            <button type="submit" onclick="goBackToContractorList(contextPath,'${principalEmployer.UNITID}')">Back</button>
+
+        <div  style="margin-top:50px;float:right;">
+<table  class="Tabular" cellpadding="0" cellspacing="0">
+     <tr> <td colspan="6">  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/list','Contractor');">Cancel</button>
+     </td></tr></table>
         </div>
-    </div>
+
 <div id="principalEmployerContent">
+
 <form id="editForm" action="/CWFM/contractor/view/${contractor.contractorId}" method="post">
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
@@ -67,20 +69,20 @@ var contextPath = '<%= request.getContextPath() %>';
                             <th><label class="custom-label"><span class="required-field">*</span>Unit Code</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="CODE" value="${principalEmployer.CODE}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;"  size="30" maxlength="30" />
                               </div></td>
                          <th><label class="custom-label"><span class="required-field">*</span>Organization</label></th>
-                            <td><input type="text" name="ORGANIZATION" value="${principalEmployer.ORGANIZATION}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;"  size="30" maxlength="30" /></td>
                        
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="code" value="${contractor.code}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="code" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" />
                               </div></td>
                          <th><label class="custom-label"><span class="required-field">*</span>State</label></th>
-                            <td><input type="text" name="name" value="${contractor.name}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><input type="text" name="name" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" /></td>
                        
                         </tr>
                         <tr>
@@ -290,9 +292,9 @@ var contextPath = '<%= request.getContextPath() %>';
 	<tbody >
 	<c:forEach items="${workOrderList}" var="workOrderList">
                 <tr>
-                    <td>${workOrderList.sapWorkOrderNum}</td>
+                    <td>${workOrderList.sapWorkorderNumber}</td>
                      <td>${workOrderList.validFrom}</td>
-                      <td>${workOrderList.validDt}</td>
+                      <td>${workOrderList.validTo}</td>
                       <td></td>
             <td>Manpower Supply</td>
             

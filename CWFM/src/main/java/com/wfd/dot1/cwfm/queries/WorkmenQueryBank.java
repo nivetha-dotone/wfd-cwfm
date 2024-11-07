@@ -6,7 +6,7 @@ public interface WorkmenQueryBank {
 			+ " join CMSPRINCIPALEMPLOYER cpe on uari.AuthorizationValue=cpe.UNITID and uari.IsActive='A' "
 			+ " where uari.UserId=? and uari.AuthorizationOn='unitId'";
 	
-	String GET_ALL_CONTRACTOR_BY_PE="SELECT ccp.contractorid,cc.NAME as contractorname "
+	String GET_ALL_CONTRACTOR_BY_PE="SELECT ccp.contractorid,cc.NAME as contractorname,cc.CODE as contractorcode,cc.ADDRESS as contractoraddress  "
 			+ " FROM CMSCONTRPEMM ccp "
 			+ " JOIN CMSPRINCIPALEMPLOYER cpe ON ccp.unitid = cpe.unitid "
 			+ " JOIN USERAUTHRELINFO uari ON uari.AuthorizationValue = ccp.contractorid AND uari.IsActive='A' "

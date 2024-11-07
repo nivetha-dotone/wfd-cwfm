@@ -656,7 +656,7 @@ table th {
     <ul class="sub-menu" id="clms-sub-menu" style="display: none;">
         <li><a href="#" onclick="loadCommonList('/principalEmployer/list','Principal Employer')">Principal Employer</a></li>
         <li><a href="#" onclick="loadCommonList('/contractor/list','Contractor')">Contractor</a></li>
-        <li><a href="#" onclick="loadCommonList('/workOrder/list', 'Work Order')">Work Order</a></li>
+        <li><a href="#" onclick="loadCommonList('/workorders/list', 'Work Order')">Work Order</a></li>
        <!--  <li><a href="#" onclick="loadCommonList('/minimumWage/list', 'Minimum Wage Master')">Minimum Wage Master</a></li> -->
         <li><a href="#" onclick="loadCommonList('/workmenDetail.jsp', 'Contract Workmen')">Contract Workmen</a></li>
         <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->

@@ -18,26 +18,38 @@
         xhttp.send();
     }
     
- function searchWithPEInContractor(contextPath) {
-	 var principalEmployerId = document.getElementById("principalEmployerId").value;
- event.preventDefault();
-     // Assuming you have jQuery available for making AJAX requests
-     $.ajax({
-         type: "GET",
-         url: contextPath + "/contractor/list",
-         data: { principalEmployerId: principalEmployerId}, // Pass the search query as data
-         success: function(response) {
-             // Handle success response
-           //  console.log("Search results:", response);
-             document.getElementById("mainContent").innerHTML = response;
-         },
-         error: function(xhr, status, error) {
-             // Handle error response
-             console.error("Error searching:", error);
-         }
-     });
- }
- 
+	function searchContractorsBasedOnPE() {
+			    var principalEmployerId = $('#principalEmployerId').val();
+			    
+
+			    $.ajax({
+			        url: '/CWFM/contractor/getAllContractorsBasedOnPE',
+			        type: 'POST',
+			        data: {
+			            principalEmployerId: principalEmployerId
+			        },
+			        success: function(response) {
+			            var tableBody = $('#contractorTable tbody');
+			            tableBody.empty();
+			            if (response.length > 0) {
+			                $.each(response, function(index, contr) {
+			                    var row = '<tr>' +
+										'<td ><input type="checkbox" name="selectedContractorIds" value="' + contr.contractorId + '"></td>'+
+			                              '<td>' + contr.contractorCode + '</td>' +
+			                              '<td>' + contr.contractorName + '</td>' +
+										  '<td>' + contr.contractorAddress + '</td>' +				                             
+			                              '</tr>';
+			                    tableBody.append(row);
+			                });
+			            } else {
+			                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+			            }
+			        },
+			        error: function(xhr, status, error) {
+			            console.error("Error fetching data:", error);
+			        }
+			    });
+			}
  
 function redirectToContrAdd() {
 
@@ -73,23 +85,23 @@ function redirectToContrEdit() {
     xhr.send();
 }
 
-function redirectToContrView(principalEmployerId) {
-    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-    if (selectedCheckboxes.length !== 1) {
-        alert("Please select exactly one row to view.");
-        return;
-    }
-    
-    var selectedRow = selectedCheckboxes[0].closest('tr');
-    var unitId = selectedRow.querySelector('[name="selectedContractors"]').value;
- /*var principalEmployerId = document.getElementById("principalEmployerId").value;*/
+function redirectToContrView() {
+	var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+	    if (selectedCheckboxes.length !== 1) {
+	        alert("Please select exactly one row to view.");
+	        return;
+	    }
+	    
+	    var selectedRow = selectedCheckboxes[0].closest('tr');
+	    var contractorId = selectedRow.querySelector('[name="selectedContractorIds"]').value;
+		var principalEmployerId = $('#principalEmployerId').val();
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
             document.getElementById("mainContent").innerHTML = xhr.responseText;
         }
     };
-    xhr.open("GET", "/CWFM/contractor/view/" + unitId+ "?principalEmployerId=" + principalEmployerId, true);
+    xhr.open("GET", "/CWFM/contractor/view/" + contractorId+ "?principalEmployerId=" + principalEmployerId, true);
     xhr.send();
 }
  function ContrExportToCSV() {
