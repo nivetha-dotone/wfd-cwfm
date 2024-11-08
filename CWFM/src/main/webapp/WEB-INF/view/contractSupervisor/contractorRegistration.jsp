@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Contractor Registration</title>
+<title>Contractor Supervisor Registration</title>
 </head>
 <body>
 
