@@ -234,7 +234,15 @@ function initializeDatePicker() {
             maxDate: 0              // Prevent selecting future dates
         });
     }
-    
+	function initializeDatePicker1() {
+	    $('.datetimepickerformat1').datepicker({
+	        dateFormat: 'yy-mm-dd', // Set the date format
+	        changeMonth: true,      // Allow changing month via dropdown
+	        changeYear: true,       // Allow changing year via dropdown
+	        yearRange: "0:+100", 
+	        minDate: 0              // Prevent selecting future dates
+	    });
+	} 
     function validateBasicData() {
     let isValid = true;
     const aadharNumber = $("#aadharNumber").val().trim();
@@ -551,9 +559,9 @@ function fileUpload(){
         // Get the selected files
         var aadharFile = $("#aadharFile").prop("files")[0];
         var policeFile = $("#policeFile").prop("files")[0];
-
+		var profilePic =$("imageFile").prop("files")[0];
         // Validate the files (optional)
-        if (!validateFiles(aadharFile, policeFile)) {
+        if (!validateFiles(aadharFile, policeFile,profilePic)) {
             isValid=false; // Stop the upload if validation fails
         }
 
@@ -565,6 +573,9 @@ function fileUpload(){
         if (policeFile) {
             formData.append("policeFile", policeFile);
         }
+		if(profilePic){
+			formData.append("profilePic",profilePic);
+		}
 
         // Submit the form data using AJAX
         $.ajax({
@@ -584,7 +595,7 @@ function fileUpload(){
         });
    return isValid;
 }
-    function validateFiles(aadharFile, policeFile) {
+    function validateFiles(aadharFile, policeFile,profilePc) {
         let valid = true;
         
         // Example validation for file size and type
@@ -601,6 +612,13 @@ function fileUpload(){
         } else {
             $("#policeError").text(""); // Clear error if valid
         }
+		
+		if (profilePc && profilePc.size > 5 * 1024 * 1024) { // Check if file size is more than 5MB
+		           $("#profilePcError").text("Photo/Image must be less than 5MB").css("color", "red");
+		           valid = false;
+		       } else {
+		           $("#profilePcError").text(""); // Clear error if valid
+		       }
 
         return valid; // Return the validation result
     }
@@ -690,9 +708,10 @@ function fileUpload(){
 
     var aadharFile = $("#aadharFile").prop("files")[0];
     var policeFile = $("#policeFile").prop("files")[0];
-
+	var profilePic = $("#imageFile").prop("files")[0];
+	
     // Validate the files (optional)
-    if (!validateFiles(aadharFile, policeFile)) {
+    if (!validateFiles(aadharFile, policeFile,profilePic)) {
         documentValid = false; // Stop the upload if validation fails
     }
 
@@ -765,6 +784,8 @@ function fileUpload(){
             userId: userId,
             gatePassAction: "save",
             comments: $("#comments").val().trim(),
+			address:$("#address").val().trim(),
+			doj:$("#doj").val(),
         };
 
         // Serialize the JSON object to a string
@@ -781,6 +802,10 @@ function fileUpload(){
             data.append("policeFile", policeFile);
         }
 		
+		
+		if(profilePic){
+			data.append("profilePic",profilePic);
+		}
 		
     	const additionalFields = document.querySelectorAll('.document-field');
     additionalFields.forEach((field, index) => {
@@ -1151,29 +1176,29 @@ if(isValid){
 			}
 			}//eofunc
 			function submitBlack(userId,gatePassType){
-							let isValid=true;
-							 const comments = $("#comments").val().trim();
+	let isValid=true;
+	 const comments = $("#comments").val().trim();
 if (comments === "") {
     $("#error-comments").show();
     isValid = false;
 }else{
-							$("#error-comments").hide();
-						}
-						if(isValid){
-							const data = {
-								createdBy : userId,
-								comments : $("#comments").val().trim(),
-								gatePassId : $("#gatePassId").val().trim(),
-								gatePassType : gatePassType,
-							};
-								  const xhr = new XMLHttpRequest();
+	$("#error-comments").hide();
+}
+if(isValid){
+	const data = {
+		createdBy : userId,
+		comments : $("#comments").val().trim(),
+		gatePassId : $("#gatePassId").val().trim(),
+		gatePassType : gatePassType,
+	};
+		  const xhr = new XMLHttpRequest();
 xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
 xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 xhr.onload = function() {
     if (xhr.status === 200) {
         // Handle successful response
         console.log("Data saved successfully:", xhr.responseText);
-								  
+		  
       loadCommonList('/contractworkmen/blackList', 'Black List');
     } else {
         // Handle error response
@@ -1187,29 +1212,29 @@ xhr.onerror = function() {
 
 // Send the data object as a JSON string
 xhr.send(JSON.stringify(data));
-							}else{
-								//error 
-							}
-							}//eofunc
+	}else{
+		//error 
+	}
+	}//eofunc
 			function approveRejectBlack(status,gatePassType){
-						let isValid=true;
-						 const approvercomments = $("#approvercomments").val().trim();
+let isValid=true;
+ const approvercomments = $("#approvercomments").val().trim();
 					   if (approvercomments === "") {
 					       $("#error-approvercomments").show();
 					       isValid = false;
 					   }else{
-						$("#error-approvercomments").hide();
+$("#error-approvercomments").hide();
 					}
 					if(isValid){
-						const data = {
-							approverId : $("#userId").val().trim(),
-							comments : $("#approvercomments").val().trim(),
-							status : status,
-							gatePassId : $("#gatePassId").val().trim(),
-							approverRole : $("#roleName").val().trim(),
-							gatePassType : gatePassType,
-						};
-							  const xhr = new XMLHttpRequest();
+const data = {
+	approverId : $("#userId").val().trim(),
+	comments : $("#approvercomments").val().trim(),
+	status : status,
+	gatePassId : $("#gatePassId").val().trim(),
+	approverRole : $("#roleName").val().trim(),
+	gatePassType : gatePassType,
+};
+	  const xhr = new XMLHttpRequest();
 					   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
 					   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 					   xhr.onload = function() {
@@ -1229,34 +1254,34 @@ xhr.send(JSON.stringify(data));
 					   
 					   // Send the data object as a JSON string
 					   xhr.send(JSON.stringify(data));
-						}else{
-							//error 
-						}
-						}//eofunc
-						function submitDeblack(userId,gatePassType){
-										let isValid=true;
-										 const comments = $("#comments").val().trim();
+}else{
+	//error 
+}
+}//eofunc
+function submitDeblack(userId,gatePassType){
+				let isValid=true;
+				 const comments = $("#comments").val().trim();
 			if (comments === "") {
 			    $("#error-comments").show();
 			    isValid = false;
 			}else{
-										$("#error-comments").hide();
-									}
-									if(isValid){
-										const data = {
-											createdBy : userId,
-											comments : $("#comments").val().trim(),
-											gatePassId : $("#gatePassId").val().trim(),
-											gatePassType : gatePassType,
-										};
-											  const xhr = new XMLHttpRequest();
+				$("#error-comments").hide();
+			}
+			if(isValid){
+				const data = {
+					createdBy : userId,
+					comments : $("#comments").val().trim(),
+					gatePassId : $("#gatePassId").val().trim(),
+					gatePassType : gatePassType,
+				};
+					  const xhr = new XMLHttpRequest();
 			xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
 			xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 			xhr.onload = function() {
 			    if (xhr.status === 200) {
 			        // Handle successful response
 			        console.log("Data saved successfully:", xhr.responseText);
-											  
+					  
 			      loadCommonList('/contractworkmen/deblackList', 'Deblack List');
 			    } else {
 			        // Handle error response
@@ -1270,29 +1295,29 @@ xhr.send(JSON.stringify(data));
 			
 			// Send the data object as a JSON string
 			xhr.send(JSON.stringify(data));
-										}else{
-											//error 
-										}
-										}//eofunc
-						function approveRejectDeblacklist(status,gatePassType){
-									let isValid=true;
-									 const approvercomments = $("#approvercomments").val().trim();
+				}else{
+					//error 
+				}
+				}//eofunc
+function approveRejectDeblacklist(status,gatePassType){
+			let isValid=true;
+			 const approvercomments = $("#approvercomments").val().trim();
 		if (approvercomments === "") {
 		    $("#error-approvercomments").show();
 		    isValid = false;
 		}else{
-									$("#error-approvercomments").hide();
-								}
-								if(isValid){
-									const data = {
-										approverId : $("#userId").val().trim(),
-										comments : $("#approvercomments").val().trim(),
-										status : status,
-										gatePassId : $("#gatePassId").val().trim(),
-										approverRole : $("#roleName").val().trim(),
-										gatePassType : gatePassType,
-									};
-										  const xhr = new XMLHttpRequest();
+			$("#error-approvercomments").hide();
+		}
+		if(isValid){
+			const data = {
+				approverId : $("#userId").val().trim(),
+				comments : $("#approvercomments").val().trim(),
+				status : status,
+				gatePassId : $("#gatePassId").val().trim(),
+				approverRole : $("#roleName").val().trim(),
+				gatePassType : gatePassType,
+			};
+				  const xhr = new XMLHttpRequest();
 		xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
 		xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 		xhr.onload = function() {
@@ -1312,20 +1337,20 @@ xhr.send(JSON.stringify(data));
 		
 		// Send the data object as a JSON string
 		xhr.send(JSON.stringify(data));
-									}else{
-										//error 
-									}
-									}//eofunc
-									function submitLostOrDamage(userId,gatePassType){
+			}else{
+				//error 
+			}
+			}//eofunc
+			function submitLostOrDamage(userId,gatePassType){
 let isValid=true;
  const comments = $("#comments").val().trim();
-												if (comments === "") {
-												    $("#error-comments").show();
-												    isValid = false;
-												}else{
+if (comments === "") {
+    $("#error-comments").show();
+    isValid = false;
+}else{
 $("#error-comments").hide();
-																		}
-																		if(isValid){
+}
+if(isValid){
 const data = {
 	createdBy : userId,
 	comments : $("#comments").val().trim(),
@@ -1333,26 +1358,26 @@ const data = {
 	gatePassType : gatePassType,
 };
 	  const xhr = new XMLHttpRequest();
-												xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-												xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-												xhr.onload = function() {
-												    if (xhr.status === 200) {
-												        // Handle successful response
-												        console.log("Data saved successfully:", xhr.responseText);
+xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
+xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+xhr.onload = function() {
+    if (xhr.status === 200) {
+        // Handle successful response
+        console.log("Data saved successfully:", xhr.responseText);
 	  
 	   loadCommonList('/contractworkmen/lostordamage', 'Lost or Damage List');
-												    } else {
-												        // Handle error response
-												        console.error("Error saving data:", xhr.statusText);
-												    }
-												};
-												
-												xhr.onerror = function() {
-												    console.error("Request failed");
-												};
-												
-												// Send the data object as a JSON string
-												xhr.send(JSON.stringify(data));
+    } else {
+        // Handle error response
+        console.error("Error saving data:", xhr.statusText);
+    }
+};
+
+xhr.onerror = function() {
+    console.error("Request failed");
+};
+
+// Send the data object as a JSON string
+xhr.send(JSON.stringify(data));
 }else{
 	//error 
 }
@@ -1483,24 +1508,24 @@ function searchWorkmenWithGatePassId(){
      success: function(response) {
          var tableBody = $('#workmenTable tbody');
          tableBody.empty();
-									if (response.length > 0) {
-						             $.each(response, function(index, wo) {
-						                 var row = '<tr style="border: 1px solid black;">' +
-																			'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-						                           '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-						                           '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																			  '<td style="border: 1px solid black;">'+ wo.lastName + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.vendorCode + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.unitName + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																			  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
-						                           '</tr>';
-						                 tableBody.append(row);
-						             });
+			if (response.length > 0) {
+             $.each(response, function(index, wo) {
+                 var row = '<tr style="border: 1px solid black;">' +
+	'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+                           '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+                           '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+	  '<td style="border: 1px solid black;">'+ wo.lastName + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.vendorCode + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.unitName + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+	  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+                           '</tr>';
+                 tableBody.append(row);
+             });
          } else {
              tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
          }
@@ -1509,4 +1534,27 @@ function searchWorkmenWithGatePassId(){
          console.error("Error fetching data:", error);
      }
  });
-						}		
+}	
+
+
+function previewImage(event,inputId,displayId) {
+	const fileInput = document.getElementById(inputId);
+	   const displayElement = document.getElementById(displayId);
+
+	   // Get the selected file's name
+	   if (fileInput.files.length > 0) {
+	       const fileName = fileInput.files[0].name;
+	       displayElement.textContent = fileName; // Display the file name
+	   } else {
+	       displayElement.textContent = ''; // Clear the display if no file is selected
+	   }
+            const file = event.target.files[0];
+            if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewDiv = document.getElementById("preview");
+                    previewDiv.innerHTML = `<img src="${e.target.result}" alt="Image Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }

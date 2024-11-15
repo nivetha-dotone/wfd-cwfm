@@ -273,6 +273,22 @@ label {
     color: #495057; /* Set the text color to a dark shade */
     font-family: Arial, sans-serif;
 }
+
+/* #preview {
+            width: 200px;
+            height: 200px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        } */
+        #preview img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
     </style>
      <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -417,8 +433,8 @@ label {
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12">
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
-    <th></th>
-    <td></td>
+    
+    <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" >Aadhar Search</button></td>
     <!--  <td rowspan="6" class="image-container">
         <img id="imageId" width="150" height="150" onclick="openFilePicker();">
         <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileSelect(event)">
@@ -487,7 +503,13 @@ label {
                 	<label id="error-maritalStatus"style="color: red;display: none;">Marital Status is required</label>
                 </td>
             </tr>
-           
+           <tr>
+           	 <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
+                <td>
+                	<input id="address" name="address" style="width: 100%;height: 20px;" type="text" >
+                	<label id="error-address" style="color: red;display: none;">Address is required</label>
+                </td>
+           </tr>
         </tbody>
     </table>
    
@@ -612,6 +634,15 @@ label {
                             	<label id="error-healthCheckDate"style="color: red;display: none;">Health Check Up Date is required</label>
                             	</td>
                         </tr>
+                        <tr>
+                         <th><label class="custom-label">Date Of Joining</label></th>
+                        	<td>
+    				<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"  onfocus="initializeDatePicker1()" 
+       onclick="initializeDatePicker1()" >
+					  <label id="error-doj" style="color: red;display: none;">Date Of Joining is required</label>
+			</td>
+                        </tr>
+                        
                     </tbody>
                 </table>
             </div>
@@ -785,6 +816,20 @@ label {
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
                    <tr>
+                   
+                  <td>
+                  <label for="aadharFile">Upload Photo:</label>
+    <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
+        
+    </div>
+    <div style="display: flex; justify-content: start;">
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event,'imageFile','imageFileName')" style="overflow: hidden;">
+     </div>
+     <span id="imageFileName" style="margin-left: 10px;color:black;"></span> 
+</td>
+                  
+                   
+						
                 		<td>
                 		 	<label for="aadharFile">Upload Aadhar Card (PDF):</label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">
@@ -799,8 +844,9 @@ label {
 						</td>
 						
 						
-						
             		</tr>
+            		
+            		
             		<tr><td>
             		<a href="#" id="add_field_button" onclick="additionalDocUpload()">Add Document</a></td>
             		<td><div id="additionalDoc" ></div></td></tr>
@@ -826,7 +872,7 @@ label {
       		<tr >    	
 				<td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;"><b>
 				<input type="checkbox" name="acceptCheck" id="acceptCheck"  /> 
-				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behaviour of the persons engaged by me or our company to work or visit Adani premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of Adani Group where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per Adani Group's safety and security policy
+				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
 				</b></td>
 			</tr>
 				<!-- <tr >

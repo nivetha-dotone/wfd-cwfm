@@ -283,6 +283,7 @@ textarea {
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
         String userId = user != null ? user.getUserId() : "";
         String roleName = user != null ? user.getRoleName() : "";
+        String contextPath =  request.getContextPath() ;
 		%>
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -408,6 +409,8 @@ textarea {
                 </c:if>
             </div>
             <div id="tab1" class="tab-content active">
+            <table cellspacing="0" cellpadding="0">
+            <tr><td>
     <table cellspacing="0" cellpadding="0">
         <tbody>
        <!--  <tr>
@@ -423,11 +426,16 @@ textarea {
 </tr> -->
             <tr>
             
-            
+            <th>
+            	<label class="custom-label"><span class="required-field">*</span>GatePass Id</label></th>
+            	<td>
+            	<input id="gatePassId" name="gatePassId" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.gatePassId }" readonly>
+   
+            	</td>
     <th>
     		<input type="hidden" id="userId" name="userId" value="<%= userId %>">
 			<input type="hidden" id="roleName" name="roleName" value="<%= roleName %>">
-			<input type="hidden" id="gatePassId" name="gatePassId" value="${GatePassObj.gatePassId}">
+			
     <label class="custom-label"><span class="required-field">*</span>Aadhar Number</label></th>
     <td>
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.aadhaarNumber }" readonly>
@@ -480,10 +488,20 @@ textarea {
                 	<input id="maritalStatus" name="maritalStatus" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.maritalStatus }" readonly>
                 	 </td>
             </tr>
-           
+           <tr>
+           	 <th><label class="custom-label">Address</label></th>
+                <td>
+                	<input id="address" name="address" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.address }" readonly>
+                	<label id="error-address" style="color: red;display: none;">Address is required</label>
+                </td>
+           </tr>
         </tbody>
-    </table>
-   
+    </table></td>
+    <td></td>
+    <td>
+                   		 <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
+        					<img class="target" src="/imageinline/${GatePassObj.createdBy }/${GatePassObj.gatePassId}/${GatePassObj.photoName }" alt="Image" style="max-width: 100%; height: auto;">
+    					</div></td></tr></table>
 </div>
 
             <div id="tab2" class="tab-content">
@@ -536,6 +554,13 @@ textarea {
                             <td>
                             	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.healthCheckDate }" readonly>
                             	</td>
+                        </tr>
+                        <tr>
+                         <th><label class="custom-label">Date Of Joining</label></th>
+                        	<td>
+    				<input id="doj" name="doj" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
+     value="${GatePassObj.doj }" readonly>
+			</td>
                         </tr>
                     </tbody>
                 </table>
@@ -648,6 +673,14 @@ textarea {
             <div id="tab5" class="tab-content">
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
+                     
+                    <tr>
+                		<td style="color:black">Profile Photo</td>
+                <td>
+                   <a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','${GatePassObj.photoName }')">Download Photo</a>
+                </td>
+            		</tr> 
+            		
                    <tr>
                 		<td style="color:black">Aadhar Document</td>
                 <td>
@@ -746,8 +779,8 @@ textarea {
 				 -->
 				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
 				 <th><label class="custom-label">Approver Comment</label></th>
-				<td><textarea id="comments"  name="comments" placeholder="Type here..."></textarea>
-				<label id="error-comments" style="color: red;display: none;">Comments is required</label>
+				<td><textarea id="approvercomments"  name="approvercomments" placeholder="Type here..."></textarea>
+				<label id="error-approvercomments" style="color: red;display: none;">Comments is required</label>
 				</td>
 				<% } %>
 			</tr>

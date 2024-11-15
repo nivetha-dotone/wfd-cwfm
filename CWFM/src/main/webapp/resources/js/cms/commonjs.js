@@ -127,12 +127,12 @@ function showTab(tabId) {
             menuItem.classList.add('active');
         }
 
-        function loadContent(text) {
+       /* function loadContent(text) {
             const headingText = text;
             updateHeading(headingText);
             document.getElementById("mainContent").innerHTML = `<h1>${text}</h1><p>Content for ${text} will go here.</p>`;
             resetSessionTimer();
-        }
+        }*/
 
         function updateHeading(text) {
             const headingElement = document.querySelector('.top-nav .heading');

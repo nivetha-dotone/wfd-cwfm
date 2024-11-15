@@ -17,7 +17,24 @@
     <script src="resources/js/cms/report.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
-   
+    function initializeDatePicker() {
+        $('.datetimepickerformat').datepicker({
+            dateFormat: 'yy-mm-dd', // Set the date format
+            changeMonth: true,      // Allow changing month via dropdown
+            changeYear: true,       // Allow changing year via dropdown
+            yearRange: "-100:+0",   // Set the year range from 100 years ago to the current year
+            maxDate: 0              // Prevent selecting future dates
+        });
+    }
+	function initializeDatePicker1() {
+	    $('.datetimepickerformat1').datepicker({
+	        dateFormat: 'yy-mm-dd', // Set the date format
+	        changeMonth: true,      // Allow changing month via dropdown
+	        changeYear: true,       // Allow changing year via dropdown
+	        yearRange: "0:+100", 
+	        minDate: 0              // Prevent selecting future dates
+	    });
+	} 
 function redirectToPEAdd() {
     // Fetch the content of add.jsp using AJAX
     var xhr = new XMLHttpRequest();
@@ -671,12 +688,12 @@ table th {
             menuItem.classList.add('active');
         }
 
-        function loadContent(text) {
-            const headingText = text;
-            updateHeading(headingText);
-            document.getElementById("mainContent").innerHTML = `<h1>${text}</h1><p>Content for ${text} will go here.</p>`;
-            resetSessionTimer();
-        }
+       // function loadContent(text) {
+        //    const headingText = text;
+        //    updateHeading(headingText);
+        //    document.getElementById("mainContent").innerHTML = `<h1>${text}</h1><p>Content for ${text} will go here.</p>`;
+        //    resetSessionTimer();
+       // } */
 
         function updateHeading(text) {
             const headingElement = document.querySelector('.top-nav .heading');

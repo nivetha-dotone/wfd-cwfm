@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -191,6 +192,7 @@ public class WorkmenController {
 
     public String uploadDocuments( MultipartFile aadharFile,
                                          MultipartFile policeFile,
+                                         MultipartFile profilePic,
                                          String userId,
                                          String gatePassId) {
 
@@ -215,6 +217,12 @@ public class WorkmenController {
                 String policeFilePath = directoryPath + "police.pdf";
                 saveFile(policeFile, policeFilePath);
             }
+            
+            // Save Profile Pic
+            if(!profilePic.isEmpty()) {
+            	String profilePicPath = directoryPath +profilePic.getOriginalFilename();
+            	saveFile(profilePic,profilePicPath);
+            }
 
             // Return success message
             return "success";
@@ -237,6 +245,7 @@ public class WorkmenController {
             @RequestParam("jsonData") String jsonData,
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
+            @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -255,6 +264,7 @@ public class WorkmenController {
             gatePassMain.setCreatedBy(gatePassMain.getUserId());
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
+            gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
          // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
@@ -264,7 +274,7 @@ public class WorkmenController {
             docTypeSetterMap.put("Education", gatePassMain::setEducationDocName);
             docTypeSetterMap.put("Training", gatePassMain::setTrainingDocName);
             docTypeSetterMap.put("Form11", gatePassMain::setForm11DocName);
-            if(additionalFiles.size()>0) {
+            if(additionalFiles != null && !additionalFiles.isEmpty()) {
             // Set document names based on additionalFiles and documentTypes
             for (int i = 0; i < additionalFiles.size(); i++) {
                 String docType = documentTypes.get(i);
@@ -280,7 +290,7 @@ public class WorkmenController {
 
             if (gatePassId != null) {
                 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                    uploadDocuments(aadharFile, policeFile, gatePassMain.getUserId(), gatePassId);
+                    uploadDocuments(aadharFile, policeFile,profilePic, gatePassMain.getUserId(), gatePassId);
                 }
                 // Upload additional files
                 if (additionalFiles != null && documentTypes != null) {
@@ -339,11 +349,15 @@ public class WorkmenController {
     public String viewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
-    		
+    		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + gatePassId + "/" +gatePassMainObj.getPhotoName();
+    		 request.setAttribute("imagePath", profilePicFilePath);
+    		 
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -401,8 +415,16 @@ public class WorkmenController {
     @GetMapping("/downloadFile/{gatePassId}/{userId}/{docType}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String gatePassId,@PathVariable String userId,  @PathVariable String docType) {
         try {
-            // Construct the file path based on gatePassId and docType
-            String filePath = ROOT_DIRECTORY+userId+"/" + gatePassId + "/" + docType + ".pdf";
+        	String filePath=null;
+        	if(docType.equals("aadhar")||docType.equals("police")||docType.equals("bank")||docType.equals("training")
+        			||docType.equals("other")||docType.equals("id2")||docType.equals("medical")||docType.equals("education")||docType.equals("form11"))
+        	{
+        		// Construct the file path based on gatePassId and docType
+                filePath = ROOT_DIRECTORY+userId+"/" + gatePassId + "/" + docType + ".pdf";
+        	}else {
+                filePath = ROOT_DIRECTORY+userId+"/" + gatePassId + "/" + docType;
+        	}
+        	
             File file = new File(filePath);
             Resource resource = new FileSystemResource(file);
 
@@ -866,6 +888,28 @@ public class WorkmenController {
     	
     		return "contractWorkmen/lostView";
     	
+    }
+    
+    @PostMapping("/uploadImage")
+    @ResponseBody
+    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return "No file selected or file is empty.";
+        }
+
+        try {
+                String uploadPath = ROOT_DIRECTORY + "user01/GP1234/";
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
+
+            String filePath = uploadPath + File.separator + file.getOriginalFilename();
+            file.transferTo(new File(filePath));
+
+            return "File uploaded successfully: " + file.getOriginalFilename();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error uploading file: " + e.getMessage();
+        }
     }
     
 }

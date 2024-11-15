@@ -427,4 +427,19 @@ public class GatePassMain {
 	public void setUnitId(String unitId) {
 		this.unitId = unitId;
 	}
+	
+	private String address;
+	private String doj;
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getDoj() {
+		return doj;
+	}
+	public void setDoj(String doj) {
+		this.doj = doj;
+	}
 }
