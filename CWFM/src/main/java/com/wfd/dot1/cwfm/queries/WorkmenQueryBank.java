@@ -53,14 +53,14 @@ public interface WorkmenQueryBank {
 	 		+ " AccessAreaId, UanNumber, HealthCheckDate, BloodGroupId, Accommodation, AcademicId, Technical, IfscCode, AccountNumber,   "
 	 		+ " EmergencyContactName,EmergencyContactNumber, WorkmenWageCategoryId, BonusPayoutId, PfCap,ZoneId, Basic, DA, HRA, WashingAllowance, OtherAllowance, UniformAllowance,   "
 	 		+ " AadharDocName, PhotoName, BankDocName, PoliceVerificationDocName, IdProof2DocName, MedicalDocName, EducationDocName, Form11DocName,   "
-	 		+ " TrainingDocName, OtherDocName,WorkFlowType,Comments,Address,DOJ, UpdatedBy, UpdatedDate)   "
+	 		+ " TrainingDocName, OtherDocName,WorkFlowType,Comments,Address,DOJ, DOT,UpdatedBy, UpdatedDate)   "
 	 		+ " VALUES  "
 	 		+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?,?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  "
-	 		+ "			  ?, ?, ?, ?, ?,?,?,?,?, GETDATE())";
+	 		+ "			  ?, ?, ?, ?, ?,?,?,?,?,?, GETDATE())";
 	 
 	 String GET_ALL_GATE_PASS_FOR_CREATOR = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
 	 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
@@ -117,7 +117,7 @@ public interface WorkmenQueryBank {
 	 		+ " WorkmenWageCategoryId,BonusPayoutId "
 	 		+ " ,ZoneId,Basic,DA,HRA,WashingAllowance,OtherAllowance,UniformAllowance,PfCap,AadharDocName,PhotoName,BankDocName, "
 	 		+ " PoliceVerificationDocName,IdProof2DocName "
-	 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy,gpm.Comments,gpm.Address,gpm.DOJ  "
+	 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy,gpm.Comments,gpm.Address,gpm.DOJ,gpm.DOT  "
 	 		+ " FROM GATEPASSMAIN gpm "
 	 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID  = gpm.UnitId "
 	 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
@@ -135,7 +135,7 @@ public interface WorkmenQueryBank {
 	 String GET_WORKFLOW_TYPE_BY_PE ="select distinct gpwft.WorkflowType "
 	 		+ " from CMSPRINCIPALEMPLOYER CPE  "
 	 		+ " join GATEPASSWORKFLOWTYPE gpwft on gpwft.BusinessTypeId = cpe.BUSINESSTYPE "
-	 		+ " WHERE CPE.UNITID=?";
+	 		+ " WHERE CPE.UNITID=? and gpwft.WorkflowType in ('1','2','3')";
 	 
 	 String GET_APPROVERS_FOR_GATE_PASS="select mu.UserId, CONCAT(mu.FirstName, ' ',mu.LastName) AS FullName,uari.AuthorizationOn "
 	 		+ " from MASTERUSER mu  "
@@ -177,6 +177,26 @@ public interface WorkmenQueryBank {
 		 		+ " join CMSGENERALMASTER cgm on cgm.GMID = TRY_CAST(gpm.Gender AS BIGINT)"
 		 		+ " where gpm.UpdatedBy=? and (gpm.GatePassTypeId=? and gpm.GatePassStatus=?) or gpm.GatePassTypeId=? ";
 	 
+	 String GET_DOT_TYPE_BY_PE ="select distinct gpwft.WorkflowType "
+		 		+ " from CMSPRINCIPALEMPLOYER CPE  "
+		 		+ " join GATEPASSWORKFLOWTYPE gpwft on gpwft.BusinessTypeId = cpe.BUSINESSTYPE "
+		 		+ " WHERE CPE.UNITID=? and gpwft.WorkflowType not in ('1','2','3')";
 	 
+	 String GET_VALIDITY_OF_WO_WC=" select VALIDDT as validTill, 'WO' as source from CMSWORKORDER where WORKORDERID=? "
+	 		+ " union "
+	 		+ " select WC_TO_DTM as validTill,'WC' as source from CMSCONTRACTOR_WC where WCID=? ";
+	 
+	 String GET_APPROVER_INFO_BY_GPID="SELECT GatePassApproverInfoId,GatePassId,UserId,UserRole,[Index],Status,CreatedBy,CreatedDate"
+	 		+ "	 FROM GATEPASSAPPROVERINFO WHERE GatePassId = ? ORDER BY [Index] ASC";
+
+	String GET_APPROVAL_STATUS_BY_GPID = "SELECT GatePassApprovalStatusId"
+			+ "      ,GatePassId"
+			+ "      ,UserId"
+			+ "      ,UserRole"
+			+ "      ,Status"
+			+ "      ,Comments"
+			+ "      ,LastUpdatedDate"
+			+ "      ,GatePassTypeId"
+			+ "  FROM GATEPASSAPPROVALSTATUS where GatePassId=? and GatePassTypeId='1'";
 	 
 }

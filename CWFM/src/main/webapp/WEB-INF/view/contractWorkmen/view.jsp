@@ -278,6 +278,7 @@ textarea {
             width: 300px; /* Optional width */
             height: 150px; /* Optional height */
         }
+         
     </style>
      <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -388,6 +389,7 @@ textarea {
             <button data-target="tab3" onclick="showTabNew('tab3')">Other Information</button>
             <button data-target="tab4" onclick="showTabNew('tab4')">Wages</button>
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
+            <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button>
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
@@ -409,6 +411,8 @@ textarea {
                 </c:if>
             </div>
             <div id="tab1" class="tab-content active">
+            
+            
             <table cellspacing="0" cellpadding="0">
             <tr><td>
     <table cellspacing="0" cellpadding="0">
@@ -560,6 +564,12 @@ textarea {
                         	<td>
     				<input id="doj" name="doj" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
      value="${GatePassObj.doj }" readonly>
+			</td>
+			
+			 <th><label class="custom-label">Date Of Termination</label></th>
+                        	<td>
+    				<input id="dot" name="dot" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
+     value="${GatePassObj.dot }" readonly>
 			</td>
                         </tr>
                     </tbody>
@@ -792,10 +802,39 @@ textarea {
                 </tbody>
                 </table>
             </div>
+            
+            
+            
+            <div id="tab6" class="tab-content">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
+                   
+        <thead>
+            <tr style=" border: 1px solid #ddd;">
+                <th><label class="custom-label">Role</label></th>
+                <th><label class="custom-label">Status</label></th>
+                <th><label class="custom-label">Comments</label></th>
+                <th><label class="custom-label">Timestamp</label></th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="approver" items="${approvers}" varStatus="status">
+                <tr style=" border: 1px solid #ddd;background-color: ${status.index % 2 == 0 ? '#f9f9f9' : '#ffffff'};">
+                    
+                    <td style="color:black">${approver.userRole}</td>
+                    <td style="color:black">
+                      ${approver.status}
+                    </td >
+                    <td style="color:black">${approver.comments}</td>
+                    <td style="color:black">${approver.timestamp != null ? approver.timestamp : 'N/A'}</td>
+                </tr>
+            </c:forEach>
+        </tbody>
+                </table>
+            </div>
         </f:form>
     </div>
    
-   
+  
 </body>
  
 </html>

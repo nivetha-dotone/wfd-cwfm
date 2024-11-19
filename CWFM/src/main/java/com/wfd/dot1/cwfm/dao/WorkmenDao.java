@@ -1,8 +1,11 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
@@ -75,5 +78,11 @@ public interface WorkmenDao {
 	boolean updateGatePassMainStatusAndType(String gatePassId, String status, String gatePassType);
 
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId);
+
+	public int getDOTTYpe(String principalEmployer);
+
+	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId);
+
+	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId);
 
 }

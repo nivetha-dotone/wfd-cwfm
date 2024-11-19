@@ -4,8 +4,12 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +20,15 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
+import com.wfd.dot1.cwfm.pojo.ApprovalStatus;
+import com.wfd.dot1.cwfm.pojo.ApproverInfo;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
@@ -311,7 +318,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        gatePassMain.getWorkFlowType(),
 	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
-	        				gatePassMain.getDoj(),
+	        				gatePassMain.getDoj(),gatePassMain.getDot(),
 	        gatePassMain.getUserId()
 	    };
 	}
@@ -492,6 +499,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setComments(rs.getString("Comments"));
 			dto.setAddress(rs.getString("Address"));
 			dto.setDoj(rs.getString("DOJ"));
+			dto.setDot(rs.getString("DOT"));
 		}
 		log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 		return dto;
@@ -798,5 +806,103 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("Exiting from getWorkmenDetailBasedOnId dao method "+listDto.size());
 		return listDto;
 	}
+	
+
+	@Override
+	public int getDOTTYpe(String principalEmployer) {
+		log.info("Entering into getDOTTYpe dao method ");
+		int workflowTypeId = 0;
+		log.info("Query to getDOTTYpe "+WorkmenQueryBank.GET_DOT_TYPE_BY_PE);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_DOT_TYPE_BY_PE,principalEmployer);
+		if(rs.next()) {
+			workflowTypeId = rs.getInt("WorkflowType");
+		}
+		log.info("Exiting from getDOTTYpe dao method "+principalEmployer);
+		return workflowTypeId;
+	}
+	@Override
+	 public Map<String, LocalDate> getValidityDates(String workOrderId, String wcId) {
+		 Map<String, LocalDate> validityDates = new HashMap<>();
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_VALIDITY_OF_WO_WC,workOrderId,wcId);
+		 while(rs.next()) {
+			 LocalDate validTill = rs.getDate("validTill").toLocalDate();
+             String source = rs.getString("source");
+             validityDates.put(source, validTill);
+			}
+		 return validityDates;
+	 }
+
+	@Override
+	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId) {
+		 // Fetch approvers from GATEPASSAPPROVERINFO
+        List<ApproverInfo> approverList = this.getApproversByGatePassId(gatePassId);
+
+        // Fetch approval statuses from GATEPASSAPPROVALSTATUS
+        List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(gatePassId);
+
+        // Map to hold approval status by User ID
+        Map<String, ApprovalStatus> statusMap = approvalStatuses.stream()
+            .collect(Collectors.toMap(ApprovalStatus::getUserRole, status -> status));
+
+        // Prepare the DTO list
+        List<ApproverStatusDTO> approverStatusList = new ArrayList<>();
+        for (ApproverInfo approver : approverList) {
+            ApproverStatusDTO dto = new ApproverStatusDTO();
+           
+            dto.setUserRole(approver.getUserRole().toUpperCase());
+
+            if (statusMap.containsKey(approver.getUserRole())) {
+                ApprovalStatus status = statusMap.get(approver.getUserRole());
+                dto.setStatus(status.getStatus() == 4 ? "Approved" : "Rejected");
+                dto.setComments(status.getComments());
+                dto.setTimestamp(status.getLastUpdatedDate());
+            } else {
+                dto.setStatus("Pending");
+                dto.setComments("");
+                dto.setTimestamp(null);
+            }
+
+            approverStatusList.add(dto);
+        }
+
+        return approverStatusList;
+	}
+
+	private List<ApproverInfo> getApproversByGatePassId(String gatePassId) {
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVER_INFO_BY_GPID,gatePassId);
+		 List<ApproverInfo> list = new ArrayList<ApproverInfo>();
+		 while(rs.next()) {
+			 ApproverInfo info=new ApproverInfo();
+			 info.setGatePassApproverInfoId(rs.getString("GatePassApproverInfoId"));
+			 info.setGatePassId(rs.getString("GatePassId"));
+			 info.setIndex(rs.getInt("Index"));
+			 info.setUserRole(rs.getString("UserRole"));
+			 info.setStatus(rs.getInt("Status"));
+			 info.setCreatedBy(rs.getString("CreatedBy"));
+			 info.setCreatedDate(rs.getString("CreatedDate"));
+			 list.add(info);
+		 }
+		 return list;
+	}
+
+	private List<ApprovalStatus> getApprovalStatusByGatePassId(String gatePassId) {
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVAL_STATUS_BY_GPID,gatePassId);
+		 List<ApprovalStatus> list = new ArrayList<ApprovalStatus>();
+		 while(rs.next()) {
+			 ApprovalStatus info=new ApprovalStatus();
+			 info.setGatePassApprovalStatusId(rs.getString("GatePassApprovalStatusId"));
+			 info.setGatePassId(rs.getString("GatePassId"));
+			 info.setGatePassTypeId(rs.getInt("GatePassTypeId"));
+			 info.setUserRole(rs.getString("UserRole"));
+			 info.setUserId(rs.getString("UserId"));
+			 info.setStatus(rs.getInt("Status"));
+			 info.setComments(rs.getString("Comments"));
+			 info.setLastUpdatedDate(rs.getString("LastUpdatedDate"));
+			 list.add(info);
+		 }
+		 return list;
+	}
+
+	
 
 }

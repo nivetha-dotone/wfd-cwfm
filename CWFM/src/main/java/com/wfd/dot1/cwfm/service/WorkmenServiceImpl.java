@@ -1,15 +1,21 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
+import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
@@ -78,6 +84,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getPrincipalEmployer());
 			gatePassMain.setWorkFlowType(workFlowTypeId);
 			
+			int dotTypeId = workmenDao.getDOTTYpe(gatePassMain.getPrincipalEmployer());
+			gatePassMain.setDotType(dotTypeId);
+			
+			String dot = this.getDOT(gatePassMain);
+			gatePassMain.setDot(dot);
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
 				gatePassId = workmenDao.saveGatePass(gatePassMain); 
@@ -126,6 +137,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		}
 		return gatePassId;
 	}
+	
 	@Override
 	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId) {
 		return workmenDao.getGatePassListingDetails(userId,gatePassTypeId);
@@ -292,5 +304,56 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.getWorkmenDetailBasedOnId(gatePassId);
 	}
 	
+	private String getDOT(GatePassMain gatePassMain) {
+		String dot=null;
+		int dotTypeId = gatePassMain.getDotType();
+		 Map<String, LocalDate>  validityDates = workmenDao.getValidityDates(gatePassMain.getWorkorder(), gatePassMain.getWcEsicNo());
+	        
+		int retirementAge = 60; // Define the retirement age
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateOfBirth = LocalDate.parse(gatePassMain.getDateOfBirth(), formatter);
+        LocalDate retirementDate = dateOfBirth.plusYears(retirementAge);
+        LocalDate woDate = validityDates.get("WO");
+        LocalDate wcDate = validityDates.get("WC");
+        
+		if(dotTypeId == DotType.LLWCWO.getStatus()) {
+			
+		}else if(dotTypeId == DotType.LLWC.getStatus()) {
+			
+		}else if(dotTypeId == DotType.LLWO.getStatus()) {
+			
+		}else if(dotTypeId == DotType.WCWO.getStatus()) {
+			List<LocalDate> dates = Arrays.asList(retirementDate, woDate, wcDate);
+	        LocalDate earliestDate = dates.stream()
+	             .filter(date -> date != null) 
+	             .min(LocalDate::compareTo)    
+	             .orElse(null); 
+	         dot = earliestDate != null ? earliestDate.format(formatter) : "No valid date available";
+
+		}else if(dotTypeId == DotType.LL.getStatus()) {
+			
+		}else if(dotTypeId == DotType.WC.getStatus()) {
+			List<LocalDate> dates = Arrays.asList(retirementDate, wcDate);
+	        LocalDate earliestDate = dates.stream()
+	             .filter(date -> date != null) 
+	             .min(LocalDate::compareTo)    
+	             .orElse(null);
+	        dot = earliestDate != null ? earliestDate.format(formatter) : "No valid date available";
+		}else if(dotTypeId == DotType.WO.getStatus()) {
+			List<LocalDate> dates = Arrays.asList(retirementDate, woDate);
+	        LocalDate earliestDate = dates.stream()
+	             .filter(date -> date != null) 
+	             .min(LocalDate::compareTo)    
+	             .orElse(null); 
+	        dot = earliestDate != null ? earliestDate.format(formatter) : "No valid date available";
+		}
+		
+		return dot;
+	}
+	@Override
+	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId) {
+		// TODO Auto-generated method stub
+		return workmenDao.getApprovalDetails( gatePassId);
+	}
 
 }

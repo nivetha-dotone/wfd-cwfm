@@ -434,7 +434,12 @@ label {
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
     
-    <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" >Aadhar Search</button></td>
+    <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" >Generate OTP</button></td>
+    
+    <td>
+    	<input id="otp" name="otp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" placeholder="Enter otp here">
+    </td>
+     <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" >Verify OTP</button></td>
     <!--  <td rowspan="6" class="image-container">
         <img id="imageId" width="150" height="150" onclick="openFilePicker();">
         <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileSelect(event)">
@@ -742,7 +747,7 @@ label {
 						<label id="error-wageCategory"style="color: red;display: none;">Workmen Wage Category is required</label>
 				</td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span>Bonus Payout</label></th>
+				<th><label class="custom-label">Payment Cycle</label></th>
 				<td >
 					<select class="custom-select" id="bonusPayout"    name="bonusPayoutId"  >
 						<option value=""> Select Bonus Payout</option>
@@ -848,7 +853,9 @@ label {
             		
             		
             		<tr><td>
-            		<a href="#" id="add_field_button" onclick="additionalDocUpload()">Add Document</a></td>
+            		<a href="#" id="add_field_button" onclick="additionalDocUpload()">Add Document</a>
+            		<label>You can add a maximum of 7 additional documents.</label>
+            		</td>
             		<td><div id="additionalDoc" ></div></td></tr>
       		
         

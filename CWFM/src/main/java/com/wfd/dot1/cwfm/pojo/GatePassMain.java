@@ -442,4 +442,20 @@ public class GatePassMain {
 	public void setDoj(String doj) {
 		this.doj = doj;
 	}
+	
+	private int dotType;
+	public int getDotType() {
+		return dotType;
+	}
+	public void setDotType(int dotType) {
+		this.dotType = dotType;
+	}
+	
+	private String dot;
+	public String getDot() {
+		return dot;
+	}
+	public void setDot(String dot) {
+		this.dot = dot;
+	}
 }

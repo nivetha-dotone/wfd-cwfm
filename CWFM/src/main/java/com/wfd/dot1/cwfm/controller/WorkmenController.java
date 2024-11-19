@@ -36,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
+import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.enums.GatePassType;
@@ -382,8 +383,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
     	    }
     		}
-    		
-    		 
+    		List<ApproverStatusDTO> approvers = workmenService.getApprovalDetails(gatePassId);
+    		 request.setAttribute("approvers", approvers);
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
