@@ -21,6 +21,11 @@
     </bean>
     
     <context:component-scan base-package="com.wfd.dot1.cwfm.config,com.wfd.dot1.cwfm.*" />
+    
+	 <!-- Property Placeholder -->
+    <!-- Externalized Queries Configuration -->
+    <context:property-placeholder location="file:/D:/wfd_cwfm/config/queries.properties"/>
+    
     <context:annotation-config/>
     <mvc:annotation-driven />
     
@@ -40,10 +45,13 @@
     <!-- Resources mapping -->
     <mvc:resources mapping="/resources/**" location="/resources/" />
 
-    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-        <property name="basename" value="classpath:messages" />
-        <property name="defaultEncoding" value="UTF-8" />
-    </bean>
+   <bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames" value="file:/D:/wfd_cwfm/config/messages" />
+		<property name="fallbackToSystemLocale" value="true" />
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="cacheSeconds" value="10" />
+	</bean>
 
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
         <property name="defaultLocale" value="en" />

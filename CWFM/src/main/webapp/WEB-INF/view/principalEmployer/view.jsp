@@ -2,6 +2,8 @@
     pageEncoding="ISO-8859-1"%>
     <%@ page isELIgnored="false" %>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -176,9 +178,9 @@ table.ControlLayout td {
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Unit Name</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
                 <td><input type="text" name="NAME" value="${principalEmployer.name}" style="height: 20px;" size="30" maxlength="30" readonly="true" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>PE Inactive</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.peInactive"/></label></th>
                 <td>
                     <c:choose>
                         <c:when test="${principalEmployer.isActive == 1}}">
@@ -191,13 +193,13 @@ table.ControlLayout td {
                 </td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Unit Code</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
                 <td><input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Organization</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.organization"/></label></th>
                 <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;" size="30" maxlength="30" /></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td><input type="text" name="address" value="${principalEmployer.address}" style="height: 20px;" size="30" maxlength="30" /></td>
                 <th><label class="custom-label"><span class="required-field">*</span>State</label></th>
                 <td><input type="text" name="stateId" value="${principalEmployer.stateId}" style="height: 20px;" size="30" maxlength="30" /></td>

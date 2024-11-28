@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
@@ -20,12 +21,18 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
 	 
+	 @Value("${GET_ALL_PES}")
+	    private String getAllPes;
+
+	    @Value("${GET_PE_BY_UNITID}")
+	    private String getPeByUnitId;
+	 
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId) {
 		log.info("Entering into getAllPrincipalEmployer dao method ");
 		List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
-		log.info("Query to getAllPrincipalEmployer "+PrincipalEmployerQueryBank.GET_ALL_PES);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(PrincipalEmployerQueryBank.GET_ALL_PES);
+		log.info("Query to getAllPrincipalEmployer "+getAllPes);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllPes);
 		while(rs.next()) {
 			PrincipalEmployer pe = new PrincipalEmployer();
 			pe.setUnitId(rs.getInt("UNITID"));
@@ -63,8 +70,8 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	public PrincipalEmployer getIndividualPEDetailByUnitId(String id) {
 		log.info("Entering into getIndividualPEDetailByUnitId dao method ");
 		PrincipalEmployer pe = new PrincipalEmployer();
-		log.info("Query to getIndividualPEDetailByUnitId "+PrincipalEmployerQueryBank.GET_PE_BY_UNITID);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(PrincipalEmployerQueryBank.GET_PE_BY_UNITID,id);
+		log.info("Query to getIndividualPEDetailByUnitId "+getPeByUnitId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getPeByUnitId,id);
 		while(rs.next()) {
 		
 			pe.setUnitId(rs.getInt("UNITID"));
