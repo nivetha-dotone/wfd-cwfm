@@ -12,7 +12,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
-import com.wfd.dot1.cwfm.queries.PrincipalEmployerQueryBank;
 @Repository
 public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 

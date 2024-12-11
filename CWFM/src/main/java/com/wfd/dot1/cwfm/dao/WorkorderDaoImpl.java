@@ -3,6 +3,7 @@ package com.wfd.dot1.cwfm.dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
@@ -17,9 +18,12 @@ public class WorkorderDaoImpl implements WorkorderDao{
 	
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
+	 
+	 @Value("${GET_WO_BY_ID}")
+	    private String getWOById;
 	@Override
 	public Workorder getWorkorderById(String id) {
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkorderQueryBank.GET_WO_BY_ID,id);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getWOById,id);
         
         if (rs.next()) {
             Workorder wo = new Workorder();

@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -347,7 +347,7 @@ public class WorkmenController {
  }
     
     @GetMapping("/view/{gatePassId}")
-    public String viewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String viewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
@@ -414,7 +414,7 @@ public class WorkmenController {
     }
     
     @GetMapping("/downloadFile/{gatePassId}/{userId}/{docType}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String gatePassId,@PathVariable String userId,  @PathVariable String docType) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable("gatePassId") String gatePassId,@PathVariable("userId") String userId,  @PathVariable("docType") String docType) {
         try {
         	String filePath=null;
         	if(docType.equals("aadhar")||docType.equals("police")||docType.equals("bank")||docType.equals("training")
@@ -632,7 +632,7 @@ public class WorkmenController {
     }
     
     @GetMapping("/cancelview/{gatePassId}")
-    public String cancelviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String cancelviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
@@ -675,7 +675,7 @@ public class WorkmenController {
     	
     }
     @GetMapping("/blockview/{gatePassId}")
-    public String blockviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String blockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
@@ -718,7 +718,7 @@ public class WorkmenController {
     	
     }
     @GetMapping("/unblockview/{gatePassId}")
-    public String unblockviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
@@ -761,7 +761,7 @@ public class WorkmenController {
     	
     }
     @GetMapping("/blackview/{gatePassId}")
-    public String blackviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String blackviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
@@ -805,7 +805,7 @@ public class WorkmenController {
     }
     
     @GetMapping("/deblackview/{gatePassId}")
-    public String deblackviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
@@ -848,7 +848,7 @@ public class WorkmenController {
     	
     }
     @GetMapping("/lostordamageview/{gatePassId}")
-    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {

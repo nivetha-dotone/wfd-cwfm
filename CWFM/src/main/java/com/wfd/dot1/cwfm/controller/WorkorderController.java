@@ -2,9 +2,9 @@ package com.wfd.dot1.cwfm.controller;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -98,7 +98,7 @@ public class WorkorderController {
 	 }
 	 
 	 @GetMapping("/view/{id}")
-	    public String viewContractors(@PathVariable String id,@RequestParam(required = false) String principalEmployerId,@RequestParam(required = false) String contractorId, HttpServletRequest request,HttpServletResponse response) {
+	    public String viewContractors(@PathVariable("id") String id,@RequestParam(required = false) String principalEmployerId,@RequestParam(required = false) String contractorId, HttpServletRequest request,HttpServletResponse response) {
 	    	Workorder workorder =woService.getWorkorderById(id);
 	       request.setAttribute("workorder", workorder);
 	       

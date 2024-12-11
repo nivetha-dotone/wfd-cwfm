@@ -53,16 +53,34 @@
 		<property name="cacheSeconds" value="10" />
 	</bean>
 
-    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+   <!--  <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
         <property name="defaultLocale" value="en" />
         <property name="cookieName" value="myAppLocaleCookie" />
-        <property name="cookieMaxAge" value="3600" />
-    </bean> 
+         <property name="cookieMaxAge" value="3600" /> 
+        <property name="cookieMaxAge" value="PT1H" />
+        
+    </bean>  -->
+    
+  	<bean id="cookieMaxAgeLong" class="java.lang.Long">
+    <constructor-arg value="3600"/>  <!-- Example value in seconds -->
+</bean>
 
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- Set max upload size if needed -->
-        <property name="maxUploadSize" value="10000000"/> <!-- 10 MB -->
-    </bean>
+<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+    <property name="defaultLocale" value="en" />
+    <property name="cookieName" value="myAppLocaleCookie" />
+    <property name="cookieMaxAge" ref="cookieMaxAgeLong" />
+</bean>
+  	
+
+    
+
+    <!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        Set max upload size if needed
+        <property name="maxUploadSize" value="10000000"/> 10 MB
+    </bean> -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+    
+    
 
     <tx:annotation-driven />
 </beans>

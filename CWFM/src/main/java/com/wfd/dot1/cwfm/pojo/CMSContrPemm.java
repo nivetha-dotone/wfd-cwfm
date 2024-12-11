@@ -3,9 +3,9 @@ package com.wfd.dot1.cwfm.pojo;
 import java.util.Date;
 
 public class CMSContrPemm {
-	private long refId;
-    private long contractorId;
-    private long unitId;
+	private Long refId;
+    private Long contractorId;
+    private Long unitId;
     private String managerNm;
     private String managerEmail;
     private String managerMobile;
@@ -16,27 +16,27 @@ public class CMSContrPemm {
     private String esicNum;
     private boolean rcValidated;
 
-    public long getRefId() {
+    public Long getRefId() {
         return refId;
     }
 
-    public void setRefId(long refId) {
+    public void setRefId(Long refId) {
         this.refId = refId;
     }
 
-    public long getContractorId() {
+    public Long getContractorId() {
         return contractorId;
     }
 
-    public void setContractorId(long contractorId) {
+    public void setContractorId(Long contractorId) {
         this.contractorId = contractorId;
     }
 
-    public long getUnitId() {
+    public Long getUnitId() {
         return unitId;
     }
 
-    public void setUnitId(long unitId) {
+    public void setUnitId(Long unitId) {
         this.unitId = unitId;
     }
 

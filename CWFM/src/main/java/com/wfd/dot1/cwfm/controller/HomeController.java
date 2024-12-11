@@ -2,7 +2,7 @@ package com.wfd.dot1.cwfm.controller;
 
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

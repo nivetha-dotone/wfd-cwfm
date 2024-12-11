@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
@@ -22,10 +23,21 @@ public class ContractorDaoImpl implements ContractorDao{
 	
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
+	 
+	 @Value("${GET_CONTRACOTR_BY_ID}")
+	    private String getContractorById;
 
+	 @Value("${GET_ALL_WORKORDER_BY_PE_AND_CONT}")
+	    private String getAllWorkorderByPeAndCOnt;
+	 
+	 @Value("${GET_CONTRPEMM_BY_PE_AND_CONT}")
+	    private String getContrpemmByPeAndCont;
+	 
+	 @Value("${GET_MAPPING_BY_PE_CONT}")
+	    private String getMappingByPeCont;
 	@Override
 	public Contractor getContractorById(String contractorId) {
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(ContractorQueryBank.GET_CONTRACOTR_BY_ID,contractorId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getContractorById,contractorId);
         
                 if (rs.next()) {
                     Contractor contractor = new Contractor();
@@ -45,8 +57,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	public List<Workorder> getWorkOrdersByContractorIdAndUnitId(String contractorId, String unitId) {
 		log.info("Entering into getAllWorkordersBasedOnPEAndContractor dao method "+unitId+" "+contractorId);
 		List<Workorder> woList= new ArrayList<Workorder>();
-		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+ContractorQueryBank.GET_ALL_WORKORDER_BY_PE_AND_CONT);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(ContractorQueryBank.GET_ALL_WORKORDER_BY_PE_AND_CONT,contractorId,unitId);
+		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+getAllWorkorderByPeAndCOnt);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllWorkorderByPeAndCOnt,contractorId,unitId);
 		while(rs.next()) {
 			Workorder wo = new Workorder();
 			wo.setWorkorderId(rs.getString("WORKORDERID"));
@@ -72,8 +84,8 @@ public class ContractorDaoImpl implements ContractorDao{
 			String principalEmployerId, String string) {
 		log.info("Entering into getcontrsByContractorIdAndUnitIdAndLicenseType dao method  "+contractorId);
 		List<CmsContractorWC> contrWcList= new ArrayList<CmsContractorWC>();
-		log.info("Query to getcontrsByContractorIdAndUnitIdAndLicenseType "+ContractorQueryBank.GET_MAPPING_BY_PE_CONT);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(ContractorQueryBank.GET_MAPPING_BY_PE_CONT,contractorId,principalEmployerId,string);
+		log.info("Query to getcontrsByContractorIdAndUnitIdAndLicenseType "+getMappingByPeCont);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getMappingByPeCont,contractorId,principalEmployerId,string);
 		while(rs.next()) {
 			CmsContractorWC contr = new CmsContractorWC();
 			contr.setWcCode(rs.getString("WC_CODE"));
@@ -138,7 +150,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	@Override
 	public CMSContrPemm getMappingByContractorIdAndUnitId(String contractorId, String principalEmployerId) {
 		 CMSContrPemm contr = null;
-			SqlRowSet rs = jdbcTemplate.queryForRowSet(ContractorQueryBank.GET_CONTRPEMM_BY_PE_AND_CONT,contractorId,principalEmployerId);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(getContrpemmByPeAndCont,contractorId,principalEmployerId);
 			if (rs.next()) {
 	            contr = new CMSContrPemm();
 	            contr.setRefId(rs.getLong("REFID"));
