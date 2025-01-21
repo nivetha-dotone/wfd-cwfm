@@ -51,6 +51,16 @@ public class CmsGeneralMaster {
 	public void setAuthorizationValue(String authorizationValue) {
 		this.authorizationValue = authorizationValue;
 	}
+
+	public void setGmdescription(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Object getGmdescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 }

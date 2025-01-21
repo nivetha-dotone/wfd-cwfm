@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -184,28 +185,28 @@ alert(1);
                     <td style="border: 1px solid black;">
                         <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
                     </td> 
-                    <th class="header-text" onclick="sortTable(1)">Name<span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(2)">Address<span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(3)">Manager Name<span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(4)">Manager Address<span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(5)">Business Type<span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(6)">Max Workmen<span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(7)">Max Contract Workmen<span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(8)">BOCW Applicability<span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(9)">ISMW Applicability<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(10)">Code<span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(11)">Organization<span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(12)">PF Code<span id="sortIndicatorPfCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(13)">License Number<span id="sortIndicatorLicenseNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(14)">WC Number<span id="sortIndicatorWcNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(15)">ESIC Number<span id="sortIndicatorEsicNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(16)">PTREGNO<span id="sortIndicatorPtReg" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(17)">LWFREGNO<span id="sortIndicatorLwfReg" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(18)">Factory License Number<span id="sortIndicatorFactoryLicNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(19)">ISRC Applicable<span id="sortIndicatorCgst" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(20)">RC Number<span id="sortIndicatorSgst" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text" onclick="sortTable(21)">Attachment Name<span id="sortIndicatorIgst" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                <th class="header-text" onclick="sortTable(22)">State ID<span id="sortIndicatorIgst" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(1)"><spring:message code="label.name"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(2)"><spring:message code="label.address"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(3)"><spring:message code="label.managerName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(4)"><spring:message code="label.managerAddress"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(5)"><spring:message code="label.bussinessType"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(6)"><spring:message code="label.maxWorkmen"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(7)"><spring:message code="label.maxContractorWorkmen"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(8)"><spring:message code="label.bocwApplicability"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(9)"><spring:message code="label.ismwApplicability"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(10)"><spring:message code="label.code"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(11)"><spring:message code="label.organization"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(12)"><spring:message code="label.pfCode"/><span id="sortIndicatorPfCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(13)"><spring:message code="label.licenseNumber"/><span id="sortIndicatorLicenseNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(14)"><spring:message code="label.wcNumber"/><span id="sortIndicatorWcNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(15)"><spring:message code="label.esicNumber"/><span id="sortIndicatorEsicNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(16)"><spring:message code="label.ptregno"/><span id="sortIndicatorPtReg" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(17)"><spring:message code="label.lwfregno"/><span id="sortIndicatorLwfReg" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(18)"><spring:message code="label.factoryLicenseNumber"/><span id="sortIndicatorFactoryLicNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(19)"><spring:message code="label.isrcApplicable"/><span id="sortIndicatorIsrApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(20)"><spring:message code="label.rcNumber"/><span id="sortIndicatorRcNum" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text" onclick="sortTable(21)"><spring:message code="label.attachmentName"/><span id="sortIndicatorAttachment" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                <th class="header-text" onclick="sortTable(22)"><spring:message code="label.stateId"/><span id="sortIndicatorStateId" class="sort-indicator sort-asc">&#x25B2;</span></th>
                 </tr>
             </thead>
             <tbody>

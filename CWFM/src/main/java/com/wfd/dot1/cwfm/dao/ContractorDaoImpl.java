@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import org.springframework.ui.Model;
 
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
+import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
+import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.queries.ContractorQueryBank;
 @Repository
@@ -168,6 +173,260 @@ public class ContractorDaoImpl implements ContractorDao{
 	        }
 			return null;
 	}
+	@Value("${SAVE_INSERT_CONTRACTOR_DETAILS}")
+	 private String saveContractorDetails;
+	@Override
+	public String saveReg(ContractorRegistration contreg) {
+		String result = null; 
 
+		int status=0;
+        Object[] parameters = new Object[] {contreg.getContractorregId(),contreg.getPrincipalEmployer(),contreg.getVendorCode(),contreg.getManagerName(),contreg.getLocofWork(),contreg.getTotalStrength(),contreg.getRcMaxEmp(),contreg.getPfNum(),contreg.getNatureOfWork(),contreg.getContractFrom(),contreg.getContractTo(),contreg.getContractType(),contreg.getRcVerified()}; 
 
+        try {
+           status  = jdbcTemplate.update(saveContractorDetails, parameters);
+           return String.valueOf(status);
+        } catch (Exception e) {
+            
+        }
+    
+
+    return String.valueOf(status);
+	}
+	
+	 @Value("${GET_ALL_CONTRACTORS}")
+	 private String getAllContractors;
+	
+	@Override
+	public List<ContractorRegistration> getContractorRegistrationList(String userId) {
+	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractors);
+	while(rs.next()) {
+		ContractorRegistration pe = new ContractorRegistration();
+		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
+		pe.setPrincipalEmployer(rs.getString("UNITCODE"));
+		pe.setVendorCode(rs.getString("CODE"));
+		pe.setContractName(rs.getString("CONTRACTORNAME"));
+		pe.setStatus(rs.getString("STATUS"));
+		pe.setRequestType(rs.getString("TYPE"));
+		
+		peList.add(pe);
+	
+	}
+	return peList;
+	}
+	 @Value("${GET_CONTRACTOR_DETAILS}")
+	 private String getContractorsDetails;
+	@Override
+	public ContractorRenewal getContractorDetails(String contractorRenewId) {
+		ContractorRenewal contr = null;
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(getContractorsDetails, contractorRenewId);
+			if (rs.next()) {
+	            contr = new ContractorRenewal();
+	            contr.setContractorRenewId(rs.getString("CONTRACTORREGID"));
+	            contr.setUnitCode(rs.getString("UNITCODE"));
+	            contr.setOrganisation(rs.getString("UNITNAME"));
+	            contr.setContractorCode(rs.getString("CODE"));
+	            contr.setContractorName(rs.getString("CONTRACTORNAME"));
+	            contr.setManagerName(rs.getString("MANAGERNM"));
+	            contr.setLocationOfWork(rs.getString("LOCOFWORK"));
+	            contr.setSupervisorName(rs.getString("SUPERVISORNAME"));
+	            contr.setPfCode(rs.getString("PFNUM"));
+	            contr.setEmailAdd(rs.getString("EMAILADDR"));
+	            contr.setMobileNumber(rs.getString("MOBILENO"));
+	            contr.setEsicReg(rs.getString("ESICREGNO"));
+	            contr.setContractorValidTo(rs.getString("CONTRACTVALIDTILL"));
+	            contr.setContractorClass(rs.getString("SERVICES"));
+	            contr.setContractorType(rs.getString("CONTYPE"));
+	        }
+			return null;
+	}
+
+	@Override
+	public List<ContractorRegistration> getContractorRegistrationList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	 @Value("${GET_ALL_CONTRACTOR_DETAIL_VIEW}")
+	 private String getAllContractorsDetailsView;
+	@Override
+	public ContractorRegistration viewContractorDetails(String contractorregId) {
+		ContractorRegistration contr = new ContractorRegistration();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractorsDetailsView,contractorregId);
+			if (rs.next()) {
+	            contr = new ContractorRegistration();
+	            contr.setContractorregId(rs.getString("CONTRACTORREGID"));
+	            contr.setPrincipalEmployer(rs.getString("UNITID"));
+	            contr.setVendorCode(rs.getString("CODE"));
+	            contr.setManagerName(rs.getString("MANAGERNM"));
+	            contr.setLocofWork(rs.getString("LOCOFWORK"));
+	            contr.setTotalStrength(rs.getString("TOTALSTRENGTH"));
+	            contr.setRcMaxEmp(rs.getString("MAXNOEMP"));
+	            contr.setPfNum(rs.getString("PFNUM"));
+	            contr.setNatureOfWork(rs.getString("NATUREOFWORK"));
+	            contr.setContractFrom(rs.getString("PERIODSTARTDATE"));
+	            contr.setContractTo(rs.getString("PERIODENDDATE"));
+	            contr.setContractType(rs.getString("CONTTYPE"));
+	            contr.setRcVerified(rs.getString("RCVALIDATED"));
+	            contr.setMainContractor(rs.getString("MAINCONTRACTOR"));
+	        }
+			return contr;
+	}
+	@Value("${GET_ALL_RENEWAL_LIST_CONTRACTORS}")
+	 private String getAllRenewalContractors;
+	@Override
+	public List<ContractorRegistration> getContractorRenewalList(String userId) {
+	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllRenewalContractors);
+	while(rs.next()) {
+		ContractorRegistration pe = new ContractorRegistration();
+		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
+		pe.setPrincipalEmployer(rs.getString("UNITCODE"));
+		pe.setVendorCode(rs.getString("CODE"));
+		pe.setContractName(rs.getString("CONTRACTORNAME"));
+		pe.setStatus(rs.getString("STATUS"));
+		
+		
+		peList.add(pe);
+	
+	}
+	return peList;
+	}
+	@Value("${GET_ALL_CONTRACTOR_ADD_DETAIL_VIEW}")
+	 private String getAllContractorsAdditionalDetails;
+	@Override
+	public List<ContractorRegistration> viewContractorAddDetails(String userId) {
+	List<ContractorRegistration> conList= new ArrayList<ContractorRegistration>();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractorsAdditionalDetails);
+	while(rs.next()) {
+		ContractorRegistration pe = new ContractorRegistration();
+		pe.setWorkOrderNum(rs.getString("WONUMBER"));
+		pe.setNatureOfJob(rs.getString("JOB_NAME"));
+		pe.setDocumentType(rs.getString("LICENCETYPE"));
+		pe.setDocumentNum(rs.getString("WCCODE"));
+		pe.setCoverage(rs.getString("WCTOTAL"));
+		pe.setValidFrom(rs.getString("WCFROMDTM"));
+		pe.setValidTo(rs.getString("WCTODTM"));
+		pe.setAttachments(rs.getString("ATTACHMENTNAME"));
+		
+		conList.add(pe);
+	
+	}
+	return conList;
+	}
+	@Value("${GET_RENEWAL_CONTRACTORS_VIEW}")
+	 private String getRenewalView;
+	@Override
+	public ContractorRenewal viewContractorRenewDetails(String contractorRenewId) {
+		ContractorRenewal contr = new ContractorRenewal();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(getRenewalView,contractorRenewId);
+			if (rs.next()) {
+	            contr = new ContractorRenewal();
+	            contr.setContractorRenewId(rs.getString("CONTRACTORREGID"));
+	            contr.setUnitCode(rs.getString("UNITCODE"));
+	            contr.setOrganisation(rs.getString("UNITNAME"));
+	            contr.setContractorCode(rs.getString("CONTRACTORID"));
+	            contr.setContractorName(rs.getString("CONTRACTORNAME"));
+	            contr.setManagerName(rs.getString("MANAGERNM"));
+	            contr.setLocationOfWork(rs.getString("LOCOFWORK"));
+	            contr.setSupervisorName(rs.getString("SUPERVISORNAME"));
+	            contr.setPfCode(rs.getString("PFNUM"));
+	            contr.setEmailAdd(rs.getString("EMAILADDR"));
+	            contr.setMobileNumber(rs.getString("MOBILENO"));
+	            contr.setEsicReg(rs.getString("ESICREGNO"));
+	            contr.setContractorValidTo(rs.getString("CONTRACTVALIDTILL"));
+	            contr.setContractorClass(rs.getString("SERVICES"));
+	            contr.setContractorType(rs.getString("CONTTYPE"));
+	            
+	           
+	        }
+			return contr;
+	}
+	@Value("${GET_RENEW_CONTRACTOR_ADD_DETAIL_VIEW}")
+	 private String getRenewalContractorsView;
+	@Override
+	public List<ContractorRenewal> viewContractorRenewAddDetails(String userId) {
+	List<ContractorRenewal> conList= new ArrayList<ContractorRenewal>();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(getRenewalContractorsView);
+	while(rs.next()) {
+		ContractorRenewal pe = new ContractorRenewal();
+		
+		pe.setDocumentType(rs.getString("LICENCETYPE"));
+		pe.setDocumentNumber(rs.getString("WCCODE"));
+		pe.setCoverage(rs.getString("WCTOTAL"));
+		pe.setValidFrom(rs.getString("WCFROMDTM"));
+		pe.setValidTo(rs.getString("WCTODTM"));
+		pe.setAttachment(rs.getString("ATTACHMENTNAME"));
+		pe.setPanIndia(rs.getString("ISGLOBAL"));
+		pe.setSubContractor(rs.getString("SUBCONTAPPL"));
+		
+		conList.add(pe);
+	
+	}
+	return conList;
+	}
+	@Override
+	public List<MasterUser> getRoleList(String userId) {
+	List<MasterUser> peList= new ArrayList<MasterUser>();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(ContractorQueryBank.GET_ROLE_LIST);
+	while(rs.next()) {
+		MasterUser pe = new MasterUser();
+		pe.setUserId(rs.getString("UserId"));
+		pe.setFirstName(rs.getString("FirstName"));
+		pe.setLastName(rs.getString("LastName"));
+		pe.setContactNumber(rs.getString("ContactNumber"));
+		pe.setRoleName(rs.getString("RoleName"));
+		
+		
+		peList.add(pe);
+	
+	}
+	return peList;
+	}
+
+	
+	@Override
+	public String saveRole(MasterUser user) {
+		String result = null; 
+
+		int status=0;
+        Object[] parameters = new Object[] {user.getFirstName(),user.getLastName(),user.getUserId(),user.getEmailId(),user.getContactNumber(),user.getPassword(),user.getRoleName()}; 
+
+        try {
+           status  = jdbcTemplate.update(ContractorQueryBank.SAVE_ROLE_FORM, parameters);
+           return String.valueOf(status);
+        } catch (Exception e) {
+            
+        }
+    
+
+    return String.valueOf(status);
+	}
+	@Value("${SET_RENEWAL_DETAILS}")
+	 private String setRenewalDetails;
+	@Override
+	public String saveRenew(ContractorRenewal contrenew) {
+		String result = null; 
+
+		int status=0;
+        Object[] parameters = new Object[] {contrenew.getContractorRenewId(),contrenew.getUnitCode(),contrenew.getOrganisation(),contrenew.getContractorCode(),contrenew.getContractorName(),contrenew.getManagerName(),contrenew.getLocationOfWork(),contrenew.getSupervisorName(),contrenew.getPfCode(),contrenew.getEmailAdd(),contrenew.getMobileNumber(),contrenew.getEsicReg(),contrenew.getContractorValidTo(),contrenew.getContractorClass(),contrenew.getContractorType()}; 
+
+        try {
+           status  = jdbcTemplate.update(setRenewalDetails, parameters);
+           return String.valueOf(status);
+        } catch (Exception e) {
+            
+        }
+    
+
+    return String.valueOf(status);
+	}
+	@Value("${SET_UNIQUE_REGISTRATION_ID}")
+	private String setuniqueregistrationid;
+	@Override
+    public boolean checkIfIdExists(String contractorregId) {
+        String sql = setuniqueregistrationid;
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{contractorregId}, Integer.class);
+        return count != null && count > 0; // True if the ID exists
+    }
 }
+

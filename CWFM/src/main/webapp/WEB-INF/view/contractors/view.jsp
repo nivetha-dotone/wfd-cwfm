@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
     <%@ page isELIgnored="false" %>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -66,49 +67,49 @@ var contextPath = '<%= request.getContextPath() %>';
             <tr>
                 <td>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Unit Code</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
-                         <th><label class="custom-label"><span class="required-field">*</span>Organization</label></th>
-                            <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.organization"/></label></th>
+                            <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        <td >  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/list','Contractor');">Cancel</button>
      </td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="code" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="code" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
-                         <th><label class="custom-label"><span class="required-field">*</span>State</label></th>
-                            <td><input type="text" name="name" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.state"/></label></th>
+                            <td><input type="text" name="name" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Manager Name</label></th>
-                            <td><input type="text" name="managerNm" value="${contractorPEMM.managerNm}" style="height: 20px;"  size="30" maxlength="30" /></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Manager Address</label></th>
-                            <td><input type="text" name="pfNum" value="${contractorPEMM.pfNum}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
+                            <td><input type="text" name="managerNm" value="${contractorPEMM.managerNm}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerAddress"/></label></th>
+                            <td><input type="text" name="pfNum" value="${contractorPEMM.pfNum}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        
                         </tr>
                         
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Email Address</label></th>
-                            <td><input type="text" name="managerEmail" value="${contractorPEMM.managerEmail}" style="height: 20px;"  size="30" maxlength="30" /></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Mobile Number</label></th>
-                            <td><input type="text" name="managerMobile" value="${contractorPEMM.managerMobile}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
+                            <td><input type="text" name="managerEmail" value="${contractorPEMM.managerEmail}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
+                            <td><input type="text" name="managerMobile" value="${contractorPEMM.managerMobile}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>ESIC Registration</label></th>
-                            <td><input type="text" name="esicNum" value="${contractorPEMM.esicNum}" style="height: 20px;"  size="30" maxlength="30" /></td>
-                            <th><label class="custom-label">Contract Valid Till</label></th>
-                            <td><input type="text" name="" value="0" style="height: 20px;"  size="30" maxlength="30" disabled="true" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicRegistration"/></label></th>
+                            <td><input type="text" name="esicNum" value="${contractorPEMM.esicNum}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <th><label class="custom-label"><spring:message code="label.contractValidTill"/></label></th>
+                            <td><input type="text" name="" value="0" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Is RC Verified</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isRcVerified"/></label></th>
                             <td>
     <c:choose>
         <c:when test="${contractorPEMM.rcValidated}">
@@ -180,11 +181,11 @@ var contextPath = '<%= request.getContextPath() %>';
 <div class="panel second-child">
 <table  class="Tabular" cellpadding="0" cellspacing="0">
 	<thead>
-		<tr><th> Labor License Number</th>
-		<th>From Date</th>
-		<th>To Date</th> 
-		<th>Total</th>
-		<th>Active Workmen Count</th>
+		<tr><th> <spring:message code="label.labourLicenseNumber"/></th>
+		<th><spring:message code="label.fromDate"/></th>
+		<th><spring:message code="label.toDate"/></th> 
+		<th><spring:message code="label.total"/></th>
+		<th><spring:message code="label.activeWorkmenCount"/></th>
 		</tr> 		
 	</thead>
 	<tbody >
@@ -219,13 +220,13 @@ var contextPath = '<%= request.getContextPath() %>';
 <div class="panel second-child">
 <table class="Tabular" cellpadding="0" cellspacing="0">
 	<thead>
-		<tr><th>WC Policy/ESIC Reg Number <%-- <fmt:message key="label.wc.code" /> --%></th>
-		<th>License Type</th>
-		<th>Job Name</th>
-			<th>From Date</th>
-		<th>To Date</th> 
-		<th>Total</th>
-		<th>Active Workmen Count</th>
+		<tr><th><spring:message code="label.wcPolicyesicRegNumber"/> <%-- <fmt:message key="label.wc.code" /> --%></th>
+		<th><spring:message code="label.licenseType"/></th>
+		<th><spring:message code="label.jobName"/></th>
+			<th><spring:message code="label.fromDate"/></th>
+		<th><spring:message code="label.toDate"/></th> 
+		<th><spring:message code="label.total"/></th>
+		<th><spring:message code="label.activeWorkmenCount"/></th>
 		</tr> 		
 	</thead>
 	<tbody >
@@ -283,11 +284,11 @@ var contextPath = '<%= request.getContextPath() %>';
 <div class="panel second-child">
 <table class="Tabular" cellpadding="0" cellspacing="0">
 	<thead>
-		<tr><th> Workorder Number</th>
-			<th>From Date</th>
-		<th>To Date</th> 
-		<th>Active Workmen Count</th>
-		 <th>Contract Classification</th> 
+		<tr><th><spring:message code="label.workOrderNumber"/></th>
+			<th><spring:message code="label.fromDate"/></th>
+		<th><spring:message code="label.toDate"/></th> 
+		<th><spring:message code="label.activeWorkmenCount"/></th>
+		 <th><spring:message code="label.contractorClassification"/></th> 
 		</tr> 		
 	</thead>
 	<tbody >

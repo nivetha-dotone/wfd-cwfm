@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+    <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -163,15 +164,15 @@ th label {
 				<th style="display: none"><input type="text" value=""   onchange="setDataChanged();" size="40" maxlength="50" /></th>
 			</tr>
 			<tr >
-				<th><label class="custom-label"><span class="required-field">*</span> TransactionId</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.transactioId"/></label></th>
 				<td><input type="text" value="9104018702"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 				
 			</tr>
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Unit Code</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.unitCode"/></label></th>
 				<td><input type="text" value="590E"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span> Unit Name</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.unitName"/></label></th>
 				<td><input type="text" value="AIIL-AHMEDABAD"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 			<!-- <td rowspan="4" colspan="3">
 			<img id="imageId" src="img/profile.jpg" alt="profileImg" width="150" height="150" onclick="document.getElementById('importFile').click();" onchange="setDataChanged();"/>
@@ -179,23 +180,23 @@ th label {
 			</tr>
 			
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Vendor Code</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
 				<td><input type="text" value="135597"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span> Contractor Name</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.contractorName"/></label></th>
 				<td><input type="text" value="Innovsource Srvices Pvt Ltd"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 					
 			</tr>
 			
 			
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Bill End Date</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.billEndDate"/></label></th>
 				<td >
 					<input id="value(bed)" readonly="true" name="value(bed)" onchange="setAge();" type=text style="width: 180px;height: 20px;" value="08/10/2024"></input>
 					<%-- <kvl:date-selector-eot-bot-popup id="value(dob)" eot_bot_enable="bot" start_of_week="1" hide_text_field="true" text_label_field="label.dateofbirth" /> --%>
 <!-- 					<span>*dd/mm/yyyy format only</span> -->
 				</td>
-				<th><label class="custom-label"><span class="required-field">*</span> Bill Start Date</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billStartDate"/></label></th>
 				<td >
 					<input id="value(bsd)" readonly="true" name="value(bsd)" onchange="setAge();" type=text style="width: 180px;height: 20px;" value="01/10/2024"></input>
 					<%-- <kvl:date-selector-eot-bot-popup id="value(dob)" eot_bot_enable="bot" start_of_week="1" hide_text_field="true" text_label_field="label.dateofbirth" /> --%>
@@ -204,10 +205,10 @@ th label {
 			</tr>
 			
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Work Order Code</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.workorderCode"/></label></th>
 				<td><input type="text" value="5703000909"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span>Bill Type</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billType"/></label></th>
 				<td >
 					<select id="value(billtype)" name="value(billtype)" style="width: 180px;height: 25px;">
 					<option value="Female">Regular</option>
@@ -215,13 +216,13 @@ th label {
 				</td>			
 			</tr>
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Work Order Valid From</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.workorderValidFrom"/></label></th>
 				<td >
 					<input id="value(wvf)" readonly="true" name="value(wvf)" onchange="setAge();" type=text style="width: 180px;height: 20px;" value="28/04/2021"></input>
 					<%-- <kvl:date-selector-eot-bot-popup id="value(dob)" eot_bot_enable="bot" start_of_week="1" hide_text_field="true" text_label_field="label.dateofbirth" /> --%>
 <!-- 					<span>*dd/mm/yyyy format only</span> -->
 				</td>
-				<th><label class="custom-label"><span class="required-field">*</span> Work Order Valid To</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.workorderValidTo"/></label></th>
 				<td >
 					<input id="value(wvt)" readonly="true" name="value(wvt)" onchange="setAge();" type=text style="width: 180px;height: 20px;" value="01/01/2025"></input>
 					<%-- <kvl:date-selector-eot-bot-popup id="value(dob)" eot_bot_enable="bot" start_of_week="1" hide_text_field="true" text_label_field="label.dateofbirth" /> --%>
@@ -229,7 +230,7 @@ th label {
 				</td>
 			</tr>
 			<tr>
-			<th><label class="custom-label"><span class="required-field">*</span>Bill Category</label></th>
+			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billCategory"/></label></th>
 				<td >
 					<select id="value(billcategory)" name="value(billcategory)" style="width: 180px;height: 25px;">
 					<option value="Female">SLA with head count</option>
@@ -238,7 +239,7 @@ th label {
 			</tr>
 			
 			<tr>
-			<th><label class="custom-label"><span class="required-field">*</span>Enginerring -in-Charge</label></th>
+			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.engineeringInCharge"/></label></th>
 				<td>
 					<select id="value(engincharge)" name="value(engincharge)" style="width: 256px;height: 150px;"></select>
 				</td>	
@@ -264,24 +265,24 @@ th label {
        <table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Standardize Muster roll Report</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.standardMusterRollReport"/></label></th>
 				<td><input type="file" value="No file selected"   onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span> Bill verification Abstract Report</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.billVerificationAbstractReport"/></label></th>
 				<td><input type="file" value="No file selected"   onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 					
 			</tr>
 			
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Wage Cost Report</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wageCostReport"/></label></th>
 				<td><input type="file" value="No file selected"   onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span> Bonus Report</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.bonusReport"/></label></th>
 				<td><input type="file" value="No file selected"   onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 					
 			</tr>
 			<tr>
-				<th><label class="custom-label"><span class="required-field">*</span> Extra Hours Report</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.extraHoursReport"/></label></th>
 				<td><input type="file" value="No file selected"   onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 			</tr>
 			</tbody>
@@ -295,74 +296,74 @@ th label {
        <table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
 		   <tr>
-		   		<th><label class="custom-label"><span></span>Form A</label></th>
+		   		<th><label class="custom-label"><span></span><spring:message code="label.formA"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">Form B</label></th>
+				<th><label class="custom-label"><spring:message code="label.formB"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 		   
 			   <tr>
-		   		<th><label class="custom-label"><span></span>Form C</label></th>
+		   		<th><label class="custom-label"><span></span><spring:message code="label.formC"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">Form D</label></th>
+				<th><label class="custom-label"><spring:message code="label.formD"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 			 <tr>
-		   		<th><label class="custom-label"><span></span>ECR PF</label></th>
+		   		<th><label class="custom-label"><span></span><spring:message code="label.ecrpf"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">Challan and Copy of Remittance PF</label></th>
+				<th><label class="custom-label"><spring:message code="label.challanandCopyofRemittancePF"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 			
 			<tr>
-		   		<th><label class="custom-label"><span></span>ECR ESIC</label></th>
+		   		<th><label class="custom-label"><span></span><spring:message code="label.esicpf"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">Challan and Copy of Remittance ESIC</label></th>
-				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
-		   </tr>
-			
-			
-			<tr>
-		   		<th><label class="custom-label"><span></span>Bank Statement</label></th>
-				<td>
-					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
-				</td>
-				<th><label class="custom-label">Annual Return</label></th>
+				<th><label class="custom-label"><spring:message code="label.challanandCopyofRemittanceesic"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 			
 			
 			<tr>
-		   		<th><label class="custom-label"><span>Bonus Register</span></label></th>
+		   		<th><label class="custom-label"><span></span><spring:message code="label.bankStatement"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">LWF Challan and Remittance</label></th>
+				<th><label class="custom-label"><spring:message code="label.annualReturn"/></label></th>
+				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
+		   </tr>
+			
+			
+			<tr>
+		   		<th><label class="custom-label"><span><spring:message code="label.bonusRegister"/></span></label></th>
+				<td>
+					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
+				</td>
+				<th><label class="custom-label"><spring:message code="label.lwfChallanandRemittance"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 			
 				<tr>
-		   		<th><label class="custom-label">Challan and copy of remittance PT</label></th>
+		   		<th><label class="custom-label"><spring:message code="label.challanandCopyofRemittancePT"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">User Attachment 1</label></th>
+				<th><label class="custom-label"><spring:message code="label.userAttachment1"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 				<tr>
-		   		<th><label class="custom-label">User Attachment 2</label></th>
+		   		<th><label class="custom-label"><spring:message code="label.userAttachment2"/></label></th>
 				<td>
 					<input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" />
 				</td>
-				<th><label class="custom-label">User Attachment 3</label></th>
+				<th><label class="custom-label"><spring:message code="label.userAttachment3"/></label></th>
 				<td><input type="file" value="No file selected"  onchange="setDataChanged();" style="width: 165px;height: 21px;" /></td>
 		   </tr>
 		</tbody>
@@ -381,15 +382,15 @@ th label {
 </thead>
 	<tbody>
 		<tr>
-    <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><b>S.N</b></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid;width:40%;"><b>Check Points</b></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid;width:30%;"><b>Status Y/N</b></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid; text-align: left;width:24%;"><b>Licence No./ Policy No/ Code No.</b></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid;width:30%;"><b>Date of Compliance /valid upto </b></td>
+    <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><b><spring:message code="label.s.no"/></b></td>
+    <td style=" border-top: thin solid; border-bottom: thin solid;width:40%;"><b><spring:message code="label.checkPoints"/></b></td>
+    <td style=" border-top: thin solid; border-bottom: thin solid;width:30%;"><b><spring:message code="label.statusy/n"/></b></td>
+    <td style=" border-top: thin solid; border-bottom: thin solid; text-align: left;width:24%;"><b><spring:message code="label.licenseNoPolicyCodeNo"/></b></td>
+    <td style=" border-top: thin solid; border-bottom: thin solid;width:30%;"><b><spring:message code="label.dateofCompilanceValidUpto"/> </b></td>
    </tr>
    <tr>
 	 <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" >1</td>
-    <td  style="text-align: left;border-bottom: thin solid;" >Licence copy obtained by Vendor under Contract Labour Act 1970.</td>
+    <td  style="text-align: left;border-bottom: thin solid;color: black;" >Licence copy obtained by Vendor under Contract Labour Act 1970.</td>
     			<td style="text-align: center;border-bottom: thin solid;">
 					<select id="value(LLStatus)"  name="value(LLStatus)" style="width: 100px;height:20px;">
 					  <option  value="1">Yes</option> 
@@ -631,10 +632,10 @@ th label {
 <table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
 			<tr>
-				<th><label class="custom-label"> Previous Comment</label></th>
+				<th><label class="custom-label"> <spring:message code="label.previousComment"/></label></th>
 				<td><input type="text" value=" "   onchange="setDataChanged();" style="width: 265px;height: 150px;" /></td>
 				
-				<th><label class="custom-label">Comment</label></th>
+				<th><label class="custom-label"><spring:message code="label.comment"/></label></th>
 				<td><input type="text" value=" "   onchange="setDataChanged();" style="width: 265px;height: 150px;" /></td>
 				</tr>
 		</tbody>

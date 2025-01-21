@@ -14,6 +14,10 @@ public class MasterUser {
 	
 	private String fullName;
 	
+	private String newPassword;
+	
+	private String confirmPassword;
+	
 	public String getFullName() {
 		return fullName;
 	}
@@ -119,5 +123,31 @@ public class MasterUser {
 
 	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
+	}
+
+	public void setUserAccount(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Object getUserAccount() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 }

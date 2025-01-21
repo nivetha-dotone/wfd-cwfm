@@ -254,19 +254,27 @@ function initializeDatePicker() {
 	}
 
     const firstName = $("#firstName").val().trim();
-    if (firstName === "") {
-        $("#error-firstName").show();
-        isValid = false;
-    }else{
-		$("#error-firstName").hide();
-	}
+    const firstnameRegex = /^[A-Za-z\s]{2,}$/;
+    if (!firstnameRegex.test(firstName)) {
+    $("#error-firstName").show(); 
+    isValid = false;
+    } else {
+    $("#error-firstName").hide(); 
+    }
     const lastName = $("#lastName").val().trim();
-    if (lastName === "") {
+    const lastnameRegex = /^[A-Za-z\s]{1,}$/;
+    if (!lastnameRegex.test(lastName)) {
         $("#error-lastName").show();
         isValid = false;
     }else{
 		 $("#error-lastName").hide();
 	}
+	if (firstName.toLowerCase() === lastName.toLowerCase()) {
+    $("#error-equalNames").show();
+    isValid = false;
+    } else {
+    $("#error-equalNames").hide();
+    }
     const dateOfBirth = $("#dateOfBirth").val().trim();
     if (dateOfBirth === "") {
         $("#error-dateOfBirth").show();
@@ -282,14 +290,16 @@ function initializeDatePicker() {
 		$("#error-gender").hide();
 	}
     const relationName = $("#relationName").val().trim();
-    if (relationName === "") {
-        $("#error-relationName").show();
-        isValid = false;
-    }else{
-		 $("#error-relationName").hide();
-	}
+    const relationnameRegex = /^[A-Za-z\s]{2,}$/;  // Only alphabetic characters, at least 2 letters
+    if (!relationnameRegex.test(relationName)) {
+    $("#error-relationName").show(); // Show error if invalid
+    isValid = false;
+    } else {
+    $("#error-relationName").hide(); // Hide error if valid
+    }
     const idMark = $("#idMark").val().trim();
-    if (idMark === "") {
+    const idmarkRegex=/^[A-Za-z\s]+$/;
+    if (!idmarkRegex.test(idMark)) {
         $("#error-idMark").show();
         isValid = false;
     }else{
@@ -312,6 +322,15 @@ function initializeDatePicker() {
     }else{
 		$("#error-maritalStatus").hide();
 	}
+	const address=$("#address").val().trim();
+	const addressRegex=/^[A-Za-z0-9\s,.'-]{5,}$/;
+	if (!addressRegex.test(address)) {
+                 $("#error-address").show();
+        			isValid = false;
+     }else{
+		 $("#error-address").hide();
+	 }
+
     return isValid;
 
 }
@@ -375,7 +394,8 @@ function validateEmploymentInformation(){
 		$("#error-eic").hide();
 	}
 	 const noj = $("#natureOfJob").val().trim();
-    if (noj === "") {
+	 const nojRegex = /^[A-Za-z]{2,}$/;
+    if (!nojRegex.test(noj)) {
         $("#error-natureOfJob").show();
         isValid = false;
     }else{
@@ -403,7 +423,8 @@ function validateEmploymentInformation(){
 		$("#error-accessArea").hide();
 	}
 	 const uan = $("#uanNumber").val().trim();
-    if (uan === "") {
+	 const uanRegex = /^\d{12}$/;
+    if (!uanRegex.test(uan)) {
         $("#error-uanNumber").show();
         isValid = false;
     }else{
@@ -415,6 +436,13 @@ function validateEmploymentInformation(){
         isValid = false;
     }else{
 		 $("#error-healthCheckDate").hide();
+	}
+	const doj = $("#doj").val().trim();
+    if (doj === "") {
+        $("#error-doj").show();
+        isValid = false;
+    }else{
+		 $("#error-doj").hide();
 	}
 	return isValid;
 }
@@ -466,7 +494,8 @@ function validateOtherInformation(){
 		$("#error-accountNumber").hide();
 	}
 	const emergencyName = $("#emergencyName").val().trim();
-    if (emergencyName === "") {
+	const firstnameRegex = /^[A-Za-z\s]{2,}$/;
+    if (!firstnameRegex.test(emergencyName)) {
         $("#error-emergencyName").show();
         isValid = false;
     }else{
@@ -506,7 +535,7 @@ function validateWages(){
     }else{
 		$("#error-zone").hide();
 	}
-	const allowanceRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+	const allowanceRegex = /^[0-9]{1,3}(\.[0-9]{1,2})?$/;
 	const basic = $("#basic").val().trim();
 	const da = $("#da").val().trim();
 	const hra = $("#hra").val().trim();
@@ -1557,4 +1586,30 @@ function previewImage(event,inputId,displayId) {
                 };
                 reader.readAsDataURL(file);
             }
+        }
+        
+        function exportCSVFormat() {
+            var selectedRows = document.querySelectorAll('input[name="selectedWOs"]:checked');
+            console.log("selectedRows.length"+selectedRows.length);
+            if (selectedRows.length === 0) {
+                alert("Please select at least one record to export.");
+                return;
+            }
+
+            var csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "GatePass Id,First Name,Last Name,Gender,Date of Birth,Aadhar Number,Contractor Name,Vendor Code,Unit Name,GatePass Type,Status\n"; // Add headers here
+            selectedRows.forEach(function(row) {
+                var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6),td:nth-child(7),td:nth-child(8),td:nth-child(9),td:nth-child(10),td:nth-child(11),td:nth-child(12)'); // Adjust column indices as needed
+                var rowArray = [];
+                rowData.forEach(function(cell) {
+                    rowArray.push(cell.innerText);
+                });
+                csvContent += rowArray.join(",") + "\n";
+            });
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "QuickOnboarding.csv");
+            document.body.appendChild(link);
+            link.click();
         }

@@ -78,10 +78,10 @@
                     </td> 
                     <!-- Add more table headers for each column -->
                     <th class="header-text"  onclick="sortTable(1)">Name<span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(2)">Address<span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(3)">Manager Name<span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(4)">Manager Address<span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(5)">Business Type<span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                   <th class="header-text"  onclick="sortTable(2)">Address<span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                   <th class="header-text"  onclick="sortTable(3)">Manager Name<span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                   <th class="header-text"  onclick="sortTable(4)">Manager Address<span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(5)">Business Type<span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(6)">Max Workmen<span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(7)">Max Contract Workmen<span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(8)">BOCW Applicability<span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>

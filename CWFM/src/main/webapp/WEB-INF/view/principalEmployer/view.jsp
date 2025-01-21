@@ -179,48 +179,48 @@ table.ControlLayout td {
         <tbody>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
-                <td><input type="text" name="NAME" value="${principalEmployer.name}" style="height: 20px;" size="30" maxlength="30" readonly="true" /></td>
+                <td><input type="text" name="NAME" value="${principalEmployer.name}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.peInactive"/></label></th>
                 <td>
                     <c:choose>
                         <c:when test="${principalEmployer.isActive == 1}}">
-                            <input type="checkbox" name="isActive" value="1" checked="checked" style="height: 20px;" onclick="return false;"/>
+                            <input type="checkbox" name="isActive" value="1" checked="checked" style="height: 20px;" onclick="return false;" readonly/>
                         </c:when>
                         <c:otherwise>
-                            <input type="checkbox" name="isActive" value="0" style="height: 20px;" onclick="return false;"/>
+                            <input type="checkbox" name="isActive" value="0" style="height: 20px;" onclick="return false;" readonly/>
                         </c:otherwise>
                     </c:choose>
                 </td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
-                <td><input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.organization"/></label></th>
-                <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;" size="30" maxlength="30"readonly /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
-                <td><input type="text" name="address" value="${principalEmployer.address}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>State</label></th>
-                <td><input type="text" name="stateId" value="${principalEmployer.stateId}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <td><input type="text" name="address" value="${principalEmployer.address}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.state"/></label></th>
+                <td><input type="text" name="stateId" value="${principalEmployer.stateId}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Manager Name</label></th>
-                <td><input type="text" name="managerName" value="${principalEmployer.managerName}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Manager Address</label></th>
-                <td><input type="text" name="managerAddrs" value="${principalEmployer.managerAddrs}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
+                <td><input type="text" name="managerName" value="${principalEmployer.managerName}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerAddress"/></label></th>
+                <td><input type="text" name="managerAddrs" value="${principalEmployer.managerAddrs}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Type of Business</label></th>
-                <td><input type="text" name="businessType" value="${principalEmployer.businessType}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Maximum Number of Workmen</label></th>
-                <td><input type="text" name="maxWorkmen" value="${principalEmployer.maxWorkmen}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.typeOfBusiness"/></label></th>
+                <td><input type="text" name="businessType" value="${principalEmployer.businessType}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.maximumNumberofWorkmen"/></label></th>
+                <td><input type="text" name="maxWorkmen" value="${principalEmployer.maxWorkmen}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Maximun Number of Contract Workmen</label></th>
-                <td><input type="text" name="maxCntrWorkmen" value="${principalEmployer.maxCntrWorkmen}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label">Current count of Contract Workmen</label></th>
-                <td><input type="text" name="" value="0" style="height: 20px;" size="30" maxlength="30" disabled="true" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.maximumNumberofContractWorkmen"/></label></th>
+                <td><input type="text" name="maxCntrWorkmen" value="${principalEmployer.maxCntrWorkmen}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <th><label class="custom-label"><spring:message code="label.currentCountofContractWorkmen"/></label></th>
+                <td><input type="text" name="" value="0" style="height: 20px;" size="30" maxlength="30" readonly/></td>
             </tr>
             
         </tbody>
@@ -239,29 +239,29 @@ table.ControlLayout td {
                     <tbody>
                         <!-- Additional Info Content Here -->
                       <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>BOCW License Number</label></th>
-                <td><input type="text" name="licenseNumber" value="BOCW12345" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Coverage</label></th>
-                <td><input type="text" name="pfCode" value="150" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.bocwLicenseNumber"/></label></th>
+                <td><input type="text" name="licenseNumber" value="BOCW12345" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.coverage"/></label></th>
+                <td><input type="text" name="pfCode" value="150" style="height: 20px;" size="30" maxlength="30" readonly/></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Validity From</label></th>
-                <td><input type="text" name="licenseNumber" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Validity To</label></th>
-                <td><input type="text" name="pfCode" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.validFrom"/></label></th>
+                <td><input type="text" name="licenseNumber" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.validTo"/></label></th>
+                <td><input type="text" name="pfCode" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             
               <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>ISMW License Number</label></th>
-                <td><input type="text" name="licenseNumber" value="ISMW12345" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Coverage</label></th>
-                <td><input type="text" name="pfCode" value="100" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.ismwLicenseNumber"/></label></th>
+                <td><input type="text" name="licenseNumber" value="ISMW12345" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.coverage"/></label></th>
+                <td><input type="text" name="pfCode" value="100" style="height: 20px;" size="30" maxlength="30" readonly/></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Validity From</label></th>
-                <td><input type="text" name="licenseNumber" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>Validity To</label></th>
-                <td><input type="text" name="pfCode" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.validFrom"/></label></th>
+                <td><input type="text" name="licenseNumber" value="01/01/2024" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.validTo"/></label></th>
+                <td><input type="text" name="pfCode" value="01/01/2030" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
                      <%--   <tr>
                 <th><label class="custom-label"><span class="required-field">*</span>BOCWAct Applicability</label></th>
@@ -288,41 +288,41 @@ table.ControlLayout td {
                 </td>
             </tr> --%>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>License Number</label></th>
-                <td><input type="text" name="licenseNumber" value="${principalEmployer.licenseNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>PF Code</label></th>
-                <td><input type="text" name="pfCode" value="${principalEmployer.pfCode}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.licenseNumber"/></label></th>
+                <td><input type="text" name="licenseNumber" value="${principalEmployer.licenseNumber}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfCode"/></label></th>
+                <td><input type="text" name="pfCode" value="${principalEmployer.pfCode}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>WC Number</label></th>
-                <td><input type="text" name="wcNumber" value="${principalEmployer.wcNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>ESIC Number</label></th>
-                <td><input type="text" name="esicNumber" value="${principalEmployer.esicNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcNumber"/></label></th>
+                <td><input type="text" name="wcNumber" value="${principalEmployer.wcNumber}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.esicNumber"/></label></th>
+                <td><input type="text" name="esicNumber" value="${principalEmployer.esicNumber}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>PT Registration No.</label></th>
-                <td><input type="text" name="ptRegNo" value="${principalEmployer.ptRegNo}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>LWF Registration No.</label></th>
-                <td><input type="text" name="lwfRegNo" value="${principalEmployer.lwfRegNo}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.ptRegistrationNo"/></label></th>
+                <td><input type="text" name="ptRegNo" value="${principalEmployer.ptRegNo}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.lwfRegistrationNo"/></label></th>
+                <td><input type="text" name="lwfRegNo" value="${principalEmployer.lwfRegNo}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Factory Licence No</label></th>
-                <td><input type="text" name="factoryLicenseNumber" value="${principalEmployer.factoryLicenseNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
-                <th><label class="custom-label"><span class="required-field">*</span>IS RC Applicable ?</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.factoryLicenseNumber"/></label></th>
+                <td><input type="text" name="factoryLicenseNumber" value="${principalEmployer.factoryLicenseNumber}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isrcApplicable"/></label></th>
                 <td>
                     <c:choose>
                         <c:when test="${principalEmployer.isRcApplicable == 1}}">
-                            <input type="checkbox" name="isRcApplicable" value="1" checked="checked" style="height: 20px;" onclick="return false;"/>
+                            <input type="checkbox" name="isRcApplicable" value="1" checked="checked" style="height: 20px;" onclick="return false;" readonly />
                         </c:when>
                         <c:otherwise>
-                            <input type="checkbox" name="isRcApplicable" value="0" style="height: 20px;" onclick="return false;"/>
+                            <input type="checkbox" name="isRcApplicable" value="0" style="height: 20px;" onclick="return false;" readonly/>
                         </c:otherwise>
                     </c:choose>
                 </td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>RC Number</label></th>
-                <td><input type="text" name="rcNumber" value="${principalEmployer.rcNumber}" style="height: 20px;" size="30" maxlength="30" /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.rcNumber"/></label></th>
+                <td><input type="text" name="rcNumber" value="${principalEmployer.rcNumber}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
                 <%-- <th><label class="custom-label"><span class="required-field">*</span>RC Validity</label></th>
                 <td><input type="text" name="RCVALIDITY" value="${principalEmployer.RCVALIDITY}" style="height: 20px;" size="30" maxlength="30" /></td>
              --%></tr>

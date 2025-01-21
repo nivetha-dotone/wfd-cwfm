@@ -189,7 +189,7 @@ public class WorkmenController {
     
     }
     
-    private static final String ROOT_DIRECTORY = "D:/wfd_cwfm/ep_docs/";
+    private static final String ROOT_DIRECTORY = "C:/wfd_cwfm/ep_docs/";
 
     public String uploadDocuments( MultipartFile aadharFile,
                                          MultipartFile policeFile,

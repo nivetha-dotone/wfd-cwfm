@@ -562,7 +562,34 @@ table th {
         <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->
     </ul>
 </li>
-    
+  <li>
+            <a href="#" class="nav-link" onclick="toggleSubMenu('general-management-sub-menu')">
+                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
+                <span class="nav-text">General Management</span>
+                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
+                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
+            </a>
+            <ul class="sub-menu" id="general-management-sub-menu">
+              <li><a href="#" onclick="loadCommonList('/generalController/gmType', 'General Type')">General Type</a></li>
+<li><a href="#" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">General Master</a></li>
+<li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
+<li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
+            </ul>
+        </li>
+        
+        <li>
+            <a href="#" class="nav-link" onclick="toggleSubMenu('admin-sub-menu')">
+                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
+                <span class="nav-text">Admin</span>
+                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
+                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
+            </a>
+            <ul class="sub-menu" id="admin-sub-menu">
+              <li><a href="#" onclick="loadCommonList('/org-level/list', 'Org Levels')">Org Levels</a></li>
+<li><a href="#" onclick="loadCommonList('/org-level-entryController/org-level-entry', 'Org Level Entries')">Org Level Entries</a></li>
+<li><a href="#" onclick="loadCommonList('/org-level-mapping/list', 'Org Level Mappings')">Org Level Mappings</a></li>
+            </ul>
+        </li>  
   <li>
                 <a href="#" class="nav-link" onclick="toggleSubMenu('contractor-sub-menu')">
                     <i class="fa fa-users nav-icon"></i>
@@ -572,6 +599,8 @@ table th {
                 </a>
                 <ul class="sub-menu" id="contractor-sub-menu">
                     <li><a href="#" onclick="loadCommonList('/contractor/contReg','Contractor Registration')">Contractor Registration</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Contractor Registration List</a></li> 
+                     <li><a href="#" onclick="loadCommonList('/contractor/view','Contractor Registration view')">Contractor View</a></li> 
                     <li><a href="#" onclick="loadContractorRenewal()">Renewal</a></li>
                 </ul>
             </li>

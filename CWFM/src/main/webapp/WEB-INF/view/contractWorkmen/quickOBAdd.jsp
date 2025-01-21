@@ -3,6 +3,7 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -288,6 +289,7 @@ label {
             max-width: 100%;
             max-height: 100%;
         }
+       
         
     </style>
      <%
@@ -428,13 +430,13 @@ label {
     </td>
 </tr> -->
             <tr>
-    <th><label class="custom-label"><span class="required-field">*</span>Aadhar Number</label></th>
+    <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
     <td>
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12">
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
     
-    <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" >Generate OTP</button></td>
+    <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" ><spring:message code="label.generateotp"/></button></td>
     
     <td>
     	<input id="otp" name="otp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" placeholder="Enter otp here">
@@ -446,30 +448,33 @@ label {
     </td> -->
     </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>First Name</label></th>
-                <td>
-                	<input id="firstName" name="firstName" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	<label id="error-firstName" style="color: red;display: none;">First Name is required</label>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.firstName"/></label></th>
+                <td class="capitalize">
+                	<input id="firstName" name="firstName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                	<label id="error-firstName" style="color: red;display: none;">Please enter a valid First Name.</label>
                 </td>
            
             
-                <th><label class="custom-label"><span class="required-field">*</span>Last Name</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.lastName"/></label></th>
                 <td>
-                	<input id="lastName" name="lastName" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	 <label id="error-lastName" style="color: red;display: none;">Last Name is required</label>
+                	<input id="lastName" name="lastName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                	 <label id="error-lastName" style="color: red;display: none;">Please enter a valid Last Name.</label>
                 </td>
           
             </tr>
+            <tr  id="error-equalNames" style="display: none;" >
+           <label  id="error-equalNames" style="display:none;">First name cannot be the same as last name.</label>
+            </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Date of Birth</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <!--  <td><input id="dateOfBirth" name="dateOfBirth" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30"></td> -->
                <td>
     				<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"  onfocus="initializeDatePicker()" 
        onclick="initializeDatePicker()" >
-					  <label id="error-dateOfBirth" style="color: red;display: none;">Date Of Birth is required</label>
+					  <label id="error-dateOfBirth" style="color: red;display: none;">Please enter a valid Date Of Birth</label>
 			</td>
                
-                <th><label class="custom-label"><span class="required-field">*</span>Gender</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.gender"/></label></th>
                 <td>
                     <select class="custom-select" name="gender" id="gender">
                         <option value="">Please select Gender</option>
@@ -481,24 +486,24 @@ label {
                 </td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Father/Husband Name</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.fatherHusbandName"/></label></th>
                 <td>
-                	<input id="relationName" name="relationName" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	<label id="error-relationName" style="color: red;display: none;">Father / Husband name is required</label>
+                	<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                	<label id="error-relationName" style="color: red;display: none;">Please enter a valid Father / Husband name</label>
                 </td>
-                <th><label class="custom-label"><span class="required-field">*</span>ID Mark</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.idMark"/></label></th>
                 <td>
-                	<input id="idMark" name="idMark" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	<label id="error-idMark"style="color: red;display: none;">ID Mark is required</label>
+                	<input id="idMark" name="idMark" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                	<label id="error-idMark"style="color: red;display: none;">Please enter a valid ID Mark</label>
                 </td>
             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span>Mobile Number</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
                 <td>
                 	<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	<label id="error-mobileNumber" style="color: red;display: none;">Mobile Number is required</label>
+                	<label id="error-mobileNumber" style="color: red;display: none;">Please enter a valid Mobile Number</label>
                 </td>
-                <th><label class="custom-label"><span class="required-field">*</span>Marital Status</label></th>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.maritalStatus"/></label></th>
                 <td>
                 	<select class="custom-select" name="maritalStatus" id="maritalStatus">
                         <option value="">Please select Marital Status</option>
@@ -509,10 +514,10 @@ label {
                 </td>
             </tr>
            <tr>
-           	 <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
+           	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td>
-                	<input id="address" name="address" style="width: 100%;height: 20px;" type="text" >
-                	<label id="error-address" style="color: red;display: none;">Address is required</label>
+                	<input id="address" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" >
+                	<label id="error-address" style="color: red;display: none;">Please enter a valid Address</label>
                 </td>
            </tr>
         </tbody>
@@ -524,7 +529,7 @@ label {
                 <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Principal Employer</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
                             <td><select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getContractorsAndTrades(this.value, '${sessionScope.loginuser.userId}')">
                                 <option value="">Please select Principal Employer</option>
                                 <c:forEach var="pe" items="${PrincipalEmployer}">
@@ -533,7 +538,7 @@ label {
                                 </select>
                                 <label id="error-principalEmployer"style="color: red;display: none;">Principal Employer is required</label>
                             </td>
-                            <th><label class="custom-label"><span class="required-field">*</span>Contractor</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractor"/></label></th>
                             <td><select class="custom-select" id="contractor" name="contractorId" onchange="getWorkordersAndWC()">
             						<option value="">Please select Contractor</option>
         						</select>
@@ -541,20 +546,20 @@ label {
         					</td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Workorder</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workorder"/></label></th>
                             <td><select class="custom-select" id="workorder" name="workorderId" >
                                 <option value="">Please select Workorder</option>
                                 </select>
                                 <label id="error-workorder" style="color: red;display: none;">Workorder is required</label>
                             </td>
-                            <th><label class="custom-label"><span class="required-field">*</span>Trade</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.trade"/></label></th>
                             <td><select class="custom-select" id="trade" name="tradeId" >
                                 <option value="">Please select Trade</option></select>
                                 <label id="error-trade"style="color: red;display: none;">Trade is required</label>
                                 </td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Skill</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.skill"/></label></th>
                             <td><select class="custom-select" id="skill" name="skillId" >
                                 	<option value="">Please select Skill</option>
                                 	 <c:forEach var="s" items="${Skills}">
@@ -563,7 +568,7 @@ label {
                                 </select>
                                 <label id="error-skill" style="color: red;display: none;">Skill is required</label>
                             </td>
-                            <th><label class="custom-label"><span class="required-field">*</span>Department</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.department"/></label></th>
                             <td><select class="custom-select" id="department" name="departmentId" >
                                 <option value="">Please select Department</option>
                                  <c:forEach var="dept" items="${Dept}">
@@ -574,7 +579,7 @@ label {
                                 </td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Area</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.area"/></label></th>
                             <td><select class="custom-select" id="subdepartment" name="subdepartmentId" >
                                 <option value="">Please select Area</option>
                                  <c:forEach var="dept" items="${Subdept}">
@@ -583,7 +588,7 @@ label {
                                 </select>
                                 <label id="error-area"style="color: red;display: none;">Area is required</label>
                                 </td>
-                            <th><label class="custom-label"><span class="required-field">*</span>Engineering-in-Charge</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.engineeringInCharge"/></label></th>
                             <td><select class="custom-select" id="eic" name="eicId" >
                                 <option value="">Please select EIC</option>
                                 <c:forEach var="eic" items="${EIC}">
@@ -595,12 +600,12 @@ label {
                                 </td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Nature of Job</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfJob"/></label></th>
                             <td>
-                            	<input id="natureOfJob" name="natureOfJob" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                            	  <label id="error-natureOfJob"style="color: red;display: none;">Nature of Job is required</label>
+                            	<input id="natureOfJob" name="natureOfJob" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                            	  <label id="error-natureOfJob"style="color: red;display: none;">Please enter a valid Nature of Job</label>
                             </td>
-                            <th><label class="custom-label"><span class="required-field">*</span>WC Policy/ESIC Reg Number</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcPolicyesicRegNumber"/></label></th>
                             <td><select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 
@@ -609,7 +614,7 @@ label {
                                 </td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Hazardous Area</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.hazardeousArea"/></label></th>
                             <td><select class="custom-select"  id="hazardousArea" name="hazardousArea">
                                 <option value="">Please select Hazardous Area</option>
                                 <option value="Yes">Yes</option>
@@ -617,7 +622,7 @@ label {
                                 </select>
                                  <label id="error-hazardous"style="color: red;display: none;">Hazardous Area is required</label>
                                 </td>
-                            <th><label class="custom-label"><span class="required-field">*</span>Access Area</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.accessArea"/></label></th>
                             <td>  <select class="custom-select"  id="accessArea" name="accessArea" >
        								 <option value="">Please select Access Area</option>
         							<c:forEach var="option" items="${AccessArea}">
@@ -628,23 +633,23 @@ label {
     						</td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label">UAN Number</label></th>
+                            <th><label class="custom-label"><spring:message code="label.uanNumber"/></label></th>
                             <td>
-                            	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                            	<label id="error-uanNumber"style="color: red;display: none;">UAN Number is required</label>
+                            	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                            	<label id="error-uanNumber"style="color: red;display: none;">Please enter a valid UAN Number</label>
                             </td>
-                            <th><label class="custom-label">Health Check Up Date</label></th>
+                            <th><label class="custom-label"><spring:message code="label.healthCheckUpDate"/></label></th>
                             <td>
                             	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" onfocus="initializeDatePicker()">
-                            	<label id="error-healthCheckDate"style="color: red;display: none;">Health Check Up Date is required</label>
+                            	<label id="error-healthCheckDate"style="color: red;display: none;">Please enter a valid Health Check Up Date</label>
                             	</td>
                         </tr>
                         <tr>
-                         <th><label class="custom-label">Date Of Joining</label></th>
+                         <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
                         	<td>
     				<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"  onfocus="initializeDatePicker1()" 
        onclick="initializeDatePicker1()" >
-					  <label id="error-doj" style="color: red;display: none;">Date Of Joining is required</label>
+					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
                         </tr>
                         
@@ -657,7 +662,7 @@ label {
                     <tbody>
           	 
 		   <tr>
-<th><label class="custom-label"><span class="required-field">*</span>Blood Group</label></th>				
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.bloodGroup"/></label></th>				
 				<td >
 				<select class="custom-select" id="bloodGroup"   name="bloodGroupId"  >
 						<option value="" >Select Blood Group</option>
@@ -669,7 +674,7 @@ label {
 				</td>
 				
 			
-<th><label class="custom-label"><span class="required-field">*</span>Accommodation</label></th>				
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.accommodation"/></label></th>				
 				<td ><select class="custom-select" id="accommodation"   name="accommodation"  >
 						<option value="" >Select Accommodation</option>
 						<option value="Yes">Yes</option>
@@ -679,7 +684,7 @@ label {
 						</td>
 				 </tr>
 			<tr>
-<th><label class="custom-label"><span class="required-field">*</span>Academic</label></th>				
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.academic"/></label></th>				
 				<td >
 					<select class="custom-select"  id="academic"   name="academicId" >
 					<option value="" >Select Educational Qualification</option>
@@ -690,7 +695,7 @@ label {
 					<label id="error-academic"style="color: red;display: none;">Academic is required</label>
 				</td>
 				
-<th><label class="custom-label"><span class="required-field">*</span>Technical</label></th>				
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.technical"/></label></th>				
 				<td >
 					<select class="custom-select" id="technical"    name="technical"  >
 						<option value="" >Select Technical</option>
@@ -702,27 +707,27 @@ label {
 				</tr>
 			
 		   <tr>
-<th><label class="custom-label"><span class="required-field">*</span>IFSC Code</label></th>
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.ifscCode"/></label></th>
 				<td >
-				<input  style="width: 100%;height: 20px;" type="text" size="30" id="ifscCode" name="ifscCode"    maxlength="11"   />
-				<label id="error-ifscCode"style="color: red;display: none;">IFSC Code is required</label>
+				<input  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" id="ifscCode" name="ifscCode"    maxlength="11"   />
+				<label id="error-ifscCode"style="color: red;display: none;">Please enter a valid IFSC Code</label>
 				</td>
-			<th><label class="custom-label"><span class="required-field">*</span>Account Number</label></th>
+			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.accountNumber"/></label></th>
 				<td >
-				<input style="width: 100%;height: 20px;" type="text" size="30" id="accountNumber" name="accountNumber"    />
-				<label id="error-accountNumber"style="color: red;display: none;">Account Number is required</label>
+				<input style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" id="accountNumber" name="accountNumber"    />
+				<label id="error-accountNumber"style="color: red;display: none;">Please enter a valid Account Number</label>
 				</td>
 			</tr>
 			
 		   <tr>
-				<th><label class="custom-label"><span class="required-field"></span>Emergency Contact Name</label></th>
+				<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.emergencyContactName"/></label></th>
 				<td>
-				<input style="width: 100%;height: 20px;" type="text" size="30" id="emergencyName" name="emergencyName"    maxlength="30"  />
-					<label id="error-emergencyName"style="color: red;display: none;">Emergency Name is required</label>
+				<input style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" id="emergencyName" name="emergencyName"    maxlength="30"  />
+					<label id="error-emergencyName"style="color: red;display: none;">Please enter a valid Emergency Name</label>
 				</td>			
-			<th><label class="custom-label"><span class="required-field"></span>Emergency Contact Number</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.emergencyContactNumber"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" id="emergencyNumber" name="emergencyNumber"    maxlength="10"    />
-					<label id="error-emergencyNumber"style="color: red;display: none;">Emergency Number is required</label>
+					<label id="error-emergencyNumber"style="color: red;display: none;">Please enter a valid Emergency Number</label>
 				</td>				
 			
 			</tr>
@@ -736,7 +741,7 @@ label {
                      
 		   <tr>
 				
-				<th><label class="custom-label"><span class="required-field">*</span>Workmen Wage Category</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenWageCategory"/></label></th>
 				<td >
 					<select class="custom-select" id="wageCategory"    name="wageCategoryId"  >
 						<option value=""> Select Workmen Wage Category</option>
@@ -747,7 +752,7 @@ label {
 						<label id="error-wageCategory"style="color: red;display: none;">Workmen Wage Category is required</label>
 				</td>
 				
-				<th><label class="custom-label">Payment Cycle</label></th>
+				<th><label class="custom-label"><spring:message code="label.bonusPayout"/></label></th>
 				<td >
 					<select class="custom-select" id="bonusPayout"    name="bonusPayoutId"  >
 						<option value=""> Select Bonus Payout</option>
@@ -759,7 +764,7 @@ label {
 				</td>
 				</tr>
         <tr>
-				<th><label class="custom-label"><span class="required-field">*</span>Zone</label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.zone"/></label></th>
 				<td >
 					<select class="custom-select" id="zone"    name="zoneId"  >
 						<option value=""> Select Zone</option>
@@ -770,41 +775,41 @@ label {
 					<label id="error-zone"style="color: red;display: none;">Zone is required</label>
 				</td>
 		
-			<th><label class="custom-label"><span class="required-field"></span>Basic</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.basic"/></label></th>
 			
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="basic" id="basic"  />
 				<label id="error-basic"style="color: red;display: none;">Enter valid Basic</label>
 				</td>						
 			</tr>
         <tr>
-			<th><label class="custom-label"><span class="required-field"></span>DA</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.da"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text" size="30" name="da" id="da"/>
 				<label id="error-da"style="color: red;display: none;">Enter valid DA</label>
 				</td>				
-			<th><label class="custom-label"><span class="required-field"></span>HRA</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.hra"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text" size="30" name="hra"  id="hra"/>
 				<label id="error-hra"style="color: red;display: none;">Enter valid HRA</label>
 				</td>				
 			
 			</tr>
          <tr>
-			<th><label class="custom-label"><span class="required-field"></span>Washing Allowance</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.washingAllowance"/></label></th>
 				<td>
 				<input style="width: 100%;height: 20px;" type="text" size="30" name="washingAllowance" id="washingAllowance" />
 				<label id="error-washingAllowance"style="color: red;display: none;">Enter valid Washing Allowance</label>
 				</td>				
-			<th><label class="custom-label"><span class="required-field"></span>Other Allowance</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.otherAllowance"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="otherAllowance" id="otherAllowance"  />
 				<label id="error-otherAllowance"style="color: red;display: none;">Enter valid Other Allowance</label>
 				</td>				
 			</tr>
         <tr>
-			<th><label class="custom-label"><span class="required-field"></span>Uniform Allowance</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.uniformAllowance"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="uniformAllowance" id="uniformAllowance" />
 				<label id="error-uniformAllowance"style="color: red;display: none;">Enter valid Uniform Allowance</label>
 				</td>				
 			
-			<th><label class="custom-label"><span class="required-field"></span>PF Cap</label></th>
+			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.pfcap"/></label></th>
 			 <td>
         <select class="custom-select" id="pfCap" name="pfCap"   >
             <option value="Yes" <c:if test="${pfCap == 'Yes'}">selected</c:if>>Yes</option>
@@ -823,7 +828,7 @@ label {
                    <tr>
                    
                   <td>
-                  <label for="aadharFile">Upload Photo:</label>
+                  <label for="aadharFile"><spring:message code="label.uploadPhoto"/></label>
     <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
         
     </div>
@@ -836,13 +841,13 @@ label {
                    
 						
                 		<td>
-                		 	<label for="aadharFile">Upload Aadhar Card (PDF):</label>
+                		 	<label for="aadharFile"><spring:message code="label.uploadAadharCard"/></label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">
        					 	  <span id="aadharFileName" style="margin-left: 10px;color:black;"></span> 
         					<div id="aadharError"></div> <!-- Error message for Aadhar file -->
                 		</td>
                 		<td>
-                			<label for="policeFile">Upload PoliceVerification Report (PDF):</label> 
+                			<label for="policeFile"><spring:message code="label.uploadPoliceVerificationReport"/></label> 
                 			<input type="file"	id="policeFile" name="policeFile" accept="application/pdf" onchange="displayFileName1('policeFile', 'policeFileName')">
                 			  <span id="policeFileName" style="margin-left: 10px;color:black;"></span> 
 							<div id="policeError"></div> <!-- Error message for Police file -->
@@ -853,7 +858,7 @@ label {
             		
             		
             		<tr><td>
-            		<a href="#" id="add_field_button" onclick="additionalDocUpload()">Add Document</a>
+            		<a href="#" id="add_field_button" onclick="additionalDocUpload()"><spring:message code="label.addDocument"/></a>
             		<label>You can add a maximum of 7 additional documents.</label>
             		</td>
             		<td><div id="additionalDoc" ></div></td></tr>
@@ -862,7 +867,7 @@ label {
         <tr>
             <td colspan="20">
                 <div>
-                    <p id="p3"><b><font color="darkblue" size="3">Comments</font></b></p>
+                    <p id="p3"><b><font color="darkblue" size="3"><spring:message code="label.comments"/></font></b></p>
                     <hr10 style="color:rgb(0, 102, 204);">
                 </div>
             </td>
@@ -870,8 +875,8 @@ label {
         <tr>
 				<!-- <th><label class="custom-label">Previous Comment</label></th>
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
-				 --><th><label class="custom-label">Comment</label></th>
-				<td><textarea id="comments"  name="comments" placeholder="Type here..." style="width: 501px; height: 70px;"></textarea>
+				 --><th><label class="custom-label"><spring:message code="label.comment"/></label></th>
+				<td><textarea id="comments"  name="comments" placeholder="Type here..." style="width: 501px; height: 70px;text-transform: capitalize;"></textarea>
 				</td>
 			</tr>
 		<tr>

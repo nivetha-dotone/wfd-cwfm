@@ -43,5 +43,15 @@ public class MasterUserDaoImpl implements MasterUserDao{
 		
 		return user;
 	}
+	@Override
+    public String getPasswordByUserId(String userId) {
+        String sql = "SELECT Password FROM MASTERUSER WHERE UserId = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, String.class);
+    }
 
+    @Override
+    public void updatePassword(String userId, String newPassword) {
+        String sql = "UPDATE MASTERUSER SET Password = ? WHERE UserId = ?";
+        jdbcTemplate.update(sql, newPassword, userId);
+    }
 }

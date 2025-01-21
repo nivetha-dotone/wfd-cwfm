@@ -1,0 +1,234 @@
+package com.wfd.dot1.cwfm.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wfd.dot1.cwfm.dao.CommonDao;
+import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
+import com.wfd.dot1.cwfm.pojo.CMSGMType;
+//import com.wfd.dot1.cwfm.pojo.CMSGMType;
+//import com.wfd.dot1.cwfm.pojo.CMSPerson;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
+import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.State;
+import com.wfd.dot1.cwfm.pojo.Workorder;
+
+@Service
+public class CommonServiceImpl implements CommonService {
+
+    @Autowired
+    private CommonDao commonDAO;
+
+//    @Override
+//    public State getStateById(int stateId) {
+//        return commonDAO.getStateById(stateId);
+//    }
+//
+    @Override
+    public List<State> getAllStates() {
+        return commonDAO.getAllStates();
+    }
+    @Override
+	public List<CmsContractorWC> getMappingsByContractorIdAndUnitIdAndLicenseType(Long id, Long principalEmployerId,
+			String string) {
+		return commonDAO.getMappingsByContractorIdAndUnitIdAndLicenseType(id, principalEmployerId, string);
+	}
+
+	@Override
+	public List<CmsContractorWC> getMappingsByContractorIdAndUnitIdAndLicenseTypes(Long id,
+			Long principalEmployerId, List<String> licenseTypes) {
+		return commonDAO.getMappingsByContractorIdAndUnitIdAndLicenseTypes(id, principalEmployerId, licenseTypes);
+	}
+    // Implement other methods by delegating to DAO layer
+
+	@Override
+	public List<Workorder> getWorkOrdersByContractorIdAndUnitId(Long id, Long principalEmployerId) {
+		return commonDAO.getWorkOrdersByContractorIdAndUnitId(id, principalEmployerId);
+	}
+	@Override
+    public Workorder getWorkorderById(Long id) {
+        return commonDAO.getWorkorderById(id);
+    }
+
+	@Override
+	public CMSGMType findById(Long gmTypeId) {
+		 return commonDAO.findById(gmTypeId);
+	}
+
+//	@Override
+//	public List<CMSPerson> getAllPersons() {
+//		return commonDAO.getAllPersons();
+//	}
+//
+//	@Override
+//	public List<CMSPerson> getAllPersonsByPrincipalEmployerAndContractor(Long principalEmployerId, Long contractorId) {
+//		// TODO Auto-generated method stub
+//		return commonDAO.getAllPersonsByPrincipalEmployerAndContractor(principalEmployerId,contractorId);
+//	}
+
+	@Override
+	public CmsGeneralMaster findByGMId(Integer bloodGroupId) {
+		// TODO Auto-generated method stub
+		return commonDAO.findByGMId(bloodGroupId);
+	}
+
+	@Override
+	public List<CmsGeneralMaster> getCmsGeneralMasterOptionsByName(String string) {
+		// TODO Auto-generated method stub
+		return commonDAO.getCmsGeneralMasterOptionsByName(string);
+	}
+	
+	@Override
+    public boolean isGMTypeNameDuplicate(String gmTypeName) {
+        CMSGMType gmType = commonDAO.findByGMTypeName(gmTypeName);
+        return gmType != null;  // Return true if the name already exists
+    }
+
+	 @Override
+    public boolean isCmsGeneralMasterDuplicate(String masterName, String masterValue) {
+        CmsGeneralMaster master = commonDAO.findByMasterNameAndValue(masterName, masterValue);
+        return master != null;  // Return true if the name and value combination exists
+    }
+    
+
+    @Override
+    public List<CMSGMType> getAllGMTypes() {
+        return commonDAO.getAllGMTypes();
+    }
+
+    @Override
+    public String saveGMType(String gmType) {
+    	return commonDAO.saveGMType(gmType);
+    }
+
+    @Override
+    public void deleteGMType(List<Long> gmTypeId) {
+    	commonDAO.deleteGMType(gmTypeId);
+    }
+
+
+    @Override
+    public List<GeneralMasterDTO> getAllCmsGeneralMasters() {
+        return commonDAO.getAllCmsGeneralMasters();
+    }
+
+    @Override
+    public void saveCmsGeneralMaster(CmsGeneralMaster gm) {
+    	commonDAO.saveCmsGeneralMaster(gm);
+    }
+
+    @Override
+    public void deleteCmsGeneralMaster(Long gmId) {
+    	commonDAO.deleteCmsGeneralMaster(gmId);
+    }
+    
+    @Override
+    public List<CMSRoleRights> getRoleRightsByRoleId(Long roleId) {
+        return commonDAO.getRoleRightsByRoleId(roleId);
+    }
+
+    @Override
+    public CMSRoleRights saveRoleRights(CMSRoleRights roleRights) {
+        roleRights.setCreationDate(LocalDateTime.now());
+        roleRights.setLastUpdatedDate(LocalDateTime.now());
+        return commonDAO.saveRoleRights(roleRights);
+    }
+    
+    @Override
+    public CmsGeneralMaster findCmsGeneralMasterById(String id) {
+        return commonDAO.findCmsGeneralMasterById(id); // Assuming this method exists
+    }
+    
+	/*
+	 * @Override public CmsGeneralMaster findDefaultAddRights() { return
+	 * findCmsGeneralMasterById(1L); // Assuming default Add Rights is with ID 1 }
+	 * 
+	 * @Override public CmsGeneralMaster findDefaultEditRights() { return
+	 * findCmsGeneralMasterById(2L); // Assuming default Edit Rights is with ID 2 }
+	 * 
+	 * @Override public CmsGeneralMaster findDefaultDeleteRights() { return
+	 * findCmsGeneralMasterById(3L); // Assuming default Delete Rights is with ID 3
+	 * }
+	 * 
+	 * @Override public CmsGeneralMaster findDefaultImportRights() { return
+	 * findCmsGeneralMasterById(4L); // Assuming default Import Rights is with ID 4
+	 * }
+	 * 
+	 * @Override public CmsGeneralMaster findDefaultExportRights() { return
+	 * findCmsGeneralMasterById(5L); // Assuming default Export Rights is with ID 5
+	 * }
+	 */
+
+	@Override
+	public List<CMSRoleRights> getAllRoleRights() {
+		return commonDAO.getAllRoleRights();
+	}
+	@Override
+	 public void saveUser(User user) {
+		 commonDAO.save(user); // Only save the user information
+	    }
+
+	@Override
+	public List<CmsGeneralMaster> getGMByType(String type) {
+		return commonDAO.getGMByType(type);
+	}
+
+	@Override
+	public CmsGeneralMaster getGMById(Long id) {
+		return commonDAO.getGMById(id);
+	}
+
+	@Override
+	public List<CmsGeneralMaster> getAllPages() {
+		return commonDAO.getAllPages();
+	}
+
+	@Override
+	public List<CmsGeneralMaster> getAllRoles() {
+		return commonDAO.getAllRoles();
+	}
+
+	@Override
+	public List<CmsGeneralMaster> getPagesByRole(Long roleId) {
+		return commonDAO.getPagesByRole(roleId);
+	}
+	@Override
+	public List<GeneralMasterDTO> getGeneralMastersWithTypeName(Long gmTypeId) {
+		// TODO Auto-generated method stub
+		return commonDAO.getGeneralMastersWithTypeName(gmTypeId);
+	}
+	@Override
+	public void deleteGmDataById(Long gmId) {
+		commonDAO.deleteGmDataById(gmId);
+		
+	}
+	@Override
+	public void saveGeneralMaster(GeneralMasterDTO generalMasterDTO) {
+		commonDAO.saveGeneralMaster(generalMasterDTO);	
+	}
+	@Override
+	public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
+		// TODO Auto-generated method stub
+		return commonDAO.checkDuplicateRoleRight(roleId,roleId);
+	}
+	@Override
+	public boolean existsByGmTypeIdAndGmDescription(Long gmTypeId, String gmDescription) {
+		// TODO Auto-generated method stub
+		return commonDAO.existsByGmTypeIdAndGmDescription(gmTypeId,gmDescription);
+	}
+	/*
+	 * @Override public boolean isDuplicateRolePageCombination(Long roleId, Long
+	 * pageId) { return commonDAO.existsByRoleIdAndPageId(roleId, pageId); }
+	 */
+	@Override
+	public boolean isDuplicateRolePageCombination(Long roleId, Long pageId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+}

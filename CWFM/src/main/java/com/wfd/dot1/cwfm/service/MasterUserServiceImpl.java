@@ -20,5 +20,16 @@ public class MasterUserServiceImpl implements MasterUserService{
 		log.info("Entering into findMasterUserDetailsByUserName service method "+username+" "+password);
 		return masterUserDao.findMasterUserDetailsByUserName(username, password);
 	}
+	@Override
+    public boolean validateOldPassword(String userId, String password) {
+        String storedPassword = masterUserDao.getPasswordByUserId(userId);
+        return storedPassword != null && storedPassword.equals(password); // Use hashed password in real applications
+    }
 
+    @Override
+    public void updatePassword(String userId, String newPassword) {
+    	masterUserDao.updatePassword(userId, newPassword); // Hash password before saving in real applications
+    }
+	
+    
 }

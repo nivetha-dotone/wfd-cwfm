@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
     <%@ page isELIgnored="false" %>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -70,55 +71,55 @@ var contextPath = '<%= request.getContextPath() %>';
                         <tr>
                            
                         
-                         <th><label class="custom-label"><span class="required-field">*</span>Work order Number</label></th>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workOrderNumber"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="sapWorkorderNumber" value="${workorder.sapWorkorderNumber}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="sapWorkorderNumber" value="${workorder.sapWorkorderNumber}" style="height: 20px;"  size="30" maxlength="30" readonly/>
                               </div></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Unit Name</label></th>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="name" value="${principalEmployer.name}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="name" value="${principalEmployer.name}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
                               <td >  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','Work Order');">Cancel</button>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Contractor Name</label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="contractorname" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" />
+                              <input type="text" name="contractorname" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
-                         <th><label class="custom-label"><span class="required-field">*</span>Contractor Code</label></th>
-                            <td><input type="text" name="contractorcode" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorCode"/></label></th>
+                            <td><input type="text" name="contractorcode" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Valid From</label></th>
-                            <td><input type="text" name="validFrom" value="${workorder.validFrom}" style="height: 20px;"  size="30" maxlength="30" /></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Valid To</label></th>
-                            <td><input type="text" name="validTo" value="${workorder.validTo}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.validFrom"/></label></th>
+                            <td><input type="text" name="validFrom" value="${workorder.validFrom}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.validTo"/></label></th>
+                            <td><input type="text" name="validTo" value="${workorder.validTo}" style="height: 20px;"  size="30" maxlength="30"  readonly/></td>
                        
                         </tr>
                         
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Workorder Type</label></th>
-                            <td><input type="text" name="typeId" value="BSR" style="height: 20px;"  size="30" maxlength="30" /></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Department Name</label></th>
-                            <td><input type="text" name="depId" value="Mechanical" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workOrderType"/></label></th>
+                            <td><input type="text" name="typeId" value="BSR" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.departmentName"/></label></th>
+                            <td><input type="text" name="depId" value="Mechanical" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>Area Name</label></th>
-                            <td><input type="text" name="secId" value="Mechanical" style="height: 20px;"  size="30" maxlength="30" /></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Cost Centre</label></th>
-                            <td><input type="text" name="costCenter" value="${workorder.costCenter}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.areaName"/></label></th>
+                            <td><input type="text" name="secId" value="Mechanical" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.costCentre"/></label></th>
+                            <td><input type="text" name="costCenter" value="${workorder.costCenter}" style="height: 20px;"  size="30" maxlength="30" readonly/></td>
                         
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span>GL Code</label></th>
-                            <td><input type="text" name="glCode" value="${workorder.glCode}" style="height: 20px;"  size="30" maxlength="30" /></td>
-                        <th><label class="custom-label"><span class="required-field">*</span>Job Description</label></th>
-                            <td><input type="text" name="job" value="${workorder.glCode}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.glCode"/></label></th>
+                            <td><input type="text" name="glCode" value="${workorder.glCode}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.jobDescription"/></label></th>
+                            <td><input type="text" name="job" value="${workorder.glCode}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
         </tbody>
@@ -127,15 +128,15 @@ var contextPath = '<%= request.getContextPath() %>';
 	<table  class="Tabular" cellpadding="0" cellspacing="0">
 	<thead>
 		<tr>
-					<th>Job</th>
-					<th>Service Code</th>
-					<th>Trade</th>
-					<th>Skill</th>
-					<th>Item Quantity</th>
-					<th>Rate</th>
-					<th>Service Entry Qty</th>
-				    <th>WBS Code</th>
-				    <th>UOM</th>
+					<th><spring:message code="label.job"/></th>
+					<th><spring:message code="label.serviceCode"/></th>
+					<th><spring:message code="label.trade"/></th>
+					<th><spring:message code="label.skill"/></th>
+					<th><spring:message code="label.itemQuantity"/></th>
+					<th><spring:message code="label.rate"/></th>
+					<th><spring:message code="label.serviceEntryQty"/></th>
+				    <th><spring:message code="label.wbsCode"/></th>
+				    <th><spring:message code="label.uom"/></th>
 					
 		</tr>
 	</thead>

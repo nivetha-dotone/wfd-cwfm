@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -184,7 +185,7 @@ alert(1);
        <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
         <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContrView()">View</button>
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
     </div>
 </div>
  
@@ -193,14 +194,15 @@ alert(1);
         <thead>
             <tr>
              <td style="border: 1px solid black;">
-                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllContrcators()">
+                        <input type="checkbox" id="selectAllCheckedbox" onchange="toggleSelectAllContrcators()">
                     </td> 
-                <th style="border: 1px solid black;">Contractor Code</th>
-                  <th style="border: 1px solid black;">Name</th>
-               <th style="border: 1px solid black;">Address</th>
+                <th style="border: 1px solid black;"><spring:message code="label.contractorCode"/></th>
+                  <th style="border: 1px solid black;"><spring:message code="label.name"/></th>
+               <th style="border: 1px solid black;"><spring:message code="label.address"/></th>
             </tr>
         </thead>
         <tbody>
+        
             
         </tbody>
     </table>

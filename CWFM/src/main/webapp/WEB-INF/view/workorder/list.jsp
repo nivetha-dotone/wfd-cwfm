@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -178,7 +179,7 @@
        <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
         <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWOView()">View</button>
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="woListExportToCSV()">Export</button>
     </div>
 </div>
  
@@ -190,16 +191,16 @@
                         <input type="checkbox" id="selectAllWOCheckbox" onchange="toggleSelectAllWOS()">
                     </td> 
                     <!-- Add more table headers for each column -->
-                    <th class="header-text"  onclick="sortTable(1)">Workorder Number<span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(2)">Job<span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(3)">Workorder Type<span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(4)">Area Name<span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
-<th class="header-text"  onclick="sortTable(5)">Valid From<span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(6)">Valid To<span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(7)">Contractor Name<span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(8)">Vendor Code<span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(9)">Unit Name<span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(10)">Status<span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.workOrderNumber"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(2)"><spring:message code="label.job"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(3)"><spring:message code="label.workOrderType"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(4)"><spring:message code="label.areaName"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(5)"><spring:message code="label.validFrom"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.validTo"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.status"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <!-- Add more headers as needed -->
                 <!-- <td style="border: 1px solid black;">ISACTIVE</td>
                 <td style="border: 1px solid black;">UPDATEDTM</td>

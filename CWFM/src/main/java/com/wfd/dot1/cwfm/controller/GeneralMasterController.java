@@ -1,0 +1,222 @@
+package com.wfd.dot1.cwfm.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
+import com.wfd.dot1.cwfm.pojo.CMSGMType;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.service.CommonService;
+
+@Controller
+@RequestMapping("/generalController")
+public class GeneralMasterController {
+
+    @Autowired
+    private CommonService commonService;
+
+    // Display GMType page
+    @GetMapping("/gmType")
+    public String showGMTypePage(Model model) {
+        List<CMSGMType> gmTypes = commonService.getAllGMTypes();
+        model.addAttribute("gmTypes", gmTypes);
+        return "generalMaster/gmType";
+    }
+
+    // Save GMType
+//    @PostMapping("/saveGMType")
+//    public String saveGMType(@RequestParam("gmTypeName") String gmTypeName) {
+//        if (!commonService.isGMTypeNameDuplicate(gmTypeName)) {
+//            CMSGMType gmType = new CMSGMType();
+//            gmType.setGmType(gmTypeName);
+//            commonService.saveGMType(gmType);
+//        }
+//        return  "redirect:/CWFM/generalController/gmType";
+//    }
+    @PostMapping("/saveGMType")
+    public String saveGMType(@RequestParam("gmTypeName") String gmTypeName, RedirectAttributes redirectAttributes) {
+        if (!commonService.isGMTypeNameDuplicate(gmTypeName)) {
+//            CMSGMType gmType = new CMSGMType();
+//            gmType.setGmType(gmTypeName);
+            commonService.saveGMType(gmTypeName);
+            redirectAttributes.addFlashAttribute("successMessage", "GM Type saved successfully!");
+        } else {
+        	   redirectAttributes.addFlashAttribute("errorMessage", "Failed to save GM Type.");
+            // Optionally, handle the case when the GM Type name is a duplicate
+        }
+        return "redirect:/generalController/gmType";
+    }
+
+    // Delete GMType hibernate
+//    @PostMapping("/deleteGMType")
+//    public String deleteGMType(@RequestParam("gmTypeId") Long gmTypeId) {
+//        commonService.deleteGMType(gmTypeId);
+//        return "generalMaster/gmType";
+//    }
+
+//    @PostMapping("/deleteGMTypes")
+//    @ResponseBody
+//    public ResponseEntity<Map<String, Object>> deleteGMTypes(@RequestBody List<Long> gmTypeIds) {
+//        Map<String, Object> response = new HashMap<>();
+//        List<Long> undeletableIds = new ArrayList<>();
+//
+//        for (Long gmTypeId : gmTypeIds) {
+//            try {
+//                commonService.deleteGMType(gmTypeId); // Attempt to delete
+//            } catch (DataIntegrityViolationException ex) {
+//                undeletableIds.add(gmTypeId); // Collect IDs that can't be deleted
+//            }
+//        }
+//
+//        if (undeletableIds.isEmpty()) {
+//            response.put("success", true);
+//        } else {
+//            response.put("success", false);
+//            response.put("message", "Some GM Types cannot be deleted due to dependencies: " + undeletableIds);
+//        }
+//
+//        return ResponseEntity.ok(response);
+//    }
+    @PostMapping("/deleteGMTypes")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteGMTypes(@RequestBody List<Long> gmTypeIds) {
+        System.out.println("Received gmTypeIds: " + gmTypeIds);
+        Map<String, Object> response = new HashMap<>();
+        if (gmTypeIds == null || gmTypeIds.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "No IDs received.");
+            return ResponseEntity.badRequest().body(response);
+        }
+        try {
+            commonService.deleteGMType(gmTypeIds);
+            response.put("success", true);
+            response.put("message", "Selected GM Types deleted successfully.");
+        } catch (DataIntegrityViolationException ex) {
+            response.put("success", false);
+            response.put("message", ex.getMessage());
+        } catch (Exception ex) { // Catch any other exceptions
+            response.put("success", false);
+            response.put("message", "An unexpected error occurred: " + ex.getMessage());
+            ex.printStackTrace(); // Print stack trace for debugging
+        }
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/generalMaster")
+    public String showGeneralMasterPage(Model model) {
+        List<CMSGMType> gmTypes = commonService.getAllGMTypes();  // Fetch GM Types for dropdown
+       // List<GeneralMasterDTO> generalMasters = commonService.getAllCmsGeneralMasters();
+        model.addAttribute("gmTypes", gmTypes);  // Add GM Types to model
+      //  model.addAttribute("generalMasters", generalMasters);
+        return "generalMaster/generalMaster";
+    }
+
+    // Save GeneralMaster with gmTypeId from dropdown
+//    @PostMapping("/saveGeneralMaster")
+//    public String saveGeneralMaster(@RequestParam("gmTypeId") Long gmTypeId,
+//                                    @RequestParam("masterName") String masterName,
+//                                    @RequestParam("masterValue") String masterValue) {
+//        if (!commonService.isCmsGeneralMasterDuplicate(masterName, masterValue)) {
+//        	CmsGeneralMaster gm = new CmsGeneralMaster();
+//            CMSGMType gmType = commonService.findById(gmTypeId);  // Fetch GM Type by ID
+//            gm.setGmTypes(gmType);  // Set GM Type
+//            gm.setGmName(masterName);
+//            gm.setGmdescription(masterValue);
+//            gm.setUpdatedby("Admin");
+//            commonService.saveCmsGeneralMaster(gm);
+//        }
+//        return "generalMaster/generalMaster";
+//    }
+    
+//    @GetMapping("/getGmData")
+//    public ResponseEntity<List<GeneralMasterDTO>> getGmData(@RequestParam("gmTypeId") Long gmTypeId) {
+//        List<GeneralMasterDTO> gmData = commonService.getGeneralMastersWithTypeName(gmTypeId);
+//        return ResponseEntity.ok(gmData);
+//    }
+   
+
+    @GetMapping("/getGmData/{gmTypeId}")
+    public String showEntriesForOrgLevel(@PathVariable Long gmTypeId, Model model) {
+        System.out.println("Received orgLevelDefId: " + gmTypeId); // Debug log
+        if (gmTypeId <= 0) {
+            model.addAttribute("error", "Invalid General Type selected.");
+            return "generalMaster/generalMaster";
+        }
+        List<GeneralMasterDTO> gmData = commonService.getGeneralMastersWithTypeName(gmTypeId);
+        System.out.println("Retrieved entries: " + gmData); // Debug log
+        model.addAttribute("generalMasters", gmData);
+        model.addAttribute("gmTypeId", gmTypeId);
+        List<CMSGMType> gmTypes = commonService.getAllGMTypes();  // Fetch GM Types for dropdown
+         model.addAttribute("gmTypes", gmTypes); 
+        return "generalMaster/generalMaster";
+    }
+    @PostMapping("/saveGeneralMaster")
+    public ResponseEntity<String> saveGeneralMaster(@RequestBody GeneralMasterDTO generalMasterDTO) {
+        try {
+            // Check for duplicate Master Value
+            boolean isDuplicate = commonService.existsByGmTypeIdAndGmDescription(
+                    generalMasterDTO.getGmTypeId(),
+                    generalMasterDTO.getGmDescription());
+
+            if (isDuplicate) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                                     .body("Duplicate data not allowed");
+            }
+
+            // Save the General Master
+            commonService.saveGeneralMaster(generalMasterDTO);
+
+            return ResponseEntity.ok("Data saved successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to save General Master");
+        }
+    }
+
+
+
+    @PostMapping("/deleteGmData")
+    public String deleteOrgLevelEntry(@RequestParam Long gmId, @RequestParam Long gmTypeId, Model model) {
+        try {
+            // Perform the deletion
+            commonService.deleteGmDataById(gmId);
+
+            List<CMSGMType> gmTypes = commonService.getAllGMTypes(); // Fetch GM Types for the dropdown
+            List<GeneralMasterDTO> updatedMasters =commonService.getGeneralMastersWithTypeName(gmTypeId);
+            model.addAttribute("gmTypes", gmTypes);
+            model.addAttribute("generalMasters", updatedMasters);
+            model.addAttribute("gmTypeId", gmTypeId);
+
+            return "generalMaster/generalMaster"; // Updated list view
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to delete entry.");
+            return "generalMaster/generalMaster";
+        }
+    }
+
+
+    // Delete GeneralMaster
+    @PostMapping("/deleteGeneralMaster")
+    public String deleteGeneralMaster(@RequestParam("gmId") Long gmId) {
+        commonService.deleteCmsGeneralMaster(gmId);
+        return "generalMaster/generalMaster";
+    }
+}

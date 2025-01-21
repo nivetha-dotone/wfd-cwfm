@@ -95,13 +95,13 @@ function searchWithPEContractorInWO(contextPath) {
  
    function woListExportToCSV() {
             var selectedRows = document.querySelectorAll('input[name="selectedWOs"]:checked');
-            if (selectedRows.length === 0) {
+            if (selectedRows.length === 1) {
                 alert("Please select at least one record to export.");
                 return;
             }
 
             var csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Workorder Number,Job,Workorder Type,Area Name,Valid From,Valid To,Contractor Name,Vendor Code,Unit Name,Status\n"; // Add headers here
+            csvContent += "WORKORDERID,SAP_WORKORDER_NUM,TYPEID,DEPID,VALIDFROM,VALIDDT,CONTRACTORID,COSTCENTER,UNITID,STATUS\n"; // Add headers here
             selectedRows.forEach(function(row) {
                 var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10), td:nth-child(11)'); // Adjust column indices as needed
                 var rowArray = [];
