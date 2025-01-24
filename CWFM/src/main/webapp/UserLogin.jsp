@@ -47,7 +47,7 @@ box-shadow:0 0 10px 0 rgba(0,0,0,0.3);
 <div class="mb-3">
 <label class="form-label">User Name
 </label>
-<input required name="email" type="email" class="form-control"> 
+<input required name="email" type="text" class="form-control"> 
 </div>
 
 <div class="mb-3">

@@ -46,12 +46,12 @@ public class WorkorderController {
 	    public String getlist(@RequestParam(required = false) String principalEmployerId,@RequestParam(required = false)  String contractorId,HttpServletRequest request,HttpServletResponse response) {
 		 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
          MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		 List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserId());
+		 List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
 	 		request.setAttribute("principalEmployers", peList);
 		 
 	        if (principalEmployerId != null) {
 	            request.setAttribute("selectedPrincipalEmployerId", principalEmployerId);
-	            List<Contractor> contList =  workmenService.getAllContractorBasedOnPE(principalEmployerId, user.getUserId());
+	            List<Contractor> contList =  workmenService.getAllContractorBasedOnPE(principalEmployerId,String.valueOf(user.getUserId()));
 	            request.setAttribute("contractors", contList);
 	            request.setAttribute("selectedContractorId", contractorId);
 	            

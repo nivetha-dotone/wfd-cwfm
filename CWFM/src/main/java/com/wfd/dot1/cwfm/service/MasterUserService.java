@@ -10,5 +10,7 @@ public interface MasterUserService {
 
 	public void updatePassword(String UserId, String newPassword);
 
+	MasterUser findMasterUserDetailsByUserName(String username);
+
 	
 }

@@ -20,6 +20,9 @@ public class MasterUserDaoImpl implements MasterUserDao{
 	 
 	 @Value("${GET_MASTERUSER_BY_USERNAME_AND_PASSWROD}")
 	    private String getMasterUserByUsernameAndPassword;
+	 
+	 @Value("${GET_MASTERUSER_BY_USERACCOUNT}")
+	 private String getMasterUserByUserAccount;
 	
 	@Override
 	public MasterUser findMasterUserDetailsByUserName(String username, String password) {
@@ -29,20 +32,40 @@ public class MasterUserDaoImpl implements MasterUserDao{
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(getMasterUserByUsernameAndPassword, username,password);
 		if (rs.next()) {
 			user = new MasterUser();
-			user.setUserId(rs.getString("UserId"));
-			user.setUserName(rs.getString("UserName"));
+			user.setUserId(rs.getInt("UserId"));
+			user.setUserAccount(rs.getString("UserAccount"));
 			user.setEmailId(rs.getString("EmailId"));
 			user.setFirstName(rs.getString("FirstName"));
 			user.setLastName(rs.getString("LastName"));
-			user.setRoleName(rs.getString("RoleName"));
 			user.setContactNumber(rs.getString("ContactNumber"));
 			user.setStatus(rs.getString("Status"));
-			user.setBusinessType(rs.getString("BusinessType"));
+			user.setPassword(rs.getString("Password"));
 			log.info("Exiting from findMasterUserDetailsByUserName dao method "+user.toString());
 		}
 		
 		return user;
 	}
+	@Override
+	public MasterUser findMasterUserDetailsByUserName(String ua) {
+		MasterUser user =null;
+		log.info("Query to findMasterUserDetailsByUserName "+getMasterUserByUserAccount);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getMasterUserByUserAccount, ua);
+		if (rs.next()) {
+			user = new MasterUser();
+			user.setUserId(rs.getInt("UserId"));
+			user.setUserAccount(rs.getString("UserAccount"));
+			user.setEmailId(rs.getString("EmailId"));
+			user.setFirstName(rs.getString("FirstName"));
+			user.setLastName(rs.getString("LastName"));
+			user.setContactNumber(rs.getString("ContactNumber"));
+			user.setStatus(rs.getString("Status"));
+			user.setPassword(rs.getString("Password"));
+			log.info("Exiting from findMasterUserDetailsByUserName dao method "+user.toString());
+		}
+		
+		return user;
+	}
+	
 	@Override
     public String getPasswordByUserId(String userId) {
         String sql = "SELECT Password FROM MASTERUSER WHERE UserId = ?";
@@ -55,3 +78,4 @@ public class MasterUserDaoImpl implements MasterUserDao{
         jdbcTemplate.update(sql, newPassword, userId);
     }
 }
+

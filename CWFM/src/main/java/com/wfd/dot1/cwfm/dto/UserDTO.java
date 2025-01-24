@@ -1,5 +1,9 @@
 package com.wfd.dot1.cwfm.dto;
 
+import java.util.List;
+
+import com.wfd.dot1.cwfm.pojo.MasterUser;
+
 public class UserDTO {
     public UserDTO(String userId, String userName, String emailId, String firstName, String lastName,
 			String contactNumber, String roleName, String status, String businessType) {
@@ -80,5 +84,23 @@ public class UserDTO {
 	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
 	}
+	  private MasterUser user; // Represents the user data
+	    private List<Long> roleIds; // List of role IDs for the user
 
+	    // Getters and Setters
+	    public MasterUser getUser() {
+	        return user;
+	    }
+
+	    public void setUser(MasterUser user) {
+	        this.user = user;
+	    }
+
+	    public List<Long> getRoleIds() {
+	        return roleIds;
+	    }
+
+	    public void setRoleIds(List<Long> roleIds) {
+	        this.roleIds = roleIds;
+	    }
 }

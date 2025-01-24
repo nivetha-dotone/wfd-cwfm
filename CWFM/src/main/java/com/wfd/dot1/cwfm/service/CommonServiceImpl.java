@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.wfd.dot1.cwfm.dao.CommonDao;
 import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
+import com.wfd.dot1.cwfm.dto.SectionDto;
 import com.wfd.dot1.cwfm.pojo.CMSGMType;
 //import com.wfd.dot1.cwfm.pojo.CMSGMType;
 //import com.wfd.dot1.cwfm.pojo.CMSPerson;
@@ -68,19 +69,16 @@ public class CommonServiceImpl implements CommonService {
 //
 //	@Override
 //	public List<CMSPerson> getAllPersonsByPrincipalEmployerAndContractor(Long principalEmployerId, Long contractorId) {
-//		// TODO Auto-generated method stub
 //		return commonDAO.getAllPersonsByPrincipalEmployerAndContractor(principalEmployerId,contractorId);
 //	}
 
 	@Override
 	public CmsGeneralMaster findByGMId(Integer bloodGroupId) {
-		// TODO Auto-generated method stub
 		return commonDAO.findByGMId(bloodGroupId);
 	}
 
 	@Override
 	public List<CmsGeneralMaster> getCmsGeneralMasterOptionsByName(String string) {
-		// TODO Auto-generated method stub
 		return commonDAO.getCmsGeneralMasterOptionsByName(string);
 	}
 	
@@ -188,6 +186,11 @@ public class CommonServiceImpl implements CommonService {
 	public List<CmsGeneralMaster> getAllPages() {
 		return commonDAO.getAllPages();
 	}
+	@Override
+	public List<CmsGeneralMaster> getAllSections() {
+		return commonDAO.getAllSections();
+	}
+
 
 	@Override
 	public List<CmsGeneralMaster> getAllRoles() {
@@ -200,7 +203,6 @@ public class CommonServiceImpl implements CommonService {
 	}
 	@Override
 	public List<GeneralMasterDTO> getGeneralMastersWithTypeName(Long gmTypeId) {
-		// TODO Auto-generated method stub
 		return commonDAO.getGeneralMastersWithTypeName(gmTypeId);
 	}
 	@Override
@@ -214,21 +216,43 @@ public class CommonServiceImpl implements CommonService {
 	}
 	@Override
 	public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
-		// TODO Auto-generated method stub
 		return commonDAO.checkDuplicateRoleRight(roleId,roleId);
 	}
 	@Override
-	public boolean existsByGmTypeIdAndGmDescription(Long gmTypeId, String gmDescription) {
-		// TODO Auto-generated method stub
-		return commonDAO.existsByGmTypeIdAndGmDescription(gmTypeId,gmDescription);
+	public List<CmsGeneralMaster> getRolesByUserId(Integer userId) {
+		return commonDAO.getRolesByUserId(userId);
 	}
-	/*
-	 * @Override public boolean isDuplicateRolePageCombination(Long roleId, Long
-	 * pageId) { return commonDAO.existsByRoleIdAndPageId(roleId, pageId); }
-	 */
 	@Override
-	public boolean isDuplicateRolePageCombination(Long roleId, Long pageId) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<CmsGeneralMaster> getPagesByRoleId(String gmId) {
+		return commonDAO.getPagesByRoleId(gmId);
 	}
+	@Override
+	public List<CmsGeneralMaster> getAvailablePagesForSection(Long sectionId) {
+		return  commonDAO.getAvailablePagesForSection(sectionId);
+	}
+	@Override
+	public List<CmsGeneralMaster> getSelectedPagesForSection(Long sectionId) {
+		return  commonDAO.getSelectedPagesForSection(sectionId);
+	}
+	@Override
+	public void saveSectionPage(Long sectionId, List<Long> pageId, String string) {
+		  commonDAO.saveSectionPage(sectionId,pageId,string);
+	}
+	@Override
+	public List<SectionDto> getAllSectionsWithPages() {
+		return  commonDAO.getAllSectionsWithPages();
+	}
+	@Override
+	public List<SectionDto> getSectionsByRoleId(String roleId) {
+		return commonDAO.getSectionsByRoleId(roleId);
+	}
+	@Override
+	public List<Long> getPageIdsByRoleId(String roleId) {
+		return commonDAO.getPageIdsByRoleId(roleId);
+	}
+	@Override
+	public boolean hasPageAccessForRole(String roleId, Long pageId) {
+		return commonDAO.hasPageAccessForRole(roleId,pageId);
+	}
+    
 }

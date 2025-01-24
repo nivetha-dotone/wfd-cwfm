@@ -9,6 +9,8 @@ public interface MasterUserDao {
 	public void updatePassword(String userId, String newPassword);
 
 	public String getPasswordByUserId(String userId);
+	
+	public MasterUser findMasterUserDetailsByUserName(String ua);
 
 	
 }

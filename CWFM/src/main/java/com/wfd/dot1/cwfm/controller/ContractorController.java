@@ -49,7 +49,7 @@ public class ContractorController {
 	public String getAllPrincipalEmployer(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserId());
+		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
 		request.setAttribute("principalEmployers", peList);
 
 		return "contractors/list";
@@ -65,7 +65,7 @@ public class ContractorController {
 
 			// Sample data (replace with your database queries)
 			List<Contractor> contractorList = workmenService.getAllContractorBasedOnPE(principalEmployerId,
-					user.getUserId());
+					String.valueOf(user.getUserId()));
 
 			if (contractorList.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -110,7 +110,7 @@ public class ContractorController {
 	public String getContractorRegistration(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserId());
+		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
 		request.setAttribute("PrincipalEmployer", peList);
 
 		return "contractors/contractorRegistration";
@@ -144,7 +144,7 @@ public class ContractorController {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 
-		List<ContractorRegistration> listDto = contrService.getContractorRegistrationList(user.getUserId());
+		List<ContractorRegistration> listDto = contrService.getContractorRegistrationList(String.valueOf(user.getUserId()));
 		request.setAttribute("contractorlist", listDto);
 		return "contractors/contractorRegistrationList";
 
@@ -174,7 +174,7 @@ public class ContractorController {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 
-		List<ContractorRegistration> listDto = contrService.getContractorRenewalList(user.getUserId());
+		List<ContractorRegistration> listDto = contrService.getContractorRenewalList(String.valueOf(user.getUserId()));
 		request.setAttribute("contractorlist", listDto);
 		return "contractors/contractorRenewList";
 
@@ -204,7 +204,7 @@ public class ContractorController {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 
-		List<MasterUser> listDto = contrService.getRoleList(user.getUserId());
+		List<MasterUser> listDto = contrService.getRoleList(String.valueOf(user.getUserId()));
 		request.setAttribute("contractorlist", listDto);
 		return "contractors/rolelist";
 

@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
+import com.wfd.dot1.cwfm.dto.SaveMappingRequest;
 import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.service.CommonService;
@@ -167,29 +169,42 @@ public class GeneralMasterController {
         return "generalMaster/generalMaster";
     }
     @PostMapping("/saveGeneralMaster")
-    public ResponseEntity<String> saveGeneralMaster(@RequestBody GeneralMasterDTO generalMasterDTO) {
+    public String saveGeneralMaster(
+            @RequestBody GeneralMasterDTO generalMasterDTO,
+            Model model) {
         try {
-            // Check for duplicate Master Value
-            boolean isDuplicate = commonService.existsByGmTypeIdAndGmDescription(
-                    generalMasterDTO.getGmTypeId(),
-                    generalMasterDTO.getGmDescription());
+            // Log the received data
+            System.out.println("Received gmTypeId: " + generalMasterDTO.getGmTypeId());
+            System.out.println("Received masterName: " + generalMasterDTO.getGmName());
+            System.out.println("Received masterValue: " + generalMasterDTO.getGmDescription());
 
-            if (isDuplicate) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                                     .body("Duplicate data not allowed");
+            // Validate input
+            if (generalMasterDTO.getGmTypeId() == null || 
+                generalMasterDTO.getGmName() == null || 
+                generalMasterDTO.getGmDescription() == null) {
+                model.addAttribute("error", "All fields are required.");
+                return "generalMaster/generalMaster";
             }
 
             // Save the General Master
             commonService.saveGeneralMaster(generalMasterDTO);
 
-            return ResponseEntity.ok("Data saved successfully");
+            // Fetch the updated data
+            List<GeneralMasterDTO> updatedMasters =commonService.getGeneralMastersWithTypeName(generalMasterDTO.getGmTypeId());
+            List<CMSGMType> gmTypes = commonService.getAllGMTypes();
+
+            model.addAttribute("gmTypes", gmTypes);
+            model.addAttribute("generalMasters", updatedMasters);
+            model.addAttribute("gmTypeId", generalMasterDTO.getGmTypeId());
+
+             
+            return "generalMaster/generalMaster"; // Return the updated list view
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Failed to save General Master");
+            model.addAttribute("error", "Failed to save General Master.");
+            return "generalMaster/generalMaster";
         }
     }
-
 
 
     @PostMapping("/deleteGmData")
@@ -219,4 +234,55 @@ public class GeneralMasterController {
         commonService.deleteCmsGeneralMaster(gmId);
         return "generalMaster/generalMaster";
     }
+    
+    @GetMapping("/addSection")
+    public String showAddRoleRightForm(Model model) {
+    	List<CmsGeneralMaster> sections = commonService.getAllSections();
+        model.addAttribute("sections", sections);
+        return "generalMaster/pageSections"; 
+    }
+    @RequestMapping(path = "/getSectionPages", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<?> getSectionPages(@RequestParam("sectionId") Long sectionId) {
+        try {
+            // Fetch all available pages for the section
+            List<CmsGeneralMaster> availablePages = commonService.getAvailablePagesForSection(sectionId);
+
+            // Fetch already selected/mapped pages for the section
+            List<CmsGeneralMaster> selectedPages = commonService.getSelectedPagesForSection(sectionId);
+
+            // Build response object
+            Map<String, Object> response = new HashMap<>();
+            response.put("availablePages", availablePages);
+            response.put("selectedPages", selectedPages);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to retrieve pages for the section.");
+        }
+    }
+    @RequestMapping(value = "/saveMapping", method = RequestMethod.POST)
+    public ResponseEntity<String> saveMapping(@RequestBody SaveMappingRequest request) {
+        try {
+            System.out.println("Section ID: " + request.getSectionId());
+            System.out.println("Page IDs: " + request.getPageIds());
+
+            if (request.getPageIds() == null || request.getPageIds().isEmpty()) {
+                return ResponseEntity.badRequest().body("Page IDs cannot be null or empty.");
+            }
+            commonService.saveSectionPage(request.getSectionId(), request.getPageIds(), "Admin");
+//            for (Long pageId : request.getPageIds()) {
+//                commonService.saveSectionPage(request.getSectionId(), pageId, "Admin");
+//            }
+            return ResponseEntity.ok("Mapping saved successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving mapping");
+        }
+    }
+
+
+
 }

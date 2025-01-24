@@ -157,7 +157,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_EIC,userId);
 		while(rs.next()) {
 			MasterUser mu = new MasterUser();
-			mu.setUserId(rs.getString("userId"));
+			mu.setUserId(rs.getInt("userId"));
 			mu.setFullName(rs.getString("FullName"));
 			eicList.add(mu);
 		}
@@ -544,7 +544,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVERS_FOR_GATE_PASS,createdBy);
 		while(rs.next()) {
 			MasterUser mu = new MasterUser();
-			mu.setUserId(rs.getString("UserId"));
+			mu.setUserId(rs.getInt("UserId"));
 			mu.setFullName(rs.getString("FullName"));
 			mu.setRoleName(rs.getString("AuthorizationOn"));
 			approverList.add(mu);
@@ -561,7 +561,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				ps.setString(1, gatePassId);
 				ps.setString(2, approverList.get(i).getRoleName());
-				ps.setString(3, approverList.get(i).getUserId());
+				ps.setInt(3, approverList.get(i).getUserId());
 				ps.setInt(4, approverList.get(i).getIndex());
 				ps.setInt(5,Integer.parseInt(approverList.get(i).getStatus()));
 				ps.setString(6,createdBy);
@@ -747,7 +747,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVERS_FOR_GATE_PASS_ACTION,createdBy,gatepassAction);
 		while(rs.next()) {
 			MasterUser mu = new MasterUser();
-			mu.setUserId(rs.getString("UserId"));
+			mu.setUserId(rs.getInt("UserId"));
 			mu.setFullName(rs.getString("FullName"));
 			mu.setRoleName(rs.getString("RoleName"));
 			approverList.add(mu);

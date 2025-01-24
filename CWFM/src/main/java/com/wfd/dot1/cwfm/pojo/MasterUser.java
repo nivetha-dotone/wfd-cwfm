@@ -2,9 +2,9 @@ package com.wfd.dot1.cwfm.pojo;
 
 public class MasterUser {
 	
-	private String userId;
+	private Integer userId;
 	
-	private String userName;
+	private String userAccount;
 	
 	private String emailId;
 	
@@ -13,10 +13,6 @@ public class MasterUser {
 	private String lastName;
 	
 	private String fullName;
-	
-	private String newPassword;
-	
-	private String confirmPassword;
 	
 	public String getFullName() {
 		return fullName;
@@ -28,27 +24,26 @@ public class MasterUser {
 
 	private String contactNumber;
 	
-	private String roleName;
 	
 	private String status;
 
 	private String password;
 
-	public String getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
+	 public String getUserAccount() {
+	        return userAccount;
+	    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+	    public void setUserAccount(String userAccount) {
+	        this.userAccount = userAccount;
+	    }
 
 	public String getEmailId() {
 		return emailId;
@@ -82,13 +77,6 @@ public class MasterUser {
 		this.contactNumber = contactNumber;
 	}
 
-	public String getRoleName() {
-		return roleName;
-	}
-
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
-	}
 
 	public String getStatus() {
 		return status;
@@ -115,24 +103,15 @@ public class MasterUser {
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	private String businessType;
 
-	public String getBusinessType() {
-		return businessType;
+	private String newPassword;
+
+	public String getRoleName() {
+		return roleName;
 	}
 
-	public void setBusinessType(String businessType) {
-		this.businessType = businessType;
-	}
-
-	public void setUserAccount(String string) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public Object getUserAccount() {
-		// TODO Auto-generated method stub
-		return null;
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
 	}
 
 	public String getNewPassword() {
@@ -143,11 +122,6 @@ public class MasterUser {
 		this.newPassword = newPassword;
 	}
 
-	public String getConfirmPassword() {
-		return confirmPassword;
-	}
-
-	public void setConfirmPassword(String confirmPassword) {
-		this.confirmPassword = confirmPassword;
-	}
+	private String roleName;
+	
 }

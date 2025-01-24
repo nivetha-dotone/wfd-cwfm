@@ -13,5 +13,4 @@ public interface UserDAO {
     void updateUser(MasterUser user);
     void deleteUser(String userId);
 	void saveUser(MasterUser user, List<Long> roleIds);
-	void saveUser(User user, List<Long> roleIds);
 }

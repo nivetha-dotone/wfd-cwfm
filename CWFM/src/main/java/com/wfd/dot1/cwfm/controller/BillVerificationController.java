@@ -53,7 +53,7 @@ public class BillVerificationController {
     		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
     		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 
-    		List<BillVerification> listDto = billService.getBillVerificationList(user.getUserId());
+    		List<BillVerification> listDto = billService.getBillVerificationList(String.valueOf(user.getUserId()));
     		request.setAttribute("billlist", listDto);
     		return "bill/list";
 

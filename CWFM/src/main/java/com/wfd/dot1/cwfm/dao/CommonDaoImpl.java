@@ -1,7 +1,10 @@
 package com.wfd.dot1.cwfm.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
+import com.wfd.dot1.cwfm.dto.PageDto;
+import com.wfd.dot1.cwfm.dto.SectionDto;
 //import com.wfd.dot1.cwfm.pojo.CMSContractor;
 import com.wfd.dot1.cwfm.pojo.CMSGMType;
 //import com.wfd.dot1.cwfm.pojo.CMSPerson;
@@ -459,6 +464,10 @@ public class CommonDaoImpl implements CommonDao {
 	        String sql = "SELECT gm.* FROM CmsGeneralMaster gm INNER JOIN CMSGMType gmt ON gm.gmTypeId = gmt.gmTypeId WHERE gmt.gmType = ?";
 	        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(CmsGeneralMaster.class), "PAGE");
 	    }
+	    public List<CmsGeneralMaster> getAllSections() {
+	        String sql = "SELECT gm.* FROM CmsGeneralMaster gm INNER JOIN CMSGMType gmt ON gm.gmTypeId = gmt.gmTypeId WHERE gmt.gmType = ?";
+	        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(CmsGeneralMaster.class), "SECTION");
+	    }
 
 	    public List<CmsGeneralMaster> getAllRoles() {
 	        String sql = "SELECT gm.* FROM CmsGeneralMaster gm INNER JOIN CMSGMType gmt ON gm.gmTypeId = gmt.gmTypeId WHERE gmt.gmType = ?";
@@ -506,26 +515,255 @@ public class CommonDaoImpl implements CommonDao {
 		    }
 		 @Override
 		    public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
-		        String sql = "SELECT COUNT(*) FROM CMSROLERIGHTS rp WHERE rp.ROLE_ID = ? AND rp.PAGE_ID = ? and DELETED_FLAG=0";
+		        String sql = "SELECT COUNT(*) FROM CMSRoleRights WHERE role_id = ? AND page_id = ? and DELETED_FLAG=0";
 		        Integer count = jdbcTemplate.queryForObject(sql, new Object[] { roleId, pageId }, Integer.class);
 		        return count > 0;
 		    }
-		 @Override
-		    public boolean existsByGmTypeIdAndGmDescription(Long gmTypeId, String gmDescription) {
-		        String sql = "SELECT COUNT(*) FROM CMSGENERALMASTER WHERE gmTypeId = ? AND GMDESCRIPTION = ?";
-		        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{gmTypeId, gmDescription}, Integer.class);
-		        return count != null && count > 0; // Return true if a duplicate exists
-		    }
-			/*
-			 * @Override public boolean existsByRoleIdAndPageId(Long roleId, Long pageId) {
-			 * String sql =
-			 * "SELECT COUNT(*) FROM CMSROLERIGHTS rp WHERE rp.ROLE_ID = ? AND rp.PAGE_ID = ?"
-			 * ; Integer count = jdbcTemplate.queryForObject(sql, new Object[] { roleId,
-			 * pageId }, Integer.class); return count > 0; }
-			 */
 		@Override
-		public boolean existsByRoleIdAndPageId(Long roleId, Long pageId) {
-			// TODO Auto-generated method stub
-			return false;
+		public List<CmsGeneralMaster> getRolesByUserId(Integer userId) {
+			 String sql = 
+				        "SELECT gm.* " +
+				        "FROM UserRoleMapping urm " +
+				        "INNER JOIN CmsGeneralMaster gm ON urm.RoleId = gm.gmId " +
+				        "WHERE urm.UserId = ?";
+			 
+		        return jdbcTemplate.query(
+		            sql,
+		            new BeanPropertyRowMapper<>(CmsGeneralMaster.class),
+		            userId
+		        );
+		}
+			
+		 public List<CmsGeneralMaster> getRolesByUserId(Long userId) {
+			 String sql = 
+				        "SELECT gm.* " +
+				        "FROM UserRoleMapping urm " +
+				        "INNER JOIN CmsGeneralMaster gm ON urm.RoleId = gm.gmId " +
+				        "WHERE urm.UserId = ?";
+			 
+		        return jdbcTemplate.query(
+		            sql,
+		            new BeanPropertyRowMapper<>(CmsGeneralMaster.class),
+		            userId
+		        );
+		    }
+		 public List<CmsGeneralMaster> getPagesByRoleId(Long roleId) {
+			    String sql = 
+			        "SELECT gm.* " +
+			        "FROM CMSROLERIGHTS rr " +
+			        "INNER JOIN CMSGENERALMASTER gm ON rr.PAGE_ID = gm.gmId " +
+			        "WHERE rr.ROLE_ID = ? AND rr.ENABLED_FLAG = 1 AND rr.DELETED_FLAG = 0";
+			    LOGGER.info("Executing query with ROLE_ID: {}", roleId);
+			    return jdbcTemplate.query(
+			        sql,
+			        new BeanPropertyRowMapper<>(CmsGeneralMaster.class),
+			        roleId
+			    );
+			}
+		@Override
+		public List<CmsGeneralMaster> getPagesByRoleId(String roleId) {
+			 String sql = 
+				        "SELECT gm.* " +
+				        "FROM CMSROLERIGHTS rr " +
+				        "INNER JOIN CMSGENERALMASTER gm ON rr.PAGE_ID = gm.gmId " +
+				        "WHERE rr.ROLE_ID = ? AND rr.ENABLED_FLAG = 1 AND rr.DELETED_FLAG = 0";
+			 System.out.println("Controller hit: saveUsers"+roleId);
+				    return jdbcTemplate.query(
+				        sql,
+				        new BeanPropertyRowMapper<>(CmsGeneralMaster.class),
+				        roleId
+				    );
+		}
+		@Override
+		public List<CmsGeneralMaster> getAvailablePagesForSection(Long sectionId) {
+			 String sql = 
+				        "SELECT gm.* " +
+				        "FROM CmsGeneralMaster gm " +
+				        "INNER JOIN CMSGMType gmt ON gm.gmTypeId = gmt.gmTypeId " +
+				        "WHERE gmt.gmType = 'PAGE' " +
+				        "AND gm.gmId NOT IN (" +
+				        "    SELECT sp.page_id " +
+				        "    FROM CMSSectionPage sp " +
+				        "    WHERE sp.section_id = ? AND sp.is_active = 0" +
+				        ")";
+				    return jdbcTemplate.query(
+				        sql,
+				        new BeanPropertyRowMapper<>(CmsGeneralMaster.class),
+				         sectionId
+				    );
+		}
+		@Override
+		public List<CmsGeneralMaster> getSelectedPagesForSection(Long sectionId) {
+			String sql = 
+			        "SELECT gm.* " +
+			        "FROM CmsGeneralMaster gm " +
+			        "INNER JOIN CMSGMType gmt ON gm.gmTypeId = gmt.gmTypeId " +
+			        "WHERE gmt.gmType = 'PAGE' " +
+			        "AND gm.gmId IN (" +
+			        "    SELECT sp.page_id " +
+			        "    FROM CMSSectionPage sp " +
+			        "    WHERE sp.section_id = ? AND sp.is_active = 0" +
+			        ")";
+			    return jdbcTemplate.query(
+			        sql,
+			        new BeanPropertyRowMapper<>(CmsGeneralMaster.class),
+			         sectionId
+			    );
+		}
+		
+		/*
+		 * public void saveSectionPage(Long sectionId, Long pageId, String createdBy) {
+		 * String sql =
+		 * "INSERT INTO CMSSectionPage (section_id, page_id, is_active, created_by, updated_by) "
+		 * + "VALUES (?, ?, ?, ?, ?)";
+		 * 
+		 * jdbcTemplate.update(sql, sectionId, pageId, 0, createdBy, createdBy); }
+		 */
+		public void saveSectionPage(Long sectionId, List<Long> pageIds, String createdBy) {
+		    String selectSql = "SELECT COUNT(*) FROM CMSSectionPage WHERE section_id = ? AND page_id = ?";
+		    String updateSql = "UPDATE CMSSectionPage SET is_active = 0, updated_by = ? WHERE section_id = ? AND page_id = ?";
+		    String insertSql = "INSERT INTO CMSSectionPage (section_id, page_id, is_active, created_by, updated_by) " +
+	                 "VALUES (?, ?, ?, ?, ?)";
+		 //   String deactivateSql = "UPDATE CMSSectionPage SET is_active = 1, updated_by = ? WHERE section_id = ? AND page_id NOT IN (?)";
+
+		    try {
+		        for (Long pageId : pageIds) {
+		            // Check if the record already exists
+		            int count = jdbcTemplate.queryForObject(selectSql, Integer.class, sectionId, pageId);
+		            System.out.println("count---"+count);
+		            if (count > 0) {
+		                // Update the existing record to set is_active = 1
+		                jdbcTemplate.update(updateSql, createdBy, sectionId, pageId);
+		            } else {
+		                // Insert a new record
+		                jdbcTemplate.update(insertSql, sectionId, pageId, 0, createdBy, createdBy);
+		            }
+		        }
+
+		        // Deactivate pages that are not selected
+		        String deactivateQuery = String.format(
+		        	    "UPDATE CMSSectionPage SET is_active = 1 WHERE section_id = ? AND page_id NOT IN (%s)",
+		        	    String.join(",", pageIds.stream().map(String::valueOf).collect(Collectors.toList()))
+		        	);
+		        	jdbcTemplate.update(deactivateQuery, sectionId);
+		       // jdbcTemplate.update(deactivateSql, createdBy, sectionId, String.join(",", pageIds.stream().map(String::valueOf).collect(Collectors.toList())));
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        throw new RuntimeException("Error saving section-page mapping");
+		    }
+		}
+		@Override
+		public List<SectionDto> getAllSectionsWithPages() {
+		    String sql =
+		        "SELECT sp.section_id AS sectionId, gm_section.gmName AS sectionName, " +
+		        "       gm_page.gmId AS pageId, gm_page.gmName AS pageName ,gm_page.GMDESCRIPTION as pageUrl " +
+		        "FROM CMSSectionPage sp " +
+		        "LEFT JOIN CmsGeneralMaster gm_page ON sp.page_id = gm_page.gmId " +
+		        "LEFT JOIN CmsGeneralMaster gm_section ON sp.section_id = gm_section.gmId " +
+		        "LEFT JOIN CMSGMType gmt ON gm_page.gmTypeId = gmt.gmTypeId " +
+		        "WHERE gmt.gmType = 'PAGE' AND sp.is_active = 0";
+
+		    List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+
+		    if (rows.isEmpty()) {
+		        return Collections.emptyList();
+		    }
+
+		    Map<Long, SectionDto> sectionMap = rows.stream()
+		        .collect(Collectors.groupingBy(
+		            row -> ((Number) row.get("sectionId")).longValue(),
+		            Collectors.collectingAndThen(Collectors.toList(), sectionRows -> {
+		                SectionDto sectionDto = new SectionDto();
+		                sectionDto.setSectionId(((Number) sectionRows.get(0).get("sectionId")).longValue());
+		                sectionDto.setSectionName((String) sectionRows.get(0).get("sectionName"));
+
+		                List<PageDto> pages = sectionRows.stream()
+		                    .filter(row -> row.get("pageId") != null)
+		                    .map(row -> {
+		                        PageDto pageDto = new PageDto();
+		                        pageDto.setPageId(((Number) row.get("pageId")).longValue());
+		                        pageDto.setPageName((String) row.get("pageName"));
+		                        pageDto.setPageUrl((String) row.get("pageUrl"));
+		                        return pageDto;
+		                    }).collect(Collectors.toList());
+
+		                sectionDto.setPages(pages);
+		                return sectionDto;
+		            })
+		        ));
+
+		    return new ArrayList<>(sectionMap.values());
+		}
+		@Override
+		public List<SectionDto> getSectionsByRoleId(String roleId) {
+			  String sql =
+				        "SELECT sp.section_id AS sectionId, " +
+				        "       gm_section.gmName AS sectionName, " +
+				        "       gm_page.gmId AS pageId, " +
+				        "       gm_page.gmName AS pageName, " +
+				        "       gm_page.GMDESCRIPTION AS pageUrl " +
+				        "FROM CMSSectionPage sp " +
+				        "LEFT JOIN CmsGeneralMaster gm_page ON sp.page_id = gm_page.gmId " +
+				        "LEFT JOIN CmsGeneralMaster gm_section ON sp.section_id = gm_section.gmId " +
+				        "LEFT JOIN CMSGMType gmt ON gm_page.gmTypeId = gmt.gmTypeId " +
+				        "LEFT JOIN CMSROLERIGHTS rpm ON sp.page_id = rpm.page_id " +
+				        "WHERE gmt.gmType = 'PAGE' AND sp.is_active = 0 AND rpm.role_id = ?";
+
+				    List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, roleId);
+
+				    if (rows.isEmpty()) {
+				        return Collections.emptyList();
+				    }
+
+				    // Group rows by sectionId and construct SectionDto objects
+				    Map<Long, SectionDto> sectionMap = rows.stream()
+				        .collect(Collectors.groupingBy(
+				            row -> ((Number) row.get("sectionId")).longValue(),
+				            Collectors.collectingAndThen(Collectors.toList(), sectionRows -> {
+				                SectionDto sectionDto = new SectionDto();
+				                sectionDto.setSectionId(((Number) sectionRows.get(0).get("sectionId")).longValue());
+				                sectionDto.setSectionName((String) sectionRows.get(0).get("sectionName"));
+
+				                // Collect pages for this section
+				                List<PageDto> pages = sectionRows.stream()
+				                    .filter(row -> row.get("pageId") != null)
+				                    .map(row -> {
+				                        PageDto pageDto = new PageDto();
+				                        pageDto.setPageId(((Number) row.get("pageId")).longValue());
+				                        pageDto.setPageName((String) row.get("pageName"));
+				                        pageDto.setPageUrl((String) row.get("pageUrl"));
+				                        return pageDto;
+				                    }).collect(Collectors.toList());
+
+				                sectionDto.setPages(pages);
+				                return sectionDto;
+				            })
+				        ));
+
+				    return new ArrayList<>(sectionMap.values());
+		}
+
+		@Override
+		public List<Long> getPageIdsByRoleId(String roleId) {
+		    String sql = 
+		        "SELECT gm.gmId " + 
+		        "FROM CMSROLERIGHTS rr " + 
+		        "INNER JOIN CMSGENERALMASTER gm ON rr.PAGE_ID = gm.gmId " + 
+		        "WHERE rr.ROLE_ID = ? AND rr.ENABLED_FLAG = 1 AND rr.DELETED_FLAG = 0";
+
+		    System.out.println("Fetching page IDs for roleId: " + roleId);
+
+		    // Use queryForList to fetch a list of Long values
+		    return jdbcTemplate.queryForList(sql, Long.class, roleId);
+		}
+		
+		public boolean hasPageAccessForRole(String roleId, Long pageId) {
+			 System.out.println("common roleId: " + roleId);
+			 System.out.println("common for pageId: " + pageId);
+		    // Query your database or service to check if the role has access to this page
+		    String sql = "SELECT COUNT(*) FROM CMSROLERIGHTS WHERE ROLE_ID = ? AND PAGE_ID = ? AND ENABLED_FLAG = 1 AND DELETED_FLAG = 0";
+		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, roleId, pageId);
+		    System.out.println("common for count: " + count);
+		    return count > 0;
 		}
 }

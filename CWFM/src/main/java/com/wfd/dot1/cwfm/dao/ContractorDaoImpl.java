@@ -370,7 +370,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(ContractorQueryBank.GET_ROLE_LIST);
 	while(rs.next()) {
 		MasterUser pe = new MasterUser();
-		pe.setUserId(rs.getString("UserId"));
+		pe.setUserId(rs.getInt("UserId"));
 		pe.setFirstName(rs.getString("FirstName"));
 		pe.setLastName(rs.getString("LastName"));
 		pe.setContactNumber(rs.getString("ContactNumber"));

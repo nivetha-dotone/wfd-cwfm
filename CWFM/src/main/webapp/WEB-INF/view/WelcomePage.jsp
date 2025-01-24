@@ -1504,7 +1504,8 @@ table th {
                 </a>
                 <ul class="sub-menu" id="workmen-onboarding-sub-menu">
                     <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'On-Bording List')">List</a></li>
-                    <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
+                    <%-- <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li> --%>
+                     <li><a href="#" onclick="loadQobAdd('/contractworkmen/gatepassCreation', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
                    <!--  <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li> -->
                     <li><a href="#" onclick="loadCommonList('/contractworkmen/blockList', 'Block List')">Block</a></li>
                     <li><a href="#" onclick="loadCommonList('/contractworkmen/unblockList', 'Unblock List')">Unblock</a></li>

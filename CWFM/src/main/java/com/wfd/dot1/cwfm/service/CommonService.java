@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.core.userdetails.User;
 
 import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
+import com.wfd.dot1.cwfm.dto.SectionDto;
 import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
@@ -59,9 +60,15 @@ public interface CommonService {
 			void deleteGmDataById(Long gmId);
 			void saveGeneralMaster(GeneralMasterDTO generalMasterDTO);
 			boolean checkDuplicateRoleRight(Long roleId, Long pageId);
-			boolean existsByGmTypeIdAndGmDescription(Long gmTypeId, String gmDescription);
-			 boolean isDuplicateRolePageCombination(Long roleId, Long pageId);
-
-
+			List<CmsGeneralMaster> getRolesByUserId(Integer userId);
+			List<CmsGeneralMaster> getPagesByRoleId(String gmId);
+			List<CmsGeneralMaster> getAllSections();
+			List<CmsGeneralMaster> getAvailablePagesForSection(Long sectionId);
+			List<CmsGeneralMaster> getSelectedPagesForSection(Long sectionId);
+			void saveSectionPage(Long sectionId, List<Long> pageId, String string);
+			List<SectionDto> getAllSectionsWithPages();
+			List<SectionDto> getSectionsByRoleId(String roleId);
+			List<Long> getPageIdsByRoleId(String roleId);
+			boolean hasPageAccessForRole(String roleId, Long pageId);
 			
 }

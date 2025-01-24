@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -92,43 +89,33 @@ public class CMSRoleRightsController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             MasterUser user = (MasterUser) authentication.getPrincipal();
-            return Long.parseLong(user.getUserId());// Replace with actual logic to retrieve the user ID
+            return (long) user.getUserId();// Replace with actual logic to retrieve the user ID
         }
         return 1L; // Default user ID for testing or fallback
     }
    
-	/*
-	 * @RequestMapping(value = "/saveRoleRights", method = RequestMethod.POST)
-	 * public String saveRoleRights(RoleRightsForm roleRights, RedirectAttributes
-	 * redirectAttributes) { try { for (CMSRoleRights roleRight :
-	 * roleRights.getRoleRights()) { if (!isDuplicateRoleRight(roleRight)) {
-	 * processRoleRight(roleRight, getCurrentUserId()); // Additional processing if
-	 * needed commonService.saveRoleRights(roleRight); } else {
-	 * redirectAttributes.addFlashAttribute("error",
-	 * "Duplicate Role-Page combination detected for Role: " + roleRight.getRoleId()
-	 * + " and Page: " + roleRight.getPageId()); return
-	 * "redirect:/roleRights/roleRightsList"; } }
-	 * redirectAttributes.addFlashAttribute("success",
-	 * "Role rights saved successfully!"); } catch (Exception e) {
-	 * redirectAttributes.addFlashAttribute("error",
-	 * "Failed to save role rights. Error: " + e.getMessage()); }
-	 * 
-	 * // Redirect back to the role rights list return
-	 * "redirect:/roleRights/roleRightsList"; }
-	 */
-    @PostMapping("/save")
-    public ResponseEntity<String> saveRoleRights(@RequestBody CMSRoleRights roleRightsDto) {
+    @RequestMapping(value = "/saveRoleRights", method = RequestMethod.POST)
+    public String saveRoleRights(RoleRightsForm roleRights, RedirectAttributes redirectAttributes) {
         try {
-            boolean isDuplicate = commonService.checkDuplicateRoleRight(roleRightsDto.getRoleId(), roleRightsDto.getPageId());
-            if (isDuplicate) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Duplicate Role-Page combination detected.");
+            for (CMSRoleRights roleRight : roleRights.getRoleRights()) {
+                if (!isDuplicateRoleRight(roleRight)) {
+                    processRoleRight(roleRight, getCurrentUserId()); // Additional processing if needed
+                    commonService.saveRoleRights(roleRight);
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Duplicate Role-Page combination detected for Role: " 
+                                                         + roleRight.getRoleId() + " and Page: " + roleRight.getPageId());
+                    return "redirect:/roleRights/roleRightsList";
+                }
             }
-            commonService.saveRoleRights(roleRightsDto);
-            return ResponseEntity.ok("Role rights saved successfully.");
+            redirectAttributes.addFlashAttribute("success", "Role rights saved successfully!");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save role rights.");
+            redirectAttributes.addFlashAttribute("error", "Failed to save role rights. Error: " + e.getMessage());
         }
+
+        // Redirect back to the role rights list
+        return "redirect:/roleRights/roleRightsList";
     }
+
 
 
 
@@ -267,10 +254,4 @@ public class CMSRoleRightsController {
         }
         return "redirect:/roleRights/list"; // Redirect to the list page
     }
-	/*
-	 * @PostMapping("/checkDuplicate") public ResponseEntity<Boolean>
-	 * checkDuplicate(@RequestBody CMSRoleRights roleRights) { boolean isDuplicate =
-	 * commonService.isDuplicateRolePageCombination(roleRights.getRoleId(),
-	 * roleRights.getPageId()); return ResponseEntity.ok(isDuplicate); }
-	 */
 }

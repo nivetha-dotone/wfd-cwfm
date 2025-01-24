@@ -144,8 +144,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	@Override
 	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser user,String gatePassTypeId) {
-			int workFlowTypeId = workmenDao.getWorkFlowTypeForApprovers(user.getBusinessType());
-			return workmenDao.getGatePassListingForApprovers(user.getUserId(),workFlowTypeId,gatePassTypeId);
+			//int workFlowTypeId = workmenDao.getWorkFlowTypeForApprovers(user.getBusinessType());
+			//return workmenDao.getGatePassListingForApprovers(user.getUserId(),workFlowTypeId,gatePassTypeId);
+		return null;
 	}
 	@Override
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId) {

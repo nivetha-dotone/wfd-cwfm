@@ -27,7 +27,7 @@ public class PrincipalEmployerController {
     public String getAllPrincipalEmployer(HttpServletRequest request,HttpServletResponse response) {
     	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
          MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-         List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployer(user.getUserId());
+         List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
     		request.setAttribute("cmSPRINCIPALEMPLOYERs", listDto);
     	
     	 
