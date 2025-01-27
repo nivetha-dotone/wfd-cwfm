@@ -1,27 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-<%@ page isELIgnored="false" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMSPRINCIPALEMPLOYER List</title>
     <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/commonjs.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
-
-    <style>
-        .form-control-rounded {
-            border-radius: 0.25rem;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-     body {
+ <style>
+ 
+ 
+    body {
         background-color: #FFFFFF; /* White background for the page */
          font-family: 'Noto Sans', sans-serif;
     }
@@ -170,72 +163,54 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-    </style>
+</style>
+<script>
 
+</script>
 </head>
 <body>
-       <div class="page-header"> 
-       </div>
-        <!-- <h1 class="page-header">Role Rights Add Page</h1> method="post" action="/CWFM/roleRights/saveRoleRights"-->
-
-  <form id="roleRightsForm" >
-    <div id="roleRightsForm">
-        <div class="table-container">
-            <table id="roleRightsTable" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>Page</th>
-                        <th>Add</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                        <th>View</th>
-                        <th>Import</th>
-                        <th>Export</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="roleRight" items="${roleRightsForm.roleRights}" varStatus="status">
-                        <tr>
-                            <td>
-                                <select id="roleId" name="roleRights[${status.index}].roleId" class="form-control form-control-rounded" required>
-                                    <option value="">Select Role</option>
-                                    <c:forEach var="role" items="${roles}">
-                                        <option value="${role.gmId}" <c:if test="${roleRight.roleId == role.gmId}">selected</c:if>>
-                                            ${role.gmName}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </td>
-                            <td>
-                                <select id="pageId" name="roleRights[${status.index}].pageId" class="form-control form-control-rounded" required>
-                                    <option value="">Select Page</option>
-                                    <c:forEach var="page" items="${pages}">
-                                        <option value="${page.gmId}" <c:if test="${roleRight.pageId == page.gmId}">selected</c:if>>
-                                            ${page.gmName}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].addRights" value="1" <c:if test="${roleRight.addRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].editRights" value="1" <c:if test="${roleRight.editRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].deleteRights" value="1" <c:if test="${roleRight.deleteRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].viewRights" value="1" <c:if test="${roleRight.viewRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].importRights" value="1" <c:if test="${roleRight.importRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].exportRights" value="1" <c:if test="${roleRight.exportRights}">checked</c:if>></td>
-                            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">-</button></td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <button type="button" class="btn btn-primary" onclick="addNewRow1()">Add New Row</button>
-            <button type="button" class="btn btn-success" onclick="saveRoleRights()">Submit</button>
-        </div>
+<div class="page-header">
+    <form id="searchForm">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
+    </form>
+    <div>
+    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUserAdd()">Add</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+</div>
+</div>
+<form id="updateForm" action="/CWFM/roleRights/update" method="POST" >
+    <div class="table-container">
+        <table border="1">
+        <thead>
+             <tr>
+                <th>User ID</th>
+                <th>User Account</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Contact Number</th>
+                <th>Status</th>
+                <!-- <th>Actions</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="user" items="${users}">
+                <tr>
+                    <td>${user.userId}</td>
+                    <td>${user.userAccount}</td>
+                    <td>${user.emailId}</td>
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td>${user.contactNumber}</td>
+                    <td>${user.status}</td>
+                    <%-- <td>
+                        <a href="editUser?userId=${user.userId}">Edit</a> |
+                        <a href="deleteUser?userId=${user.userId}" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                    </td> --%>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
     </div>
 </form>
-
 </body>
 </html>

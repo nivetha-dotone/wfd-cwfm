@@ -51,20 +51,34 @@ public class GeneralMasterController {
 //        }
 //        return  "redirect:/CWFM/generalController/gmType";
 //    }
+//    @PostMapping("/saveGMType")
+//    public String saveGMType(@RequestParam("gmTypeName") String gmTypeName, RedirectAttributes redirectAttributes) {
+//        if (!commonService.isGMTypeNameDuplicate(gmTypeName)) {
+////            CMSGMType gmType = new CMSGMType();
+////            gmType.setGmType(gmTypeName);
+//            commonService.saveGMType(gmTypeName);
+//            redirectAttributes.addFlashAttribute("successMessage", "GM Type saved successfully!");
+//        } else {
+//        	   redirectAttributes.addFlashAttribute("errorMessage", "Failed to save GM Type.");
+//            // Optionally, handle the case when the GM Type name is a duplicate
+//        }
+//        return "redirect:/generalController/gmType";
+//    }
+
+    
+    
     @PostMapping("/saveGMType")
     public String saveGMType(@RequestParam("gmTypeName") String gmTypeName, RedirectAttributes redirectAttributes) {
         if (!commonService.isGMTypeNameDuplicate(gmTypeName)) {
-//            CMSGMType gmType = new CMSGMType();
-//            gmType.setGmType(gmTypeName);
             commonService.saveGMType(gmTypeName);
             redirectAttributes.addFlashAttribute("successMessage", "GM Type saved successfully!");
         } else {
-        	   redirectAttributes.addFlashAttribute("errorMessage", "Failed to save GM Type.");
-            // Optionally, handle the case when the GM Type name is a duplicate
+            redirectAttributes.addFlashAttribute("errorMessage", "GM Type name already exists!");
         }
         return "redirect:/generalController/gmType";
     }
 
+    
     // Delete GMType hibernate
 //    @PostMapping("/deleteGMType")
 //    public String deleteGMType(@RequestParam("gmTypeId") Long gmTypeId) {

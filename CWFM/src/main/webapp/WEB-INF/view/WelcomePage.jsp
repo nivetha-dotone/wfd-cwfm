@@ -202,6 +202,495 @@ function showTabOther(tabId) {
         saveButton.style.display = 'none'; // Hide Save button
     }
 }
+function toggleSelectAllGMTYPE() {
+    const checkboxes = document.querySelectorAll('input[name="selectedGMTIds"]');
+    checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllCheckbox').checked);
+}
+
+function deleteSelectedGMTYPE() {
+    const selectedIds = Array.from(document.querySelectorAll('input[name="selectedGMTIds"]:checked')).map(cb => parseInt(cb.value, 10));
+    if (selectedIds.length === 0) {
+        alert("Please select at least one GM Type to delete.");
+        return;
+    }
+
+   
+
+    // Log the selected IDs to see what is being sent
+    console.log("Selected GM Type IDs:", selectedIds);
+
+    $.ajax({
+        type: 'POST',
+        url: '/CWFM/generalController/deleteGMTypes',
+        contentType: 'application/json', // Set content type to JSON
+        data: JSON.stringify(selectedIds), // Send data as JSON string
+        success: function(response) {
+            if (response.success) {
+                alert("Selected items deleted successfully.");
+                loadCommonList('/generalController/gmType', 'General Type');
+            } else {
+                alert(response.message || "Error deleting selected items.");
+            }
+        },
+        error: function(xhr, status, error) {
+            // Log the error response for debugging
+            console.error("Error details:", xhr.responseText, status, error);
+            alert("An unexpected error occurred. Please check the console for details.");
+        }
+    });
+}
+function setupOrgLevelTable() {
+    const tableBody = document.querySelector("#orgLevelTable tbody");
+
+    if (!tableBody) {
+        console.error("Table body not found. Please ensure the ID 'orgLevelTable' is correct.");
+        return;
+    }
+
+    // Add Row
+    tableBody.addEventListener("click", function (event) {
+        if (event.target.classList.contains("addRow")) {
+            const row = event.target.closest("tr");
+            const clonedRow = row.cloneNode(true);
+            clonedRow.querySelectorAll("input").forEach(input => input.value = ""); // Clear input values
+            tableBody.appendChild(clonedRow);
+        }
+    });
+
+    // Remove Row
+    tableBody.addEventListener("click", function (event) {
+        if (event.target.classList.contains("removeRow")) {
+            if (tableBody.querySelectorAll("tr").length > 1) {
+                const row = event.target.closest("tr");
+                tableBody.removeChild(row);
+            } else {
+                alert("At least one row is required.");
+            }
+        }
+    });
+}
+function toggleSelectAllOrgLevel() {
+    const checkboxes = document.querySelectorAll('input[name="selectedOrgLevels"]');
+    checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllOrgLevelCheckbox').checked);
+}
+//Add a new empty row
+function addNewRow() {
+        const tableBody = document.querySelector("table tbody");
+        const newRow = document.createElement("tr");
+
+        // Create a unique ID for each row
+        const rowId = new Date().getTime();
+
+        newRow.innerHTML = `
+            <td class="checkbox-cell">
+                <input type="checkbox" name="selectedOrgLevels" data-row-id="${rowId}">
+            </td>
+            <td><input type="text" name="orgLevelName[]" id="orgLevelName_${rowId}" placeholder="Org Level Name" required></td>
+            <td><input type="text" name="shortName[]" id="shortName_${rowId}" placeholder="Short Name" required></td>
+            <td><input type="number" name="hierarchy[]" id="hierarchy_${rowId}" placeholder="Hierarchy" required></td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+function deleteSelectedOrgLevel() {
+    const selectedIds = Array.from(document.querySelectorAll('input[name="selectedOrgLevels"]:checked')).map(input => parseInt(input.value));
+    console.log("Selected Org Level IDs:", selectedIds);
+
+    if (selectedIds.length === 0) {
+        alert("Please select at least one Org Level to delete.");
+        return;
+    }
+
+    $.ajax({
+    	method: 'PUT',
+        url: '/CWFM/org-level/update', // Correct endpoint
+        contentType: 'application/json',
+        data: JSON.stringify(selectedIds), // Send array of IDs as JSON
+        success: function(response) {
+            console.log("Successfully updated (set inactive) org levels:", response);
+            alert(response); // Optional: Alert the success message
+            // Optionally refresh the table or remove rows from the DOM
+           loadCommonList('/org-level/list', 'Org Levels');
+            const failedOrgLevels = response.failedOrgLevels || [];
+            const successfulOrgLevels = response.successfulOrgLevels || [];
+
+            console.log('Successfully updated org levels:', successfulOrgLevels);
+            console.log('Failed to update org levels:', failedOrgLevels);
+
+            successfulOrgLevels.forEach(orgId => {
+                const orgElement = document.getElementById(`orgLevel_${orgId}`);
+                if (orgElement) {
+                    orgElement.remove();
+                } else {
+                    console.warn(`Element for Org Level ${orgId} not found.`);
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating org levels:", error);
+            alert("Failed to update some or all Org Levels. Check console for details.");
+        }
+    });
+}
+function submitOrgLevel() {
+    const orgLevelRows = document.querySelectorAll('#orgLevelTable tbody tr'); // Select all rows in the table
+    let orgLevelsData = [];
+    let validData = true; // Track validity of the entire form
+
+    orgLevelRows.forEach((row, index) => {
+        const orgLevelDefIdElem = row.querySelector('input[name="orgLevelDefId[]"]');
+        const orgLevelNameElem = row.querySelector('input[name="orgLevelName[]"]');
+        const shortNameElem = row.querySelector('input[name="shortName[]"]');
+        const hierarchyElem = row.querySelector('input[name="hierarchy[]"]');
+
+        // Extract values or set defaults for missing elements
+        const orgLevelDefId = orgLevelDefIdElem ? orgLevelDefIdElem.value.trim() : null;
+        const orgLevelName = orgLevelNameElem ? orgLevelNameElem.value.trim() : '';
+        const shortName = shortNameElem ? shortNameElem.value.trim() : '';
+        const hierarchy = hierarchyElem ? hierarchyElem.value.trim() : '';
+
+        console.log(`Processing Row ${index + 1}:`);
+        console.log('OrgLevelDefId:', orgLevelDefId || 'New Entry (null)');
+        console.log('Name:', orgLevelName || 'Not Found');
+        console.log('Short Name:', shortName || 'Not Found');
+        console.log('Hierarchy:', hierarchy || 'Not Found');
+
+        // Validate fields for each row
+        if (!orgLevelName || !shortName || !hierarchy) {
+            console.error(`Row ${index + 1} is missing required fields.`);
+            alert(`Please fill in all fields for row ${index + 1}.`);
+            validData = false;
+            return; // Skip processing this row
+        }
+
+        // Push valid data to the array
+        orgLevelsData.push({
+            orgLevelDefId: orgLevelDefId || null, // Assign null for new rows
+            name: orgLevelName,
+            shortName: shortName,
+            orgHierarchyLevel: parseInt(hierarchy, 10)
+        });
+    });
+
+    if (!validData || orgLevelsData.length === 0) {
+        alert('Please fix errors before submitting.');
+        return;
+    }
+
+    console.log('Collected Org Levels Data:', orgLevelsData);
+
+    // AJAX request to send data to the server
+    $.ajax({
+        type: 'POST',
+        url: '/CWFM/org-level/save',
+        contentType: 'application/json',
+        data: JSON.stringify(orgLevelsData),
+        success: function (response) {
+            console.log('Server Response:', response);
+            alert('Org Levels saved successfully!');
+            loadCommonList('/org-level/list', 'Org Levels');
+        },
+        error: function (xhr, status, error) {
+            console.error('Error during request:', error);
+            alert('Error during request: ' + xhr.responseText);
+        }
+    });
+}
+
+
+
+
+function loadOrgLevels() {
+    // You can reload the Org Levels from the server or update the DOM accordingly
+    location.reload(); // Refresh the page for now
+}
+
+function fetchOrgLevelEntries() {
+    var orgLevelDefId = document.getElementById("orgLevelDropdown").value;
+    
+    // If no org level is selected, clear the entries
+    if (orgLevelDefId === "") {
+        document.getElementById("orgLevelEntries").innerHTML = "<p>No entries available for the selected org level.</p>";
+        return;
+    }
+    
+    // Perform an AJAX request to fetch entries for the selected org level
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/CWFM/org-level-entryController/org-level-entry?orgLevelDefId=" + orgLevelDefId, true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            document.getElementById("orgLevelEntries").innerHTML = xhr.responseText;
+            loadCommonList('/org-level-entryController/org-level-entry', 'Org Levels');
+        } else {
+            alert("Failed to load org level entries.");
+        }
+    };
+    xhr.send();
+}
+function addNewEntryRow() {
+    const tableBody = document.querySelector("table tbody");
+    const newRow = document.createElement("tr");
+
+    // Create a unique ID for each row
+    const rowId = new Date().getTime();  // Using current timestamp as a unique ID
+
+    newRow.innerHTML = `
+        <td><input type="text" name="name[]" id="name_${rowId}" placeholder="Name" required></td>
+        <td><input type="text" name="description[]" id="description_${rowId}" placeholder="Description" required></td>
+        <td>
+            <button type="button" onclick="removeEntryRow(this)">Remove</button>
+        </td>
+    `;
+
+    tableBody.appendChild(newRow);  // Append the new row to the table body
+}
+
+function removeEntryRow(button) {
+    // Removes the row containing the clicked remove button
+    const row = button.closest("tr");
+    row.remove();
+}
+function fetchDataByOrgLevel() {
+    const orgLevelId = document.getElementById('orgLevelDropdown').value;
+
+    $.ajax({
+        type: 'GET',
+        url: '/CWFM/org-level-entryController/getGMTypesByOrgLevel',  // Adjust this URL to your backend endpoint
+        data: { orgLevelId: orgLevelId },  // Pass selected Org Level
+        success: function(response) {
+            if (response.success) {
+                // Clear current table rows and populate with new data
+                const tableBody = document.querySelector('table tbody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                response.data.forEach(gmType => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" name="selectedGMTIds" value="${gmType.gmTypeId}"></td>
+                        <td>${gmType.gmType}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                alert(response.message || 'Error fetching GM Types for selected Org Level');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching data.');
+        }
+    });
+}
+/* function navigateToOrgLevel() {
+    const orgLevelDefId = document.getElementById('orgLevelDefId').value; // Get selected value
+alert(orgLevelDefId);
+    if (orgLevelDefId) {
+        // Redirect to the correct endpoint with the selected orgLevelDefId
+        window.location.href = `/CWFM/org-level-entryController/showorg-level-entry/${orgLevelDefId}`;
+    } else {
+        alert("Please select a valid Organization Level."); // Handle empty selection
+    }
+} */
+
+function navigateToOrgLevel() {
+    const orgLevelDefId = document.getElementById('orgLevelDefId').value;
+    if (!orgLevelDefId) {
+        alert("Please select a valid Organization Level.");
+        return;
+    }
+    document.getElementById("mainContent").innerHTML = "<p>Loading data...</p>";
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/CWFM/org-level-entryController/showorg-level-entry/" + orgLevelDefId, true);
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            document.getElementById("mainContent").innerHTML = xhr.responseText;
+        } else {
+            alert("Failed to load organization level data. Please try again.");
+            document.getElementById("mainContent").innerHTML = "<p>Error loading data. Please try again.</p>";
+        }
+    };
+    xhr.onerror = function () {
+        alert("An error occurred while making the request.");
+        document.getElementById("mainContent").innerHTML = "<p>Error loading data. Please check your connection and try again.</p>";
+    };
+    xhr.send();
+}
+function saveOrgEntries() {
+    const orgLevelEntryId = document.getElementById('orgLevelEntryId').value;
+    const orgLevelDefId = document.getElementById('orgLevelDefId').value;
+    const entryName = document.getElementById('entryName').value;
+    const description = document.getElementById('description').value;
+
+    // Validate the orgLevelDefId
+    if (!orgLevelDefId) {
+        alert('Please select an Organization Level.');
+        return;
+    }
+
+    if (entryName === '' || description === '') {
+        alert('Please enter Name and Description.');
+        return;
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/org-level-entryController/save-org-level-entry", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    var data = JSON.stringify({
+        orgLevelEntryId: orgLevelEntryId,
+        orgLevelDefId: orgLevelDefId,
+        name: entryName,
+        description: description
+    });
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText); // Parse response data
+            if (response.success) {
+                alert(response.message); // Display success message
+                updateTable(); // Call the updateTable function to refresh the table content
+            } else {
+                console.error("Failed to save entry: " + response.message);
+                alert("Failed to save entry. Please try again.");
+            }
+        } else {
+            console.error("Request error: " + xhr.statusText);
+            alert("An error occurred while saving the Org Level Entry.");
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error("Request error");
+        alert("An error occurred while saving the Org Level Entry.");
+    };
+
+    xhr.send(data);
+}
+
+function updateTable() {
+    const orgLevelDefId = document.getElementById('orgLevelDefId').value;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/CWFM/org-level-entryController/showorg-level-entry/" + orgLevelDefId, true);
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            document.getElementById("mainContent").innerHTML = xhr.responseText; // Update the table body with the new content
+        } else {
+            console.error("Request error: " + xhr.statusText);
+        }
+    };
+
+    xhr.send();
+}
+
+
+function deleteOrgLevelEntry(orgLevelEntryId, orgLevelDefId) {
+    if (confirm("Are you sure you want to delete this entry?")) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/CWFM/org-level-entryController/delete-org-level-entry", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+        var data = "orgLevelEntryId=" + encodeURIComponent(orgLevelEntryId) + "&orgLevelDefId=" + encodeURIComponent(orgLevelDefId);
+        
+        xhr.onload = function() {
+            if (xhr.status == 200) {
+            	document.getElementById("mainContent").innerHTML = xhr.responseText;
+                // Successfully deleted, reload the page or update the view
+                //window.location.reload(); // Reload to reflect changes
+            } else {
+                console.error("Failed to delete entry: " + xhr.statusText);
+                alert("Failed to delete entry. Please try again.");
+            }
+        };
+        
+        xhr.send(data);
+    }
+}
+function editEntry(id, name, desc) {
+    console.log("Editing Entry ID:", id);
+    console.log("Editing Entry name:", name);
+    console.log("Editing Entry desc:", desc);
+
+    // Access the table cells for the entry
+    const nameTd = document.getElementById(`name-${id}`);
+    const descTd = document.getElementById('name-${id}');
+
+    console.log("Editing Entry nameTd:", nameTd);
+    console.log("Editing Entry descTd:", descTd);
+    if (nameTd && descTd) {
+        // Clear the current content
+        nameTd.innerHTML = '';
+        descTd.innerHTML = '';
+
+        // Create input fields for editing
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.id = `edit-name-${id}`;
+        nameInput.value = name;
+
+        const descInput = document.createElement('input');
+        descInput.type = 'text';
+        descInput.id = `edit-desc-${id}`;
+        descInput.value = desc;
+
+        // Append input fields to their respective table cells
+        nameTd.appendChild(nameInput);
+        descTd.appendChild(descInput);
+
+        // Change the action buttons to include 'Save' and 'Cancel'
+        const actionField = document.getElementById(`action-${id}`);
+        actionField.innerHTML = `
+            <button onclick="saveEntry(${id})">Save</button>
+            <button onclick="cancelEdit(${id}, '${name}', '${desc}')">Cancel</button>
+        `;
+    } else {
+        console.error(`Editable fields not found for ID: ${id}`);
+    }
+}
+
+function saveEntry(id) {
+    const nameInput = document.getElementById(`edit-name-${id}`);
+    const descInput = document.getElementById(`edit-desc-${id}`);
+
+    if (nameInput && descInput) {
+        // Get the edited values
+        const newName = nameInput.value.trim();
+        const newDesc = descInput.value.trim();
+
+        if (newName && newDesc) {
+            // Update the entry with the new values (implement this update logic as needed)
+            updateEntry(id, newName, newDesc);
+
+            // After saving, reset to display mode
+            displayEntryMode(id, newName, newDesc);
+        } else {
+            alert("Please enter valid values for name and description.");
+        }
+    } else {
+        console.error(`Editable fields not found for ID: ${id}`);
+    }
+}
+
+function cancelEdit(id, originalName, originalDesc) {
+    displayEntryMode(id, originalName, originalDesc);
+}
+
+function displayEntryMode(id, name, desc) {
+    const nameTd = document.getElementById(`name-${id}`);
+    const descTd = document.getElementById(`desc-${id}`);
+
+    if (nameTd && descTd) {
+        nameTd.innerHTML = name;
+        descTd.innerHTML = desc;
+
+        const actionField = document.getElementById(`action-${id}`);
+        actionField.innerHTML = `
+            <button onclick="editEntry(${id}, '${name}', '${desc}')">Edit</button>
+            <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteOrgLevelEntry(${id})">Delete</button>
+        `;
+    } else {
+        console.error(`Display mode fields not found for ID: ${id}`);
+    }
+}
 function redirectToOrgMapAdd() {
 
     // Fetch the content of add.jsp using AJAX
@@ -346,13 +835,16 @@ function saveGMMaster() {
 
     xhr.onload = function () {
         if (xhr.status === 200) {
-            document.getElementById("mainContent").innerHTML = xhr.responseText;
-        } else if (xhr.status === 409) { // Conflict status for duplicate data
-            alert("Duplicate data not allowed");
+        	document.getElementById("mainContent").innerHTML = xhr.responseText; 
+            // Redirect to the updated list page
+            /* document.open();
+            document.write(xhr.responseText);
+            document.close(); */
         } else {
             alert("Error: " + xhr.statusText);
         }
     };
+  //
 
     xhr.onerror = function () {
         alert("An error occurred while saving the General Master.");
@@ -361,9 +853,29 @@ function saveGMMaster() {
     xhr.send(data);
 }
 
+function addNewRowFromTemplate() {
+    const placeholder = document.getElementById('placeholderRow');
+    const newRow = placeholder.cloneNode(true);
+    newRow.removeAttribute('id'); // Remove the ID from the cloned row
+    const tableBody = document.getElementById('roleRightsTable').querySelector('tbody');
+    tableBody.appendChild(newRow);
+}
+var rowIndex = 0; // Initial row index
 
+function addNewRow1() {
+    var table = document.getElementById('roleRightsTable').getElementsByTagName('tbody')[0];
+    var newRow = table.rows[0].cloneNode(true); // Clone the first row
+    var rowIndex = table.rows.length;
 
-/* function saveRoleRights() {
+    // Update the index for cloned rows
+    newRow.querySelectorAll('input, select').forEach(function(element) {
+        element.name = element.name.replace(/\[\d+\]/, '[' + rowIndex + ']'); // Update the index
+    });
+
+    table.appendChild(newRow);
+}
+
+function saveRoleRights() {
     const form = document.getElementById('roleRightsForm'); // Now selects a <form>
     const formData = new FormData(form);
 
@@ -382,178 +894,8 @@ function saveGMMaster() {
     .catch(error => {
         console.error('Error saving role rights:', error);
     });
-} */
-
-/* function saveRoleRights() {
-    var form = document.getElementById("roleRightsForm");
-    var formData = new FormData(form);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/CWFM/roleRights/saveRoleRights", true);
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-            	loadCommonList('/roleRights/roleRightsList', 'Role Rights')
-               // window.location.href = "/CWFM/roleRights/roleRightsList";
-            } else {
-                alert("Error: " + xhr.status + " - " + xhr.statusText);
-            }
-        }
-    };
-
-    xhr.send(formData);
-} */
-
-
-
-/* let rowCount = 1; // Start with 1 because the default row is already present.
-
-function addRow() {
-    const table = document.getElementById("roleRightsTable");
-    const row = table.insertRow(-1); // Add new row at the end
-    const rowIndex = table.rows.length - 2; // Adjust for header and 0-based index
-
-    row.innerHTML = `
-        <td>
-            <select name="roleRightsForm.roleRights[${rowIndex}].roleId" required>
-                <c:forEach var="role" items="${roles}">
-                    <option value="${role.gmId}">${role.gmName}</option>
-                </c:forEach>
-            </select>
-        </td>
-        <td>
-            <select name="roleRightsForm.roleRights[${rowIndex}].page.gmId" required>
-                <c:forEach var="page" items="${pages}">
-                    <option value="${page.gmId}">${page.gmName}</option>
-                </c:forEach>
-            </select>
-        </td>
-        <td><input type="checkbox" name="roleRightsForm.roleRights[${rowIndex}].viewRights" value="1" /></td>
-        <td><input type="checkbox" name="roleRightsForm.roleRights[${rowIndex}].addRights" value="1" /></td>
-        <td><input type="checkbox" name="roleRightsForm.roleRights[${rowIndex}].editRights" value="1" /></td>
-        <td><input type="checkbox" name="roleRightsForm.roleRights[${rowIndex}].deleteRights" value="1" /></td>
-        <td><input type="checkbox" name="roleRightsForm.roleRights[${rowIndex}].exportRights" value="1" /></td>
-        <td><button type="button" onclick="removeRow(this)">Remove</button></td>
-    `;
 }
 
-function removeRow(button) {
-    const row = button.parentElement.parentElement;
-    row.parentNode.removeChild(row);
-}
-
-// Form validation to ensure roles and pages are selected
-function validateRRForm() {
-    const rows = document.querySelectorAll('#roleRightsTable tbody tr');
-    for (const row of rows) {
-        const roleSelect = row.querySelector("select[name^='roleRights'][name$='.roleId']");
-        const pageSelect = row.querySelector("select[name^='roleRights'][name$='.pageId']");
-        if (!roleSelect.value || !pageSelect.value) {
-            alert("Please select both Role and Page for each entry.");
-            return false;
-        }
-    }
-    return true;
-} */
-function addNewRowFromTemplate() {
-    const placeholder = document.getElementById('placeholderRow');
-    const newRow = placeholder.cloneNode(true);
-    newRow.removeAttribute('id'); // Remove the ID from the cloned row
-    const tableBody = document.getElementById('roleRightsTable').querySelector('tbody');
-    tableBody.appendChild(newRow);
-}
-/* var rowIndex = 0; // Initial row index */
-
-function addNewRow() {
-    var table = document.getElementById('roleRightsTable').getElementsByTagName('tbody')[0];
-    var newRow = table.rows[0].cloneNode(true); // Clone the first row
-    var rowIndex = table.rows.length;
-
-    // Update the index for cloned rows and clear the values
-    newRow.querySelectorAll('input, select').forEach(function (element) {
-        // Update the name index
-        element.name = element.name.replace(/\[\d+\]/, '[' + rowIndex + ']');
-
-        // Clear the value for input fields
-        if (element.tagName === 'INPUT') {
-            if (element.type === 'text' || element.type === 'number' || element.type === 'email') {
-                element.value = ''; // Clear text, number, or email inputs
-            }
-            if (element.type === 'checkbox' || element.type === 'radio') {
-                element.checked = false; // Uncheck checkboxes and radio buttons
-            }
-        }
-
-        // Reset the selection for dropdown fields
-        if (element.tagName === 'SELECT') {
-            element.selectedIndex = 0; // Set to the first option
-        }
-
-        // Clear custom attributes if needed (e.g., data attributes)
-        if (element.hasAttribute('data-some-attribute')) {
-            element.removeAttribute('data-some-attribute'); // Example of clearing a custom attribute
-        }
-    });
-
-    table.appendChild(newRow); // Append the cleared row to the table
-}
-
-function saveRoleRights() {
-    const roleId = document.getElementById('roleId')?.value.trim();
-    const pageId = document.getElementById('pageId')?.value.trim();
-
-    if (!roleId) {
-        alert('Please select a Role.');
-        return;
-    }
-    if (!pageId) {
-        alert('Please select a Page.');
-        return;
-    }
-
-    // Gather selected permissions
-    const checkboxes = document.querySelectorAll('input[name="permissions"]:checked');
-    console.log('Selected checkboxes:', checkboxes); // Debugging log
-
-    const permissions = Array.from(checkboxes).map(checkbox => checkbox.value);
-    console.log('Collected permissions:', permissions); // Debugging log
-
-    if (permissions.length === 0) {
-        alert('Please select at least one permission.');
-        return;
-    }
-
-    const data = {
-        roleId: roleId,
-        pageId: pageId,
-        permissions: permissions
-    };
-
-    console.log('Data to send:', data); // Debugging log
-
-    fetch('/roleRights/save', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (response.status === 409) {
-                document.getElementById('error-message').innerText = 'Duplicate Role-Page combination is not allowed.';
-            } else if (response.ok) {
-                alert('Role rights saved successfully.');
-                location.reload();
-            } else {
-                throw new Error('Unexpected error occurred.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while saving role rights.');
-        });
-}
 
 
 /* function removeRow(button) {
@@ -612,373 +954,331 @@ function redirectToUserAdd() {
 	    xhr.send();
 	}
 function saveUser() {
-    const form = document.getElementById('userFormID'); // Now selects a <form>
+    const form = document.getElementById('userFormID');
     const formData = new FormData(form);
 
-    // Collecting specific input values manually
-    formData.append('firstName', form.elements['firstName'].value);
-    formData.append('lastName', form.elements['lastName'].value);
-    formData.append('email', form.elements['email'].value);
-    formData.append('contactNumber', form.elements['contactNumber'].value);
-    formData.append('password', form.elements['password'].value);
-    formData.append('userAccount', form.elements['userAccount'].value);
+    // Prepare user object
+    const user = {
+        firstName: form.elements['firstName'].value,
+        lastName: form.elements['lastName'].value,
+        emailId: form.elements['emailId'].value,
+        contactNumber: form.elements['contactNumber'].value,
+        password: form.elements['password'].value,
+        userAccount: form.elements['userAccount'].value,
+    };
 
-    // Assuming roleIds are checkboxes and multiple checked roles exist
-    const checkedRoles = [];
+    // Prepare role IDs
+    const roleIds = [];
     form.querySelectorAll('input[name="roleIds"]:checked').forEach(input => {
-        checkedRoles.push(input.value);
+        roleIds.push(Number(input.value));
     });
-    formData.append('roleIds', JSON.stringify(checkedRoles));
 
-    fetch('/CWFM/usersController/saveUser', {
+    // Construct payload
+    const payload = {
+        user,
+        roleIds,
+    };
+
+    console.log('Payload:', payload);
+
+    // Make POST request
+    fetch('/CWFM/usersController/saveUsers', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json' // Ensure content type matches your server's expected format
+            'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify(payload),
     })
-    .then(response => {
-        if (response.ok) {
-            alert('User saved successfully!');
-            // Load the specific list page with default styles
-            loadCommonList('/users/userList', 'Users');
-        } else {
-            alert(`Failed to save role rights: ${response.statusText}`);
-            console.error('Failed to save role rights.');
-        }
-    })
-    .catch(error => {
-        console.error('Error saving role rights:', error);
-    });
-}
-function submitGMTYPE() {
-    // Create a new FormData object and append the input values
-    const data = new FormData();
-    const gmTypeName = document.getElementById("gmTypeName").value; // Get the GM Type Name input value
-    data.append("gmTypeName", gmTypeName); // Append the gmTypeName to FormData
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/CWFM/generalController/saveGMType", true);
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            console.log("Data saved successfully:", xhr.responseText);
-            loadCommonList('/generalController/gmType', 'General Type');
-        } else {
-            console.error("Error saving data:", xhr.status, xhr.responseText);
-        }
-    };
-
-    xhr.onerror = function () {
-        console.error("Request failed");
-    };
-
-    // Send the FormData object
-    xhr.send(data);
-}
-function submitOrgLevel() {
-    const orgLevelRows = document.querySelectorAll('#orgLevelTable tbody tr'); // Select all rows in the table
-    let orgLevelsData = [];
-    let validData = true; // Track validity of the entire form
-
-    orgLevelRows.forEach((row, index) => {
-        const orgLevelDefIdElem = row.querySelector('input[name="orgLevelDefId[]"]');
-        const orgLevelNameElem = row.querySelector('input[name="orgLevelName[]"]');
-        const shortNameElem = row.querySelector('input[name="shortName[]"]');
-        const hierarchyElem = row.querySelector('input[name="hierarchy[]"]');
-
-        // Extract values or set defaults for missing elements
-        const orgLevelDefId = orgLevelDefIdElem ? orgLevelDefIdElem.value.trim() : null;
-        const orgLevelName = orgLevelNameElem ? orgLevelNameElem.value.trim() : '';
-        const shortName = shortNameElem ? shortNameElem.value.trim() : '';
-        const hierarchy = hierarchyElem ? hierarchyElem.value.trim() : '';
-
-        console.log(`Processing Row ${index + 1}:`);
-        console.log('OrgLevelDefId:', orgLevelDefId || 'New Entry (null)');
-        console.log('Name:', orgLevelName || 'Not Found');
-        console.log('Short Name:', shortName || 'Not Found');
-        console.log('Hierarchy:', hierarchy || 'Not Found');
-
-        // Validate fields for each row
-        if (!orgLevelName || !shortName || !hierarchy) {
-            console.error(`Row ${index + 1} is missing required fields.`);
-            alert(`Please fill in all fields for row ${index + 1}.`);
-            validData = false;
-            return; // Skip processing this row
-        }
-
-        // Push valid data to the array
-        orgLevelsData.push({
-            orgLevelDefId: orgLevelDefId || null, // Assign null for new rows
-            name: orgLevelName,
-            shortName: shortName,
-            orgHierarchyLevel: parseInt(hierarchy, 10)
-        });
-    });
-
-    if (!validData || orgLevelsData.length === 0) {
-        alert('Please fix errors before submitting.');
-        return;
-    }
-
-    console.log('Collected Org Levels Data:', orgLevelsData);
-
-    // AJAX request to send data to the server
-    $.ajax({
-        type: 'POST',
-        url: '/CWFM/org-level/save',
-        contentType: 'application/json',
-        data: JSON.stringify(orgLevelsData),
-        success: function (response) {
-            console.log('Server Response:', response);
-            alert('Org Levels saved successfully!');
-            loadCommonList('/org-level/list', 'Org Levels');
-        },
-        error: function (xhr, status, error) {
-            console.error('Error during request:', error);
-            alert('Error during request: ' + xhr.responseText);
-        }
-    });
-}
-function validateMasterValue() {
-    const gmTypeId = document.getElementById("gmTypeId").value.trim();
-    const masterValue = document.getElementById("masterValue").value.trim();
-    const existingMasterValues = document.getElementById("existingMasterValues").value.split(',');
-
-    if (!gmTypeId || !masterValue) {
-        alert("Please fill all the required fields.");
-        return false; // Prevent form submission
-    }
-
-    if (existingMasterValues.includes(masterValue)) {
-        alert("Duplicate Master Value is not allowed for the selected GM Type.");
-        return false; // Prevent form submission
-    }
-
-    return true; // Allow form submission
-}
-function deleteSelectedGMTYPE() {
-    const selectedIds = Array.from(document.querySelectorAll('input[name="selectedGMTIds"]:checked')).map(cb => parseInt(cb.value, 10));
-    if (selectedIds.length === 0) {
-        alert("Please select at least one GM Type to delete.");
-        return;
-    }
-
-   
-
-    // Log the selected IDs to see what is being sent
-    console.log("Selected GM Type IDs:", selectedIds);
-
-    $.ajax({
-        type: 'POST',
-        url: '/CWFM/generalController/deleteGMTypes',
-        contentType: 'application/json', // Set content type to JSON
-        data: JSON.stringify(selectedIds), // Send data as JSON string
-        success: function(response) {
-            if (response.success) {
-                alert("Selected items deleted successfully.");
-                loadCommonList('/generalController/gmType', 'General Type');
+        .then(response => {
+            console.log('Fetch response received:', response);
+            if (response.ok) {
+                alert('User saved successfully!');
+                loadCommonList('/usersController/userList', 'Users');
             } else {
-                alert(response.message || "Error deleting selected items.");
+                response.text().then(text => alert(`Failed to save user: ${text}`));
             }
-        },
-        error: function(xhr, status, error) {
-            // Log the error response for debugging
-            console.error("Error details:", xhr.responseText, status, error);
-            alert("An unexpected error occurred. Please check the console for details.");
-        }
+        })
+        .catch(error => console.error('Error saving user:', error));
+}
+function changeRole(selectedRoleId, selectedRoleName) {
+    alert(selectedRoleName);  // To check the selected role name
+    if (selectedRoleId) {
+    	 if (selectedRoleName === 'Admin') {
+    	        // Show the "Admin" menu or take other actions
+    	        showAdminMenu();
+    	    } else {
+    	        // Hide the "Admin" menu or show a different menu
+    	        showOtherMenus();
+    	    }
+        fetch('/CWFM/updateRole', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Sending JSON data
+            },
+            body: JSON.stringify({ roleId: selectedRoleId, roleName: selectedRoleName }) // Sending roleId and roleName
+        })
+         .then(response => {
+            if (response.ok) {
+            	 // loadCommonList('/generalMaster/menu.jsp', 'CONTRACT WORKFORCE MANAGEMENT SYSTEM');
+                return response.json(); // Parse the JSON response
+            } else {
+                throw new Error('Failed to update role. Please try again.');
+            }
+        })
+        .then(data => {
+        	 console.log('Sidebar update data:', data); 
+            updateSidebar(data,selectedRoleName); // Update the sidebar with the fetched pages
+          
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+}
+function showAdminMenu() {
+    // Code to show admin menu
+    console.log('Displaying Admin menu...');
+    document.getElementById("adminMenu").style.display = 'block';
+}
+
+function showOtherMenus() {
+    // Code to show other menus based on role
+    console.log('Displaying other menus...');
+    document.getElementById("adminMenu").style.display = 'none';
+}
+
+
+function onSectionChange() {
+    const sectionId = document.getElementById("sectionDropdown").value;
+    if (sectionId) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/CWFM/generalController/getSectionPages?sectionId=" + encodeURIComponent(sectionId), true);
+
+        xhr.onload = function() {
+            if (xhr.status == 200) {
+                try {
+                    const data = JSON.parse(xhr.responseText); // Parse the response JSON
+                    console.log("Fetched pages:", data);
+
+                    // Find the boxes in the DOM
+                    const availableBox = document.getElementById("availableBox");
+                    const selectedBox = document.getElementById("selectedBox");
+
+                    // Check if the elements exist
+                    if (!availableBox || !selectedBox) {
+                        console.error("Available or selected box element not found in the DOM.");
+                        return;
+                    }
+
+                    // Clear existing options
+                    availableBox.innerHTML = "";
+                    selectedBox.innerHTML = "";
+
+                    // Populate available options
+                    data.availablePages.forEach(page => {
+                        const option = document.createElement("option");
+                        option.value = page.gmId;
+                        option.text = page.gmName;
+                        availableBox.appendChild(option);
+                    });
+
+                    // Populate selected options
+                    data.selectedPages.forEach(page => {
+                        const option = document.createElement("option");
+                        option.value = page.gmId;
+                        option.text = page.gmName;
+                        selectedBox.appendChild(option);
+                    });
+
+                } catch (err) {
+                    console.error("Error parsing JSON response:", err);
+                }
+            } else {
+                console.error("Failed to fetch pages. HTTP status:", xhr.status);
+            }
+        };
+
+        xhr.onerror = function() {
+            console.error("Error during the request.");
+        };
+
+        xhr.send();
+    } else {
+        console.error("Section ID is missing");
+    }
+}
+function addPageToSelected() {
+    const availableBox = document.getElementById("availableBox");
+    const selectedBox = document.getElementById("selectedBox");
+
+    if (!availableBox || !selectedBox) {
+        console.error("Available or Selected box not found in the DOM.");
+        return;
+    }
+
+    // Move selected options from availableBox to selectedBox
+    Array.from(availableBox.selectedOptions).forEach(option => {
+        selectedBox.appendChild(option); // Move the option
     });
 }
- function editRow(gmId) {
-    if (!gmId) {
-        alert("Error: gmId is not provided. Cannot edit this row.");
-        console.error("editRow called without gmId.");
+
+function removePageFromSelected() {
+    const availableBox = document.getElementById("availableBox");
+    const selectedBox = document.getElementById("selectedBox");
+
+    if (!availableBox || !selectedBox) {
+        console.error("Available or Selected box not found in the DOM.");
         return;
     }
 
-    // Get the input fields and button for the row
-    const nameInput = document.getElementById(`name`);
-    const valueInput = document.getElementById(`value`);
-    const editButton = document.getElementById(`editBtn-${gmId}`);
-    // Validate if the elements exist
-    if (!nameInput & !valueInput & !editButton) {
-        alert(`Error: Unable to find elements for gmId: ${gmId}.`);
-        console.error(`Missing elements for gmId: ${gmId}. Check your HTML structure.`);
-        return;
-    }
-
-    // Enable editing for the name and value fields
-    nameInput.readOnly = false;
-    valueInput.readOnly = false;
-
-    // Optionally change the background color to indicate edit mode
-    nameInput.style.backgroundColor = "#e8f0fe";
-    valueInput.style.backgroundColor = "#e8f0fe";
-
-    // Change the button text to "Editing..."
-    editButton.textContent = "Editing...";
-    editButton.disabled = true;
-
- // Toggle button visibility
-    actionEdit.style.display = "none";
-    actionSave.style.display = "block";
-    // Log success
-    console.log(`Row with gmId: ${gmId} is now editable.`);
+    // Move selected options from selectedBox to availableBox
+    Array.from(selectedBox.selectedOptions).forEach(option => {
+        availableBox.appendChild(option); // Move the option
+    });
 }
- 
- /* function editRow(gmId) {
-	    // Select elements based on dynamic gmId
-	    const nameInput = document.getElementById(`name-${gmId}`);
-	    const valueInput = document.getElementById(`value-${gmId}`);
-	    const actionEdit = document.getElementById(`action-edit-${gmId}`);
-	    const actionSave = document.getElementById(`action-save-${gmId}`);
 
-	    // Check if elements exist
-	    if (!nameInput || !valueInput || !actionEdit || !actionSave) {
-	        alert(`Error: Unable to edit. Missing elements for gmId: ${gmId}.`);
-	        return;
-	    }
+function saveMapping() {
+    const sectionId = document.getElementById("sectionDropdown").value;
+    const selectedPages = Array.from(document.getElementById("selectedBox").options)
+                                .map(option => parseInt(option.value));
 
-	    // Enable editing for the fields
-	    nameInput.readOnly = false;
-	    valueInput.readOnly = false;
+    if (sectionId && selectedPages.length > 0) {
+        const data = {
+            sectionId: parseInt(sectionId),
+            pageIds: selectedPages
+        };
 
-	    // Change background for visual feedback
-	    nameInput.style.backgroundColor = "#e8f0fe";
-	    valueInput.style.backgroundColor = "#e8f0fe";
+        fetch('/CWFM/generalController/saveMapping', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            alert("Mapping saved successfully!");
+            console.log(data);
+        })
+        .catch(err => {
+            //alert("Error saving mapping.");
+            console.error(err);
+        });
+    } else {
+        alert("Please select a section and pages to save.");
+    }
+}
 
-	    // Toggle button visibility
-	    actionEdit.style.display = "none";
-	    actionSave.style.display = "block";
-	}
- */
-	function saveRow(gmId) {
-	    // Select elements
-	    const nameInput = document.getElementById(`name-${gmId}`);
-	    const valueInput = document.getElementById(`value-${gmId}`);
-	    const actionEdit = document.getElementById(`action-edit-${gmId}`);
-	    const actionSave = document.getElementById(`action-save-${gmId}`);
 
-	    // Ensure elements exist
-	    if (!nameInput || !valueInput || !actionEdit || !actionSave) {
-	        alert(`Error: Unable to save. Missing elements for gmId: ${gmId}.`);
-	        return;
-	    }
 
-	    // Get updated values
-	    const updatedName = nameInput.value.trim();
-	    const updatedValue = valueInput.value.trim();
 
-	    // Validate non-empty values
-	    if (!updatedName || !updatedValue) {
-	        alert("Error: Both fields are required.");
-	        return;
-	    }
+function populatePageDropdowns(availablePages, selectedPages) {
+    const availableBox = document.getElementById("availablePages");
+    const selectedBox = document.getElementById("selectedPages");
 
-	    // Simulate AJAX call
-	    fetch(`/CWFM/generalController/updateGeneralMaster`, {
-	        method: "POST",
-	        headers: { "Content-Type": "application/json" },
-	        body: JSON.stringify({
-	            gmId: gmId,
-	            gmName: updatedName,
-	            gmDescription: updatedValue,
-	        }),
-	    })
-	        .then(response => response.json())
-	        .then(result => {
-	            if (result.success) {
-	                alert("Data updated successfully.");
+    // Clear existing options
+    availableBox.innerHTML = "";
+    selectedBox.innerHTML = "";
 
-	                // Revert fields to read-only
-	                nameInput.readOnly = true;
-	                valueInput.readOnly = true;
-	                nameInput.style.backgroundColor = "";
-	                valueInput.style.backgroundColor = "";
+    // Populate available pages
+    availablePages.forEach(page => {
+        const option = document.createElement("option");
+        option.value = page.gmId;
+        option.textContent = page.gmName;
+        availableBox.appendChild(option);
+    });
 
-	                // Toggle button visibility
-	                actionEdit.style.display = "block";
-	                actionSave.style.display = "none";
-	            } else {
-	                alert(`Error: ${result.message}`);
-	            }
-	        })
-	        .catch(error => {
-	            console.error("Error:", error);
-	            alert("An error occurred while saving data.");
-	        });
-	}
-
-	function cancelEdit(gmId) {
-	    // Select elements
-	    const nameInput = document.getElementById(`name-${gmId}`);
-	    const valueInput = document.getElementById(`value-${gmId}`);
-	    const actionEdit = document.getElementById(`action-edit-${gmId}`);
-	    const actionSave = document.getElementById(`action-save-${gmId}`);
-
-	    // Ensure elements exist
-	    if (!nameInput || !valueInput || !actionEdit || !actionSave) {
-	        alert(`Error: Unable to cancel. Missing elements for gmId: ${gmId}.`);
-	        return;
-	    }
-
-	    // Reset to original values
-	    nameInput.value = nameInput.defaultValue;
-	    valueInput.value = valueInput.defaultValue;
-
-	    // Revert fields to read-only
-	    nameInput.readOnly = true;
-	    valueInput.readOnly = true;
-	    nameInput.style.backgroundColor = "";
-	    valueInput.style.backgroundColor = "";
-
-	    // Toggle button visibility
-	    actionEdit.style.display = "block";
-	    actionSave.style.display = "none";
-	}
-
-	 /* function redirectToBillView() {
-		    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-		    if (selectedCheckboxes.length !== 1) {
-		        alert("Please select exactly one row to view.");
-		        return;
-		    }
-		    
-		    var selectedRow = selectedCheckboxes[0].closest('tr');
-		    var unitId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
-		    var xhr = new XMLHttpRequest();
-		    xhr.onreadystatechange = function() {
-		        if (xhr.readyState == 4 && xhr.status == 200) {
-		            document.getElementById("mainContent").innerHTML = xhr.responseText;
-		        }
-		    };
-		    xhr.open("GET", "/CWFM/bill/view" + unitId , true);
-		    xhr.send();
-		}    */
-
-		  function redirectToBillView() {
-		    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-		    if (selectedCheckboxes.length !== 1) {
-		        alert("Please select exactly one row to view.");
-		        return;
-		    }
-		   
-		    var selectedRow = selectedCheckboxes[0].closest('tr');
-		    var unitId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
-		    var xhr = new XMLHttpRequest();
-		    xhr.onreadystatechange = function() {
-		        if (xhr.readyState == 4 && xhr.status == 200) {
-		            document.getElementById("mainContent").innerHTML = xhr.responseText;
-		        }
-		    };
-		    xhr.open("GET", "/CWFM/billVerification/billview/" + unitId , true);
-		    xhr.send();
-		}   
-
+    // Populate selected pages
+    selectedPages.forEach(page => {
+        const option = document.createElement("option");
+        option.value = page.gmId;
+        option.textContent = page.gmName;
+        selectedBox.appendChild(option);
+    });
+}
+/* function changeRole(selectedRoleId) {
+    alert(selectedRoleId);
+    if (selectedRoleId) {
+        $.ajax({
+            url: '/CWFM/updateRole',
+            type: 'POST',
+            contentType: 'application/json', // Send data as JSON
+            data: JSON.stringify({ roleId: selectedRoleId }), // Send roleId as a JSON object
+            success: function(data) {
+                alert("Role updated successfully");
+                console.log(data);
+                // You can handle the sidebar update here with the returned data
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                alert("Failed to update role: " + error);
+            }
+        });
+    } else {
+        console.warn("No role selected.");
+    }
+} */
+function fetchSectionData() {
+	  var xhr = new XMLHttpRequest();
+	    xhr.onreadystatechange = function() {
+	        if (xhr.readyState == 4 && xhr.status == 200) {
+	            // Update the mainContent element with the fetched content
+	            document.getElementById("mainContent").innerHTML = xhr.responseText;
+	        }
+	    };
+	    xhr.open("GET", "/CWFM/generalController/addSection", true);
+	    xhr.send();
+}
 </script>
     <style>
+    .tab-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Adjust spacing between tabs */
+}
+
+/* Tab content */
+.tab {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Add some space between elements in the tab */
+}
+      .multi-select-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrap when there's not enough space */
+        }
+
+       .multi-select-container .custom-select {
+    width: 265px;
+    height: 200px; /* Increased height */
+}
+
+        .button-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 5px; /* Adjusted spacing between buttons */
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .buttons button {
+    min-width: 100px;
+    margin: 0;
+}
      /* General Styles */
    body {
     margin: 0;
@@ -1407,6 +1707,133 @@ table th {
     font-size: 24px; /* Adjust size as needed */
     color: #ffffff; /* Change color as needed */
 }
+/* Dropdown hover effect */
+.role-select:hover {
+    border-color: #00796b;
+}
+
+/* Apply the same hover styles for role-right */
+.role-dropdown .role-select:hover,
+.role-dropdown .role-select option:hover {
+    background-color: #f1f1f1; /* Light gray background */
+    color: #fff; /* Black text */
+    text-decoration: none;
+}
+.role-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.role-dropdown label {
+    font-weight: bold;
+    margin-right: 8px;
+    color: #333; /* Default label color */
+}
+
+.role-dropdown .role-select {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    appearance: none; /* Remove default browser styles */
+    cursor: pointer;
+}
+
+/* Hover effect for the select box */
+.role-dropdown .role-select:hover {
+    border-color: #007bff; /* Match the hover color of Forgot Password */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Subtle shadow for focus */
+}
+
+/* Style for options (limited customization due to browser restrictions) */
+.role-dropdown .role-select option {
+    color: #333;
+    background-color: #fff;
+}
+
+/* Placeholder color */
+.role-dropdown .role-select option:disabled {
+    color: #999;
+}
+
+/* Force a visible hover-like experience using JavaScript */
+.role-dropdown:hover .role-select {
+    border-color: #0056b3; /* Darker blue border */
+    color: #0056b3; /* Darker blue text */
+}
+.role-label {
+    font-size: 0.9rem; /* Decrease text size */
+    color: #fff; /* Optional: Adjust label color */
+    margin-bottom: 5px; /* Add some spacing */
+}
+
+.role-dropdown {
+    margin-top: 5px;
+}
+
+.role-select {
+    background-color: green; /* Set dropdown background color */
+    color: white; /* Set dropdown text color */
+    border: 1px solid #ccc; /* Optional: Border styling */
+    border-radius: 4px; /* Optional: Rounded corners */
+    padding: 5px; /* Optional: Padding for better appearance */
+    font-size: 1rem; /* Font size for dropdown text */
+}
+
+.role-select option {
+    background-color: green; /* Dropdown option background */
+    color: white; /* Dropdown option text */
+}
+
+/* Alignment tweaks for different sections */
+.heading,
+.role-dropdown,
+.dropdown {
+    margin: 0 10px;
+}
+
+#dynamic-menu {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#dynamic-menu li {
+    margin-bottom: 10px;
+}
+
+#dynamic-menu a {
+    text-decoration: none;
+    color: white;
+}
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-menu > li {
+    margin: 10px 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.sub-menu {
+    list-style: none;
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.sub-menu li {
+    padding: 5px 0;
+}
 
     </style>
 </head>
@@ -1422,36 +1849,160 @@ table th {
     
         <!-- <img src="resources/img/Adani_2012_logo.png" alt="Company Logo" class="logo"> -->
         <div class="heading">Contract Labor Management System</div>
-         <div class="dropdown">
-             <span class="initials-icon"><c:out value="${sessionScope.userInitials}" /></span> <span><c:out value="${sessionScope.loginuser.firstName}" /><c:out value="${sessionScope.loginuser.lastName}" /></span>
-            <div class="dropdown-content">
-                <a href="#" onclick="loadCommonList('/password/change','Change Password')">Change Password</a>
-                <a href="#" onclick="loadLogout()">Logout</a>
-            </div>
+
+  <c:if test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
+    <label for="roleSelect" class="role-label">Role:</label>
+    <div class="role-dropdown">
+        <select id="roleSelect" name="roleId" onchange="changeRole(this.value, this.options[this.selectedIndex].text)" class="role-select">
+            <option value="" disabled selected>Select Role</option>
+            <c:forEach var="role" items="${sessionScope.roles}">
+                <option value="${role.gmId}" 
+                    <c:if test="${role.gmId == sessionScope.selectedRole}">selected</c:if>>
+                    <c:out value="${role.gmName}" />
+                </option>
+            </c:forEach>
+        </select>
+    </div>
+</c:if>
+
+    <div class="dropdown">
+        <span class="initials-icon">
+            <c:out value="${sessionScope.userInitials}" />
+        </span>
+        <span class="user-name">
+            <c:out value="${sessionScope.loginuser.firstName}" /> 
+            <c:out value="${sessionScope.loginuser.lastName}" />
+        </span>
+
+        <div class="dropdown-content">
+            <a href="#" onclick="loadChangePassword()">Change Password</a>
+            <a href="#" onclick="loadLogout()">Logout</a>
         </div>
-        <img src="resources/img/Dot1.png" alt="Dot1 Logo" class="logo dot1">
     </div>
 
+    <img src="resources/img/Dot1.png" alt="Dot1 Logo" class="logo dot1">
+</div>
+
+   
     <!-- Side Navigation Bar -->
-    <nav class="main-menu">
-        <ul>
-            <li class="main-menu-item" style="margin-top: 20px;">
-    <a href="#" onclick="toggleSubMenu('clms-sub-menu'); return false;" class="mainmenu-link">
-        <i class="fa fa-dashboard nav-icon"></i>
-        <span class="nav-text">CLMS</span>
-         <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
-         <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
-    </a>
-    <ul class="sub-menu" id="clms-sub-menu" style="display: none;">
-        <li><a href="#" onclick="loadCommonList('/principalEmployer/list','Principal Employer')">Principal Employer</a></li>
-        <li><a href="#" onclick="loadCommonList('/contractor/list','Contractor')">Contractor</a></li>
-        <li><a href="#" onclick="loadCommonList('/workorders/list', 'Work Order')">Work Order</a></li>
-       <!--  <li><a href="#" onclick="loadCommonList('/minimumWage/list', 'Minimum Wage Master')">Minimum Wage Master</a></li> -->
-       <!--  <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'Contract Workmen List')">Contract Workmen</a></li> -->
-        <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->
+   <nav class="main-menu">
+    <ul id="dynamic-menu" class="sidebar-menu">
+        <!-- Admin menu rendering -->
+        <c:if test="${sessionScope.isAdmin}">
+            <c:forEach var="section" items="${sessionScope.sections}">
+    <li>
+        <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
+            <i class="fa fa-folder nav-icon"></i>
+            <span class="nav-text">${section.sectionName}</span>
+            <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
+            <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
+        </a>
+        <!-- Ensure submenu is correctly set with unique ID -->
+        <ul class="sub-menu" id="sub-menu-${section.sectionId}" style="display: none;">
+            <c:forEach var="page" items="${section.pages}">
+                <a href="#" onclick="loadCommonList('${page.pageUrl}', '${page.pageName}')">${page.pageName}</a>
+                            
+            </c:forEach>
+        </ul>
+    </li>
+</c:forEach>
+
+        </c:if>
+
+        <!-- Non-Admin menu rendering -->
+        <c:if test="${not sessionScope.isAdmin}">
+            <c:forEach var="section" items="${sessionScope.sections}">
+                <li>
+                    <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
+                        <i class="fa fa-folder nav-icon"></i>
+                        <span class="nav-text">${section.sectionName}</span>
+                        <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
+            <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
+        </a>
+                    <ul class="sub-menu" id="sub-menu-${section.sectionId}" style="display: none;">
+                        <c:forEach var="page" items="${section.pages}">
+                            <c:if test="${page.accessibleForRole}">
+                                <a href="#" onclick="loadCommonList('${page.pageUrl}', '${page.pageName}')">${page.pageName}</a>
+                            </c:if>
+                        </c:forEach>
+                    </ul>
+                </li>
+            </c:forEach>
+        </c:if>
     </ul>
+
+
+        <ul id="adminMenu" style="display:none;">
+         <li>
+            <a href="#" class="nav-link" onclick="toggleGeneralManagementSubMenu(this)">
+                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
+                <span class="nav-text">General Management</span>
+                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
+                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
+            </a>
+            <ul class="sub-menu" id="general-management-sub-menu">
+              <li><a href="#" onclick="loadCommonList('/generalController/gmType', 'General Type')">General Type</a></li>
+<li><a href="#" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">General Master</a></li>
+<li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
+<li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
+<li><a href="#" onclick="loadCommonList('/generalController/addSection', 'Sections')">Sections</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+   <%--  <ul id="dynamic-menu" class="sidebar-menu">
+   <c:if test="${sessionScope.roleName eq 'Admin'}">
+    <c:forEach var="section" items="${sections}">
+        <div class="section">
+            <h3>${section.sectionName}</h3>
+            <c:forEach var="page" items="${section.pages}">
+                <div class="page">
+                    <a href="${page.pageUrl}">${page.pageName}</a>
+                </div>
+            </c:forEach>
+        </div>
+    </c:forEach>
+</c:if>
+
+<c:if test="${sessionScope.roleName ne 'Admin'}">
+    <c:forEach var="section" items="${sections}">
+        <div class="section">
+            <h3>${section.sectionName}</h3>
+            <c:forEach var="page" items="${section.pages}">
+                <c:if test="${page.accessibleForRole}">
+                    <div class="page">
+                        <a href="${page.pageUrl}">${page.pageName}</a>
+                    </div>
+                </c:if>
+            </c:forEach>
+        </div>
+    </c:forEach>
+</c:if>
+
+
+
+   
+        </ul> --%>
+    <%-- <nav class="main-menu">
+     <li>
+    <a href="#" class="nav-link" onclick="toggleSubMenu('dynamic-menu')">
+        <i class="fa fa-database nav-icon"></i>
+        <span class="nav-text">Dynamic Menu</span>
+        <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
+        <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
+    </a>
+    <ul class="menu">
+    <c:forEach var="page" items="${rolePages}">
+        <li>
+            <a href="${page.url}" onclick="loadCommonList('${page.url}', '${page.name}')">${page.name}</a>
+        </li>
+    </c:forEach>
+</ul>
 </li>
-   <li>
+        <ul>
+         <!-- New Section for General Management -->
+        <li>
             <a href="#" class="nav-link" onclick="toggleSubMenu('general-management-sub-menu')">
                 <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
                 <span class="nav-text">General Management</span>
@@ -1475,10 +2026,28 @@ table th {
             </a>
             <ul class="sub-menu" id="admin-sub-menu">
               <li><a href="#" onclick="loadCommonList('/org-level/list', 'Org Levels')">Org Levels</a></li>
-              <li><a href="#" onclick="loadCommonList('/org-level-entryController/org-level-entry', 'Org Level Entries')">Org Level Entries</a></li>
-              <li><a href="#" onclick="loadCommonList('/org-level-mapping/list', 'Org Level Mappings')">Org Level Mappings</a></li>
+<li><a href="#" onclick="loadCommonList('/org-level-entryController/org-level-entry', 'Org Level Entries')">Org Level Entries</a></li>
+<li><a href="#" onclick="loadCommonList('/org-level-mapping/list', 'Org Level Mappings')">Org Level Mappings</a></li>
             </ul>
-        </li> 
+        </li>
+       
+            <li class="main-menu-item" style="margin-top: 20px;">
+    <a href="#" onclick="toggleSubMenu('clms-sub-menu'); return false;" class="mainmenu-link">
+        <i class="fa fa-dashboard nav-icon"></i>
+        <span class="nav-text">CLMS</span>
+         <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
+         <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
+    </a>
+    <ul class="sub-menu" id="clms-sub-menu" style="display: none;">
+        <li><a href="#" onclick="loadCommonList('/principalEmployer/list','Principal Employer')">Principal Employer</a></li>
+        <li><a href="#" onclick="loadCommonList('/contractor/list','Contractor')">Contractor</a></li>
+        <li><a href="#" onclick="loadCommonList('/workOrder/list', 'Work Order')">Work Order</a></li>
+       <!--  <li><a href="#" onclick="loadCommonList('/minimumWage/list', 'Minimum Wage Master')">Minimum Wage Master</a></li> -->
+        <li><a href="#" onclick="loadCommonList('/workmenDetail.jsp', 'Contract Workmen')">Contract Workmen</a></li>
+        <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->
+    </ul>
+</li>
+    
   <li>
                 <a href="#" class="nav-link" onclick="toggleSubMenu('contractor-sub-menu')">
                     <i class="fa fa-users nav-icon"></i>
@@ -1487,14 +2056,10 @@ table th {
                     <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
                 </a>
                 <ul class="sub-menu" id="contractor-sub-menu">
-                    <li><a href="#" onclick="loadCommonList('/contractor/contReg','Contractor Registration')"> Registration</a></li>
-                    <li><a href="#" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')"> Registration List</a></li>
-                    <%-- <!--  <li><a href="#" onclick="loadCommonList('/contractor/view','Contractor Registration view')">Contractor View</a></li>   -->
-                        <li><a href="#" onclick="loadQobAdd('/contractor/view', 'Contractor Registration view','${sessionScope.loginuser.userId}')">Contractor View</a></li> --%>
-                    <li><a href="#" onclick="loadCommonList('/contractor/contRenewal','Contractor Renewal')">Renewal</a></li>
-                    <li><a href="#" onclick="loadCommonList('/contractor/contRenewalList','Contractor Renewal List')"> Renewal List</a></li>
+                    <li><a href="#" onclick="loadCommonList('/contractor/contReg','Contractor Registration')">Contractor Registration</a></li>
+                    <li><a href="#" onclick="loadContractorRenewal()">Renewal</a></li>
                 </ul>
-            </li> 
+            </li>
             <li>
                 <a href="#" class="nav-link" onclick="toggleSubMenu('workmen-onboarding-sub-menu')">
                     <i class="fa fa-briefcase nav-icon"></i>
@@ -1504,26 +2069,22 @@ table th {
                 </a>
                 <ul class="sub-menu" id="workmen-onboarding-sub-menu">
                     <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'On-Bording List')">List</a></li>
-                    <%-- <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li> --%>
-                     <li><a href="#" onclick="loadQobAdd('/contractworkmen/gatepassCreation', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
-                   <!--  <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li> -->
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/blockList', 'Block List')">Block</a></li>
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/unblockList', 'Unblock List')">Unblock</a></li>
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/blackList', 'Black List')">Blacklist</a></li>
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/deblackList', 'Deblack List')">De-blacklist</a></li>
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/cancel', 'Cancel List')">Cancel</a></li>
-                    <!-- <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li> -->
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/lostordamage', 'Lost Or Damage List')">Lost or Damage</a></li>
+                    <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
+                    <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li>
+                    <li><a href="#" onclick="loadWorkmenBlock()">Block</a></li>
+                    <li><a href="#" onclick="loadWorkmenUnblock()">Unblock</a></li>
+                    <li><a href="#" onclick="loadWorkmenBlacklist()">Blacklist</a></li>
+                    <li><a href="#" onclick="loadWorkmenDeBlacklist()">De-blacklist</a></li>
+                    <li><a href="#" onclick="loadWorkmenCancel()">Cancel</a></li>
+                    <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li>
+                    <li><a href="#" onclick="loadWorkmenLostDamage()">Lost or Damage</a></li>
                 </ul>
             </li>
-           <li>
-            <ul>
-             <li><a href="#" onclick="loadCommonList('/billVerification/viewlist', 'Bill Verification')">
+             <li>
+            <a href="#" onclick="loadCommonList('/billVerification/list', 'Bill Verification')">
                 <i class="fa fa-credit-card nav-icon"></i> <!-- Updated icon for Bill Verification -->
                 <span class="nav-text">Bill Verification</span>
-            </a></li>
-           <li><a href="#" onclick="loadCommonList('/billVerification/List','Bill Verification List')">  List</a></li>
-        </ul>
+            </a>
         </li>
         <!-- <li>
             <a href="#" onclick="loadCommonList('/contractor/contReg', 'Contractor Registration')">
@@ -1538,18 +2099,204 @@ table th {
             </a>
         </li>
         </ul>
-    </nav>
+    </nav> --%>
     
 
     <!-- Main Content Area -->
     <div id="mainContent" class="form-content"></div>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script> -->
     <script>
-  
+ // Function to toggle the General Management submenu
+    function toggleGeneralManagementSubMenu(linkElement) {
+        const submenuId = 'general-management-sub-menu'; // ID of the General Management submenu
+        const subMenu = document.getElementById(submenuId);
 
-    function toggleSubMenu(menuId) {
+        if (!subMenu) {
+            console.error(`No submenu found for section ID: ${submenuId}`);
+            return; // Exit if submenu doesn't exist
+        }
+
+        // Get the up and down arrows
+        const upArrow = linkElement.querySelector('.arrow-up');
+        const downArrow = linkElement.querySelector('.arrow-down');
+
+        // Toggle submenu visibility
+        if (subMenu.style.display === 'none' || subMenu.style.display === '') {
+            subMenu.style.display = 'block'; // Show the submenu
+            upArrow.style.display = 'inline-block'; // Show up arrow
+            downArrow.style.display = 'none'; // Hide down arrow
+        } else {
+            subMenu.style.display = 'none'; // Hide the submenu
+            upArrow.style.display = 'none'; // Hide up arrow
+            downArrow.style.display = 'inline-block'; // Show down arrow
+        }
+    }
+
+    function toggleSubMenu(sectionId, linkElement) {
+        console.log('Toggling submenu for section ID:', sectionId);
+
+        // Find the submenu by section ID
+        const submenu = document.getElementById('sub-menu-'+sectionId);
+        console.log('Toggling submenu for submenu ID:', submenu);
+
+        if (!submenu) {
+            console.error(`No submenu found for section ID: ${sectionId}`);
+            return;
+        }
+
+        // Toggle submenu visibility
+        const isHidden = submenu.style.display === 'none';
+        submenu.style.display = isHidden ? 'block' : 'none';
+
+        // Toggle arrow visibility
+        const upArrow = linkElement.querySelector('.arrow-up');
+        const downArrow = linkElement.querySelector('.arrow-down');
+        if (upArrow && downArrow) {
+            upArrow.style.display = isHidden ? 'inline-block' : 'none';
+            downArrow.style.display = isHidden ? 'none' : 'inline-block';
+        }
+    }
+
+    function updateSidebar(sections, selectedRole) {
+        const submenu = document.getElementById('dynamic-menu');
+
+        // Clear existing submenu items
+        submenu.innerHTML = '';
+
+        // Loop through sections and pages
+        sections.forEach(section => {
+            if (!section.sectionId) {
+                console.error('Missing sectionId for section:', section);
+                return; // Skip sections without valid IDs
+            }
+
+            // Create the main menu item container
+            const menuItem = document.createElement('li');
+
+            // Create the link for the section
+            const sectionLink = document.createElement('a');
+            sectionLink.href = '#';
+            sectionLink.classList.add('nav-link'); // Add your nav-link class for styling
+            sectionLink.onclick = function () {
+                toggleSubMenu(section.sectionId, this); // Pass sectionId directly
+            };
+
+            console.log('Section ID:', section.sectionId);
+
+            // Add section icon (if needed)
+            const icon = document.createElement('i');
+            icon.classList.add('fa', 'fa-cog', 'nav-icon'); // Add appropriate icon classes
+            sectionLink.appendChild(icon);
+
+            // Add section name
+            const sectionText = document.createElement('span');
+            sectionText.classList.add('nav-text');
+            sectionText.textContent = section.sectionName;
+            sectionLink.appendChild(sectionText);
+
+            // Add up and down arrows
+            const upArrow = document.createElement('img');
+            upArrow.src = 'resources/img/uarrow.png';
+            upArrow.alt = 'Arrow Up';
+            upArrow.classList.add('arrow-up');
+            upArrow.style.width = '10px';
+            upArrow.style.height = '8px';
+            upArrow.style.display = 'none';
+
+            const downArrow = document.createElement('img');
+            downArrow.src = 'resources/img/darrow.png';
+            downArrow.alt = 'Arrow Down';
+            downArrow.classList.add('arrow-down');
+            downArrow.style.width = '10px';
+            downArrow.style.height = '8px';
+            downArrow.style.display = 'inline-block';
+
+            sectionLink.appendChild(upArrow);
+            sectionLink.appendChild(downArrow);
+
+            menuItem.appendChild(sectionLink);
+
+            // Create the submenu
+            const subMenu = document.createElement('ul');
+            subMenu.classList.add('sub-menu'); // Add your submenu class
+            subMenu.id = 'sub-menu-' + section.sectionId; // Set submenu ID
+            subMenu.style.display = 'none'; // Initially hidden
+            console.log('Submenu ID:', subMenu.id);
+
+            // Loop through pages within the section and filter by role
+            if (section.pages && section.pages.length > 0) {
+                section.pages.forEach(page => {
+                    console.log('Page Role:', page.role, 'Selected Role:', selectedRole);
+             /*        if (page.role === selectedRole || selectedRole === 'Admin') { */
+                        const pageItem = document.createElement('li');
+                        const pageLink = document.createElement('a');
+                        pageLink.href = page.url || '#';
+                        pageLink.textContent = page.pageName;
+                        pageLink.classList.add('nav-link'); // Add appropriate class
+                        pageLink.onclick = function () {
+                            loadCommonList(page.pageUrl, page.pageName);
+                        };
+
+                        pageItem.appendChild(pageLink);
+                        subMenu.appendChild(pageItem);
+                   /*  } */
+                });
+            } else {
+                console.warn(`No pages found for section: ${section.sectionName}`);
+            }
+
+            menuItem.appendChild(subMenu);
+            submenu.appendChild(menuItem);
+        });
+    }
+
+
+
+
+
+   /*  function toggleSubMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        const arrowUp = menu.previousElementSibling.querySelector('.arrow-up');
+        const arrowDown = menu.previousElementSibling.querySelector('.arrow-down');
+        
+        if (menu) {
+            if (menu.style.display === "none") {
+                menu.style.display = "block";
+                if (arrowUp) arrowUp.style.display = "inline-block";
+                if (arrowDown) arrowDown.style.display = "none";
+            } else {
+                menu.style.display = "none";
+                if (arrowUp) arrowUp.style.display = "none";
+                if (arrowDown) arrowDown.style.display = "inline-block";
+            }
+        }
+    } */
+
+  /*   function toggleSubMenu(menuId) {
+        const menu = document.getElementById(menuId);
+
+        
+        if (menu) {
+            const arrowUp = menu.previousElementSibling.querySelector('.arrow-up');
+            const arrowDown = menu.previousElementSibling.querySelector('.arrow-down');
+            console.log(menu.previousElementSibling);
+            // Ensure that previousElementSibling exists before trying to toggle the arrows
+            if (menu.previousElementSibling) {
+                if (menu.style.display === "none") {
+                    menu.style.display = "block";
+                    if (arrowUp) arrowUp.style.display = "inline-block";
+                    if (arrowDown) arrowDown.style.display = "none";
+                } else {
+                    menu.style.display = "none";
+                    if (arrowUp) arrowUp.style.display = "none";
+                    if (arrowDown) arrowDown.style.display = "inline-block";
+                }
+            }
+        }
+    } */
+   /*  function toggleSubMenu(menuId) {
         const submenu = document.getElementById(menuId);
         const arrowUpIcon = submenu.previousElementSibling.querySelector('.arrow-up');
         const arrowDownIcon = submenu.previousElementSibling.querySelector('.arrow-down');
@@ -1563,7 +2310,7 @@ table th {
             arrowUpIcon.style.display = 'inline-block';
             arrowDownIcon.style.display = 'none';
         }
-    }
+    } */
 
     document.addEventListener('DOMContentLoaded', () => {
         let submenuVisible = false;
@@ -1617,11 +2364,11 @@ table th {
         }
 
         function loadContent(text) {
-           const headingText = text;
-           updateHeading(headingText);
-         //   document.getElementById("mainContent").innerHTML = `<h1>${text}</h1><p>Content for ${text} will go here.</p>`;
+            const headingText = text;
+            updateHeading(headingText);
+            document.getElementById("mainContent").innerHTML = `<h1>${text}</h1><p>Content for ${text} will go here.</p>`;
             resetSessionTimer();
-       }
+        }
 
         function updateHeading(text) {
             const headingElement = document.querySelector('.top-nav .heading');
@@ -1804,6 +2551,29 @@ table th {
             });
     }
 
+    function submitGMTYPE() {
+        const data = new FormData();
+        const gmTypeName = document.getElementById("gmTypeName").value.trim(); // Sanitize input
+        data.append("gmTypeName", gmTypeName);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/CWFM/generalController/saveGMType", true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                console.log("Data saved successfully:", xhr.responseText);
+                loadCommonList('/generalController/gmType', 'General Type');
+            } else {
+                console.error("Error saving data:", xhr.status, xhr.responseText);
+            }
+        };
+
+        xhr.onerror = function () {
+            console.error("Request failed");
+        };
+
+        xhr.send(data);
+    }
 
     </script>
 </body>
