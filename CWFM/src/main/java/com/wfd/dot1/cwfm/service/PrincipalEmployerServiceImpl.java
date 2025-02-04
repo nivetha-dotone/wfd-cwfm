@@ -13,9 +13,9 @@ public class PrincipalEmployerServiceImpl implements PrincipalEmployerService{
 	@Autowired
 	PrincipalEmployerDao peDao;
 	@Override
-	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId) {
+	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		// TODO Auto-generated method stub
-		return peDao.getAllPrincipalEmployer( userId);
+		return peDao.getAllPrincipalEmployer( userAccount);
 	}
 	@Override
 	public PrincipalEmployer getIndividualPEDetailByUnitId(String id) {

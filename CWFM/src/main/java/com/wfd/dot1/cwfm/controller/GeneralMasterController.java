@@ -253,7 +253,7 @@ public class GeneralMasterController {
     public String showAddRoleRightForm(Model model) {
     	List<CmsGeneralMaster> sections = commonService.getAllSections();
         model.addAttribute("sections", sections);
-        return "generalMaster/pageSections"; 
+        return "generalMaster/pageSection"; 
     }
     @RequestMapping(path = "/getSectionPages", method = RequestMethod.GET)
     @ResponseBody

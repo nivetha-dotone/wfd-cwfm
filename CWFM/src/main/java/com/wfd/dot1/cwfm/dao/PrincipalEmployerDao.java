@@ -6,7 +6,7 @@ import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 
 public interface PrincipalEmployerDao {
 
-	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId);
+	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount);
 
 	public PrincipalEmployer getIndividualPEDetailByUnitId(String id);
 

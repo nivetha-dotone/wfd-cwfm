@@ -27,11 +27,11 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	    private String getPeByUnitId;
 	 
 	@Override
-	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId) {
+	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method ");
 		List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
 		log.info("Query to getAllPrincipalEmployer "+getAllPes);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllPes);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllPes,userAccount);
 		while(rs.next()) {
 			PrincipalEmployer pe = new PrincipalEmployer();
 			pe.setUnitId(rs.getInt("UNITID"));
