@@ -155,7 +155,7 @@
    <!--  <form id="searchForm"> -->
     <div>
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
-         <select id="principalEmployerId" name="principalEmployerId"  style="color:gray;padding:3px;" onchange="getContractorsForWorkorder(this.value, '${sessionScope.loginuser.userId}')">
+         <select id="principalEmployerId" name="principalEmployerId"  style="color:gray;padding:3px;" onchange="getContractorsForWorkorder(this.value, '${sessionScope.loginuser.userAccount}')">
          <option value="">Select Principal Employer</option>
     <c:forEach items="${principalEmployers}" var="principalEmployer">
         <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>

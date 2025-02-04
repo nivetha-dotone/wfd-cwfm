@@ -125,10 +125,10 @@ public class WorkmenController {
     @GetMapping("/getAllContractors")
 	public ResponseEntity<List<Contractor>> getAllContractors(
             @RequestParam("unitId") String unitId, 
-            @RequestParam("userId") String userId) {
-        log.info("Fetching contractors for unitId: " + unitId + " and userId: " + userId);
+            @RequestParam("userAccount") String userAccount) {
+        log.info("Fetching contractors for unitId: " + unitId + " and userId: " + userAccount);
         try {
-            List<Contractor> contractors = workmenService.getAllContractorBasedOnPE(unitId, userId);
+            List<Contractor> contractors = workmenService.getAllContractorBasedOnPE(unitId, userAccount);
             if (contractors.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }

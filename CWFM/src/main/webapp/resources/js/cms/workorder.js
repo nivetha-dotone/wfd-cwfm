@@ -160,9 +160,9 @@ function searchWithPEContractorInWO(contextPath) {
 					    });
 					}
         
-					function getContractorsForWorkorder(unitId, userId) {
+					function getContractorsForWorkorder(unitId, userAccount) {
 					    var xhr = new XMLHttpRequest();
-					    var url = contextPath + "/contractworkmen/getAllContractors?unitId=" + unitId + "&userId=" + userId;
+					    var url = contextPath + "/contractworkmen/getAllContractors?unitId=" + unitId + "&userAccount=" + userAccount;
 					    //alert("URL: " + url);
 					    xhr.open("GET", url, true);
 
