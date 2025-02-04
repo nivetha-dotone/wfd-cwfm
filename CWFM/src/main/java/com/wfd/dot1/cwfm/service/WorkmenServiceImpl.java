@@ -36,14 +36,14 @@ public class WorkmenServiceImpl implements WorkmenService{
 	@Autowired
 	WorkmenDao workmenDao;
 	@Override
-	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId) {
+	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		
-		return workmenDao.getAllPrincipalEmployer(userId);
+		return workmenDao.getAllPrincipalEmployer(userAccount);
 	}
 	@Override
-	public List<Contractor> getAllContractorBasedOnPE(String unitId,String userId) {
+	public List<Contractor> getAllContractorBasedOnPE(String unitId,String userAccount) {
 		
-		return workmenDao.getAllContractorBasedOnPE(unitId, userId);
+		return workmenDao.getAllContractorBasedOnPE(unitId, userAccount);
 	}
 	@Override
 	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId) {

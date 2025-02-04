@@ -18,7 +18,7 @@ import com.wfd.dot1.cwfm.pojo.Workorder;
 
 public interface WorkmenService {
 
-	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId);
+	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount);
 	
 	public List<Contractor> getAllContractorBasedOnPE(String unitId,String userId);
 

@@ -49,7 +49,7 @@ public class ContractorController {
 	public String getAllPrincipalEmployer(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
+		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
 		request.setAttribute("principalEmployers", peList);
 
 		return "contractors/list";
@@ -65,7 +65,7 @@ public class ContractorController {
 
 			// Sample data (replace with your database queries)
 			List<Contractor> contractorList = workmenService.getAllContractorBasedOnPE(principalEmployerId,
-					String.valueOf(user.getUserId()));
+					user.getUserAccount());
 
 			if (contractorList.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);

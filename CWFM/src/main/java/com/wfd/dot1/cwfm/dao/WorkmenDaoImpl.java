@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -48,12 +49,19 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
 	 
+	 @Value("${GET_ALL_PES}")
+	 String getAllPes;
+	 
+	 @Value("${GET_ALL_CONTRACTOR_BY_PE}")
+	 String getAllContractorBasedOnPE;
+	 
+	 
 	@Override
-	public List<PrincipalEmployer> getAllPrincipalEmployer(String userId) {
-		log.info("Entering into getAllPrincipalEmployer dao method "+userId);
+	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
+		log.info("Entering into getAllPrincipalEmployer dao method "+userAccount);
 		List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
-		log.info("Query to getAllPrincipalEmployer "+WorkmenQueryBank.GET_ALL_PRINCIPAL_EMPLOYER);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_PRINCIPAL_EMPLOYER, userId);
+		log.info("Query to getAllPrincipalEmployer "+getAllPes);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllPes, userAccount);
 		while(rs.next()) {
 			PrincipalEmployer pe = new PrincipalEmployer();
 			pe.setUnitId(rs.getInt("UNITID"));
@@ -65,11 +73,11 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<Contractor> getAllContractorBasedOnPE(String unitId,String userId) {
-		log.info("Entering into getAllContractorBasedOnPE dao method "+unitId+" "+userId);
+	public List<Contractor> getAllContractorBasedOnPE(String unitId,String userAccount) {
+		log.info("Entering into getAllContractorBasedOnPE dao method "+unitId+" "+userAccount);
 		List<Contractor> contList= new ArrayList<Contractor>();
-		log.info("Query to getAllContractorBasedOnPE "+WorkmenQueryBank.GET_ALL_CONTRACTOR_BY_PE);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_CONTRACTOR_BY_PE,unitId, userId);
+		log.info("Query to getAllContractorBasedOnPE "+getAllContractorBasedOnPE);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractorBasedOnPE,userAccount,unitId);
 		while(rs.next()) {
 			Contractor cont = new Contractor();
 			cont.setContractorId(rs.getString("contractorid"));
