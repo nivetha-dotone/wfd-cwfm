@@ -10,6 +10,7 @@ import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
@@ -70,5 +71,6 @@ public interface CommonService {
 			List<SectionDto> getSectionsByRoleId(String roleId);
 			List<Long> getPageIdsByRoleId(String roleId);
 			boolean hasPageAccessForRole(String roleId, Long pageId);
+			List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount);
 			
 }

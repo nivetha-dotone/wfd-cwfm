@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 //import com.wfd.dot1.cwfm.service.CMSPRINCIPALEMPLOYERService;
@@ -42,6 +46,9 @@ public class CommonDaoImpl implements CommonDao {
 	    private JdbcTemplate jdbcTemplate;
 	 @Autowired
 	    private CommonDao commonDAO;
+	 
+	 @Value("${GET_PERSON_ORG_LEVEL}")
+	 private String getPersonOrgLevel;
 	 
 //	@Autowired
 //	private DataSource dataSource;
@@ -765,5 +772,19 @@ public class CommonDaoImpl implements CommonDao {
 		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, roleId, pageId);
 		    System.out.println("common for count: " + count);
 		    return count > 0;
+		}
+		@Override
+		public List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount) {
+			List<PersonOrgLevel> personOrgList= new ArrayList<PersonOrgLevel>();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(getPersonOrgLevel,userAccount);
+			while(rs.next()) {
+				PersonOrgLevel pol = new PersonOrgLevel();
+				pol.setLevelDef(rs.getString("LevelDef"));
+				pol.setOleId(rs.getString("OleId"));
+				pol.setId(rs.getString("Id"));
+				pol.setDescription(rs.getString("Description"));
+				personOrgList.add(pol);
+			}
+			return personOrgList;
 		}
 }

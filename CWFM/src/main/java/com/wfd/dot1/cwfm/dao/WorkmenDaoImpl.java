@@ -50,11 +50,31 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 private JdbcTemplate jdbcTemplate;
 	 
 	 @Value("${GET_ALL_PES}")
-	 String getAllPes;
+	private  String getAllPes;
 	 
 	 @Value("${GET_ALL_CONTRACTOR_BY_PE}")
-	 String getAllContractorBasedOnPE;
+	 private String getAllContractorBasedOnPE;
 	 
+	 @Value("${GET_ALL_SKILL}")
+	 private String getAllSkill;
+	 
+	 @Value("${GET_ALL_CMSGENERALMASTER}")
+	 private String getAllGeneralMaster;
+	 
+	 @Value("${GET_ALL_TRADES_BY_PE}")
+	 private String getAllTradesByPe;
+	 
+	 @Value("${GET_ALL_WORKORDER_BY_PE_AND_CONT}")
+	 private String getAllWoByPeAndCont;
+	 
+	 @Value("${GET_ALL_WC}")
+	 private String getAllWc;
+	 
+	 @Value("${GET_WORKFLOW_TYPE_BY_PE}")
+	 private String getWorkflowType;
+	 
+	 @Value("${GET_DOT_TYPE_BY_PE}")
+	 private String getDotType;
 	 
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
@@ -95,8 +115,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId) {
 		log.info("Entering into getAllWorkordersBasedOnPEAndContractor dao method "+unitId+" "+contractorId);
 		List<Workorder> woList= new ArrayList<Workorder>();
-		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+WorkmenQueryBank.GET_ALL_WORKORDER_BY_PE_AND_CONT);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_WORKORDER_BY_PE_AND_CONT,unitId, contractorId,contractorId);
+		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+getAllWoByPeAndCont);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllWoByPeAndCont,unitId, contractorId,contractorId);
 		while(rs.next()) {
 			Workorder wo = new Workorder();
 			wo.setWorkorderId(rs.getString("WORKORDERID"));
@@ -111,8 +131,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public List<Trade> getAllTradesBasedOnPE(String unitId) {
 		log.info("Entering into getAllTradesBasedOnPE dao method "+unitId);
 		List<Trade> tradeList= new ArrayList<Trade>();
-		log.info("Query to getAllTradesBasedOnPE "+WorkmenQueryBank.GET_ALL_TRADES_BY_PE);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_TRADES_BY_PE,unitId);
+		log.info("Query to getAllTradesBasedOnPE "+getAllTradesByPe);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllTradesByPe,unitId);
 		while(rs.next()) {
 			Trade trade = new Trade();
 			trade.setTradeId(rs.getString("TRADEID"));
@@ -127,8 +147,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public List<Skill> getAllSkill() {
 		log.info("Entering into getAllSkill dao method ");
 		List<Skill> skillList= new ArrayList<Skill>();
-		log.info("Query to getAllSkill "+WorkmenQueryBank.GET_ALL_SKILL);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_SKILL);
+		log.info("Query to getAllSkill "+getAllSkill);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllSkill);
 		while(rs.next()) {
 			Skill skill = new Skill();
 			skill.setSkillId(rs.getString("SKILLID"));
@@ -161,14 +181,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public List<MasterUser> getAllEicManager(String userId) {
 		log.info("Entering into getAllEicManager dao method ");
 		List<MasterUser> eicList= new ArrayList<MasterUser>();
-		log.info("Query to getAllEicManager "+WorkmenQueryBank.GET_ALL_EIC);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_EIC,userId);
-		while(rs.next()) {
+		//log.info("Query to getAllEicManager "+WorkmenQueryBank.GET_ALL_EIC);
+		//SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_EIC,userId);
+		//while(rs.next()) {
 			MasterUser mu = new MasterUser();
-			mu.setUserId(rs.getInt("userId"));
-			mu.setFullName(rs.getString("FullName"));
+			mu.setUserId(1);
+			mu.setFullName("Bharathi Chekka");
 			eicList.add(mu);
-		}
+		//}
 		log.info("Exiting from getAllEicManager dao method "+eicList.size());
 		return eicList;
 	}
@@ -177,8 +197,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId) {
 		log.info("Entering into getAllWCBasedOnPEAndCont dao method ");
 		List<CmsContractorWC> wcList= new ArrayList<CmsContractorWC>();
-		log.info("Query to getAllWCBasedOnPEAndCont "+WorkmenQueryBank.GET_ALL_WC);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_WC,unitId,contractorId);
+		log.info("Query to getAllWCBasedOnPEAndCont "+getAllWc);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllWc,unitId,contractorId);
 		while(rs.next()) {
 			CmsContractorWC wc = new CmsContractorWC();
 			wc.setWcId(rs.getString("WCID"));
@@ -211,8 +231,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public List<CmsGeneralMaster> getAllGeneralMasters() {
 		log.info("Entering into getAllGeneralMasters dao method ");
 		List<CmsGeneralMaster> gmList= new ArrayList<CmsGeneralMaster>();
-		log.info("Query to getAllGeneralMasters "+WorkmenQueryBank.GET_ALL_CMSGENERALMASTER);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_CMSGENERALMASTER);
+		log.info("Query to getAllGeneralMasters "+getAllGeneralMaster);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllGeneralMaster);
 		while(rs.next()) {
 			CmsGeneralMaster gm = new CmsGeneralMaster();
 			gm.setGmId(rs.getString("GMID"));
@@ -535,8 +555,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public int getWorkFlowTYpe(String principalEmployer) {
 		log.info("Entering into getWorkFlowTYpe dao method ");
 		int workflowTypeId = 0;
-		log.info("Query to getWorkFlowTYpe "+WorkmenQueryBank.GET_WORKFLOW_TYPE_BY_PE);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_WORKFLOW_TYPE_BY_PE,principalEmployer);
+		log.info("Query to getWorkFlowTYpe "+getWorkflowType);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getWorkflowType,principalEmployer);
 		if(rs.next()) {
 			workflowTypeId = rs.getInt("WorkflowType");
 		}
@@ -820,8 +840,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public int getDOTTYpe(String principalEmployer) {
 		log.info("Entering into getDOTTYpe dao method ");
 		int workflowTypeId = 0;
-		log.info("Query to getDOTTYpe "+WorkmenQueryBank.GET_DOT_TYPE_BY_PE);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_DOT_TYPE_BY_PE,principalEmployer);
+		log.info("Query to getDOTTYpe "+getDotType);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(getDotType,principalEmployer);
 		if(rs.next()) {
 			workflowTypeId = rs.getInt("WorkflowType");
 		}

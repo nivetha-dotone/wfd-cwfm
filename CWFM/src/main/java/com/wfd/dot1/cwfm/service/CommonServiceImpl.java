@@ -17,6 +17,7 @@ import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
@@ -253,6 +254,11 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public boolean hasPageAccessForRole(String roleId, Long pageId) {
 		return commonDAO.hasPageAccessForRole(roleId,pageId);
+	}
+	@Override
+	public List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount) {
+		// TODO Auto-generated method stub
+		return commonDAO.getPersonOrgLevelDetails(userAccount);
 	}
     
 }

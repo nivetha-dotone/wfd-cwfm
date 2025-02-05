@@ -48,23 +48,23 @@ function redirectToWorkmenQuickOBAdd() {
     xhr.open("GET", "/CWFM/contractworkmen/addQuickOB", true);
     xhr.send();
 }
-function getContractorsAndTrades(unitId, userId) {
+function getContractorsAndTrades(unitId, userAccount) {
     if (!unitId) {
         alert("Please select a Principal Employer.");
         return;
     }
 
     // Fetch contractors
-    getContractors(unitId, userId);
+    getContractors(unitId, userAccount);
 
     // Fetch trades
     getTrades(unitId);
 }
 
 
-function getContractors(unitId, userId) {
+function getContractors(unitId, userAccount) {
     var xhr = new XMLHttpRequest();
-    var url = contextPath + "/contractworkmen/getAllContractors?unitId=" + unitId + "&userId=" + userId;
+    var url = contextPath + "/contractworkmen/getAllContractors?unitId=" + unitId + "&userAccount=" + userAccount;
     //alert("URL: " + url);
     xhr.open("GET", url, true);
 
@@ -160,7 +160,7 @@ function getWorkorders(unitId,contractorId) {
 function getWC(unitId,contractorId) {
     var xhr = new XMLHttpRequest();
     var url = contextPath + "/contractworkmen/getAllWC?unitId=" + unitId + "&contractorId=" + contractorId;
-    //alert("URL: " + url);
+    alert("URL: " + url+" "+unitId+" "+contractorId);
     xhr.open("GET", url, true);
 
     xhr.onload = function() {

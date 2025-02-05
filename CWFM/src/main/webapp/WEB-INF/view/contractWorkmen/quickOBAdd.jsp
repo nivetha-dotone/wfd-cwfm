@@ -293,9 +293,10 @@ label {
         
     </style>
      <%
-    	MasterUser user = (MasterUser) session.getAttribute("loginuser");
-        String userId = user != null ? user.getUserId() : "";
-		%>
+    MasterUser user = (MasterUser) session.getAttribute("loginuser");
+    String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
+%>
+
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -530,10 +531,10 @@ label {
                     <tbody>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
-                            <td><select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getContractorsAndTrades(this.value, '${sessionScope.loginuser.userId}')">
+                            <td><select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getContractorsAndTrades(this.value, '${sessionScope.loginuser.userAccount}')">
                                 <option value="">Please select Principal Employer</option>
                                 <c:forEach var="pe" items="${PrincipalEmployer}">
-                					<option value="${pe.unitId}">${pe.name}</option>
+                					<option value="${pe.id}">${pe.description}</option>
             					</c:forEach>
                                 </select>
                                 <label id="error-principalEmployer"style="color: red;display: none;">Principal Employer is required</label>
@@ -572,7 +573,7 @@ label {
                             <td><select class="custom-select" id="department" name="departmentId" >
                                 <option value="">Please select Department</option>
                                  <c:forEach var="dept" items="${Dept}">
-                						<option value="${dept.gmId}">${dept.gmName}</option>
+                						<option value="${dept.id}">${dept.description}</option>
             						</c:forEach>
                                 </select>
                                 <label id="error-department"style="color: red;display: none;">Department is required</label>
@@ -583,7 +584,7 @@ label {
                             <td><select class="custom-select" id="subdepartment" name="subdepartmentId" >
                                 <option value="">Please select Area</option>
                                  <c:forEach var="dept" items="${Subdept}">
-                						<option value="${dept.gmId}">${dept.gmName}</option>
+                						<option value="${dept.id}">${dept.description}</option>
             						</c:forEach>
                                 </select>
                                 <label id="error-area"style="color: red;display: none;">Area is required</label>

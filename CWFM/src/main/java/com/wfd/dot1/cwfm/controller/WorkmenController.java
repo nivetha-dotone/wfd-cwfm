@@ -1,6 +1,5 @@
 package com.wfd.dot1.cwfm.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,38 +14,26 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
-import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
-import com.wfd.dot1.cwfm.dto.GatePassActionDto;
-import com.wfd.dot1.cwfm.dto.GatePassListingDto;
-import com.wfd.dot1.cwfm.enums.GatePassType;
-import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
-import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
 import com.wfd.dot1.cwfm.pojo.Workorder;
-import com.wfd.dot1.cwfm.service.GatePassScreenConfig;
+import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,34 +50,31 @@ public class WorkmenController {
 	WorkmenService workmenService;
 	
 	@Autowired
-	GatePassScreenConfig config;
+	CommonService commonService;
 	
 	@GetMapping("/addQuickOB")
-    public String createGatePass(@RequestParam("userId") String userId,HttpServletRequest request,HttpServletResponse response) {
-		log.info("Entered into addQuickOBForm"+userId);
-		//Principal Employer List
-		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(userId);
-		request.setAttribute("PrincipalEmployer", peList);
-		
-		//Department And Area/Sub department List
-		List<CmsGeneralMaster> list = workmenService.getAllDepartmentAndSubDepartment(userId);
-		Map<String, List<CmsGeneralMaster>> groupedByAuthorizationOn = list.stream()
-                .collect(Collectors.groupingBy(CmsGeneralMaster::getAuthorizationOn));
-        List<CmsGeneralMaster> departments = groupedByAuthorizationOn.getOrDefault("department", new ArrayList<>());
-        List<CmsGeneralMaster> subDepartments = groupedByAuthorizationOn.getOrDefault("subdepartment", new ArrayList<>());
-        request.setAttribute("Dept", departments);
-        request.setAttribute("Subdept", subDepartments);
-        
-       
-       
+    public String createGatePass(HttpServletRequest request,HttpServletResponse response) {
+	
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	log.info("Entered into addQuickOBForm"+user.getUserId());
+    	
+    	List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	request.setAttribute("PrincipalEmployer", peList);
+    	  request.setAttribute("Dept", departments);
+          request.setAttribute("Subdept", subdepartments);
+          
         //Skills
 		List<Skill> skillList = workmenService.getAllSkill();
 		request.setAttribute("Skills", skillList);
-		
 		//Eic 
-		List<MasterUser> eicList = workmenService.getAllEicManager(userId);
+		List<MasterUser> eicList = workmenService.getAllEicManager(user.getUserAccount());
 		request.setAttribute("EIC", eicList);
-		
 		//Get All GeneralMaster
 		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
 
@@ -115,8 +99,6 @@ public class WorkmenController {
 		    request.setAttribute(attributeName, gmList1);
 		});
 
-		
-		
         return "contractWorkmen/quickOBAdd";
     }
 	
@@ -159,7 +141,7 @@ public class WorkmenController {
     }
     
     @GetMapping("/getAllWC")
-    public ResponseEntity<List<CmsContractorWC>> getAllWCs(
+    public ResponseEntity<List<CmsContractorWC>> getAllWC(
     		@RequestParam("unitId") String unitId, 
             @RequestParam("contractorId") String contractorId){
     	 log.info("Entering into getAllWCs for: " + unitId + " and contractorId: " + contractorId);
@@ -245,72 +227,72 @@ public class WorkmenController {
         Files.write(filePath, bytes);
     }
     
-//    @PostMapping("/saveGatePass")
-//    public ResponseEntity<String> saveGatePass(
-//            @RequestParam("jsonData") String jsonData,
-//            @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
-//            @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
-//            @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
-//            @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
-//            @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
-//            HttpServletRequest request, HttpServletResponse response) {
-//        
-//        String gatePassId = null;
-//        GatePassMain gatePassMain;
-//
-//        try {
-//            // Convert the JSON string back to the GatePassMain object
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            gatePassMain = objectMapper.readValue(jsonData, GatePassMain.class);
-//            
-//            // Log the received GatePassMain object
-//            log.info("Received GatePassMain: {}", gatePassMain);
-//
-//            gatePassMain.setCreatedBy(gatePassMain.getUserId());
-//            gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
-//            gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
-//            gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
-//         // Mapping document types to their corresponding setter methods
-//            Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
-//            docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
-//            docTypeSetterMap.put("Id2", gatePassMain::setIdProof2DocName);
-//            docTypeSetterMap.put("Other", gatePassMain::setOtherDocName);
-//            docTypeSetterMap.put("Medical", gatePassMain::setMedicalDocName);
-//            docTypeSetterMap.put("Education", gatePassMain::setEducationDocName);
-//            docTypeSetterMap.put("Training", gatePassMain::setTrainingDocName);
-//            docTypeSetterMap.put("Form11", gatePassMain::setForm11DocName);
-//            if(additionalFiles != null && !additionalFiles.isEmpty()) {
-//            // Set document names based on additionalFiles and documentTypes
-//            for (int i = 0; i < additionalFiles.size(); i++) {
-//                String docType = documentTypes.get(i);
-//                if (docType != null) {
-//                    Consumer<String> setter = docTypeSetterMap.get(docType);
-//                    if (setter != null) {
-//                        setter.accept(docType);
-//                    }
-//                }
-//            }
-//            }
-//            gatePassId = workmenService.saveGatePass(gatePassMain);
-//
-//            if (gatePassId != null) {
-//                if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-//                    uploadDocuments(aadharFile, policeFile,profilePic, gatePassMain.getUserId(), gatePassId);
-//                }
-//                // Upload additional files
-//                if (additionalFiles != null && documentTypes != null) {
-//                    uploadAdditionalDocuments(additionalFiles, documentTypes, gatePassMain.getUserId(), gatePassId);
-//                }
-//                return new ResponseEntity<>("contractWorkmen/list", HttpStatus.OK);
-//            }
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//            
-//        } catch (Exception e) {
-//            log.error("Error saving data: ", e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                                 .body("Error saving data: " + e.getMessage());
-//        }
-//    }
+    @PostMapping("/saveGatePass")
+    public ResponseEntity<String> saveGatePass(
+            @RequestParam("jsonData") String jsonData,
+            @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
+            @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
+            @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
+            @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
+            HttpServletRequest request, HttpServletResponse response) {
+        
+        String gatePassId = null;
+        GatePassMain gatePassMain;
+
+        try {
+            // Convert the JSON string back to the GatePassMain object
+            ObjectMapper objectMapper = new ObjectMapper();
+            gatePassMain = objectMapper.readValue(jsonData, GatePassMain.class);
+            
+            // Log the received GatePassMain object
+            log.info("Received GatePassMain: {}", gatePassMain);
+
+            gatePassMain.setCreatedBy(gatePassMain.getUserId());
+            gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
+            gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
+            gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
+         // Mapping document types to their corresponding setter methods
+            Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
+            docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
+            docTypeSetterMap.put("Id2", gatePassMain::setIdProof2DocName);
+            docTypeSetterMap.put("Other", gatePassMain::setOtherDocName);
+            docTypeSetterMap.put("Medical", gatePassMain::setMedicalDocName);
+            docTypeSetterMap.put("Education", gatePassMain::setEducationDocName);
+            docTypeSetterMap.put("Training", gatePassMain::setTrainingDocName);
+            docTypeSetterMap.put("Form11", gatePassMain::setForm11DocName);
+            if(additionalFiles != null && !additionalFiles.isEmpty()) {
+            // Set document names based on additionalFiles and documentTypes
+            for (int i = 0; i < additionalFiles.size(); i++) {
+                String docType = documentTypes.get(i);
+                if (docType != null) {
+                    Consumer<String> setter = docTypeSetterMap.get(docType);
+                    if (setter != null) {
+                        setter.accept(docType);
+                    }
+                }
+            }
+            }
+            gatePassId = workmenService.saveGatePass(gatePassMain);
+
+            if (gatePassId != null) {
+                if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
+                    uploadDocuments(aadharFile, policeFile,profilePic, gatePassMain.getUserId(), gatePassId);
+                }
+                // Upload additional files
+                if (additionalFiles != null && documentTypes != null) {
+                    uploadAdditionalDocuments(additionalFiles, documentTypes, gatePassMain.getUserId(), gatePassId);
+                }
+                return new ResponseEntity<>("contractWorkmen/list", HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            
+        } catch (Exception e) {
+            log.error("Error saving data: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Error saving data: " + e.getMessage());
+        }
+    }
 
 //    @GetMapping("/quickOBList")
 //    public String gatePassListingDetails(HttpServletRequest request,HttpServletResponse response) {
@@ -450,42 +432,42 @@ public class WorkmenController {
 //
 //
 //
-//    private String uploadAdditionalDocuments(List<MultipartFile> additionalFiles,
-//    		List<String> documentTypes,
-//    		String userId,
-//    		String gatePassId) {
-//    	// Create directory path
-//    	String directoryPath = ROOT_DIRECTORY + userId + "/" + gatePassId + "/";
-//
-//    	try {
-//    		// Ensure the directory exists, if not create it
-//    		Path path = Paths.get(directoryPath);
-//    		if (!Files.exists(path)) {
-//    			Files.createDirectories(path);
-//    		}
-//
-//    		for (int i = 0; i < additionalFiles.size(); i++) {
-//    			MultipartFile file = additionalFiles.get(i);
-//    			String docType = documentTypes.get(i);
-//
-//    			// Create a filename based on the document type
-//    			String fileName = docType + ".pdf"; // or any other format you prefer
-//    			String filePath = directoryPath + fileName;
-//
-//    			// Save the file
-//    			if (!file.isEmpty()) {
-//    				saveFile(file, filePath);
-//    			}
-//    		}
-//
-//    		return "success";
-//
-//    	} catch (IOException e) {
-//    		log.error("Failed to save additional documents: ", e);
-//    		return "failed";
-//    	}
-//    }
-//    
+    private String uploadAdditionalDocuments(List<MultipartFile> additionalFiles,
+    		List<String> documentTypes,
+    		String userId,
+    		String gatePassId) {
+    	// Create directory path
+    	String directoryPath = ROOT_DIRECTORY + userId + "/" + gatePassId + "/";
+
+    	try {
+    		// Ensure the directory exists, if not create it
+    		Path path = Paths.get(directoryPath);
+    		if (!Files.exists(path)) {
+    			Files.createDirectories(path);
+    		}
+
+    		for (int i = 0; i < additionalFiles.size(); i++) {
+    			MultipartFile file = additionalFiles.get(i);
+    			String docType = documentTypes.get(i);
+
+    			// Create a filename based on the document type
+    			String fileName = docType + ".pdf"; // or any other format you prefer
+    			String filePath = directoryPath + fileName;
+
+    			// Save the file
+    			if (!file.isEmpty()) {
+    				saveFile(file, filePath);
+    			}
+    		}
+
+    		return "success";
+
+    	} catch (IOException e) {
+    		log.error("Failed to save additional documents: ", e);
+    		return "failed";
+    	}
+    }
+    
 //    
 //    @PostMapping("/gatePassAction")
 //    public ResponseEntity<String> gatePassAction(@RequestBody GatePassActionDto dto,HttpServletRequest request,HttpServletResponse response) {
@@ -916,47 +898,5 @@ public class WorkmenController {
 //            return "Error uploading file: " + e.getMessage();
 //        }
 //    }
-//    
-//    @GetMapping("/config/{screenName}")
-//    public ResponseEntity<Map<String, Object>> getScreenConfig(@PathVariable String screenName) {
-//        Map<String, Object> cf =config.getGatePassCreationConfig(screenName);
-//        return ResponseEntity.ok(cf);
-//    }
-//
-//    //dynamic mandatory field & visibility
-//    @GetMapping("/gatepassCreation")
-//    public String gatepassCreation(@RequestParam("userId") String userId,HttpServletRequest request,HttpServletResponse response) {
-//		log.info("Entered into addQuickOBForm"+userId);
-//		
-//		
-//		//Get All GeneralMaster
-//		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
-//
-//		// Grouping the CmsGeneralMaster objects by gmType
-//		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
-//		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
-//
-//		// Define the types and their corresponding request attribute names
-//		Map<String, String> attributeMapping = Map.of(
-//		        "GENDER", "GenderOptions",
-//		        "BLOODGROUP", "BloodGroup",
-//		        "ACCESSAREA", "AccessArea",
-//		        "ACADEMICS", "Academics",
-//		        "WAGECATEGORY", "WageCategory",
-//		        "BONUSPAYOUT", "BonusPayout",
-//		        "ZONE", "Zone"
-//		);
-//
-//		// Iterate over the attribute mappings and set the request attributes dynamically
-//		attributeMapping.forEach((type, attributeName) -> {
-//		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
-//		    request.setAttribute(attributeName, gmList1);
-//		});
-//
-//		
-//		
-//        return "contractWorkmen/gatepassCreation";
-//    }
-//	
-    
+//  
 }
