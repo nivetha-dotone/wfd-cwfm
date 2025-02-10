@@ -12,6 +12,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 @Repository
 public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 
@@ -20,18 +21,21 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
 	 
-	 @Value("${GET_ALL_PES}")
-	    private String getAllPes;
-
-	    @Value("${GET_PE_BY_UNITID}")
-	    private String getPeByUnitId;
+	    public String getAllPes() {
+		    return QueryFileWatcher.getQuery("GET_ALL_PES");
+		}
+	    
+	    public String getPeByUnitId() {
+		    return QueryFileWatcher.getQuery("GET_PE_BY_UNITID");
+		}
 	 
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method ");
 		List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
-		log.info("Query to getAllPrincipalEmployer "+getAllPes);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllPes,userAccount);
+		String query = getAllPes();
+		log.info("Query to getAllPrincipalEmployer "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userAccount);
 		while(rs.next()) {
 			PrincipalEmployer pe = new PrincipalEmployer();
 			pe.setUnitId(rs.getInt("UNITID"));
@@ -69,8 +73,9 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	public PrincipalEmployer getIndividualPEDetailByUnitId(String id) {
 		log.info("Entering into getIndividualPEDetailByUnitId dao method ");
 		PrincipalEmployer pe = new PrincipalEmployer();
-		log.info("Query to getIndividualPEDetailByUnitId "+getPeByUnitId);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(getPeByUnitId,id);
+		String query =getPeByUnitId();
+		log.info("Query to getIndividualPEDetailByUnitId "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,id);
 		while(rs.next()) {
 		
 			pe.setUnitId(rs.getInt("UNITID"));

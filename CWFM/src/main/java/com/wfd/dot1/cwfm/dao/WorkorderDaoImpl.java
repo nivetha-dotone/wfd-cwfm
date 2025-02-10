@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.queries.WorkorderQueryBank;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 @Repository
 public class WorkorderDaoImpl implements WorkorderDao{
 
@@ -19,11 +20,15 @@ public class WorkorderDaoImpl implements WorkorderDao{
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
 	 
-	 @Value("${GET_WO_BY_ID}")
-	    private String getWOById;
+	
+	 
+	 public String getWOById() {
+		    return QueryFileWatcher.getQuery("GET_WO_BY_ID");
+		}
 	@Override
 	public Workorder getWorkorderById(String id) {
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(getWOById,id);
+		String query=getWOById();
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,id);
         
         if (rs.next()) {
             Workorder wo = new Workorder();

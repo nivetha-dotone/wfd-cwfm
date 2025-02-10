@@ -124,4 +124,16 @@ public class MasterUser {
 
 	private String roleName;
 	
+	private String roleId;
+
+	public String getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(String roleId) {
+		this.roleId = roleId;
+	}
+	
+	
+	
 }
