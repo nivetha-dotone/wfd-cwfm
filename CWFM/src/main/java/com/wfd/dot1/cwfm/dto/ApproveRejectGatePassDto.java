@@ -45,4 +45,12 @@ public class ApproveRejectGatePassDto {
 	public void setGatePassType(String gatePassType) {
 		this.gatePassType = gatePassType;
 	}
+	private String roleId;
+	public String getRoleId() {
+		return roleId;
+	}
+	public void setRoleId(String roleId) {
+		this.roleId = roleId;
+	}
+	
 }

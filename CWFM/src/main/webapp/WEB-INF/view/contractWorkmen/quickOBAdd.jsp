@@ -570,7 +570,7 @@ label {
                                 <label id="error-skill" style="color: red;display: none;">Skill is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.department"/></label></th>
-                            <td><select class="custom-select" id="department" name="departmentId" >
+                            <td><select class="custom-select" id="department" name="departmentId" onchange="getEic()">
                                 <option value="">Please select Department</option>
                                  <c:forEach var="dept" items="${Dept}">
                 						<option value="${dept.id}">${dept.description}</option>
@@ -590,13 +590,17 @@ label {
                                 <label id="error-area"style="color: red;display: none;">Area is required</label>
                                 </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.engineeringInCharge"/></label></th>
-                            <td><select class="custom-select" id="eic" name="eicId" >
+                            <td>
+                           <%--  <select class="custom-select" id="eic" name="eicId" >
                                 <option value="">Please select EIC</option>
                                 <c:forEach var="eic" items="${EIC}">
                 						<option value="${eic.userId}">${eic.fullName}</option>
             						</c:forEach>
                                 
-                                </select>
+                                </select> --%>
+                                <select class="custom-select" id="eic" name="eicId" >
+            						<option value="">Please select EIC</option>
+        						</select>
                                 <label id="error-eic"style="color: red;display: none;">EIC is required</label>
                                 </td>
                         </tr>

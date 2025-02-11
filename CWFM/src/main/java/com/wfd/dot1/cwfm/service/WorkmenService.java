@@ -30,7 +30,7 @@ public interface WorkmenService {
 
 	public List<CmsGeneralMaster> getAllDepartmentAndSubDepartment(String userId);
 
-	public List<MasterUser> getAllEicManager(String userId);
+	public List<MasterUser> getAllEicManager(String unitId,String deptId);
 
 	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId);
 
@@ -40,9 +40,9 @@ public interface WorkmenService {
 
 	public String saveGatePass(GatePassMain gatePassMain);
 
-	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId);
 
-	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser userId,String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingForApprovers(String unitId,String deptId,MasterUser user, String gatePassTypeId);
 
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId);
 
@@ -52,7 +52,7 @@ public interface WorkmenService {
 
 	public String gatePassAction(GatePassActionDto dto);
 	
-	public List<GatePassListingDto> getGatePassActionListingDetails(String userId,String gatePassTypeId,String previousGatePassAction);
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String previousGatePassAction);
 
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId);
 

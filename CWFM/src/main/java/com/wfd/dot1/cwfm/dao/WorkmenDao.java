@@ -33,7 +33,7 @@ public interface WorkmenDao {
 	
 	public List<CmsGeneralMaster> getAllDepartmentAndSubDepartment(String userId);
 	
-	public List<MasterUser> getAllEicManager(String userId);
+	public List<MasterUser> getAllEicManager(String unitId,String deptId);
 	
 	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId);
 
@@ -43,9 +43,9 @@ public interface WorkmenDao {
 
 	public String saveGatePass(GatePassMain gatePassMain);
 
-	public List<GatePassListingDto> getGatePassListingDetails(String userId, String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId, String gatePassTypeId);
 
-	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId,String deptId,String unitId);
 
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId);
 
@@ -65,13 +65,13 @@ public interface WorkmenDao {
 
 	public boolean updateGatePassMainStatus(String gatePassId, String status);
 
-	public boolean isLastApprover(String gatePassId, String approverId,String gatePassType);
+	public boolean isLastApprover(String roleName,String gatePassTypeId);
 
 	public String gatePassAction(GatePassActionDto dto);
 
 	public void saveGatePassStatusLog(GatePassStatusLogDto dto);
 
-	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction);
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction);
 
 	public List<MasterUser> getApproversForGatePassAction(String createdBy,String gatepassAction);
 

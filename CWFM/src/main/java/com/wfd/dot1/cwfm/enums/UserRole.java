@@ -1,7 +1,7 @@
 package com.wfd.dot1.cwfm.enums;
 
 public enum UserRole {
-	CONTRACTORSUPERVISOR("0","CONTRACTOR SUPERVISOR"),
+	CONTRACTORSUPERVISOR("0","CONTRACTOR"),
 	EIC("1","EIC"),
 	SECURITY("2","SECURITY"),
 	HR("3","HR");

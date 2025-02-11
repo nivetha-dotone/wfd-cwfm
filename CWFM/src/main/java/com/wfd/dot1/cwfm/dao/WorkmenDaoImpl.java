@@ -90,6 +90,33 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		    return QueryFileWatcher.getQuery("GET_DOT_TYPE_BY_PE");
 		}
 	 
+	 public String getAllGatePassForContractor() {
+		    return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_FOR_CREATOR");
+		}
+	 
+	 public String getAllGatePassForSquential() {
+		    return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER");
+		}
+	 
+	 public String getAllGatePassForParallel() {
+		    return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER");
+		}
+	 public String getApproverHierarchy() {
+		    return QueryFileWatcher.getQuery("GET_APPROVER_INFO_BY_GPTID");
+		}
+	 public  String getApprovalStatusOfGatePass() {
+		 return QueryFileWatcher.getQuery("GET_APPROVAL_STATUS_BY_GPID");
+		}
+	 public String getGatePassActionListingDetailsQuery() {
+		 return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_ACTION_FOR_CREATOR");
+	 }
+	 public String getAllEicManagerQuery() {
+		 return QueryFileWatcher.getQuery("GET_ALL_EIC");
+	 }
+	 
+	 public String getLastApproverQuery() {
+		 return QueryFileWatcher.getQuery("LAST_APPROVER");
+	 }
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method "+userAccount);
@@ -197,17 +224,17 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<MasterUser> getAllEicManager(String userId) {
+	public List<MasterUser> getAllEicManager(String unitId,String deptId) {
 		log.info("Entering into getAllEicManager dao method ");
 		List<MasterUser> eicList= new ArrayList<MasterUser>();
 		//log.info("Query to getAllEicManager "+WorkmenQueryBank.GET_ALL_EIC);
-		//SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_EIC,userId);
-		//while(rs.next()) {
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getAllEicManagerQuery(),deptId,unitId);
+		while(rs.next()) {
 			MasterUser mu = new MasterUser();
-			mu.setUserId(1);
-			mu.setFullName("Bharathi Chekka");
+			mu.setUserId(rs.getInt("UserId"));
+			mu.setFullName(rs.getString("FullName"));
 			eicList.add(mu);
-		//}
+		}
 		log.info("Exiting from getAllEicManager dao method "+eicList.size());
 		return eicList;
 	}
@@ -373,11 +400,12 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId) {
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId) {
 		log.info("Entering into getGatePassListingDetails dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
-		log.info("Query to getGatePassListingDetails "+WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_CREATOR);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_CREATOR,userId,gatePassTypeId);
+		String query =getAllGatePassForContractor();
+		log.info("Query to getGatePassListingDetails "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,deptId,unitId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -424,16 +452,20 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId) {
+	public List<GatePassListingDto> getGatePassListingForApprovers(String roleId,int workFlowType,String gatePassTypeId,String deptId,String unitId) {
 		log.info("Entering into getGatePassListingForApprovers dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		SqlRowSet rs =null;
+		String query=null;
 		if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-			log.info("Query to getGatePassListingForApprovers "+WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER);
-			 rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_SEQUENTIAL_APPROVER,userId,gatePassTypeId,gatePassTypeId,gatePassTypeId,userId,gatePassTypeId);
+			query=this.getAllGatePassForSquential();
+			log.info("Query to getGatePassListingForApprovers "+query);
+			
+			 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,gatePassTypeId,gatePassTypeId,roleId,deptId,unitId);
 		}else {
-			log.info("Query to getGatePassListingForApprovers "+WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER);
-			 rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_FOR_PARALLEL_APPROVER,userId,gatePassTypeId,userId,gatePassTypeId,gatePassTypeId);
+			query=this.getAllGatePassForParallel();
+			log.info("Query to getGatePassListingForApprovers "+query);
+			 rs = jdbcTemplate.queryForRowSet(query,roleId,roleId,gatePassTypeId,deptId,unitId);
 		}
 		
 		while(rs.next()) {
@@ -629,7 +661,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		 String result = null; 
 
 
-		        Object[] parameters = new Object[] {dto.getGatePassId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),Integer.parseInt(dto.getGatePassType())}; 
+		        Object[] parameters = new Object[] {dto.getGatePassId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),Integer.parseInt(dto.getGatePassType()),dto.getRoleId()}; 
 
 		        try {
 		            int status = jdbcTemplate.update(WorkmenQueryBank.SAVE_GATEPASS_APPROVAL_STATUS, parameters);
@@ -684,12 +716,13 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public boolean isLastApprover(String gatePassId, String approverId,String gatePassType) {
+	public boolean isLastApprover(String roleName, String  gatePassTypeId) {
 		boolean status=false;
-		Object[] object = new Object[]{gatePassId,approverId,gatePassType,gatePassType};
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.LAST_APPROVER,object);
+		
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery(),gatePassTypeId);
 		if(rs.next()){
-			status = true;
+			if(roleName.equals(rs.getString("Role_Name")))
+				status = true;
 		}
 		log.info("exit from isLastApprover method = "+status);
 		return status; 
@@ -739,11 +772,12 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction) {
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction) {
 		log.info("Entering into getGatePassListingDetails dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
-		log.info("Query to getGatePassListingDetails "+WorkmenQueryBank.GET_ALL_GATE_PASS_ACTION_FOR_CREATOR);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_GATE_PASS_ACTION_FOR_CREATOR,userId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+		String query = getGatePassActionListingDetailsQuery();
+		log.info("Query to getGatePassListingDetails "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -886,7 +920,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	@Override
 	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId) {
 		 // Fetch approvers from GATEPASSAPPROVERINFO
-        List<ApproverInfo> approverList = this.getApproversByGatePassId(gatePassId);
+        List<ApproverInfo> approverList = this.getApproversByGatePassId(GatePassType.CREATE.getStatus());
 
         // Fetch approval statuses from GATEPASSAPPROVALSTATUS
         List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(gatePassId);
@@ -919,25 +953,25 @@ public class WorkmenDaoImpl implements WorkmenDao{
         return approverStatusList;
 	}
 
-	private List<ApproverInfo> getApproversByGatePassId(String gatePassId) {
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVER_INFO_BY_GPID,gatePassId);
+	private List<ApproverInfo> getApproversByGatePassId(String gatePassTypeId) {
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(getApproverHierarchy(),gatePassTypeId);
 		 List<ApproverInfo> list = new ArrayList<ApproverInfo>();
 		 while(rs.next()) {
 			 ApproverInfo info=new ApproverInfo();
-			 info.setGatePassApproverInfoId(rs.getString("GatePassApproverInfoId"));
-			 info.setGatePassId(rs.getString("GatePassId"));
+			 info.setGatePassApproverInfoId(rs.getString("hierarchy_id"));
+			// info.setGatePassId(rs.getString("GatePassId"));
 			 info.setIndex(rs.getInt("Index"));
-			 info.setUserRole(rs.getString("UserRole"));
-			 info.setStatus(rs.getInt("Status"));
-			 info.setCreatedBy(rs.getString("CreatedBy"));
-			 info.setCreatedDate(rs.getString("CreatedDate"));
+			 info.setUserRole(rs.getString("Role_Name"));
+			 //info.setStatus(rs.getInt("Status"));
+			// info.setCreatedBy(rs.getString("CreatedBy"));
+			// info.setCreatedDate(rs.getString("CreatedDate"));
 			 list.add(info);
 		 }
 		 return list;
 	}
 
 	private List<ApprovalStatus> getApprovalStatusByGatePassId(String gatePassId) {
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_APPROVAL_STATUS_BY_GPID,gatePassId);
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getApprovalStatusOfGatePass(),gatePassId);
 		 List<ApprovalStatus> list = new ArrayList<ApprovalStatus>();
 		 while(rs.next()) {
 			 ApprovalStatus info=new ApprovalStatus();
@@ -953,6 +987,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		 }
 		 return list;
 	}
+
+	
 
 	
 

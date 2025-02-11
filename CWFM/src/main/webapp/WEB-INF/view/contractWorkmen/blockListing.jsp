@@ -150,51 +150,45 @@
 </head>
 <body>
 <div class="page-header">
-    <form id="searchForm">
+   <%--  <form id="searchForm">
         <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
-    </form>
+    </form> --%>
+     <div>
+   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
+         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
+         <option value="">Select Principal Employer</option>
+    <c:forEach items="${principalEmployers}" var="pe">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${pe.id}">${pe.description}</option>
+    </c:forEach>
+</select>
+<input type="hidden" id="principalEmployerId" name="principalEmployerId">
+
+<label for="departmentId" style=" color: darkcyan;"   >Department:</label>
+         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
+         <option value="">Select Department</option>
+    <c:forEach items="${Dept}" var="dept">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${dept.id}">${dept.description}</option>
+    </c:forEach>
+</select>
+<input type="hidden" id="deptId" name="deptId">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchBlockList()">Search</button>
+  </div>
     <div>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenBlockView()">View</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
     </div>
 </div>
-<%-- <div class="page-header">
-       Quick on-boarding List
-        <div class="header-buttons">
-        <button type="submit" onclick="redirectToWorkmenQuickOBAdd()">Add</button>
-        <button type="submit" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
-        <button type="submit" onclick="redirectToWOView()">View</button>
-         <button type="button" onclick="woListExportToCSV()">Export</button>
-        </div>
-        </div> --%>
-    <%-- <form id="searchForm">
-    <label for="principalEmployerId">Principal Employer :</label>
-        
-        <select id="principalEmployerId" name="principalEmployerId">
-         <option value="">Select Principal Employer</option>
-    <c:forEach items="${principalEmployers}" var="principalEmployer">
-        <option value="${principalEmployer.UNITID}" ${principalEmployer.UNITID == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.NAME}
-        </option>
-    </c:forEach>
-</select>
 
- <label for="contractorId">Contractor :</label>
-        
-        <select id="contractorId" name="contractorId">
-         <option value="">Select Contractor</option>
-    <c:forEach items="${contractors}" var="contractor">
-        <option value="${contractor.contractorId}" ${contractor.contractorId == selectedContractorId ? 'selected' : ''}>
-            ${contractor.name}
-        </option>
-    </c:forEach>
-</select>
-        <button type="submit" onclick="searchWithPEContractorInWorkmenAadharList('<%= request.getContextPath() %>')">Search</button>
-</form> --%>
      <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
                          <div class="table-container">
-    <table id="principalEmployerTable"  cellspacing="0" cellpadding="0">
+    <table id="workmenTable"  cellspacing="0" cellpadding="0">
         <thead>
 <tr>
                     <td style="border: 1px solid black;">
@@ -215,25 +209,7 @@
             </tr>
         </thead>
         <tbody>
-            <c:forEach items="${contractorWorkmen}" var="wo">
-               <tr>
-                 <td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="${wo.gatePassId}"></td>
-                    <td style="border: 1px solid black;">${wo.gatePassId}</td>
-                    <td style="border: 1px solid black;">${wo.firstName}</td>
-                    <td style="border: 1px solid black;">${wo.lastName}</td>
-                    <td style="border: 1px solid black;">${wo.gender}</td>
-                    <td style="border: 1px solid black;">${wo.dateOfBirth}</td>
-                     <td style="border: 1px solid black;">${wo.aadhaarNumber}</td>
-                     
-                    <td style="border: 1px solid black;">${wo.contractorName}</td>
-                    <td style="border: 1px solid black;">${wo.vendorCode}</td>
-                    <td style="border: 1px solid black;">${wo.unitName}</td> 
-                    <td style="border: 1px solid black;">${wo.gatePassType}</td> 
-                    <td style="border: 1px solid black;">${wo.status}</td>
-                    <%--<td style="border: 1px solid black;">${principalEmployer.NAME}</td>
-                    <td style="border: 1px solid black;">${wo.status}</td> --%>
-                </tr>
-            </c:forEach>
+            
         </tbody>
     </table>
     

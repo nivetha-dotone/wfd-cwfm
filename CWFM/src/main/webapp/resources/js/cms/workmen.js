@@ -160,7 +160,7 @@ function getWorkorders(unitId,contractorId) {
 function getWC(unitId,contractorId) {
     var xhr = new XMLHttpRequest();
     var url = contextPath + "/contractworkmen/getAllWC?unitId=" + unitId + "&contractorId=" + contractorId;
-    alert("URL: " + url+" "+unitId+" "+contractorId);
+    //alert("URL: " + url+" "+unitId+" "+contractorId);
     xhr.open("GET", url, true);
 
     xhr.onload = function() {
@@ -695,6 +695,7 @@ function fileUpload(){
 			status : status,
 			gatePassId : $("#gatePassId").val().trim(),
 			approverRole : $("#roleName").val().trim(),
+			roleId :$("#roleId").val().trim(),
 			gatePassType : '1',
 		};
 			  const xhr = new XMLHttpRequest();
@@ -704,7 +705,7 @@ function fileUpload(){
         if (xhr.status === 200) {
             // Handle successful response
             console.log("Data saved successfully:", xhr.responseText);
-            loadCommonList('/contractworkmen/quickOBList', 'Quick On-Bording List');
+            loadCommonList('/contractworkmen/list', 'Quick On-Bording List');
         } else {
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
@@ -858,7 +859,8 @@ for (const [key, value] of data.entries()) {
         xhr.onload = function () {
             if (xhr.status === 200) {
                 console.log("Data saved successfully:", xhr.responseText);
-                loadCommonList('/contractworkmen/quickOBList', 'Quick On-Boarding List');
+                loadCommonList('/contractworkmen/list', 'On-Boarding List');
+				
             } else {
                 console.error("Error saving data:", xhr.status, xhr.responseText);
             }
@@ -880,7 +882,7 @@ for (const [key, value] of data.entries()) {
     
     // Construct the URL based on gatePassId, userId, and docType
     const url = `${baseUrl}/${gatePassId}/${userId}/${docType}`;
-
+	alert("url is"+url);
     // Create a temporary anchor element
     const a = document.createElement('a');
     a.href = url;
@@ -979,7 +981,7 @@ if(isValid){
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
 		  
-         loadCommonList('/contractworkmen/cancel', 'Cancel List');
+         loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
        } else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
@@ -1012,6 +1014,7 @@ if(isValid){
 		status : status,
 		gatePassId : $("#gatePassId").val().trim(),
 		approverRole : $("#roleName").val().trim(),
+		roleId :$("#roleId").val().trim(),
 		gatePassType : gatePassType,
 	};
 		  const xhr = new XMLHttpRequest();
@@ -1021,7 +1024,7 @@ if(isValid){
        if (xhr.status === 200) {
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
-         loadCommonList('/contractworkmen/cancel', 'Cancel List');
+         loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
        } else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
@@ -1062,7 +1065,7 @@ if(isValid){
 	           // Handle successful response
 	           console.log("Data saved successfully:", xhr.responseText);
 			  
-	         loadCommonList('/contractworkmen/blockList', 'Block List');
+	         loadCommonList('/contractworkmen/blockListFilter', 'Block List');
 	       } else {
 	           // Handle error response
 	           console.error("Error saving data:", xhr.statusText);
@@ -1095,6 +1098,7 @@ if(isValid){
 			status : status,
 			gatePassId : $("#gatePassId").val().trim(),
 			approverRole : $("#roleName").val().trim(),
+			roleId :$("#roleId").val().trim(),
 			gatePassType : gatePassType,
 		};
 			  const xhr = new XMLHttpRequest();
@@ -1104,7 +1108,7 @@ if(isValid){
 	       if (xhr.status === 200) {
 	           // Handle successful response
 	           console.log("Data saved successfully:", xhr.responseText);
-	         loadCommonList('/contractworkmen/blockList', 'Block List');
+	         loadCommonList('/contractworkmen/blockListFilter', 'Block List');
 	       } else {
 	           // Handle error response
 	           console.error("Error saving data:", xhr.statusText);
@@ -1145,7 +1149,7 @@ if(isValid){
 			           // Handle successful response
 			           console.log("Data saved successfully:", xhr.responseText);
 					  
-			         loadCommonList('/contractworkmen/unblockList', 'Unblock List');
+			         loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
 			       } else {
 			           // Handle error response
 			           console.error("Error saving data:", xhr.statusText);
@@ -1178,6 +1182,7 @@ if(isValid){
 				status : status,
 				gatePassId : $("#gatePassId").val().trim(),
 				approverRole : $("#roleName").val().trim(),
+				roleId :$("#roleId").val().trim(),
 				gatePassType : gatePassType,
 			};
 				  const xhr = new XMLHttpRequest();
@@ -1187,7 +1192,7 @@ if(isValid){
 		       if (xhr.status === 200) {
 		           // Handle successful response
 		           console.log("Data saved successfully:", xhr.responseText);
-		         loadCommonList('/contractworkmen/unblockList', 'Unblock List');
+		         loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
 		       } else {
 		           // Handle error response
 		           console.error("Error saving data:", xhr.statusText);
@@ -1228,7 +1233,7 @@ xhr.onload = function() {
         // Handle successful response
         console.log("Data saved successfully:", xhr.responseText);
 		  
-      loadCommonList('/contractworkmen/blackList', 'Black List');
+      loadCommonList('/contractworkmen/blackListFilter', 'Black List');
     } else {
         // Handle error response
         console.error("Error saving data:", xhr.statusText);
@@ -1261,6 +1266,7 @@ const data = {
 	status : status,
 	gatePassId : $("#gatePassId").val().trim(),
 	approverRole : $("#roleName").val().trim(),
+	roleId:$("#roleId").val().trim(),
 	gatePassType : gatePassType,
 };
 	  const xhr = new XMLHttpRequest();
@@ -1270,7 +1276,7 @@ const data = {
 					       if (xhr.status === 200) {
 					           // Handle successful response
 					           console.log("Data saved successfully:", xhr.responseText);
-					         loadCommonList('/contractworkmen/blackList', 'Black List');
+					         loadCommonList('/contractworkmen/blackListFilter', 'Black List');
 					       } else {
 					           // Handle error response
 					           console.error("Error saving data:", xhr.statusText);
@@ -1311,7 +1317,7 @@ function submitDeblack(userId,gatePassType){
 			        // Handle successful response
 			        console.log("Data saved successfully:", xhr.responseText);
 					  
-			      loadCommonList('/contractworkmen/deblackList', 'Deblack List');
+			      loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
 			    } else {
 			        // Handle error response
 			        console.error("Error saving data:", xhr.statusText);
@@ -1344,6 +1350,7 @@ function approveRejectDeblacklist(status,gatePassType){
 				status : status,
 				gatePassId : $("#gatePassId").val().trim(),
 				approverRole : $("#roleName").val().trim(),
+				roleId :$("#roleId").val().trim(),
 				gatePassType : gatePassType,
 			};
 				  const xhr = new XMLHttpRequest();
@@ -1353,7 +1360,7 @@ function approveRejectDeblacklist(status,gatePassType){
 		    if (xhr.status === 200) {
 		        // Handle successful response
 		        console.log("Data saved successfully:", xhr.responseText);
-		      loadCommonList('/contractworkmen/deblackList', 'Deblack List');
+		      loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
 		    } else {
 		        // Handle error response
 		        console.error("Error saving data:", xhr.statusText);
@@ -1394,7 +1401,7 @@ xhr.onload = function() {
         // Handle successful response
         console.log("Data saved successfully:", xhr.responseText);
 	  
-	   loadCommonList('/contractworkmen/lostordamage', 'Lost or Damage List');
+	   loadCommonList('/contractworkmen/lostordamageFilter', 'Lost or Damage List');
     } else {
         // Handle error response
         console.error("Error saving data:", xhr.statusText);
@@ -1613,3 +1620,350 @@ function previewImage(event,inputId,displayId) {
             document.body.appendChild(link);
             link.click();
         }
+		function searchGatePassBasedOnPE() {
+					    var principalEmployerId = $('#principalEmployerId').val();
+					    
+						var deptId=$("#deptId").val();
+					    $.ajax({
+					        url: '/CWFM/contractworkmen/quickOBList',
+					        type: 'POST',
+					        data: {
+					            principalEmployerId: principalEmployerId,
+								deptId:deptId
+					        },
+					        success: function(response) {
+					            var tableBody = $('#workmenTable tbody');
+					            tableBody.empty();
+					            if (response.length > 0) {
+					                $.each(response, function(index, wo) {
+					                    var row = '<tr style="border: 1px solid black;">' +
+												'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+					                              '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+					                              '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+												  '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+												  
+												  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+												  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+												  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+												  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+												  '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+												  '<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+												  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+												  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+					                              '</tr>';
+					                    tableBody.append(row);
+					                });
+					            } else {
+					                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+					            }
+					        },
+					        error: function(xhr, status, error) {
+					            console.error("Error fetching data:", error);
+					        }
+					    });
+					}
+					function searchBlockList() {
+										    var principalEmployerId = $('#principalEmployerId').val();
+										    
+											var deptId=$("#deptId").val();
+										    $.ajax({
+										        url: '/CWFM/contractworkmen/blockList',
+										        type: 'POST',
+										        data: {
+										            principalEmployerId: principalEmployerId,
+													deptId:deptId
+										        },
+										        success: function(response) {
+										            var tableBody = $('#workmenTable tbody');
+										            tableBody.empty();
+										            if (response.length > 0) {
+										                $.each(response, function(index, wo) {
+										                    var row = '<tr style="border: 1px solid black;">' +
+																	'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                              '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+										                              '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																	  '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+																	  
+																	  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+																	  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+																	  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																	  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																	  '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+																	  '<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+																	  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																	  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+										                              '</tr>';
+										                    tableBody.append(row);
+										                });
+										            } else {
+										                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										            }
+										        },
+										        error: function(xhr, status, error) {
+										            console.error("Error fetching data:", error);
+										        }
+										    });
+										}
+										function searchUnBlockList() {
+										var principalEmployerId = $('#principalEmployerId').val();
+										var deptId=$("#deptId").val();
+										$.ajax({
+										    url: '/CWFM/contractworkmen/unblockList',
+										    type: 'POST',
+										    data: {
+										        principalEmployerId: principalEmployerId,
+												deptId:deptId
+										    },
+										    success: function(response) {
+										        var tableBody = $('#workmenTable tbody');
+										        tableBody.empty();
+										        if (response.length > 0) {
+										            $.each(response, function(index, wo) {
+										                var row = '<tr style="border: 1px solid black;">' +
+																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+																											  
+																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+										                          '</tr>';
+										                tableBody.append(row);
+										            });
+										        } else {
+										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										        }
+										    },
+										    error: function(xhr, status, error) {
+										        console.error("Error fetching data:", error);
+										    }
+										});
+										}
+										function searchBlackList() {
+										var principalEmployerId = $('#principalEmployerId').val();
+										var deptId=$("#deptId").val();
+										$.ajax({
+										    url: '/CWFM/contractworkmen/blackList',
+										    type: 'POST',
+										    data: {
+										        principalEmployerId: principalEmployerId,
+												deptId:deptId
+										    },
+										    success: function(response) {
+										        var tableBody = $('#workmenTable tbody');
+										        tableBody.empty();
+										        if (response.length > 0) {
+										            $.each(response, function(index, wo) {
+										                var row = '<tr style="border: 1px solid black;">' +
+																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+																											  
+																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+										                          '</tr>';
+										                tableBody.append(row);
+										            });
+										        } else {
+										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										        }
+										    },
+										    error: function(xhr, status, error) {
+										        console.error("Error fetching data:", error);
+										    }
+										});
+										}
+										
+										function searchDeBlackList() {
+										var principalEmployerId = $('#principalEmployerId').val();
+										var deptId=$("#deptId").val();
+										$.ajax({
+										    url: '/CWFM/contractworkmen/deblackList',
+										    type: 'POST',
+										    data: {
+										        principalEmployerId: principalEmployerId,
+												deptId:deptId
+										    },
+										    success: function(response) {
+										        var tableBody = $('#workmenTable tbody');
+										        tableBody.empty();
+										        if (response.length > 0) {
+										            $.each(response, function(index, wo) {
+										                var row = '<tr style="border: 1px solid black;">' +
+																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+																											  
+																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+										                          '</tr>';
+										                tableBody.append(row);
+										            });
+										        } else {
+										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										        }
+										    },
+										    error: function(xhr, status, error) {
+										        console.error("Error fetching data:", error);
+										    }
+										});
+										}
+										function searchCancel() {
+										var principalEmployerId = $('#principalEmployerId').val();
+										var deptId=$("#deptId").val();
+										$.ajax({
+										    url: '/CWFM/contractworkmen/cancel',
+										    type: 'POST',
+										    data: {
+										        principalEmployerId: principalEmployerId,
+												deptId:deptId
+										    },
+										    success: function(response) {
+										        var tableBody = $('#workmenTable tbody');
+										        tableBody.empty();
+										        if (response.length > 0) {
+										            $.each(response, function(index, wo) {
+										                var row = '<tr style="border: 1px solid black;">' +
+																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+																											  
+																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+										                          '</tr>';
+										                tableBody.append(row);
+										            });
+										        } else {
+										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										        }
+										    },
+										    error: function(xhr, status, error) {
+										        console.error("Error fetching data:", error);
+										    }
+										});
+										}
+										function searchLost() {
+										var principalEmployerId = $('#principalEmployerId').val();
+										var deptId=$("#deptId").val();
+										$.ajax({
+										    url: '/CWFM/contractworkmen/lostordamage',
+										    type: 'POST',
+										    data: {
+										        principalEmployerId: principalEmployerId,
+												deptId:deptId
+										    },
+										    success: function(response) {
+										        var tableBody = $('#workmenTable tbody');
+										        tableBody.empty();
+										        if (response.length > 0) {
+										            $.each(response, function(index, wo) {
+										                var row = '<tr style="border: 1px solid black;">' +
+																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
+										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
+																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+																											  
+																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
+																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
+																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
+																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
+																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+										                          '</tr>';
+										                tableBody.append(row);
+										            });
+										        } else {
+										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										        }
+										    },
+										    error: function(xhr, status, error) {
+										        console.error("Error fetching data:", error);
+										    }
+										});
+										}
+										
+										function getEic() {
+											 var principalEmployerSelect = document.getElementById("principalEmployer");
+										    var unitId = principalEmployerSelect.value; // Get the selected principal employer value
+										    var deptSelect = document.getElementById("department");
+										    var deptId = deptSelect.value; // Get the selected contractor value
+										    
+										 if (!unitId) {
+										        alert("Please select a Principal Employer.");
+										        return;
+										    }
+										    
+										  if(!deptId){
+											 alert("Please select a Department.");
+										        return;
+										  }
+
+										    getEicList(unitId, deptId);
+
+										    
+										}
+										function getEicList(unitId,deptId) {
+										    var xhr = new XMLHttpRequest();
+										    var url = contextPath + "/contractworkmen/getAllEic?unitId=" + unitId + "&deptId=" + deptId;
+										    //alert("URL: " + url);
+										    xhr.open("GET", url, true);
+
+										    xhr.onload = function() {
+										        if (xhr.status === 200) {
+										            // Parse the response as a JSON array of workorder objects
+										            var eics = JSON.parse(xhr.responseText);
+										            console.log("Response:", eics);
+										            
+										            // Find the workorder select element
+										            var eicSelect = document.getElementById("eic");
+										            
+										            // Clear existing options
+										            eicSelect.innerHTML = '<option value="">Please select EIC</option>';
+										            
+										            // Populate the dropdown with the new list of workorders
+										            eics.forEach(function(eiclist) {
+										                var option = document.createElement("option");
+										                option.value = eiclist.userId;
+										                option.text = eiclist.fullName;
+										                eicSelect.appendChild(option);
+										            });
+										        } else {
+										            console.error("Error:", xhr.statusText);
+										        }
+										    };
+
+										    xhr.onerror = function() {
+										        console.error("Request failed");
+										    };
+
+										    xhr.send();
+										}

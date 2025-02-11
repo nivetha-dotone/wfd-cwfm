@@ -41,7 +41,7 @@ function exportCSVFormat() {
     xhr.open("GET", "/CWFM/billVerification/billview/" + unitId , true);
     xhr.send();
 }   
-function downloadDoc(gatePassId, userId, docType) {
+function downloadDocTemp(gatePassId, userId, docType) {
     const baseUrl = '/CWFM/billVerification/downloadFile';
     
     // Construct the URL based on gatePassId, userId, and docType

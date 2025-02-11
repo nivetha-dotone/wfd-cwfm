@@ -283,8 +283,9 @@ textarea {
     </style>
      <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
-        String userId = user != null ? user.getUserId() : "";
+     String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
         String roleName = user != null ? user.getRoleName() : "";
+        String roleId = user!=null?user.getRoleId():"";
         String contextPath =  request.getContextPath() ;
 		%>
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
@@ -394,11 +395,11 @@ textarea {
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
-            <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+            <% if (user != null && !"Contractor".equals(roleName)) { %>
     			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('4')">Approve</button>
    				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('5')">Reject</button>
 			<% } %>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/quickOBList', 'Quick On-Bording List');">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/list', 'Quick On-Bording List');">Cancel</button>
         </div> 
     </div>
 
@@ -440,6 +441,7 @@ textarea {
     <th>
     		<input type="hidden" id="userId" name="userId" value="<%= userId %>">
 			<input type="hidden" id="roleName" name="roleName" value="<%= roleName %>">
+			<input type="hidden" id="roleId" name="roleId" value="<%= roleId %>">
 			
     <label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
     <td>

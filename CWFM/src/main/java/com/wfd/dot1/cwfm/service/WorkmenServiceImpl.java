@@ -62,8 +62,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.getAllDepartmentAndSubDepartment(userId);
 	}
 	@Override
-	public List<MasterUser> getAllEicManager(String userId) {
-		return workmenDao.getAllEicManager(userId);
+	public List<MasterUser> getAllEicManager(String unitId,String deptId) {
+		return workmenDao.getAllEicManager(unitId,deptId);
 	}
 	@Override
 	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId) {
@@ -113,24 +113,25 @@ public class WorkmenServiceImpl implements WorkmenService{
 				dto.setUpdatedBy(gatePassMain.getUserId());
 				workmenDao.saveGatePassStatusLog(dto);
 				//get approvers for gatepass
-				List<MasterUser> approversList = workmenDao.getApproversForGatePass(gatePassMain.getCreatedBy());
+//				List<MasterUser> approversList = workmenDao.getApproversForGatePass(gatePassMain.getCreatedBy());
+//				
+//				if(null!=approversList && approversList.size()>0){
+//					for(MasterUser mu :approversList) {
+//						mu.setStatus(GatePassType.CREATE.getStatus());
+//						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
+//								mu.setIndex(1);
+//							
+//						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.SECURITY.getName())){
+//								mu.setIndex(2);
+//							
+//						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.HR.getName())) {
+//								mu.setIndex(3);
+//							
+//						}
+//					}
+//					workmenDao.saveGatePassApprover(gatePassId, approversList, gatePassMain.getCreatedBy());
+//				}
 				
-				if(null!=approversList && approversList.size()>0){
-					for(MasterUser mu :approversList) {
-						mu.setStatus(GatePassType.CREATE.getStatus());
-						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
-								mu.setIndex(1);
-							
-						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.SECURITY.getName())){
-								mu.setIndex(2);
-							
-						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.HR.getName())) {
-								mu.setIndex(3);
-							
-						}
-					}
-					workmenDao.saveGatePassApprover(gatePassId, approversList, gatePassMain.getCreatedBy());
-				}
 			}
 		}catch(Exception e) {
 			
@@ -139,14 +140,13 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	
 	@Override
-	public List<GatePassListingDto> getGatePassListingDetails(String userId,String gatePassTypeId) {
-		return workmenDao.getGatePassListingDetails(userId,gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId) {
+		return workmenDao.getGatePassListingDetails(unitId,deptId,userId,gatePassTypeId);
 	}
 	@Override
-	public List<GatePassListingDto> getGatePassListingForApprovers(MasterUser user,String gatePassTypeId) {
-			//int workFlowTypeId = workmenDao.getWorkFlowTypeForApprovers(user.getBusinessType());
-			//return workmenDao.getGatePassListingForApprovers(user.getUserId(),workFlowTypeId,gatePassTypeId);
-		return null;
+	public List<GatePassListingDto> getGatePassListingForApprovers(String unitId ,String deptId,MasterUser user,String gatePassTypeId) {
+		int workFlowTypeId = workmenDao.getWorkFlowTYpe(unitId);
+			return workmenDao.getGatePassListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
 	@Override
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId) {
@@ -179,7 +179,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			}
 		}else {
 			//check if last approver, if last approver change the status of gate pass main to approved
-			boolean isLastApprover = workmenDao.isLastApprover(dto.getGatePassId(),dto.getApproverId(),dto.getGatePassType());
+			boolean isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(),String.valueOf(dto.getGatePassType()));
 			if(isLastApprover) {
 				if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()) || dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
 					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
@@ -222,43 +222,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			}else {
 					dto.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
 				 result = workmenDao.gatePassAction(dto);
-				//get approvers for gatepass
-				 String approverType = null;
-				 String gatePassType=null;
-				 if(dto.getGatePassType().equalsIgnoreCase(GatePassType.CANCEL.getStatus())) {
-					 approverType="cancelapprover";
-					 gatePassType=GatePassType.CANCEL.getStatus();
-				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.BLACKLIST.getStatus())) {
-					 approverType="blacklistapprover";
-					 gatePassType=GatePassType.BLACKLIST.getStatus();
-				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.BLOCK.getStatus())) {
-					 approverType="blockapprover";
-					 gatePassType=GatePassType.BLOCK.getStatus();
-				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.UNBLOCK.getStatus())) {
-					 approverType="unblockapprover";
-					 gatePassType=GatePassType.UNBLOCK.getStatus();
-				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.DEBLACKLIST.getStatus())) {
-					 approverType="deblacklistapprover";
-					 gatePassType=GatePassType.DEBLACKLIST.getStatus();
-				 }
-				List<MasterUser> approversList = workmenDao.getApproversForGatePassAction(gatePassMain.getCreatedBy(),approverType);
-				
-				if(null!=approversList && approversList.size()>0){
-					for(MasterUser mu :approversList) {
-						mu.setStatus(gatePassType);
-						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
-								mu.setIndex(1);
-								
-						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.SECURITY.getName())){
-								mu.setIndex(3);
-							
-						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.HR.getName())) {
-								mu.setIndex(2);
-							
-						}
-					}
-					workmenDao.saveGatePassApprover(dto.getGatePassId(), approversList, gatePassMain.getCreatedBy());
-					if(null!=result) {
+				 if(null!=result) {
 						GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
 						statusLog.setGatePassId(dto.getGatePassId());
 						statusLog.setGatePassType(dto.getGatePassType());
@@ -267,9 +231,46 @@ public class WorkmenServiceImpl implements WorkmenService{
 						statusLog.setUpdatedBy(dto.getCreatedBy());
 						workmenDao.saveGatePassStatusLog(statusLog);
 					}
-				}  
+//				//get approvers for gatepass
+//				 String approverType = null;
+//				 String gatePassType=null;
+//				 if(dto.getGatePassType().equalsIgnoreCase(GatePassType.CANCEL.getStatus())) {
+//					 approverType="cancelapprover";
+//					 gatePassType=GatePassType.CANCEL.getStatus();
+//				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.BLACKLIST.getStatus())) {
+//					 approverType="blacklistapprover";
+//					 gatePassType=GatePassType.BLACKLIST.getStatus();
+//				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.BLOCK.getStatus())) {
+//					 approverType="blockapprover";
+//					 gatePassType=GatePassType.BLOCK.getStatus();
+//				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.UNBLOCK.getStatus())) {
+//					 approverType="unblockapprover";
+//					 gatePassType=GatePassType.UNBLOCK.getStatus();
+//				 }else if(dto.getGatePassType().equalsIgnoreCase(GatePassType.DEBLACKLIST.getStatus())) {
+//					 approverType="deblacklistapprover";
+//					 gatePassType=GatePassType.DEBLACKLIST.getStatus();
+//				 }
+//				List<MasterUser> approversList = workmenDao.getApproversForGatePassAction(gatePassMain.getCreatedBy(),approverType);
+//				
+//				if(null!=approversList && approversList.size()>0){
+//					for(MasterUser mu :approversList) {
+//						mu.setStatus(gatePassType);
+//						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
+//								mu.setIndex(1);
+//								
+//						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.SECURITY.getName())){
+//								mu.setIndex(3);
+//							
+//						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.HR.getName())) {
+//								mu.setIndex(2);
+//							
+//						}
+//					}
+//					workmenDao.saveGatePassApprover(dto.getGatePassId(), approversList, gatePassMain.getCreatedBy());
+//					
+//				}  
 				 
- 			}
+ 			}//end workflow type
 			}else {
 				//other action performed on gatepass
 				if(gatePassMain.getGatePassAction().equals(GatePassType.CANCEL.getStatus())) {
@@ -296,8 +297,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return result;
 	}
 	@Override
-	public List<GatePassListingDto> getGatePassActionListingDetails(String userId, String gatePassTypeId,String previousGatePassAction) {
-		return workmenDao.getGatePassActionListingDetails(userId,gatePassTypeId,previousGatePassAction);
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction) {
+		return workmenDao.getGatePassActionListingDetails(unitId,deptId,userId,gatePassTypeId,previousGatePassAction);
 	}
 	@Override
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId) {

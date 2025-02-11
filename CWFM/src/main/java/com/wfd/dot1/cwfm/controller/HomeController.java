@@ -114,10 +114,10 @@ public class HomeController {
 	        System.out.println("Fetched roleName: " + roleName);
 
 	        List<SectionDto> sections;
-//	        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-//	        user.setRoleId(roleId);
-//	        user.setRoleName(roleName);
-//	        session.setAttribute("loginuser", user);
+	        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+	        user.setRoleId(roleId);
+	        user.setRoleName(roleName);
+	        session.setAttribute("loginuser", user);
 	        if ("Admin".equals(roleName)) {  
 	            System.out.println("Admin role detected. Fetching all sections and pages.");
 	            sections = commonService.getAllSectionsWithPages(); // Fetch all sections and pages for Admin

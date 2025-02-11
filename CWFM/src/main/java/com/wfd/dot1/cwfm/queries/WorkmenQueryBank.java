@@ -149,7 +149,7 @@ public interface WorkmenQueryBank {
 	 
 	 String SAVE_GATE_PASS_APPROVER="INSERT INTO GATEPASSAPPROVERINFO(GatePassId,UserRole,UserId,[Index],Status,CreatedBy,CreatedDate) VALUES (?,?, ?, ?, ?,?,GETDATE())";
 
-	String SAVE_GATEPASS_APPROVAL_STATUS = "INSERT INTO GATEPASSAPPROVALSTATUS(GatePassId,UserId,UserRole,Status,Comments,GatePassTypeId,LastUpdatedDate) VALUES (?,?,?,?,?,?,GETDATE())";
+	String SAVE_GATEPASS_APPROVAL_STATUS = "INSERT INTO GATEPASSAPPROVALSTATUS(GatePassId,UserId,UserRole,Status,Comments,GatePassTypeId,RoleId,LastUpdatedDate) VALUES (?,?,?,?,?,?,?,GETDATE())";
 	
 	 String GET_WORKFLOW_TYPE_BY_BT ="select distinct gpwft.WorkflowType "
 		 		+ " from  GATEPASSWORKFLOWTYPE gpwft  WHERE gpwft.BusinessTypeId=?";

@@ -282,8 +282,9 @@ textarea {
     </style>
      <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
-        String userId = user != null ? user.getUserId() : "";
+     String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
         String roleName = user != null ? user.getRoleName() : "";
+        String roleId = user!=null?user.getRoleId():"";
 		%>
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -392,15 +393,15 @@ textarea {
          <div class="action-buttons" >
          <c:if test="${GatePassObj.gatePassAction eq '1' }">
       
-           <% if (user != null && "Contractor Supervisor".equals(roleName) ) { %>
+           <% if (user != null && "Contractor".equals(roleName) ) { %>
              <button id="actionButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitCancel('${sessionScope.loginuser.userId}','9')">Cancel GatePass</button> 
            <% } %> 
               </c:if>
-            <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+            <% if (user != null && !"Contractor".equals(roleName)) { %>
     			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectCancel('4','9')">Approve</button>
    				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectCancel('5','9')">Reject</button>
 			<% } %>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/cancel', 'Cancel List');">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');">Cancel</button>
         </div> 
     </div>
 
@@ -433,6 +434,7 @@ textarea {
     <th>
     		<input type="hidden" id="userId" name="userId" value="<%= userId %>">
 			<input type="hidden" id="roleName" name="roleName" value="<%= roleName %>">
+			 <input type="hidden" id="roleId" name="roleId" value="<%= roleId %>">
 			<input type="hidden" id="gatePassId" name="gatePassId" value="${GatePassObj.gatePassId}">
     <label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
     <td>
@@ -743,10 +745,10 @@ textarea {
         <tr>
         <th><label class="custom-label"><spring:message code="label.contractorSupervisorComment"/></label></th>
         <td>
-         <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+         <% if (user != null && !"Contractor".equals(roleName)) { %>
         <textarea id="comments" name="comments" readonly>${GatePassObj.comments}</textarea>
         <% } %>
-         <% if (user != null && "Contractor Supervisor".equals(roleName)) { %>
+         <% if (user != null && "Contractor".equals(roleName)) { %>
         <textarea id="comments" name="comments" >${GatePassObj.comments}</textarea>
         <% } %>
         </td>
@@ -768,7 +770,7 @@ textarea {
 				<!-- <th><label class="custom-label">Previous Comment</label></th>
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
 				 -->
-				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+				 <% if (user != null && !"Contractor".equals(roleName)) { %>
 				 <th><label class="custom-label"><spring:message code="label.approveComment"/></label></th>
 				<td><textarea id="approvercomments"  name="approvercomments" placeholder="Type here..."></textarea>
 				<label id="error-approvercomments" style="color: red;display: none;">Comments is required</label>
