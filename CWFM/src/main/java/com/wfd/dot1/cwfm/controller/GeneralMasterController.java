@@ -40,7 +40,31 @@ public class GeneralMasterController {
         model.addAttribute("gmTypes", gmTypes);
         return "generalMaster/gmType";
     }
-
+    // Display GMType page
+//    @GetMapping("/gmType")
+//    public String showGMTypePage(@RequestParam(required = false) Long pageId, @RequestParam(required = false) Long selectedRoleId, HttpServletRequest request, HttpServletResponse response,Model model) {
+//    	HttpSession session = request.getSession(false); 
+//		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+//		 if (pageId != null) {
+//		        session.setAttribute("selectedPageId", pageId);
+//		    } else {
+//		        pageId = (Long) session.getAttribute("selectedPageId");
+//		    }
+//		    
+//		   // Long selectedRoleId = (Long) session.getAttribute("selectedRoleId");
+//		    System.out.println("pageId---"+pageId);
+//		    System.out.println("selectedRoleId---"+selectedRoleId);
+//		    session.setAttribute("selectedPageId", pageId); // Set pageId
+//		    session.setAttribute("selectedRoleId", selectedRoleId); 
+//		    List<CMSRoleRights> userRights = commonService.getRoleRightsByRoleIdAndPageId(selectedRoleId, pageId); // 10029 = Contractor Page ID
+//		    request.setAttribute("userRights", userRights);
+//    	List<CMSGMType> gmTypes = commonService.getAllGMTypes();
+//    	System.out.println("pageId (after transaction): " + pageId);
+//    	System.out.println("selectedRoleId (after transaction): " + selectedRoleId);
+//        model.addAttribute("gmTypes", gmTypes);
+//        
+//        return "generalMaster/gmType";
+//    }
     // Save GMType
 //    @PostMapping("/saveGMType")
 //    public String saveGMType(@RequestParam("gmTypeName") String gmTypeName) {
@@ -259,13 +283,10 @@ public class GeneralMasterController {
     @ResponseBody
     public ResponseEntity<?> getSectionPages(@RequestParam("sectionId") Long sectionId) {
         try {
-            // Fetch all available pages for the section
             List<CmsGeneralMaster> availablePages = commonService.getAvailablePagesForSection(sectionId);
 
-            // Fetch already selected/mapped pages for the section
             List<CmsGeneralMaster> selectedPages = commonService.getSelectedPagesForSection(sectionId);
 
-            // Build response object
             Map<String, Object> response = new HashMap<>();
             response.put("availablePages", availablePages);
             response.put("selectedPages", selectedPages);
@@ -286,7 +307,7 @@ public class GeneralMasterController {
             if (request.getPageIds() == null || request.getPageIds().isEmpty()) {
                 return ResponseEntity.badRequest().body("Page IDs cannot be null or empty.");
             }
-            commonService.saveSectionPage(request.getSectionId(), request.getPageIds(), "Admin");
+            commonService.saveSectionPage(request.getSectionId(), request.getPageIds(), "System Admin");
 //            for (Long pageId : request.getPageIds()) {
 //                commonService.saveSectionPage(request.getSectionId(), pageId, "Admin");
 //            }

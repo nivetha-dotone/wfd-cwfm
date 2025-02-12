@@ -70,5 +70,9 @@ public interface  CommonDao {
 					List<SectionDto> getSectionsByRoleId(String roleId);
 					List<Long> getPageIdsByRoleId(String roleId);
 					boolean hasPageAccessForRole(String roleId, Long pageId);
+
 					List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount);
+
+					List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId);
+
 }

@@ -54,6 +54,32 @@ public class ContractorController {
 
 		return "contractors/list";
 	}
+//	@GetMapping("/list")
+//	public String getAllPrincipalEmployer(@RequestParam(required = false) Long pageId, @RequestParam(required = false) Long selectedRoleId, HttpServletRequest request, HttpServletResponse response) {
+//		HttpSession session = request.getSession(false); 
+//		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+//		 if (pageId != null) {
+//		        session.setAttribute("selectedPageId", pageId);
+//		    } else {
+//		        pageId = (Long) session.getAttribute("selectedPageId");
+//		    }
+//		    
+//		   // Long selectedRoleId = (Long) session.getAttribute("selectedRoleId");
+//		    System.out.println("pageId---"+pageId);
+//		    System.out.println("selectedRoleId---"+selectedRoleId);
+//		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
+//		request.setAttribute("principalEmployers", peList);
+//
+//		List<CMSRoleRights> userRights = commonService.getRoleRightsByRoleIdAndPageId(selectedRoleId, pageId); // 10029 = Contractor Page ID
+//	    request.setAttribute("userRights", userRights);
+//	    Enumeration<String> attributeNames = session.getAttributeNames();
+//	    while (attributeNames.hasMoreElements()) {
+//	        String attributeName = attributeNames.nextElement();
+//	        System.out.println(attributeName + ": " + session.getAttribute(attributeName));
+//	    }
+//		return "contractors/list";
+//	}
+
 
 	@PostMapping("/getAllContractorsBasedOnPE")
 	public ResponseEntity<List<Contractor>> searchResources(

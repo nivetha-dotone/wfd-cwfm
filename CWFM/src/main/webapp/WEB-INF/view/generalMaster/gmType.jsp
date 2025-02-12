@@ -6,15 +6,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+ <title>General Type</title>
+    <!-- <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
+    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
       <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
   <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/commonjs.js"></script> 
-    <script src="resources/js/jquery-3.6.0.min.js"></script>
+    <script src="resources/js/jquery-3.6.0.min.js"></script> -->
  <style>
   .success {
         color: green;
@@ -223,13 +224,20 @@
             <p class="error">${errorMessage}</p>
         </c:if>
     </div>
-   
+   <%-- <form id="hiddenForm">
+    <input type="text" id="pageId" value="${sessionScope.selectedPageId}" />
+    <input type="text" id="selectedRoleId" value="${sessionScope.selectedRoleId}" />
+</form> --%>
 <div class="page-header">
   <label for="gmTypeName">GM Type Name:</label>
+  
         <input type="text" id="gmTypeName" name="gmTypeName" required  oninput="convertToUppercase(this)">
+      <%--  <c:if test="${userRights[0].addRights == 0}"> --%>
         <button type="submit"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGMTYPE()">Save</button>
-   
+   <%-- </c:if>
+    <c:if test="${userRights[0].deleteRights == 0}"> --%>
     <button type="submit"   class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedGMTYPE()">Delete Selected</button>
+<%-- </c:if> --%>
 <!-- <div>
 <form action="/CWFM/generalController/saveGMType" method="post">
         <label for="gmTypeName">GM Type Name:</label>

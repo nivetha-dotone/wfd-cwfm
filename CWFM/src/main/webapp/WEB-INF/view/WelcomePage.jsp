@@ -17,6 +17,15 @@
     <script src="resources/js/cms/report.js"></script>
      <script src="resources/js/cms/bill.js"></script>
     <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/jquery-3.6.0.min.js"></script>
+   <!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    Include jQuery UI
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    
+    Include jQuery UI CSS
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+     -->
     <script>
     var contextPath = '<%= request.getContextPath() %>';
     function initializeDatePicker() {
@@ -52,7 +61,7 @@ function redirectToPEAdd() {
 function loadCommonList(path,heading) {
 	 updateHeading(heading);
 	    var url = contextPath + path;
-    // Construct the URL using the contextPath variable
+    // Construct the URL using the contextPath variable SystemAdmin
   //  var url = contextPath + path;
     console.log("Constructed URL:", url); // Log the constructed URL to the console
     var xhttp = new XMLHttpRequest();
@@ -699,11 +708,13 @@ function redirectToOrgMapAdd() {
         if (xhr.readyState == 4 && xhr.status == 200) {
             // Update the mainContent element with the fetched content
             document.getElementById("mainContent").innerHTML = xhr.responseText;
+            initializeOrgMapping();
         }
     };
     xhr.open("GET", "/CWFM/org-level-mapping/new", true);
     xhr.send();
 }
+
 
 function moveOptions(sourceId, targetId) {
     var source = document.getElementById(sourceId);
@@ -1000,14 +1011,130 @@ function saveUser() {
         })
         .catch(error => console.error('Error saving user:', error));
 }
+function updateSidebar(sections, selectedRole) {
+    if (!selectedRole) {
+        console.warn("Skipping sidebar update: No role selected.");
+        return;
+    }
+
+    const submenu = document.getElementById('dynamic-menu');
+    submenu.innerHTML = ''; // Clear existing menu items
+
+    console.log("Updating sidebar for role:", selectedRole);
+
+    sections.forEach(section => {
+        if (!section.sectionId) {
+            console.error("Skipping section with missing ID:", section);
+            return;
+        }
+
+        const menuItem = document.createElement('li');
+        const sectionLink = document.createElement('a');
+        sectionLink.href = '#';
+        sectionLink.classList.add('nav-link');
+        sectionLink.onclick = function () {
+            toggleSubMenu(section.sectionId, this);
+        };
+
+        // Section icon
+        const icon = document.createElement('i');
+        icon.classList.add('fa', 'fa-cog', 'nav-icon');
+        sectionLink.appendChild(icon);
+
+        // Section name
+        const sectionText = document.createElement('span');
+        sectionText.classList.add('nav-text');
+        sectionText.textContent = section.sectionName;
+        sectionLink.appendChild(sectionText);
+
+        // Arrows
+        const upArrow = document.createElement('img');
+        upArrow.src = 'resources/img/uarrow.png';
+        upArrow.alt = 'Arrow Up';
+        upArrow.classList.add('arrow-up');
+        upArrow.style.display = 'none';
+
+        const downArrow = document.createElement('img');
+        downArrow.src = 'resources/img/darrow.png';
+        downArrow.alt = 'Arrow Down';
+        downArrow.classList.add('arrow-down');
+        downArrow.style.display = 'inline-block';
+
+        sectionLink.appendChild(upArrow);
+        sectionLink.appendChild(downArrow);
+
+        menuItem.appendChild(sectionLink);
+
+        // Submenu (Fix for subsections)
+        const subMenu = document.createElement('ul');
+        subMenu.classList.add('sub-menu');
+        subMenu.id = 'sub-menu-' + section.sectionId;
+        subMenu.style.display = 'none';
+
+        if (section.pages && section.pages.length > 0) {
+            section.pages.forEach(page => {
+               /*  if (page.role === selectedRole || selectedRole === 'SystemAdmin') { */
+                    const pageItem = document.createElement('li');
+                    const pageLink = document.createElement('a');
+                    pageLink.href = page.url || '#';
+                    pageLink.textContent = page.pageName;
+                    pageLink.classList.add('nav-link');
+                    pageLink.onclick = function () {
+                        loadCommonList(page.pageUrl, page.pageName);
+                    };
+
+                    pageItem.appendChild(pageLink);
+                    subMenu.appendChild(pageItem);
+               /*  } */
+            });
+
+            if (subMenu.childNodes.length > 0) {
+                menuItem.appendChild(subMenu);
+            } else {
+                console.warn(`No accessible pages for section: ${section.sectionName}`);
+            }
+        } else {
+            console.warn(`Skipping section ${section.sectionName} due to missing pages.`);
+        }
+
+        submenu.appendChild(menuItem);
+    });
+}
+// ✅ Ensure `updateSidebar` is available before `changeRole`
+window.onload = function() {
+    let savedRoleId = localStorage.getItem("selectedRoleId");
+    let savedRoleName = localStorage.getItem("selectedRoleName");
+
+    let roleDropdown = document.getElementById("roleSelect");
+
+    if (roleDropdown) {
+        for (let i = 0; i < roleDropdown.options.length; i++) {
+            if (roleDropdown.options[i].value === savedRoleId) {
+                roleDropdown.options[i].selected = true;
+                break;
+            }
+        }
+    }
+
+    if (savedRoleId && savedRoleName) {
+        console.log("Restoring previous role:", savedRoleName);
+        changeRole(savedRoleId, savedRoleName);
+    } else {
+        console.warn("No role selected. Sidebar will remain empty.");
+        document.getElementById('dynamic-menu').innerHTML = ""; // Clear sidebar
+    }
+};
+
 function changeRole(selectedRoleId, selectedRoleName) {
     alert(selectedRoleName);  // To check the selected role name
     if (selectedRoleId) {
-    	 if (selectedRoleName === 'Admin') {
+    	 localStorage.setItem("selectedRoleId", selectedRoleId);
+         localStorage.setItem("selectedRoleName", selectedRoleName);
+    	 if (selectedRoleName === 'System Admin') {
     	        // Show the "Admin" menu or take other actions
     	        showAdminMenu();
     	    } else {
-    	        // Hide the "Admin" menu or show a different menu
+    	        // Hide the "SystemAdmin" menu or show a different menu
     	        showOtherMenus();
     	    }
         fetch('/CWFM/updateRole', {
@@ -1035,6 +1162,7 @@ function changeRole(selectedRoleId, selectedRoleName) {
         });
     }
 }
+
 function showAdminMenu() {
     // Code to show admin menu
     console.log('Displaying Admin menu...');
@@ -1233,52 +1361,426 @@ function fetchSectionData() {
 	    xhr.send();
 }
 </script>
+<script>
+function initializeOrgMapping() {
+    console.log("🔥 Initializing Org Mapping...");
+
+    let tabsContainer = document.getElementById("tabs");
+    if (!tabsContainer) {
+        console.error("❌ Tabs container not found!");
+        return;
+    }
+
+    let tabLinks = document.querySelectorAll("#tabs ul li a");
+    let tabContents = document.querySelectorAll(".tab-content");
+
+    // Show only the first tab content by default
+    tabContents.forEach(content => content.style.display = "none");
+    if (tabContents.length > 0) {
+        tabContents[0].style.display = "block";
+    }
+
+    // Attach click event to each tab
+    tabLinks.forEach(tab => {
+        tab.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            // Hide all tab contents
+            tabContents.forEach(content => content.style.display = "none");
+
+            // Show only the clicked tab's content
+            let selectedTabId = this.getAttribute("href").substring(1);
+            let selectedTab = document.getElementById(selectedTabId);
+            if (selectedTab) {
+                selectedTab.style.display = "block";
+            }
+        });
+    });
+
+    // Move options between multi-select boxes
+   /*  function moveOptions(sourceId, targetId) {
+        let sourceSelect = document.getElementById(sourceId);
+        let targetSelect = document.getElementById(targetId);
+
+        if (sourceSelect && targetSelect) {
+            let selectedOptions = Array.from(sourceSelect.selectedOptions);
+            selectedOptions.forEach(option => {
+                targetSelect.appendChild(option);
+            });
+        }
+    } */
+    function moveOptions(sourceId, targetId) {
+        let sourceSelect = document.getElementById(sourceId);
+        let targetSelect = document.getElementById(targetId);
+
+        if (sourceSelect && targetSelect) {
+            let selectedOptions = Array.from(sourceSelect.selectedOptions);
+            selectedOptions.forEach(option => {
+                targetSelect.appendChild(option);
+            });
+        } else {
+            console.error(`❌ Could not find source or target select for IDs: ${sourceId}, ${targetId}`);
+        }
+    }
+    
+/* 
+    window.moveRight = function(orgLevelDefId) {
+        console.log(`Moving right for orgLevelDefId: ${orgLevelDefId}`);
+
+        let availableSelect = document.getElementById('available-' + orgLevelDefId);
+        let selectedSelect = document.getElementById('selected-' + orgLevelDefId);
+
+        // Check if availableSelect and selectedSelect exist
+        if (!availableSelect || !selectedSelect) {
+            console.error(`❌ Select elements not found for orgLevelDefId: ${orgLevelDefId}`);
+            return;
+        }
+
+        // Log available options
+        console.log('Available options:');
+        Array.from(availableSelect.options).forEach(option => {
+            console.log(`Option value: "${option.value}", Option text: "${option.text}"`);
+        });
+
+        // Get selected options in available select
+        let selectedOptions = Array.from(availableSelect.selectedOptions);
+        console.log('Selected options:', selectedOptions);
+
+        if (selectedOptions.length === 0) {
+            console.log(`❌ No options selected for orgLevelDefId: ${orgLevelDefId}`);
+            return;
+        }
+
+        // Move each selected option to the selected select dropdown
+        selectedOptions.forEach(option => {
+            // Check if option value and text are valid
+            if (option.value && option.text) {
+                console.log(`Attempting to move option: ${option.text} (${option.value})`);
+
+                // Move the option to the selected select dropdown
+                selectedSelect.appendChild(option);
+
+                console.log(`Moved option: ${option.text} (${option.value}) to selected list.`);
+            } else {
+                console.warn(`❌ Invalid option: ${option.value}, ${option.text}`);
+            }
+        });
+    };
+
+
+
+    window.moveLeft = function (orgLevelDefId) {
+        console.log(`Moving left for orgLevelDefId: ${orgLevelDefId}`);
+
+        // Ensure orgLevelDefId is present
+        if (!orgLevelDefId) {
+            console.error("❌ orgLevelDefId is empty or undefined!");
+            return;
+        }
+
+        // Get the available and selected select elements by their IDs
+        let availableSelect = document.getElementById('available-' + orgLevelDefId);
+        let selectedSelect = document.getElementById('selected-' + orgLevelDefId);
+
+        console.log(`Available select for ${orgLevelDefId}:`, availableSelect);
+        console.log(`Selected select for ${orgLevelDefId}:`, selectedSelect);
+
+        // If elements are found, move the selected options
+        if (selectedSelect && availableSelect) {
+            // Get selected options in selected select
+            let selectedOptions = Array.from(selectedSelect.selectedOptions);
+            
+            if (selectedOptions.length === 0) {
+                console.log(`No options selected for orgLevelDefId: ${orgLevelDefId}`);
+            }
+
+            // Move selected options to available select
+            selectedOptions.forEach(option => {
+                console.log(`Attempting to move option: ${option.text} (${option.value})`);
+
+                // Check if the option has a value and text
+                if (option.value && option.text) {
+                    // Add option to the available select dropdown
+                    availableSelect.appendChild(option);
+                    console.log(`Moved option: ${option.text} (${option.value}) to available list.`);
+                } else {
+                    console.warn(`❌ Invalid option: ${option.value}, ${option.text}`);
+                }
+            });
+        } else {
+            console.error("❌ Couldn't find select elements.");
+        }
+    };
+ */
+
+}
+function moveRight(orgLevelDefId) {
+    const availableSelect = document.getElementById('available-' + orgLevelDefId);
+    const selectedSelect = document.getElementById('selected-' + orgLevelDefId);
+
+    if (!availableSelect || !selectedSelect) {
+        console.error(`Element not found: available-${orgLevelDefId} or selected-${orgLevelDefId}`);
+        return;
+    }
+
+    const selectedOptions = Array.from(availableSelect.selectedOptions);
+
+    if (selectedOptions.length === 0) {
+        alert('Please select at least one entry.');
+        return;
+    }
+
+    selectedOptions.forEach(option => {
+        if (!option.value.trim()) {
+            console.warn("Skipping invalid option with empty ID:", option);
+            return;
+        }
+
+        console.log(`Moving option -> ID: ${option.value}, Name: ${option.text}`);
+
+        // Prevent duplicates
+        if (!Array.from(selectedSelect.options).some(opt => opt.value === option.value)) {
+            selectedSelect.appendChild(option);
+        }
+    });
+
+    // Log after moving
+    console.log("After moveRight, selected options:", 
+        Array.from(selectedSelect.options).map(opt => ({ id: opt.value, name: opt.text })));
+}
+
+
+
+// Move selected option(s) from selected to available list
+// Move selected option(s) from selected to available list
+function moveLeft(orgLevelDefId) {
+    const availableSelect = document.getElementById('available-' + orgLevelDefId);
+    const selectedSelect = document.getElementById('selected-' + orgLevelDefId);
+
+    if (!availableSelect || !selectedSelect) {
+        console.error(`Element not found: available-${orgLevelDefId} or selected-${orgLevelDefId}`);
+        return;
+    }
+
+    // Get the selected options from the selected select box
+    const selectedOptions = Array.from(selectedSelect.selectedOptions);
+
+    if (selectedOptions.length === 0) {
+        alert('Please select an entry to move back.');
+        return;
+    }
+
+    selectedOptions.forEach(option => {
+        if (!option.value.trim()) {
+            console.warn("Skipping invalid option with empty ID:", option);
+            return;
+        }
+
+        console.log(`Moving option back -> ID: ${option.value}, Name: ${option.text}`);
+
+        // Prevent duplicates in the available select box
+        if (!Array.from(availableSelect.options).some(opt => opt.value === option.value)) {
+            availableSelect.appendChild(option);
+        }
+    });
+
+    // Log after moving
+    console.log("After moveLeft, available options:", 
+        Array.from(availableSelect.options).map(opt => ({ id: opt.value, name: opt.text })));
+}
+
+
+//Function to handle the save button click and send the selected data to the server
+function saveOrgLevelMapping() {
+    let data = [];
+
+    const shortName = document.getElementById('name').value;
+    const longDescription = document.getElementById('description').value;
+
+    document.querySelectorAll('.tab-content').forEach(function(tabContent) {
+        const orgLevelDefId = tabContent.id.split('-')[1];
+
+        const selectedElement = document.getElementById('selected-' + orgLevelDefId);
+        if (!selectedElement) {
+            console.warn(`No 'selected' list found for orgLevelDefId: ${orgLevelDefId}`);
+            return; // Skip this iteration if no selected list exists
+        }
+
+        const selectedOptions = Array.from(selectedElement.options)
+            .map(option => option.value)
+            .filter(value => value !== "0"); // Ignore invalid values
+
+        console.log(`Selected values for orgLevelDefId ${orgLevelDefId}:`, selectedOptions);
+
+        if (selectedOptions.length > 0) {
+            data.push({
+                shortName,
+                longDescription,
+                selectedEntryIds: selectedOptions
+            });
+        }
+    });
+
+    if (data.length === 0) {
+        alert("Please select at least one entry before submitting.");
+        return;
+    }
+
+    console.log("Final data being sent:", JSON.stringify(data));  // Debugging log
+
+    $.ajax({
+        url: '/CWFM/org-level-mapping/saveOrgLevelEntries',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            alert("Data saved successfully!");
+            loadCommonList('/org-level-mapping/list', 'Users');
+        },
+        error: function(error) {
+            console.error("❌ Error saving data", error);
+            alert("Failed to save data.");
+        }
+    });
+}
+
+
+
+
+// Validate if the name matches the user account (e.g., check with a session variable or user profile)
+function validateName(name) {
+    const userAccountName = "userAccountName"; // This should be dynamically fetched (e.g., session or API call)
+    return name === userAccountName;
+}
+
+// Check for duplicate name before saving (use AJAX to query the database)
+function isDuplicateName(name) {
+    let isDuplicate = false;
+    $.ajax({
+        url: '/CWFM/org-level-mapping/checkDuplicateName',
+        method: 'GET',
+        data: { name: name },
+        async: false,  // Wait for the response before proceeding
+        success: function(response) {
+            if (response.isDuplicate) {
+                isDuplicate = true;
+            }
+        }
+    });
+    return isDuplicate;
+}
+function redirectToOrgMapEdit() {
+    var selectedCheckbox = document.querySelector('input[name="selectedmapId"]:checked');
+
+    if (!selectedCheckbox) {
+        alert("Please select a record to edit.");
+        return;
+    }
+
+    var selectedId = selectedCheckbox.value;
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            document.getElementById("mainContent").innerHTML = xhr.responseText;
+            initializeOrgMapping(selectedId); // Initialize with selected ID
+        }
+    };
+    xhr.open("GET", "/CWFM/org-level-mapping/edit?id=" + selectedId, true);
+    xhr.send();
+}
+
+    </script>
     <style>
-    .tab-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Adjust spacing between tabs */
+    
+  /* Tabs */
+#tabs {
+    width: 100%;
+    margin-top: 10px;
 }
 
-/* Tab content */
-.tab {
-    border: 1px solid #ccc;
-    padding: 10px;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Add some space between elements in the tab */
-}
-      .multi-select-container {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* Allow wrap when there's not enough space */
-        }
-
-       .multi-select-container .custom-select {
-    width: 265px;
-    height: 200px; /* Increased height */
-}
-
-        .button-row {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            margin-top: 5px; /* Adjusted spacing between buttons */
-        }
-
-        .buttons {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-        }
-
-        .buttons button {
-    min-width: 100px;
+#tabs ul {
+    list-style: none;
+    padding: 0;
     margin: 0;
+    display: flex;
+    border-bottom: 2px solid #ddd;
 }
+
+#tabs ul li {
+    margin-right: 10px;
+}
+
+#tabs ul li a {
+    display: block;
+    padding: 10px 15px;
+    background: #f5f5f5;
+    text-decoration: none;
+    border-radius: 5px 5px 0 0;
+    border: 1px solid #ddd;
+}
+
+#tabs ul li a:hover {
+    background: #ddd;
+}
+
+/* Hide all tab contents except active one */
+.tab-content {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+/* Ensure selected tab content is visible */
+#tabs .ui-tabs-panel {
+    display: block;
+}
+
+.multi-select-container {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    gap: 20px; /* Adds space between elements */
+}
+
+.multi-select-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.multi-select-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.multi-select-box {
+    width: 250px;  /* Wider box */
+    height: 300px; /* Taller box */
+    border: 1px solid #ccc;
+    padding: 5px;
+    overflow-y: auto; /* Scrollbar if too many options */
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.select-box {
+    width: 200px;
+    height: 350px;
+}
+
+
+
+.button-group button {
+    margin: 5px 0;
+    padding: 5px 10px;
+}
+
+
      /* General Styles */
    body {
     margin: 0;
@@ -1800,7 +2302,7 @@ table th {
 }
 
 #dynamic-menu li {
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 #dynamic-menu a {
@@ -1827,12 +2329,12 @@ table th {
 
 .sub-menu {
     list-style: none;
-    padding-left: 20px;
-    margin-top: 5px;
+    padding-left: 10px;
+    margin-top: 2px;
 }
 
 .sub-menu li {
-    padding: 5px 0;
+    padding: 2px 0;
 }
 
     </style>
@@ -1849,8 +2351,38 @@ table th {
     
         <!-- <img src="resources/img/Adani_2012_logo.png" alt="Company Logo" class="logo"> -->
         <div class="heading">Contract Labor Management System</div>
+<c:choose>
+    <c:when test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
+        <label for="roleSelect" class="role-label">Role:</label>
+        <div class="role-dropdown">
+            <select id="roleSelect" name="roleId" onchange="changeRole(this.value, this.options[this.selectedIndex].text)" class="role-select">
+                <option value="" disabled selected>Select Role</option>
+                <c:forEach var="role" items="${sessionScope.roles}">
+                    <option value="${role.gmId}" 
+                        <c:if test="${role.gmId == sessionScope.selectedRole}">selected</c:if>>
+                        <c:out value="${role.gmName}" />
+                    </option>
+                </c:forEach>
+            </select>
+        </div>
+    </c:when>
 
-  <c:if test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
+ <c:when test="${not empty sessionScope.roles and sessionScope.roles.size() == 1}">
+        <c:set var="selectedRole" value="${sessionScope.roles[0].gmId}" scope="session"/>
+        <c:set var="selectedRoleName" value="${sessionScope.roles[0].gmName}" scope="session"/>
+        <div class="role-label">
+            <label for="roleSelect" class="role-label">Role:</label>
+             <c:out value="${selectedRoleName}" />
+        </div>
+        <script>
+            window.onload = function() {
+                changeRole('${selectedRole}', '${selectedRoleName}');
+            };
+        </script>
+    </c:when>
+</c:choose>
+
+  <%-- <c:if test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
     <label for="roleSelect" class="role-label">Role:</label>
     <div class="role-dropdown">
         <select id="roleSelect" name="roleId" onchange="changeRole(this.value, this.options[this.selectedIndex].text)" class="role-select">
@@ -1863,7 +2395,7 @@ table th {
             </c:forEach>
         </select>
     </div>
-</c:if>
+</c:if> --%>
 
     <div class="dropdown">
         <span class="initials-icon">
@@ -2159,7 +2691,7 @@ table th {
         }
     }
 
-    function updateSidebar(sections, selectedRole) {
+   /*  function updateSidebar(sections, selectedRole) {
         const submenu = document.getElementById('dynamic-menu');
 
         // Clear existing submenu items
@@ -2229,7 +2761,6 @@ table th {
             if (section.pages && section.pages.length > 0) {
                 section.pages.forEach(page => {
                     console.log('Page Role:', page.role, 'Selected Role:', selectedRole);
-             /*        if (page.role === selectedRole || selectedRole === 'Admin') { */
                         const pageItem = document.createElement('li');
                         const pageLink = document.createElement('a');
                         pageLink.href = page.url || '#';
@@ -2241,7 +2772,6 @@ table th {
 
                         pageItem.appendChild(pageLink);
                         subMenu.appendChild(pageItem);
-                   /*  } */
                 });
             } else {
                 console.warn(`No pages found for section: ${section.sectionName}`);
@@ -2250,7 +2780,7 @@ table th {
             menuItem.appendChild(subMenu);
             submenu.appendChild(menuItem);
         });
-    }
+    } */
 
 
 

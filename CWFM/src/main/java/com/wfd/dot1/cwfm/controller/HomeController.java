@@ -69,7 +69,7 @@ public class HomeController {
 		                List<CmsGeneralMaster> pages;
 		                
 		                // If the role is Admin, fetch all pages
-		                if ("Admin".equals(role.getGmName())) {  // Use the role name
+		                if ("System Admin".equals(role.getGmName())) {  // Use the role name
 		                    pages = commonService.getAllPages();  // Fetch all pages for Admin
 		                    
 		                } else {
@@ -81,6 +81,7 @@ public class HomeController {
 		                session.setAttribute("selectedRole", role.getGmName());
 		                System.out.println("Selected role in session: " + session.getAttribute("selectedRole"));
 		                System.out.println("Role name: " + role.getGmName());
+		                session.setAttribute("roles", roles);
 		                return "WelcomePage"; // Redirect to welcome page
 		            } else {
 		                // Multiple roles: Redirect to role selection page
@@ -114,11 +115,14 @@ public class HomeController {
 	        System.out.println("Fetched roleName: " + roleName);
 
 	        List<SectionDto> sections;
+
 	        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 	        user.setRoleId(roleId);
 	        user.setRoleName(roleName);
 	        session.setAttribute("loginuser", user);
-	        if ("Admin".equals(roleName)) {  
+
+	        if ("System Admin".equals(roleName)) {  
+
 	            System.out.println("Admin role detected. Fetching all sections and pages.");
 	            sections = commonService.getAllSectionsWithPages(); // Fetch all sections and pages for Admin
 	            session.setAttribute("sections", sections);
@@ -187,7 +191,7 @@ public class HomeController {
 //
 //	        // Filter pages based on role rights (if the role is not Admin)
 //	        List<SectionDto> filteredSections;
-//	        if ("Admin".equalsIgnoreCase(roleName)) {
+//	        if ("SystemAdmin".equalsIgnoreCase(roleName)) {
 //	            // Admin sees all sections and pages
 //	            filteredSections = allSections;
 //	        } else {
@@ -318,7 +322,7 @@ public class HomeController {
 //	        System.out.println("Fetched roleName: " + roleName);
 //
 //	        List<CmsGeneralMaster> pages;
-//	        if ("Admin".equals(roleName)) {
+//	        if ("SystemAdmin".equals(roleName)) {
 //	            pages = commonService.getAllPages();
 //	        } else {
 //	            try {
@@ -363,7 +367,7 @@ public class HomeController {
 //
 //	        // Fetch sections based on role
 ////	        List<CmsGeneralMaster> pages;
-////	        if ("Admin".equals(roleName)) {
+////	        if ("SystemAdmin".equals(roleName)) {
 ////	            pages = commonService.getAllPages();
 ////	        } else {
 ////	            try {

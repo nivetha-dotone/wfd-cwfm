@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 public class OrgLevelMapping {
     private int orgLevelEntryId;
@@ -8,7 +9,17 @@ public class OrgLevelMapping {
     private Date updatedTm;
     private String shortName; // Short name for display
     private String longDescription; // Long description for display
+    private List<String> selectedEntryIds;  // List of selected ORGLEVELENTRYID values
 
+    // Getters and Setters
+
+    public List<String> getSelectedEntryIds() {
+        return selectedEntryIds;
+    }
+
+    public void setSelectedEntryIds(List<String> selectedEntryIds) {
+        this.selectedEntryIds = selectedEntryIds;
+    }
     // Default constructor
     public OrgLevelMapping() {}
 
@@ -60,5 +71,13 @@ public class OrgLevelMapping {
 
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
+    }
+    
+    @Override
+    public String toString() {
+        return "OrgLevelMapping{" +
+               "shortName='" + shortName + '\'' +
+               ", longDescription='" + longDescription + '\'' +
+               '}';
     }
 }

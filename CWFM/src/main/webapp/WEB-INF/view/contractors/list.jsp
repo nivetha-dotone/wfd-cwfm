@@ -182,10 +182,16 @@ alert(1);
   </div>
    <!--  </form> -->
     <div>
-       <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
-        <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
+   <%--  <c:if test="${userRights[0].addRights == 0}"> --%>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
+        <%--  </c:if>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
+       <c:if test="${userRights[0].addRights == 0}"> --%>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContrView()">View</button>
+      <%--  </c:if>
+       <c:if test="${userRights[0].editRights == 0}"> --%>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
+    <%--  </c:if> --%>
     </div>
 </div>
  

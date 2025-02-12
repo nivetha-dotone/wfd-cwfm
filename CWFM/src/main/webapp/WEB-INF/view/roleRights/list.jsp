@@ -1,16 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+ <title>Role Rights List</title>
+  <!--   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMSPRINCIPALEMPLOYER List</title>
+    <title>Role Rights List</title>
     <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
+    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
  <style>
  
  
@@ -163,6 +167,7 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
+   
 </style>
 <script>
 
@@ -202,13 +207,13 @@
                     <td id=roleid>${rights.roleId}</td>
                      <td id=rolename>${rights.role.gmName}</td>
                     <td id=pagename>${rights.page.gmName}</td>
-                    <td>${rights.addRights == 1 ? 'Yes' : 'No'}</td>
-    <td>${rights.editRights == 1 ? 'Yes' : 'No'}</td>
-    <td>${rights.deleteRights == 1 ? 'Yes' : 'No'}</td>
-    <td>${rights.importRights == 1 ? 'Yes' : 'No'}</td>
-    <td>${rights.exportRights == 1 ? 'Yes' : 'No'}</td>
-    <td>${rights.viewRights == 1 ? 'Yes' : 'No'}</td>
-    <td>${rights.listRights == 1 ? 'Yes' : 'No'}</td>
+                    <td>${rights.addRights == 0 ? 'Yes' : 'No'}</td>
+    <td>${rights.editRights == 0 ? 'Yes' : 'No'}</td>
+    <td>${rights.deleteRights == 0 ? 'Yes' : 'No'}</td>
+    <td>${rights.importRights == 0 ? 'Yes' : 'No'}</td>
+    <td>${rights.exportRights == 0 ? 'Yes' : 'No'}</td>
+    <td>${rights.viewRights == 0 ? 'Yes' : 'No'}</td>
+    <td>${rights.listRights == 0 ? 'Yes' : 'No'}</td>
                 </tr>
             </c:forEach>
         </tbody>

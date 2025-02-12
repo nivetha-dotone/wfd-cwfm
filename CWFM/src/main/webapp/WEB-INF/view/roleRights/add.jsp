@@ -218,12 +218,12 @@
                                     </c:forEach>
                                 </select>
                             </td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].addRights" value="1" <c:if test="${roleRight.addRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].editRights" value="1" <c:if test="${roleRight.editRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].deleteRights" value="1" <c:if test="${roleRight.deleteRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].viewRights" value="1" <c:if test="${roleRight.viewRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].importRights" value="1" <c:if test="${roleRight.importRights}">checked</c:if>></td>
-                            <td><input type="checkbox" name="roleRights[${status.index}].exportRights" value="1" <c:if test="${roleRight.exportRights}">checked</c:if>></td>
+                            <td><input type="checkbox" name="roleRights[${status.index}].addRights" value="0" <c:if test="${roleRight.addRights}">checked</c:if>></td>
+                            <td><input type="checkbox" name="roleRights[${status.index}].editRights" value="0" <c:if test="${roleRight.editRights}">checked</c:if>></td>
+                            <td><input type="checkbox" name="roleRights[${status.index}].deleteRights" value="0" <c:if test="${roleRight.deleteRights}">checked</c:if>></td>
+                            <td><input type="checkbox" name="roleRights[${status.index}].viewRights" value="0" <c:if test="${roleRight.viewRights}">checked</c:if>></td>
+                            <td><input type="checkbox" name="roleRights[${status.index}].importRights" value="0" <c:if test="${roleRight.importRights}">checked</c:if>></td>
+                            <td><input type="checkbox" name="roleRights[${status.index}].exportRights" value="0" <c:if test="${roleRight.exportRights}">checked</c:if>></td>
                             <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">-</button></td>
                         </tr>
                     </c:forEach>

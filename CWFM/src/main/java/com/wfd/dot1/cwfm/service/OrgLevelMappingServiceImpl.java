@@ -27,7 +27,7 @@ public class OrgLevelMappingServiceImpl implements OrgLevelMappingService {
     }
 
     @Override
-    public OrgLevelMapping getMappingById(int id) {
+    public OrgLevelMapping getMappingById(Long id) {
         return orgLevelMappingDao.findById(id);
     }
 
@@ -50,6 +50,43 @@ public class OrgLevelMappingServiceImpl implements OrgLevelMappingService {
 	public void saveOrgLevelEntries(List<Map<String, Object>> orgLevelMappings) {
 		orgLevelMappingDao.saveOrgLevelEntries(orgLevelMappings);
 		
+	}
+
+	@Override
+	public int getNextOrgAcctSetId() {
+		// TODO Auto-generated method stub
+		return orgLevelMappingDao.getNextOrgAcctSetId();
+	}
+
+	@Override
+	public int saveOrgAcctSet(OrgLevelMapping orgAcctSet) {
+		return orgLevelMappingDao.saveOrgAcctSet(orgAcctSet);
+		
+	}
+
+	@Override
+	public void saveOrgLevelMapping(OrgLevelMapping orgLevelMapping) {
+		orgLevelMappingDao.saveOrgLevelMapping(orgLevelMapping)	;
+	}
+
+	@Override
+	public List<OrgLevelMapping> findAvailableMappings(Long id) {
+		return orgLevelMappingDao.findAvailableMappings(id);
+	}
+
+	@Override
+	public List<OrgLevelMapping> findSelectedMappings(Long id) {
+		return orgLevelMappingDao.findSelectedMappings(id);
+	}
+
+	@Override
+	public OrgLevelMapping findBasicInfo(Long id) {
+		return orgLevelMappingDao.findBasicInfo(id);
+	}
+
+	@Override
+	public List<OrgLevelMapping> findAllMaps() {
+		return orgLevelMappingDao.findAllMaps();
 	}
     
     

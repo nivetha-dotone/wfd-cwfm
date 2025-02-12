@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
 import com.wfd.dot1.cwfm.pojo.OrgLevel;
+import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
 
 @Repository
 public class OrgLevelDaoImpl implements OrgLevelDao {
@@ -262,6 +263,14 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		            entry.setDescription(rs.getString("DESCRIPTION"));
 		            return entry;
 		        });
+		    }
+		    public OrgLevelMapping findBasicInfo(Long id) {
+		        String sql = "SELECT TOP 1 os.SHORTNM, os.LONGDSC " +
+		                     "FROM OLACCTSETMM om " +
+		                     "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
+		                     "WHERE om.ORGACCTSETID = ?";
+		        
+		        return jdbcTemplate.queryForObject(sql, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
 		    }
 
 }

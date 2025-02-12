@@ -6,75 +6,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Org Level Set Mapping</title>
+    <title>Org Level Mapping</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    
-   <script></script>
    
 </head>
 <body>
-    <h1>Org Level Set Mapping</h1>
-<!-- <h1>Create/Edit - Org Level Set Mapping</h1> -->
+    <h1>Org Level Mapping</h1>
     
-    <!-- Form to enter Name and Description -->
-      <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgLevelMappings()">Save</button>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        
-        <label for="description">Description:</label>
-        <input type="text" id="description" name="description" required>
-        
-      <!--   <input type="submit" value="Save"> -->
+     <!-- Form to enter Name and Description -->
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description" required>
+
+    <button type="button" onclick="saveOrgLevelMapping()">Save</button>
+
+<div id="orgMappingContainer">
     <div id="tabs">
-        <!-- Tabs Header -->
         <ul>
             <c:forEach var="orgLevel" items="${orgLevels}">
                 <li><a href="#tab-${orgLevel.orgLevelDefId}">${orgLevel.name}</a></li>
             </c:forEach>
         </ul>
 
-        <!-- Tabs Content -->
-       <c:forEach var="orgLevel" items="${orgLevels}">
-    <div class="tab" id="tab-${orgLevel.orgLevelDefId}">
-        <h4>${orgLevel.name} - ${orgLevel.shortName}</h4>
-        
-        <!-- Available Entries -->
-        <div class="multi-select-container">
-            <label>Available Entries</label>
-            <select id="available-${orgLevel.orgLevelDefId}" class="custom-select" multiple>
-                <c:forEach var="entry" items="${orgLevel.availableEntries}">
-                    <option value="${entry.orgLevelDefId}">${entry.name}</option>
-                </c:forEach>
-            </select>
-            
-            <div class="button-row">
-                <button type="button" onclick="moveRight(${orgLevel.orgLevelDefId})"> > </button>
-                <button type="button" onclick="moveRight(${orgLevel.orgLevelDefId})"> >> </button>
-                <button type="button" onclick="moveLeft(${orgLevel.orgLevelDefId})"> < </button>
-                <button type="button" onclick="moveLeft(${orgLevel.orgLevelDefId})"> << </button>
+        <c:forEach var="orgLevel" items="${orgLevels}">
+            <div id="tab-${orgLevel.orgLevelDefId}" class="tab-content" style="display: none;">
+                <h3>${orgLevel.name}</h3>
+
+                <div class="multi-select-container">
+                    <div class="multi-select-group">
+                        <label for="available-${orgLevel.orgLevelDefId}" class="multi-select-label">Available Entries</label>
+                        <select id="available-${orgLevel.orgLevelDefId}" class="multi-select-box" style="height:200px;width:250px;" multiple>
+                            <c:forEach var="entry" items="${orgLevel.availableEntries}">
+                                <option value="${entry.orgLevelEntryId}">${entry.orgLevelEntryId}-${entry.name}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" onclick="moveRight('${orgLevel.orgLevelDefId}')">&gt;</button>
+                        <button type="button" onclick="moveLeft('${orgLevel.orgLevelDefId}')">&lt;</button>
+                        
+                    </div>
+
+                    <div class="multi-select-group">
+                        <label for="selected-${orgLevel.orgLevelDefId}" class="multi-select-label">Selected Entries</label>
+                        <select id="selected-${orgLevel.orgLevelDefId}" class="multi-select-box" style="height:200px;width:250px;" multiple>
+                            <!-- Dynamically populated when moving items -->
+                        </select>
+                    </div>
+                   
+                </div>
             </div>
+        </c:forEach>
         
-        
-        <!-- Selected Entries -->
-        <div class="multi-select-container">
-            <label>Selected Entries</label>
-            <select id="selected-${orgLevel.orgLevelDefId}" class="custom-select" multiple>
-                <c:forEach var="entry" items="${orgLevel.selectedEntries}">
-                    <option value="${entry.orgLevelDefId}">${entry.name}</option>
-                </c:forEach>
-            </select>
-        </div>
-        </div>
     </div>
-</c:forEach>
+</div>
 
-    </div>
 
-    <!-- Submit Button -->
-   <%--  <form action="/CWFM/saveOrgLevelEntries" method="post">
-        <button type="submit">Save</button>
-    </form> --%>
+
+
+           
 </body>
 </html>

@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Admin</title>
+<title>SystemAdmin</title>
 <%@include file="resources/component/allcss.jsp" %>
 <link href="component/style.css" rel="stylesheet" type="text/css">
 </head>

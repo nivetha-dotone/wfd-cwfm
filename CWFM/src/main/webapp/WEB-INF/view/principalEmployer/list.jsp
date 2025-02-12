@@ -150,7 +150,7 @@
 </style>
 <script>
 function redirectToPEAdd() {
-alert(1);
+//alert(1);
     // Fetch the content of add.jsp using AJAX
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {

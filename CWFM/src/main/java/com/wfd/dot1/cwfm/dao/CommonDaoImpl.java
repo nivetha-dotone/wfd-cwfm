@@ -518,7 +518,7 @@ public class CommonDaoImpl implements CommonDao {
 		 @Override
 		    public void saveGeneralMaster(GeneralMasterDTO generalMasterDTO) {
 		        String sql = "INSERT INTO CMSGENERALMASTER (gmTypeId, gmName, GMDESCRIPTION,ISACTIVE,UPDATEDBY) VALUES (?, ?, ?,1,?)";
-		        jdbcTemplate.update(sql, generalMasterDTO.getGmTypeId(), generalMasterDTO.getGmName(), generalMasterDTO.getGmDescription(),"Admin");
+		        jdbcTemplate.update(sql, generalMasterDTO.getGmTypeId(), generalMasterDTO.getGmName(), generalMasterDTO.getGmDescription(),"System Admin");
 		    }
 		 @Override
 		    public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
@@ -773,6 +773,7 @@ public class CommonDaoImpl implements CommonDao {
 		    System.out.println("common for count: " + count);
 		    return count > 0;
 		}
+
 		@Override
 		public List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount) {
 			List<PersonOrgLevel> personOrgList= new ArrayList<PersonOrgLevel>();
@@ -786,5 +787,48 @@ public class CommonDaoImpl implements CommonDao {
 				personOrgList.add(pol);
 			}
 			return personOrgList;
+		}
+		
+		
+		public List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId) {
+		    String sql = "SELECT rr.ROLE_RIGHT_ID, rr.ROLE_ID, rr.PAGE_ID, rr.ADD_RIGHTS, rr.EDIT_RIGHTS, rr.DELETE_RIGHTS, rr.IMPORT_RIGHTS, rr.EXPORT_RIGHTS, rr.VIEW_RIGHTS, rr.LIST_RIGHTS, rr.ENABLED_FLAG, rr.DELETED_FLAG, rr.CREATED_BY, rr.CREATION_DATE, rr.LAST_UPDATED_BY, rr.LAST_UPDATED_DATE, " +
+		                 "r.GMTYPEID as roleTypeId, p.GMTYPEID as pageTypeId, r.GMNAME as roleName, p.GMNAME as pageName " +
+		                 "FROM CMSRoleRights rr " +
+		                 "JOIN CMSGeneralMaster r ON rr.ROLE_ID = r.GMID " +
+		                 "JOIN CMSGeneralMaster p ON rr.PAGE_ID = p.GMID " +
+		                 "JOIN CMSGMTYPE rType ON r.GMTYPEID = rType.GMTYPEID " +
+		                 "JOIN CMSGMTYPE pType ON p.GMTYPEID = pType.GMTYPEID " +
+		                 "WHERE rType.GMTYPE = 'ROLE' AND pType.GMTYPE = 'PAGE' " +
+		                 "AND rr.ROLE_ID = ? AND rr.PAGE_ID = ?";
+
+		    return jdbcTemplate.query(sql, new Object[]{roleId, pageId}, (rs, rowNum) -> {
+		        CMSRoleRights rights = new CMSRoleRights();
+		        rights.setRoleRightId(rs.getLong("ROLE_RIGHT_ID"));
+		        rights.setRoleId(rs.getLong("ROLE_ID"));
+		        rights.setPageId(rs.getLong("PAGE_ID"));
+
+		        CmsGeneralMaster role = new CmsGeneralMaster();
+		        role.setGmId(String.valueOf(rs.getLong("ROLE_ID")));
+		        role.setGmName(rs.getString("roleName"));
+		        rights.setRole(role);
+
+		        CmsGeneralMaster page = new CmsGeneralMaster();
+		        page.setGmId(String.valueOf(rs.getLong("PAGE_ID")));
+		        page.setGmName(rs.getString("pageName"));
+		        rights.setPage(page);
+
+		        rights.setAddRights(rs.getInt("ADD_RIGHTS"));
+		        rights.setEditRights(rs.getInt("EDIT_RIGHTS"));
+		        rights.setDeleteRights(rs.getInt("DELETE_RIGHTS"));
+		        rights.setImportRights(rs.getInt("IMPORT_RIGHTS"));
+		        rights.setExportRights(rs.getInt("EXPORT_RIGHTS"));
+		        rights.setViewRights(rs.getInt("VIEW_RIGHTS"));
+		        rights.setListRights(rs.getInt("LIST_RIGHTS"));
+		        rights.setEnabledFlag(rs.getInt("ENABLED_FLAG"));
+		        rights.setDeletedFlag(rs.getInt("DELETED_FLAG"));
+
+		        return rights;
+		    });
+
 		}
 }

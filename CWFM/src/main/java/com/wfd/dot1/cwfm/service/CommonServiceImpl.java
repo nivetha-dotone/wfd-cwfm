@@ -260,5 +260,10 @@ public class CommonServiceImpl implements CommonService {
 		// TODO Auto-generated method stub
 		return commonDAO.getPersonOrgLevelDetails(userAccount);
 	}
+	@Override
+	public List<CMSRoleRights> getRoleRightsByRoleIdAndPageId(Long selectedRoleId, Long pageId) {
+		return commonDAO.getRoleRightsByRoleAndPage(selectedRoleId,pageId);
+
+	}
     
 }

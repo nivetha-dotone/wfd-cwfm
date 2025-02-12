@@ -22,23 +22,33 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    
     @Override
     public List<OrgLevelMapping> findAll() {
-        String sql = "SELECT om.*, os.SHORTNM, os.LONGDSC " +
+        String sql = "SELECT om.*, os.SHORTNM as shortName, os.LONGDSC as longDescription " +
                      "FROM OLACCTSETMM om " +
                      "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+        List<OrgLevelMapping> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+        System.out.println("Fetched OrgLevelMappings: " + result);  // Log the fetched data
+        return result;
     }
 
     @Override
-    public OrgLevelMapping findById(int id) {
+    public OrgLevelMapping findById(Long id) {
         String sql = "SELECT om.*, os.SHORTNM, os.LONGDSC " +
                      "FROM OLACCTSETMM om " +
                      "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
-                     "WHERE om.ORGLEVELENTRYID = ?";
+                     "WHERE om.ORGACCTSETID = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
     }
+    public List<OrgLevelMapping> findOrgById(Long id) {
+        String sql = "SELECT om.*, os.SHORTNM, os.LONGDSC " +
+                     "FROM OLACCTSETMM om " +
+                     "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
+                     "WHERE om.ORGACCTSETID = ?";
 
+        return jdbcTemplate.query(sql, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+    }
     @Override
     public void save(OrgLevelMapping mapping) {
         String sql = "INSERT INTO OLACCTSETMM (ORGLEVELENTRYID, ORGACCTSETID) VALUES (?, ?)";
@@ -90,22 +100,21 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
 
             for (Map<String, Object> mapping : orgLevelMappings) {
                 // Extract orgLevelDefId with null and type check
-                Object orgLevelDefIdObj = mapping.get("orgLevelDefId");
-                if (!(orgLevelDefIdObj instanceof String)) {
-                    throw new IllegalArgumentException("orgLevelDefId must be a string");
-                }
-                String orgLevelDefId = (String) orgLevelDefIdObj;
+                String orgLevelDefIdObj = (String) mapping.get("orgLevelDefId");
+				/*
+				 * if (!(orgLevelDefIdObj instanceof String)) { throw new
+				 * IllegalArgumentException("orgLevelDefId must be a string"); } String
+				 * orgLevelDefId = (String) orgLevelDefIdObj;
+				 * 
+				 * // Extract 'selected' entries Object selectedEntriesObj =
+				 * mapping.get("selected"); if (!(selectedEntriesObj instanceof List)) { throw
+				 * new IllegalArgumentException("'selected' must be a list of maps"); }
+				 */
 
-                // Extract 'selected' entries
-                Object selectedEntriesObj = mapping.get("selected");
-                if (!(selectedEntriesObj instanceof List)) {
-                    throw new IllegalArgumentException("'selected' must be a list of maps");
-                }
-
-                List<Map<String, String>> selectedEntries = (List<Map<String, String>>) selectedEntriesObj;
+                List<Map<String, String>> selectedEntries = (List<Map<String, String>>) mapping.get("selected");
 
                 // Step 1: Delete existing records for this orgLevelDefId
-                deleteExistingRecords(orgLevelDefId);
+                deleteExistingRecords(orgLevelDefIdObj);
 
                 // Step 2: Insert new records
                 for (Map<String, String> entry : selectedEntries) {
@@ -120,7 +129,7 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
                     int orgAcctSetId = insertIntoORGACCTSET(shortName, longDescription);
 
                     // Insert into OLACCTSETMM
-                    insertIntoOLACCTSETMM(orgLevelDefId, orgAcctSetId);
+                    insertIntoOLACCTSETMM(orgLevelDefIdObj, orgAcctSetId);
                 }
             }
         }
@@ -150,6 +159,109 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
             String insertQuery = "INSERT INTO OLACCTSETMM (ORGLEVELENTRYID, ORGACCTSETID, UPDATEDTM) VALUES (?, ?, GETDATE())";
             jdbcTemplate.update(insertQuery, orgLevelDefId, orgAcctSetId);
         }
+        public int getNextOrgAcctSetId() {
+            // Query to get the maximum OrgAcctSetId from the ORGACCTSET table
+            String query = "SELECT MAX(ORGACCTSETID) FROM ORGACCTSET";
+
+            // Execute the query to get the maximum ID
+            Integer maxOrgAcctSetId = jdbcTemplate.queryForObject(query, Integer.class);
+
+            // If no data exists, return 1 as the starting point
+            if (maxOrgAcctSetId == null) {
+                return 1; // First ID to be created
+            }
+            
+            // Otherwise, return the next available ID by incrementing the max ID by 1
+            return maxOrgAcctSetId + 1;
+        }
+        
+        @Override
+        public int saveOrgAcctSet(OrgLevelMapping orgAcctSet) {
+            // Use OUTPUT clause to retrieve the inserted ID
+            String insertSql = "INSERT INTO ORGACCTSET (SHORTNM, LONGDSC) " +
+                               "OUTPUT INSERTED.ORGACCTSETID " +
+                               "VALUES (?, ?)";
+
+            // Perform the insert operation and retrieve the generated ID
+            Integer generatedId = jdbcTemplate.queryForObject(insertSql,
+                    new Object[] { orgAcctSet.getShortName(), orgAcctSet.getLongDescription() },
+                    Integer.class);
+
+            // Check if the generatedId is null
+            if (generatedId == null) {
+                System.out.println("Failed to retrieve the generated ID after insert.");
+                throw new RuntimeException("Failed to retrieve the generated ID after insert.");
+            }
+
+            // Log the generated ID
+            System.out.println("Generated ID: " + generatedId);
+
+            // Return the generated ID
+            return generatedId;
+        }
+
 
         
+		/*
+		 * public void saveOrgAcctSet(OrgLevelMapping orgAcctSet) { String insertQuery =
+		 * "INSERT INTO ORGACCTSET ( SHORTNM, LONGDSC) VALUES ( ?, ?)";
+		 * jdbcTemplate.update(insertQuery, orgAcctSet.getShortName(),
+		 * orgAcctSet.getLongDescription()); }
+		 */
+
+        // Save mapping in the OLACCTSETMM table
+        public void saveOrgLevelMapping(OrgLevelMapping orgLevelMapping) {
+            String insertMappingQuery = "INSERT INTO OLACCTSETMM (ORGLEVELENTRYID, ORGACCTSETID, UPDATEDTM) VALUES (?, ?, getdate())";
+            jdbcTemplate.update(insertMappingQuery, orgLevelMapping.getOrgLevelEntryId(), orgLevelMapping.getOrgAcctSetId());
+        }
+        public List<OrgLevelMapping> findAvailableMappings(Long id) {
+            String sql = "SELECT om.* " +
+                         "FROM OLACCTSETMM om " +
+                         "WHERE om.ORGACCTSETID NOT IN " +
+                         "(SELECT ORGACCTSETID FROM ORGACCTSET WHERE ORGACCTSETID = ?)";
+
+            return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrgLevelMapping.class), id);
+        }
+
+        /**
+         * Fetch the selected mappings for the given ID.
+         */
+        public List<OrgLevelMapping> findSelectedMappings(Long id) {
+        	 String sql = "SELECT om.ORGLEVELENTRYID, om.ORGACCTSETID, os.SHORTNM, os.LONGDSC " +
+                     "FROM OLACCTSETMM om " +
+                     "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
+                     "WHERE om.ORGACCTSETID = ?";
+
+//        List<OrgLevelMapping> mappings = jdbcTemplate.query(sql, new OrgLevelMappingRowMapper(), id);
+//
+//        // Debug log the mappings to ensure correct mapping of shortName and longDescription
+//        for (OrgLevelMapping mapping : mappings) {
+//            System.out.println("Mapping ID: " + mapping.getOrgLevelEntryId() + 
+//                               ", shortName: " + mapping.getShortName() + 
+//                               ", longDescription: " + mapping.getLongDescription());
+//        }
+
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrgLevelMapping.class), id);
+         }
+        
+     //Admin
+
+        public OrgLevelMapping findBasicInfo(Long id) {
+            String sql = "SELECT TOP 1 os.SHORTNM, os.LONGDSC " +
+                         "FROM OLACCTSETMM om " +
+                         "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
+                         "WHERE om.ORGACCTSETID = ?";
+            
+            return jdbcTemplate.queryForObject(sql, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+        }
+        @Override
+        public List<OrgLevelMapping> findAllMaps() {
+            String sql = "SELECT distinct top 1 os.ORGACCTSETID, os.SHORTNM as shortName, os.LONGDSC as longDescription " +
+                         "FROM OLACCTSETMM om " +
+                         "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID";
+            List<OrgLevelMapping> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+            System.out.println("Fetched OrgLevelMappings: " + result);  // Log the fetched data
+            return result;
+        }
+		
 }

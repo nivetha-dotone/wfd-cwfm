@@ -168,12 +168,12 @@ public class CMSRoleRightsController {
         roleRight.setDeletedFlag(0);
 
         // Set default rights
-        roleRight.setAddRights(roleRight.getAddRights() != null ? roleRight.getAddRights() : 0);
-        roleRight.setEditRights(roleRight.getEditRights() != null ? roleRight.getEditRights() : 0);
-        roleRight.setDeleteRights(roleRight.getDeleteRights() != null ? roleRight.getDeleteRights() : 0);
-        roleRight.setViewRights(roleRight.getViewRights() != null ? roleRight.getViewRights() : 0);
-        roleRight.setImportRights(roleRight.getImportRights() != null ? roleRight.getImportRights() : 0);
-        roleRight.setExportRights(roleRight.getExportRights() != null ? roleRight.getExportRights() : 0);
+        roleRight.setAddRights(roleRight.getAddRights() != null ? roleRight.getAddRights() : 1);
+        roleRight.setEditRights(roleRight.getEditRights() != null ? roleRight.getEditRights() : 1);
+        roleRight.setDeleteRights(roleRight.getDeleteRights() != null ? roleRight.getDeleteRights() : 1);
+        roleRight.setViewRights(roleRight.getViewRights() != null ? roleRight.getViewRights() : 1);
+        roleRight.setImportRights(roleRight.getImportRights() != null ? roleRight.getImportRights() : 1);
+        roleRight.setExportRights(roleRight.getExportRights() != null ? roleRight.getExportRights() : 1);
         roleRight.setListRights(roleRight.getListRights() != null ? roleRight.getListRights() : 0);
 
         // Fetch page information
