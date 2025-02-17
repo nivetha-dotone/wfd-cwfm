@@ -1,24 +1,96 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workorder List</title>
-    <script src="resources/js/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
+    <title>Workorders List</title>
     <script src="resources/js/cms/workorder.js"></script>
-    <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
- <style>
- 
- 
+
+
+    <style>
+        /* Add your styles here */
+        .success {
+            color: green;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #e0ffe0;
+            border: 1px solid green;
+            margin-bottom: 1rem;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #ffe0e0;
+            border: 1px solid red;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #DDF3FF;
+            color: #005151;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f8f8f8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+         .success {
+        color: green;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #e0ffe0;
+        border: 1px solid green;
+        margin-bottom: 1rem;
+    }
+    .error {
+        color: red;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #ffe0e0;
+        border: 1px solid red;
+        margin-bottom: 1rem;
+    }
+ label {
+    color: black;
+}
     body {
         background-color: #FFFFFF; /* White background for the page */
         font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
-        overflow-y: scroll; /* Adds a vertical scroll bar */
     }
 
     .action-bar {
@@ -66,7 +138,7 @@
     }
 
     table {
-        width: 100%;
+        width: 30%;
         border-collapse: collapse;
     }
 
@@ -90,7 +162,8 @@
     .page-header {
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Distribute space between search and buttons */
+        justify-content: flex-start; /* Align elements to the left */
+    gap: 10px;  /* Distribute space between search and buttons */
         padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
         border-bottom: 1px solid #ccc; /* Subtle border for separation */
@@ -108,7 +181,7 @@
         }
 
         #searchForm {
-            width: 100%; /* Full width for small screens */
+            width: 100%; 
             margin-right: 0; /* Remove margin on small screens */
         }
 
@@ -147,13 +220,13 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-</style>
+    </style>
 
 </head>
 <body>
 <div class="page-header">
    <!--  <form id="searchForm"> -->
-    <div>
+   <!--  <div> -->
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
          <select id="principalEmployerId" name="principalEmployerId"  style="color:gray;padding:3px;" onchange="getContractorsForWorkorder(this.value, '${sessionScope.loginuser.userAccount}')">
          <option value="">Select Principal Employer</option>
@@ -173,7 +246,7 @@
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
 <input type="hidden" id="contractorId" name="contractorId">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchWorkordersBasedOnPEAndContr()">Search</button>
-  </div>
+  <!-- </div> -->
    <!--  </form> -->
     <div>
        <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
@@ -184,10 +257,10 @@
 </div>
  
 
-   <table border="1"  id="workorderTable" >
+   <table border="1"  id="workorderTable" style="width:100%;">
         <thead>
-            <tr style="border: 1px solid black;">
-             <td style="border: 1px solid black;">
+            <tr >
+             <td >
                         <input type="checkbox" id="selectAllWOCheckbox" onchange="toggleSelectAllWOS()">
                     </td> 
                     <!-- Add more table headers for each column -->

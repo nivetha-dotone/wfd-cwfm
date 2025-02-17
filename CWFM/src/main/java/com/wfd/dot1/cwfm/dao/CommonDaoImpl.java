@@ -37,6 +37,7 @@ import com.wfd.dot1.cwfm.pojo.Workorder;
 //import com.wfd.dot1.cwfm.service.CMSPRINCIPALEMPLOYERService;
 import com.wfd.dot1.cwfm.service.CommonService;
 //import com.wfd.dot1.cwfm.service.ContractorService;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
 public class CommonDaoImpl implements CommonDao {
@@ -47,8 +48,10 @@ public class CommonDaoImpl implements CommonDao {
 	 @Autowired
 	    private CommonDao commonDAO;
 	 
-	 @Value("${GET_PERSON_ORG_LEVEL}")
-	 private String getPersonOrgLevel;
+
+	 public String getPersonOrgLevel() {
+		    return QueryFileWatcher.getQuery("GET_PERSON_ORG_LEVEL");
+		}
 	 
 //	@Autowired
 //	private DataSource dataSource;
@@ -777,7 +780,7 @@ public class CommonDaoImpl implements CommonDao {
 		@Override
 		public List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount) {
 			List<PersonOrgLevel> personOrgList= new ArrayList<PersonOrgLevel>();
-			SqlRowSet rs = jdbcTemplate.queryForRowSet(getPersonOrgLevel,userAccount);
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(getPersonOrgLevel(),userAccount);
 			while(rs.next()) {
 				PersonOrgLevel pol = new PersonOrgLevel();
 				pol.setLevelDef(rs.getString("LevelDef"));

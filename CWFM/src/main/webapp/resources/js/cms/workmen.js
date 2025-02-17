@@ -1546,19 +1546,19 @@ function searchWorkmenWithGatePassId(){
          tableBody.empty();
 			if (response.length > 0) {
              $.each(response, function(index, wo) {
-                 var row = '<tr style="border: 1px solid black;">' +
-	'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-                           '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-                           '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-	  '<td style="border: 1px solid black;">'+ wo.lastName + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.vendorCode + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.unitName + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-	  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+                 var row = '<tr  >' +
+	'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+                           '<td  >' + wo.gatePassId + '</td>' +
+                           '<td  >' + wo.firstName + '</td>' +
+	  '<td  >'+ wo.lastName + '</td>' +	
+	  '<td  >' + wo.gender + '</td>' +	
+	  '<td  >' + wo.dateOfBirth + '</td>' +	
+	  '<td  >' + wo.aadhaarNumber + '</td>' +	
+	  '<td  >' + wo.contractorName + '</td>' +	
+	  '<td  >' + wo.vendorCode + '</td>' +	
+	  '<td  >' + wo.unitName + '</td>' +	
+	  '<td  >' + wo.gatePassType + '</td>' +	
+	  '<td  >' + wo.status + '</td>' +				                             
                            '</tr>';
                  tableBody.append(row);
              });
@@ -1636,20 +1636,20 @@ function previewImage(event,inputId,displayId) {
 					            tableBody.empty();
 					            if (response.length > 0) {
 					                $.each(response, function(index, wo) {
-					                    var row = '<tr style="border: 1px solid black;">' +
-												'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-					                              '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-					                              '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-												  '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+					                    var row = '<tr  >' +
+												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+					                              '<td  >' + wo.gatePassId + '</td>' +
+					                              '<td  >' + wo.firstName + '</td>' +
+												  '<td  >' + wo.lastName + '</td>' +	
 												  
-												  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-												  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-												  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-												  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-												  '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-												  '<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-												  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-												  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+												  '<td  >' + wo.gender + '</td>' +
+												  '<td  >' + wo.dateOfBirth + '</td>' +
+												  '<td  >' + wo.aadhaarNumber + '</td>' +	
+												  '<td  >' + wo.contractorName + '</td>' +	
+												  '<td  >' +wo.vendorCode + '</td>' +	
+												  '<td  >' +wo.unitName + '</td>' +	
+												  '<td  >' + wo.gatePassType + '</td>' +	
+												  '<td  >' + wo.status + '</td>' +				                             
 					                              '</tr>';
 					                    tableBody.append(row);
 					                });
@@ -1678,20 +1678,20 @@ function previewImage(event,inputId,displayId) {
 										            tableBody.empty();
 										            if (response.length > 0) {
 										                $.each(response, function(index, wo) {
-										                    var row = '<tr style="border: 1px solid black;">' +
-																	'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-										                              '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-										                              '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																	  '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+										                    var row = '<tr  >' +
+																	'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                              '<td  >' + wo.gatePassId + '</td>' +
+										                              '<td  >' + wo.firstName + '</td>' +
+																	  '<td  >' + wo.lastName + '</td>' +	
 																	  
-																	  '<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-																	  '<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-																	  '<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																	  '<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																	  '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-																	  '<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-																	  '<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																	  '<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+																	  '<td  >' + wo.gender + '</td>' +
+																	  '<td  >' + wo.dateOfBirth + '</td>' +
+																	  '<td  >' + wo.aadhaarNumber + '</td>' +	
+																	  '<td  >' + wo.contractorName + '</td>' +	
+																	  '<td  >' +wo.vendorCode + '</td>' +	
+																	  '<td  >' +wo.unitName + '</td>' +	
+																	  '<td  >' + wo.gatePassType + '</td>' +	
+																	  '<td  >' + wo.status + '</td>' +				                             
 										                              '</tr>';
 										                    tableBody.append(row);
 										                });
@@ -1719,20 +1719,20 @@ function previewImage(event,inputId,displayId) {
 										        tableBody.empty();
 										        if (response.length > 0) {
 										            $.each(response, function(index, wo) {
-										                var row = '<tr style="border: 1px solid black;">' +
-																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+										                var row = '<tr  >' +
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td  >' + wo.gatePassId + '</td>' +
+										                          '<td  >' + wo.firstName + '</td>' +
+																 '<td  >' + wo.lastName + '</td>' +	
 																											  
-																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+																'<td  >' + wo.gender + '</td>' +
+																'<td  >' + wo.dateOfBirth + '</td>' +
+																'<td  >' + wo.aadhaarNumber + '</td>' +	
+																'<td  >' + wo.contractorName + '</td>' +	
+																 '<td  >' +wo.vendorCode + '</td>' +	
+																'<td  >' +wo.unitName + '</td>' +	
+																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
@@ -1760,20 +1760,20 @@ function previewImage(event,inputId,displayId) {
 										        tableBody.empty();
 										        if (response.length > 0) {
 										            $.each(response, function(index, wo) {
-										                var row = '<tr style="border: 1px solid black;">' +
-																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+										                var row = '<tr  >' +
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td  >' + wo.gatePassId + '</td>' +
+										                          '<td  >' + wo.firstName + '</td>' +
+																 '<td  >' + wo.lastName + '</td>' +	
 																											  
-																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+																'<td  >' + wo.gender + '</td>' +
+																'<td  >' + wo.dateOfBirth + '</td>' +
+																'<td  >' + wo.aadhaarNumber + '</td>' +	
+																'<td  >' + wo.contractorName + '</td>' +	
+																 '<td  >' +wo.vendorCode + '</td>' +	
+																'<td  >' +wo.unitName + '</td>' +	
+																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
@@ -1802,20 +1802,20 @@ function previewImage(event,inputId,displayId) {
 										        tableBody.empty();
 										        if (response.length > 0) {
 										            $.each(response, function(index, wo) {
-										                var row = '<tr style="border: 1px solid black;">' +
-																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+										                var row = '<tr  >' +
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td  >' + wo.gatePassId + '</td>' +
+										                          '<td  >' + wo.firstName + '</td>' +
+																 '<td  >' + wo.lastName + '</td>' +	
 																											  
-																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+																'<td  >' + wo.gender + '</td>' +
+																'<td  >' + wo.dateOfBirth + '</td>' +
+																'<td  >' + wo.aadhaarNumber + '</td>' +	
+																'<td  >' + wo.contractorName + '</td>' +	
+																 '<td  >' +wo.vendorCode + '</td>' +	
+																'<td  >' +wo.unitName + '</td>' +	
+																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
@@ -1843,20 +1843,20 @@ function previewImage(event,inputId,displayId) {
 										        tableBody.empty();
 										        if (response.length > 0) {
 										            $.each(response, function(index, wo) {
-										                var row = '<tr style="border: 1px solid black;">' +
-																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+										                var row = '<tr  >' +
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td  >' + wo.gatePassId + '</td>' +
+										                          '<td  >' + wo.firstName + '</td>' +
+																 '<td  >' + wo.lastName + '</td>' +	
 																											  
-																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+																'<td  >' + wo.gender + '</td>' +
+																'<td  >' + wo.dateOfBirth + '</td>' +
+																'<td  >' + wo.aadhaarNumber + '</td>' +	
+																'<td  >' + wo.contractorName + '</td>' +	
+																 '<td  >' +wo.vendorCode + '</td>' +	
+																'<td  >' +wo.unitName + '</td>' +	
+																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
@@ -1884,20 +1884,20 @@ function previewImage(event,inputId,displayId) {
 										        tableBody.empty();
 										        if (response.length > 0) {
 										            $.each(response, function(index, wo) {
-										                var row = '<tr style="border: 1px solid black;">' +
-																											'<td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-										                          '<td style="border: 1px solid black;">' + wo.gatePassId + '</td>' +
-										                          '<td style="border: 1px solid black;">' + wo.firstName + '</td>' +
-																 '<td style="border: 1px solid black;">' + wo.lastName + '</td>' +	
+										                var row = '<tr  >' +
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
+										                          '<td  >' + wo.gatePassId + '</td>' +
+										                          '<td  >' + wo.firstName + '</td>' +
+																 '<td  >' + wo.lastName + '</td>' +	
 																											  
-																'<td style="border: 1px solid black;">' + wo.gender + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.dateOfBirth + '</td>' +
-																'<td style="border: 1px solid black;">' + wo.aadhaarNumber + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.contractorName + '</td>' +	
-																 '<td style="border: 1px solid black;">' +wo.vendorCode + '</td>' +	
-																'<td style="border: 1px solid black;">' +wo.unitName + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.gatePassType + '</td>' +	
-																'<td style="border: 1px solid black;">' + wo.status + '</td>' +				                             
+																'<td  >' + wo.gender + '</td>' +
+																'<td  >' + wo.dateOfBirth + '</td>' +
+																'<td  >' + wo.aadhaarNumber + '</td>' +	
+																'<td  >' + wo.contractorName + '</td>' +	
+																 '<td  >' +wo.vendorCode + '</td>' +	
+																'<td  >' +wo.unitName + '</td>' +	
+																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
 										            });

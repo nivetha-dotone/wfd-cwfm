@@ -134,18 +134,18 @@ function searchWithPEContractorInWO(contextPath) {
 					            tableBody.empty();
 								if (response.woList && response.woList.length > 0) {
 								               $.each(response.woList, function(index, wo) {
-								                   var row = '<tr style="border: 1px solid black;">' +
-								                       '<td style="border: 1px solid black;"><input type="checkbox" name="selectedWorkorderIds" value="' + wo.workorderId + '"></td>' +
-													   '<td style="border: 1px solid black;">' + wo.workorderId + '</td>' +
-													   '<td style="border: 1px solid black;">' + wo.sapWorkorderNumber + '</td>' +
-								                       '<td style="border: 1px solid black;">' + wo.typeId + '</td>' +
-								                       '<td style="border: 1px solid black;">' + wo.secId + '</td>' +
-								                       '<td style="border: 1px solid black;">' + wo.validFrom + '</td>' +
-								                       '<td style="border: 1px solid black;">' + wo.validTo + '</td>' +
-								                       '<td style="border: 1px solid black;">' + response.contractor.contractorName + '</td>' +
-													   '<td style="border: 1px solid black;">' + response.contractor.contractorCode + '</td>' +
-								                       '<td style="border: 1px solid black;">' + response.principalEmployer.name + '</td>' +
-								                       '<td style="border: 1px solid black;">' + wo.status + '</td>' +
+								                   var row = '<tr >' +
+								                       '<td ><input type="checkbox" name="selectedWorkorderIds" value="' + wo.workorderId + '"></td>' +
+													   '<td >' + wo.workorderId + '</td>' +
+													   '<td >' + wo.sapWorkorderNumber + '</td>' +
+								                       '<td >' + wo.typeId + '</td>' +
+								                       '<td >' + wo.secId + '</td>' +
+								                       '<td >' + wo.validFrom + '</td>' +
+								                       '<td >' + wo.validTo + '</td>' +
+								                       '<td >' + response.contractor.contractorName + '</td>' +
+													   '<td >' + response.contractor.contractorCode + '</td>' +
+								                       '<td >' + response.principalEmployer.name + '</td>' +
+								                       '<td >' + wo.status + '</td>' +
 								                     
 								                       '</tr>';
 								                   tableBody.append(row);
