@@ -58,5 +58,7 @@ public interface WorkmenService {
 
 	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId);
 
+	public List<Contractor> getAllContractorForAdmin(String principalEmployerId);
+
 
 }	

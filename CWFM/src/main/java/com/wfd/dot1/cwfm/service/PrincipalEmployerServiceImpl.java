@@ -22,5 +22,10 @@ public class PrincipalEmployerServiceImpl implements PrincipalEmployerService{
 		// TODO Auto-generated method stub
 		return peDao.getIndividualPEDetailByUnitId(id);
 	}
+	@Override
+	public List<PrincipalEmployer> getAllPrincipalEmployerForAdmin() {
+		// TODO Auto-generated method stub
+		return peDao.getAllPrincipalEmployerForAdmin();
+	}
 
 }

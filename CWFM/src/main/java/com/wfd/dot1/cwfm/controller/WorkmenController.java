@@ -135,10 +135,22 @@ public class WorkmenController {
     @GetMapping("/getAllContractors")
 	public ResponseEntity<List<Contractor>> getAllContractors(
             @RequestParam("unitId") String unitId, 
-            @RequestParam("userAccount") String userAccount) {
+            @RequestParam("userAccount") String userAccount,
+            HttpServletRequest request,HttpServletResponse response) {
         log.info("Fetching contractors for unitId: " + unitId + " and userId: " + userAccount);
         try {
-            List<Contractor> contractors = workmenService.getAllContractorBasedOnPE(unitId, userAccount);
+        	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+        	List<Contractor> contractors=new ArrayList<Contractor>();
+        	if(user!=null) {
+    			if("System Admin".equals(user.getRoleName())) {
+    				contractors = workmenService.getAllContractorForAdmin(unitId);
+    			}else {
+    				contractors = workmenService.getAllContractorBasedOnPE(unitId,
+    						userAccount);
+    			}
+        	}
+            //List<Contractor> contractors = workmenService.getAllContractorBasedOnPE(unitId, userAccount);
             if (contractors.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }

@@ -10,5 +10,7 @@ public interface PrincipalEmployerDao {
 
 	public PrincipalEmployer getIndividualPEDetailByUnitId(String id);
 
+	public List<PrincipalEmployer> getAllPrincipalEmployerForAdmin();
+
 	
 }

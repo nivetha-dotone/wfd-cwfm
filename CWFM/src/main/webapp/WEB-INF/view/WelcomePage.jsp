@@ -16,36 +16,13 @@
        <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
      <script src="resources/js/cms/bill.js"></script>
-    <script src="resources/js/jquery.min.js"></script>
-    <script src="resources/js/jquery-3.6.0.min.js"></script>
-   <!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    Include jQuery UI
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    
-    Include jQuery UI CSS
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-     -->
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
-    function initializeDatePicker() {
-        $('.datetimepickerformat').datepicker({
-            dateFormat: 'yy-mm-dd', // Set the date format
-            changeMonth: true,      // Allow changing month via dropdown
-            changeYear: true,       // Allow changing year via dropdown
-            yearRange: "-100:+0",   // Set the year range from 100 years ago to the current year
-            maxDate: 0              // Prevent selecting future dates
-        });
-    }
-	function initializeDatePicker1() {
-	    $('.datetimepickerformat1').datepicker({
-	        dateFormat: 'yy-mm-dd', // Set the date format
-	        changeMonth: true,      // Allow changing month via dropdown
-	        changeYear: true,       // Allow changing year via dropdown
-	        yearRange: "0:+100", 
-	        minDate: 0              // Prevent selecting future dates
-	    });
-	}
+  
+
 function redirectToPEAdd() {
     // Fetch the content of add.jsp using AJAX
     var xhr = new XMLHttpRequest();
@@ -68,6 +45,20 @@ function loadCommonList(path,heading) {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             document.getElementById("mainContent").innerHTML = this.responseText;
+            $(".datetimepickerformat").datepicker({
+            	  dateFormat: 'yy-mm-dd', // Set the date format
+                  changeMonth: true,      // Allow changing month via dropdown
+                  changeYear: true,       // Allow changing year via dropdown
+                  yearRange: "-100:+0",   // Set the year range from 100 years ago to the current year
+                  maxDate: 0
+            });
+            $('.datetimepickerformat1').datepicker({
+    	        dateFormat: 'yy-mm-dd', // Set the date format
+    	        changeMonth: true,      // Allow changing month via dropdown
+    	        changeYear: true,       // Allow changing year via dropdown
+    	        yearRange: "0:+100", 
+    	        minDate: 0              // Prevent selecting future dates
+    	    });
               resetSessionTimer();
         }
     };
@@ -2636,10 +2627,9 @@ table th {
 
     <!-- Main Content Area -->
     <div id="mainContent" class="form-content"></div>
-<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script> -->
+
     <script>
+   
  // Function to toggle the General Management submenu
     function toggleGeneralManagementSubMenu(linkElement) {
         const submenuId = 'general-management-sub-menu'; // ID of the General Management submenu

@@ -85,4 +85,6 @@ public interface WorkmenDao {
 
 	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId);
 
+	public List<Contractor> getAllContractorForAdmin(String unitId);
+
 }

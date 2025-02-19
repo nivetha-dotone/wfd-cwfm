@@ -117,6 +117,11 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 public String getLastApproverQuery() {
 		 return QueryFileWatcher.getQuery("LAST_APPROVER");
 	 }
+	 
+	 
+	 public String getContrForAdmin() {
+		 return QueryFileWatcher.getQuery("GET_ALL_CONTR_FOR_ADMIN");
+	 }
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method "+userAccount);
@@ -988,7 +993,25 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		 return list;
 	}
 
-	
+	@Override
+	public List<Contractor> getAllContractorForAdmin(String unitId) {
+		log.info("Entering into getAllContractorForAdmin dao method "+unitId);
+		List<Contractor> contList= new ArrayList<Contractor>();
+		String query=this.getContrForAdmin();
+		log.info("Query to getAllContractorForAdmin "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+		while(rs.next()) {
+			Contractor cont = new Contractor();
+			cont.setContractorId(rs.getString("contractorid"));
+			cont.setContractorName(rs.getString("contractorname"));
+			cont.setUnitId(unitId);
+			cont.setContractorCode(rs.getString("contractorcode"));
+			cont.setContractorAddress(rs.getString("contractoraddress"));
+			contList.add(cont);
+		}
+		log.info("Exiting from getAllContractorForAdmin dao method "+contList.size());
+		return contList;
+	}
 
 	
 

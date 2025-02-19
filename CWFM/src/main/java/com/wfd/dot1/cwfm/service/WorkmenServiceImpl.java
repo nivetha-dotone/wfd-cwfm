@@ -357,5 +357,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 		// TODO Auto-generated method stub
 		return workmenDao.getApprovalDetails( gatePassId);
 	}
+	
+	@Override
+	public List<Contractor> getAllContractorForAdmin(String unitId) {
+		
+		return workmenDao.getAllContractorForAdmin(unitId);
+	}
 
 }

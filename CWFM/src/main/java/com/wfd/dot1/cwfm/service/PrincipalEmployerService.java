@@ -10,4 +10,6 @@ public interface PrincipalEmployerService {
 
 	public PrincipalEmployer getIndividualPEDetailByUnitId(String id);
 
+	public List<PrincipalEmployer> getAllPrincipalEmployerForAdmin();
+
 }

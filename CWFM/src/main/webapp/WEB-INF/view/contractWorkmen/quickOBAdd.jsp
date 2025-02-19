@@ -16,7 +16,6 @@
     <script src="resources/js/cms/workorder.js"></script>
     <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
-    <script src="resources/js/jquery.min.js"></script>
     <style>
   body {
     margin: 0;
@@ -297,10 +296,7 @@ label {
     String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
 %>
 
-		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
-		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	
     <script>
  // Function to validate fields in the current active tab
     function validateCurrentTab() {
@@ -376,7 +372,7 @@ label {
     document.addEventListener("DOMContentLoaded", function() {
         // Set the default tab
         showTab('tab1');
-        
+        initializeDatePicker();
     });
        
 
@@ -470,8 +466,9 @@ label {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <!--  <td><input id="dateOfBirth" name="dateOfBirth" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30"></td> -->
                <td>
-    				<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"  onfocus="initializeDatePicker()" 
-       onclick="initializeDatePicker()" >
+    				<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat " style="width: 100%; height: 20px;" type="text" size="30" maxlength="30">  
+    				<!-- onfocus="initializeDatePicker()" 
+       onclick="initializeDatePicker()"  >-->
 					  <label id="error-dateOfBirth" style="color: red;display: none;">Please enter a valid Date Of Birth</label>
 			</td>
                
@@ -645,15 +642,15 @@ label {
                             </td>
                             <th><label class="custom-label"><spring:message code="label.healthCheckUpDate"/></label></th>
                             <td>
-                            	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" onfocus="initializeDatePicker()">
+                            	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" >
                             	<label id="error-healthCheckDate"style="color: red;display: none;">Please enter a valid Health Check Up Date</label>
                             	</td>
                         </tr>
                         <tr>
                          <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
                         	<td>
-    				<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"  onfocus="initializeDatePicker1()" 
-       onclick="initializeDatePicker1()" >
+    				<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"   
+        >
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
                         </tr>

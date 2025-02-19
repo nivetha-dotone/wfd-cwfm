@@ -1,12 +1,8 @@
 package com.wfd.dot1.cwfm.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +28,10 @@ import com.wfd.dot1.cwfm.service.ContractorService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/contractor")
 public class ContractorController {
@@ -49,9 +49,19 @@ public class ContractorController {
 	public String getAllPrincipalEmployer(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
-		request.setAttribute("principalEmployers", peList);
+		
+		//List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
+		
 
+		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+        if(user!=null) {
+        if(user.getRoleName().equals("System Admin")) {
+        	peList = peService.getAllPrincipalEmployerForAdmin();
+        }else {
+        	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+        }
+        }
+        request.setAttribute("principalEmployers", peList);
 		return "contractors/list";
 	}
 //	@GetMapping("/list")
@@ -88,10 +98,16 @@ public class ContractorController {
 		try {
 			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
-			// Sample data (replace with your database queries)
-			List<Contractor> contractorList = workmenService.getAllContractorBasedOnPE(principalEmployerId,
-					user.getUserAccount());
+			List<Contractor> contractorList = new ArrayList<Contractor>();
+			if(user!=null) {
+			if("System Admin".equals(user.getRoleName())) {
+				contractorList = workmenService.getAllContractorForAdmin(principalEmployerId);
+			}else {
+				contractorList = workmenService.getAllContractorBasedOnPE(principalEmployerId,
+						user.getUserAccount());
+			}
+			}
+			 
 
 			if (contractorList.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);

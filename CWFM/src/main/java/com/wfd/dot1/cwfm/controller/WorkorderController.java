@@ -1,5 +1,6 @@
 package com.wfd.dot1.cwfm.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,14 +47,35 @@ public class WorkorderController {
 	    public String getlist(@RequestParam(required = false) String principalEmployerId,@RequestParam(required = false)  String contractorId,HttpServletRequest request,HttpServletResponse response) {
 		 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
          MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		 List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
-	 		request.setAttribute("principalEmployers", peList);
+		 //List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
+	 		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+	        if(user!=null) {
+	        if(user.getRoleName().equals("System Admin")) {
+	        	peList = peService.getAllPrincipalEmployerForAdmin();
+	        }else {
+	        	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+	        }
+	        }
+	        request.setAttribute("principalEmployers", peList);
 		 
 	        if (principalEmployerId != null) {
 	            request.setAttribute("selectedPrincipalEmployerId", principalEmployerId);
-	            List<Contractor> contList =  workmenService.getAllContractorBasedOnPE(principalEmployerId,user.getUserAccount());
-	            request.setAttribute("contractors", contList);
+	            
+	           // List<Contractor> contList =  workmenService.getAllContractorBasedOnPE(principalEmployerId,user.getUserAccount());
+	            
+	            List<Contractor> contList = new ArrayList<Contractor>();
+				if(user!=null) {
+				if("System Admin".equals(user.getRoleName())) {
+					contList = workmenService.getAllContractorForAdmin(principalEmployerId);
+				}else {
+					contList = workmenService.getAllContractorBasedOnPE(principalEmployerId,
+							user.getUserAccount());
+				}
+				
+				}
+				request.setAttribute("contractors", contList);
 	            request.setAttribute("selectedContractorId", contractorId);
+	            
 	            
 	            List<Workorder> woList = contrService.getWorkOrdersByContractorIdAndUnitId(principalEmployerId,contractorId);
 	            request.setAttribute("woList", woList);
