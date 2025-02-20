@@ -74,5 +74,5 @@ public interface  CommonDao {
 					List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount);
 
 					List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId);
-
+					CmsGeneralMaster findByGMName(Long gmTypeId, String gmName);
 }

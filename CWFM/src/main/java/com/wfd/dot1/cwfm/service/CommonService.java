@@ -75,6 +75,7 @@ public interface CommonService {
 			List<PersonOrgLevel> getPersonOrgLevelDetails(String userAccount);
 
 			List<CMSRoleRights> getRoleRightsByRoleIdAndPageId(Long selectedRoleId, Long pageId);
+			boolean isMasterNameDuplicate(Long gmTypeId, String gmName);
 
 			
 }

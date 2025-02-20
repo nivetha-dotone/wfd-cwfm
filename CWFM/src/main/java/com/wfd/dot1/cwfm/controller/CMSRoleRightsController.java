@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -94,35 +97,30 @@ public class CMSRoleRightsController {
         return 1L; // Default user ID for testing or fallback
     }
    
-    @RequestMapping(value = "/saveRoleRights", method = RequestMethod.POST)
-    public String saveRoleRights(RoleRightsForm roleRights, RedirectAttributes redirectAttributes) {
+    @PostMapping("/saveRoleRights")
+    @ResponseBody
+    public ResponseEntity<?> saveRoleRights(@RequestBody RoleRightsForm roleRights) {
         try {
             for (CMSRoleRights roleRight : roleRights.getRoleRights()) {
-                if (!isDuplicateRoleRight(roleRight)) {
-                    processRoleRight(roleRight, getCurrentUserId()); // Additional processing if needed
-                    commonService.saveRoleRights(roleRight);
-                } else {
-                    redirectAttributes.addFlashAttribute("error", "Duplicate Role-Page combination detected for Role: " 
-                                                         + roleRight.getRoleId() + " and Page: " + roleRight.getPageId());
-                    return "redirect:/roleRights/roleRightsList";
+                // Check for duplicate Role-Page combination
+                boolean isDuplicate = commonService.checkDuplicateRoleRight(roleRight.getRoleId(), roleRight.getPageId());
+
+                if (isDuplicate) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body("Error: Duplicate Role-Page combination detected for Role ID: " 
+                                  + roleRight.getRoleId() + " and Page ID: " + roleRight.getPageId());
                 }
+
+                // Save if no duplicate
+                commonService.saveRoleRights(roleRight);
             }
-            redirectAttributes.addFlashAttribute("success", "Role rights saved successfully!");
+            return ResponseEntity.ok("Role rights saved successfully!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to save role rights. Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to save role rights. Error: " + e.getMessage());
         }
-
-        // Redirect back to the role rights list
-        return "redirect:/roleRights/roleRightsList";
     }
 
-
-
-
-
-    private boolean isDuplicateRoleRight(CMSRoleRights roleRight) {
-        return commonService.checkDuplicateRoleRight(roleRight.getRoleId(), roleRight.getPageId());
-    }
 
 
 	/*

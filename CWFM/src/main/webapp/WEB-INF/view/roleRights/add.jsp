@@ -227,6 +227,7 @@
                             <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">-</button></td>
                         </tr>
                     </c:forEach>
+                    <div id="error-message" style="display: none; color: red; font-weight: bold;"></div>
                 </tbody>
             </table>
         </div>

@@ -13,82 +13,142 @@ import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
 import com.wfd.dot1.cwfm.pojo.OrgLevel;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
 public class OrgLevelDaoImpl implements OrgLevelDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
+    
+    public String saveorglevel() {
+	    return QueryFileWatcher.getQuery("SAVE_ORG_LEVEL");
+    }
+    public String findbynameandshortname() {
+	    return QueryFileWatcher.getQuery("FIND_BY_NAME_AND_SHORTNAME");
+    }
+    public String existsbynameshortnameandhierarchy() {
+	    return QueryFileWatcher.getQuery("EXISTS_BY_NAME_SHORTNAME_AND_HIERARCHY");
+    }
+    public String saveorglevelcheck() {
+	    return QueryFileWatcher.getQuery("SAVE_OR_LEVEL_CHECK");
+    }
+    public String saveorglevelupdate() {
+	    return QueryFileWatcher.getQuery("SAVE_OR_LEVEL_UPDATE");
+    }
+    public String saveorglevelinsert() {
+	    return QueryFileWatcher.getQuery("SAVE_OR_LEVEL_INSERT");
+    }
+    public String ishierarchylevelexists() {
+	    return QueryFileWatcher.getQuery("IS_HIERARCHY_LEVEL");
+    }
+    public String hasdependencies() {
+	    return QueryFileWatcher.getQuery("HAS_DEPENDENCIES");
+    }
+    public String deleteorglevel() {
+	    return QueryFileWatcher.getQuery("DELETE_ORG_LEVEL");
+    }
+    public String fetchallorglevels() {
+	    return QueryFileWatcher.getQuery("FETCH_ALL_ORG_LEVELS");
+    }
+    public String updateorglevel() {
+	    return QueryFileWatcher.getQuery("UPDATE_ORG_LEVEL");
+    }
+    public String uupdateorlevel() {
+	    return QueryFileWatcher.getQuery("UPDATE_OR_LEVEL");
+    }
+    public String updateorglevels() {
+	    return QueryFileWatcher.getQuery("UPDATE_ORG_LEVELS");
+    }
+    public String existsbyid() {
+	    return QueryFileWatcher.getQuery("EXISTS_BY_ID");
+    }
+    public String getactiveorglevels() {
+	    return QueryFileWatcher.getQuery("GET_ACTIVE_ORG_LEVELS");
+    }
+    public String getorglevelentriesbydefid() {
+	    return QueryFileWatcher.getQuery("GET_ORG_ENTRIES_BY_DEF_ID");
+    }
+    public String saveorglevelentry() {
+	    return QueryFileWatcher.getQuery("SAVE_ORG_LEVEL_ENTRY");
+    }
+    public String updateorglevelentry() {
+	    return QueryFileWatcher.getQuery("UPDATE_ORG_LEEVEL_ENTRY");
+    }
+    public String deleteorglevelentry() {
+	    return QueryFileWatcher.getQuery("DELETE_ORG_LEEVEL_ENTRY");
+    }
+    public String getorglevelentrybyid() {
+	    return QueryFileWatcher.getQuery("GET_ORG_LEVEL_ENTRY_BY_ID");
+    }
+    public String getavailableentries() {
+	    return QueryFileWatcher.getQuery("GET_AVAILABLE_ENTRIES");
+    }
+    public String getselectedentries() {
+	    return QueryFileWatcher.getQuery("GET_SELECTED_ENTRIES");
+    }
+    public String findbasicinfo() {
+	    return QueryFileWatcher.getQuery("FIND_BASIC_INFO");
+    }
+    
     @Override
     public void saveOrgLevel(OrgLevelDefDTO orgLevel) {
     	 System.out.println("Saving org level: " + orgLevel.getName() + ", " + orgLevel.getShortName() + ", " + orgLevel.getOrgHierarchyLevel());
-
-        String sql = "INSERT INTO ORGLEVELDEF (NAME, SHORTNAME, ORGHIERARCHYLEVEL, MINIMUMLENGTH, MAXIMUMLENGTH,UPDATEDBYUSRACCTID) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel(),
+    	 String query=saveorglevel();
+        jdbcTemplate.update(query, orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel(),
                             orgLevel.getMinimumLength(), orgLevel.getMaximumLength(),orgLevel.getUpdatedByUsrAcctId());
     }
+    
     public OrgLevel findByNameAndShortName(String name, String shortName) {
+    	String query=findbynameandshortname();
         try {
-            String sql = "SELECT * FROM ORGLEVELDEF WHERE NAME = ? AND SHORTNAME = ?";
-            return jdbcTemplate.queryForObject(sql, new Object[]{name, shortName}, new BeanPropertyRowMapper<>(OrgLevel.class));
+            return jdbcTemplate.queryForObject(query, new Object[]{name, shortName}, new BeanPropertyRowMapper<>(OrgLevel.class));
         } catch (EmptyResultDataAccessException e) {
-            return null; // No matching record found
+            return null; 
         }
     }
     @Override
     public boolean existsByNameShortNameAndHierarchy(String name, String shortName, int hierarchyLevel) {
-        // Trim inputs to avoid leading/trailing space issues
+    	 String query=existsbynameshortnameandhierarchy();
         name = name.trim();
         shortName = shortName.trim();
-
-        // Log the values being checked
         System.out.println("Checking for existing record with Name: " + name + ", Short Name: " + shortName + ", Hierarchy Level: " + hierarchyLevel);
-
-        // Perform case-insensitive check for duplicates based on Name, Short Name, and Hierarchy Level
-        String sql = "SELECT COUNT(*) FROM ORGLEVELDEF WHERE LOWER(NAME) = LOWER(?) AND LOWER(SHORTNAME) = LOWER(?) AND ORGHIERARCHYLEVEL = ? and INACTIVE=1";
-        int count = jdbcTemplate.queryForObject(sql, Integer.class, name, shortName, hierarchyLevel);
-
-        // Return true if any matching records are found (to indicate a duplicate), false otherwise
-        return count > 0;  // If count > 0, that means there is a match, and the validation fails
+        int count = jdbcTemplate.queryForObject(query, Integer.class, name, shortName, hierarchyLevel);
+        return count > 0;  
     }
 
     public void saveOrUpdate(OrgLevel orgLevel) {
-        String checkSql = "SELECT COUNT(*) FROM ORGLEVELDEF WHERE NAME = ? AND SHORTNAME = ?";
-        int count = jdbcTemplate.queryForObject(checkSql, Integer.class, orgLevel.getName(), orgLevel.getShortName());
-
+    	String checkquery=saveorglevelcheck();
+    	String updatequery=saveorglevelupdate();
+    	String insertquery=saveorglevelinsert();
+        int count = jdbcTemplate.queryForObject(checkquery, Integer.class, orgLevel.getName(), orgLevel.getShortName());
         if (count > 0) {
-            // Update logic
-            String updateSql = "UPDATE ORGLEVELDEF SET ORGHIERARCHYLEVEL = ?, MINIMUMLENGTH = ?, MAXIMUMLENGTH = ?, UPDATEDBYUSRACCTID = ? WHERE NAME = ? AND SHORTNAME = ?";
-            jdbcTemplate.update(updateSql, orgLevel.getOrgHierarchyLevel(), orgLevel.getMinimumLength(),
+            jdbcTemplate.update(updatequery, orgLevel.getOrgHierarchyLevel(), orgLevel.getMinimumLength(),
                     orgLevel.getMaximumLength(), orgLevel.getUpdatedByUsrAcctId(),
                     orgLevel.getName(), orgLevel.getShortName());
         } else {
-            // Insert logic
-            String insertSql = "INSERT INTO ORGLEVELDEF (NAME, SHORTNAME, ORGHIERARCHYLEVEL, MINIMUMLENGTH, MAXIMUMLENGTH,  UPDATEDBYUSRACCTID) VALUES (?, ?, ?, ?, ?,  ?)";
-            jdbcTemplate.update(insertSql, orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel(),
+            jdbcTemplate.update(insertquery, orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel(),
                     orgLevel.getMinimumLength(), orgLevel.getMaximumLength(),
                     orgLevel.getUpdatedByUsrAcctId());
         }
     }
+   
     @Override
     public boolean isHierarchyLevelExists(int hierarchyLevel) {
-        String sql = "SELECT COUNT(*) FROM ORGLEVELDEF WHERE ORGHIERARCHYLEVEL = ?";
-        return jdbcTemplate.queryForObject(sql, Integer.class, hierarchyLevel) > 0;
+    	String query=ishierarchylevelexists();
+        return jdbcTemplate.queryForObject(query, Integer.class, hierarchyLevel) > 0;
     }
-
+   
     @Override
     public boolean hasDependencies(int orgLevelDefId) {
-        String sql = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ?";
-        return jdbcTemplate.queryForObject(sql, Integer.class, orgLevelDefId) > 0;
+    	String query=hasdependencies();
+        return jdbcTemplate.queryForObject(query, Integer.class, orgLevelDefId) > 0;
     }
-
+   
     @Override
     public void deleteOrgLevel(int id) {
-        String sql = "UPDATE ORGLEVELDEF SET INACTIVE=0 WHERE ORGLEVELDEFID = ?";
-
+    	String query=deleteorglevel();
         try {
-            int rowsAffected = jdbcTemplate.update(sql, id);
+            int rowsAffected = jdbcTemplate.update(query, id);
             if (rowsAffected > 0) {
                 System.out.println("Org Level with ID " + id + " successfully marked as inactive.");
             } else {
@@ -100,11 +160,9 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
         }
     }
 
-
-
     @Override
     public List<OrgLevel> fetchAllOrgLevels() {
-        String query = "SELECT * FROM ORGLEVELDEF where INACTIVE=1";
+    	String query=fetchallorglevels();
         return jdbcTemplate.query(query, (rs, rowNum) -> {
             OrgLevel orgLevel = new OrgLevel();
             orgLevel.setOrgLevelDefId(rs.getInt("ORGLEVELDEFID"));
@@ -119,24 +177,19 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
             return orgLevel;
         });
     }
+   
     @Override
     public void updateOrgLevel(int id, String newName, String newShortName, int newHierarchyLevel) {
+    	String query=updateorglevel();
         System.out.println("updateOrgLevel method called for ID: " + id); // Basic log to check if method is entered
-
-        // SQL Update statement
-        String sql = "UPDATE ORGLEVELDEF SET ORGLEVELNAME = ?, SHORTNAME = ?, ORGHIERARCHYLEVEL = ? WHERE ORGLEVELDEFID = ?";
-
         // Log the attempt to update
         System.out.println("Attempting to update Org Level with ID: " + id);
-        System.out.println("Executing SQL: " + sql + " with ID: " + id + ", newName: " + newName + ", newShortName: " + newShortName + ", newHierarchyLevel: " + newHierarchyLevel);
-
+        System.out.println("Executing SQL: " + query + " with ID: " + id + ", newName: " + newName + ", newShortName: " + newShortName + ", newHierarchyLevel: " + newHierarchyLevel);
         try {
             // Executing the update query
-            int rowsAffected = jdbcTemplate.update(sql, newName, newShortName, newHierarchyLevel, id);
-
+            int rowsAffected = jdbcTemplate.update(query, newName, newShortName, newHierarchyLevel, id);
             // Log the number of rows affected
             System.out.println("Rows affected by the update: " + rowsAffected);
-
             if (rowsAffected > 0) {
                 System.out.println("Org Level with ID " + id + " successfully updated.");
             } else {
@@ -148,12 +201,12 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
             e.printStackTrace();
         }
     }
-	@Override
+   
+    @Override
 	public void updateOrgLevel(int id) {
-		  String sql = "UPDATE ORGLEVELDEF SET INACTIVE=0 WHERE ORGLEVELDEFID = ?";
-
+		String query=uupdateorlevel();
 	        try {
-	            int rowsAffected = jdbcTemplate.update(sql, id);
+	            int rowsAffected = jdbcTemplate.update(query, id);
 	            if (rowsAffected > 0) {
 	                System.out.println("Org Level with ID " + id + " successfully marked as inactive.");
 	            } else {
@@ -163,14 +216,11 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 	            System.err.println("Error during update operation: " + e.getMessage());
 	            e.printStackTrace();
 	        }
-		
 	}
+	 
 	public void updateOrgLevel(List<OrgLevelDefDTO> orgLevels) {
-	    String sql = "UPDATE ORGLEVELDEF SET NAME = ?, SHORTNAME = ?, ORGHIERARCHYLEVEL = ?, MINIMUMLENGTH = ?, MAXIMUMLENGTH = ?, UPDATEDBYUSRACCTID = ?, UPDATE_DTM = CURRENT_TIMESTAMP WHERE ORGLEVELDEFID = ?";
-
-	    // Use batchUpdate for better performance when updating multiple rows
+		String query=updateorglevels();
 	    List<Object[]> batchArgs = new ArrayList<>();
-
 	    for (OrgLevelDefDTO orgLevel : orgLevels) {
 	        batchArgs.add(new Object[]{
 	            orgLevel.getName(),
@@ -182,15 +232,13 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 	            orgLevel.getOrgLevelDefId()
 	        });
 	    }
-
 	    // Execute the batch update
-	    jdbcTemplate.batchUpdate(sql, batchArgs);
+	    jdbcTemplate.batchUpdate(query, batchArgs);
 	}
 
 	@Override
 	public List<OrgLevelDefDTO> saveOrgLevels(List<OrgLevelDefDTO> orgLevels) {
 	    List<OrgLevelDefDTO> savedEntries = new ArrayList<>();
-	    
 	    // Loop through each orgLevel and save it using saveOrgLevel method
 	    for (OrgLevelDefDTO orgLevel : orgLevels) {
 	        try {
@@ -202,49 +250,50 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 	            e.printStackTrace();
 	        }
 	    }
-
 	    // Return the list of successfully saved orgLevels
 	    return savedEntries;
-	}
-	
-	 public boolean existsById(Long id) {
-	        String sql = "SELECT COUNT(*) FROM ORGLEVELDEF WHERE ORGLEVELDEFID = ?";
-	        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
+	  }
+	 
+	    public boolean existsById(Long id) {
+		 String query=existsbyid();
+	        Integer count = jdbcTemplate.queryForObject(query, new Object[]{id}, Integer.class);
 	        return count != null && count > 0;
 	    }
-	 
-	 public List<OrgLevelDefDTO> getActiveOrgLevels() {
-		    String sql = "SELECT ORGLEVELDEFID, NAME FROM ORGLEVELDEF WHERE INACTIVE = 1";
-		    return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrgLevelDefDTO.class));
+	
+	    public List<OrgLevelDefDTO> getActiveOrgLevels() {
+		 String query=getactiveorglevels();
+		    return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevelDefDTO.class));
 		}
-
+	
 		public List<OrgLevelEntryDTO> getOrgLevelEntriesByDefId(int orgLevelDefId) {
-		    String sql = "SELECT * FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ? AND INACTIVE = 1";
-		    return jdbcTemplate.query(sql, new Object[]{orgLevelDefId}, new BeanPropertyRowMapper<>(OrgLevelEntryDTO.class));
+			 String query=getorglevelentriesbydefid();
+		    return jdbcTemplate.query(query, new Object[]{orgLevelDefId}, new BeanPropertyRowMapper<>(OrgLevelEntryDTO.class));
 		}
-
+		
 		public void saveOrgLevelEntry(OrgLevelEntryDTO orgLevelEntry) {
-		    String sql = "INSERT INTO ORGLEVELENTRY (ORGLEVELDEFID, NAME, DESCRIPTION, INACTIVE, UPDATEDBYUSRACCTID) VALUES (?, ?, ?, ?, ?)";
-		    jdbcTemplate.update(sql, orgLevelEntry.getOrgLevelDefId(), orgLevelEntry.getName(), orgLevelEntry.getDescription(), 1, orgLevelEntry.getUpdatedByUsrAcctId());
+			String query=saveorglevelentry();
+		    jdbcTemplate.update(query, orgLevelEntry.getOrgLevelDefId(), orgLevelEntry.getName(), orgLevelEntry.getDescription(), 1, orgLevelEntry.getUpdatedByUsrAcctId());
 		}
-
+		
 		public void updateOrgLevelEntry(OrgLevelEntryDTO orgLevelEntry) {
-		    String sql = "UPDATE ORGLEVELENTRY SET NAME = ?, DESCRIPTION = ?, UPDATEDBYUSRACCTID = ? WHERE ORGLEVELENTRYID = ?";
-		    jdbcTemplate.update(sql, orgLevelEntry.getName(), orgLevelEntry.getDescription(), orgLevelEntry.getUpdatedByUsrAcctId(), orgLevelEntry.getOrgLevelEntryId());
+			String query=updateorglevelentry();
+		    jdbcTemplate.update(query, orgLevelEntry.getName(), orgLevelEntry.getDescription(), orgLevelEntry.getUpdatedByUsrAcctId(), orgLevelEntry.getOrgLevelEntryId());
 		}
-
+		 
 		public void deleteOrgLevelEntry(int orgLevelEntryId) {
-		    String sql = "UPDATE ORGLEVELENTRY SET INACTIVE = 0 WHERE ORGLEVELENTRYID = ?";
-		    jdbcTemplate.update(sql, orgLevelEntryId);
+			String query=deleteorglevelentry();
+		    jdbcTemplate.update(query, orgLevelEntryId);
 		}
+		 
 		public OrgLevelEntryDTO getOrgLevelEntryById(int orgLevelEntryId) {
-		    String sql = "SELECT * FROM ORGLEVELENTRY WHERE ORGLEVELENTRYID = ? AND INACTIVE = 1";
-		    return jdbcTemplate.queryForObject(sql, new Object[]{orgLevelEntryId}, new BeanPropertyRowMapper<>(OrgLevelEntryDTO.class));
+			String query=getorglevelentrybyid();
+		    return jdbcTemplate.queryForObject(query, new Object[]{orgLevelEntryId}, new BeanPropertyRowMapper<>(OrgLevelEntryDTO.class));
 		}
+		
 		  @Override
 		    public List<OrgLevelEntryDTO> getAvailableEntries(Long orgLevelDefId) {
-		        String sql = "SELECT * FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ? AND INACTIVE = 1";
-		        return jdbcTemplate.query(sql, new Object[]{orgLevelDefId}, (rs, rowNum) -> {
+			  String query=getavailableentries();
+		        return jdbcTemplate.query(query, new Object[]{orgLevelDefId}, (rs, rowNum) -> {
 		            OrgLevelEntryDTO entry = new OrgLevelEntryDTO();
 		            entry.setOrgLevelEntryId((int) rs.getLong("ORGLEVELENTRYID"));
 		            entry.setName(rs.getString("NAME"));
@@ -252,11 +301,11 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		            return entry;
 		        });
 		    }
-
+		  
 		    @Override
 		    public List<OrgLevelEntryDTO> getSelectedEntries(Long orgLevelDefId) {
-		        String sql = "SELECT * FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ? AND INACTIVE = 0"; // Example condition
-		        return jdbcTemplate.query(sql, new Object[]{orgLevelDefId}, (rs, rowNum) -> {
+		    	String query=getselectedentries();
+		        return jdbcTemplate.query(query, new Object[]{orgLevelDefId}, (rs, rowNum) -> {
 		            OrgLevelEntryDTO entry = new OrgLevelEntryDTO();
 		            entry.setOrgLevelEntryId((int) rs.getLong("ORGLEVELENTRYID"));
 		            entry.setName(rs.getString("NAME"));
@@ -264,13 +313,10 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		            return entry;
 		        });
 		    }
+		   
 		    public OrgLevelMapping findBasicInfo(Long id) {
-		        String sql = "SELECT TOP 1 os.SHORTNM, os.LONGDSC " +
-		                     "FROM OLACCTSETMM om " +
-		                     "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
-		                     "WHERE om.ORGACCTSETID = ?";
-		        
-		        return jdbcTemplate.queryForObject(sql, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+		    	String query=findbasicinfo();
+		        return jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
 		    }
 
 }

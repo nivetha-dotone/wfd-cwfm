@@ -178,6 +178,7 @@
     <div>
    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapAdd()">New</button>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapEdit()">Edit</button>
+    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportOrgLevelMapCSV()">Export</button>
 </div>
 </div>
 <!-- <div class="page-header">
@@ -188,7 +189,7 @@
     <table border="1">
                 <thead>
                     <tr>
-                    <th></th>
+                    <td><input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()"></td>
                         <th>Short Name</th>
                         <th>Long Description</th>
                     </tr>
@@ -196,7 +197,7 @@
                 <tbody>
                     <c:forEach var="map" items="${mappings}">
                         <tr>
-                         <td ><input type="checkbox" name="selectedmapId" value="${map.orgAcctSetId}"></td>
+                         <td ><input type="checkbox" name="selectedGMMaster" value="${map.orgAcctSetId}"></td>
                             <td>${map.shortName}</td>
                             <td>${map.longDescription}</td>
                         </tr>

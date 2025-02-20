@@ -181,7 +181,7 @@
     </form>
     <div>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToRRAdd()">Add</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToRoleCSV()">Export</button>
 </div>
 </div>
 <form id="updateForm" action="/CWFM/roleRights/update" method="POST" >
@@ -189,8 +189,11 @@
         <table border="1">
         <thead>
             <tr>
-                <th>Role ID</th>
-                   <th>Role Name</th>
+                <td>
+                        <input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()">
+                </td> 
+               <!--  <th>Role ID</th> -->
+                <th>Role Name</th>
                 <th>Page Name</th>
                 <th>Add Rights</th>
                 <th>Edit Rights</th>
@@ -204,7 +207,9 @@
         <tbody>
             <c:forEach var="rights" items="${roleRightsList}">
                 <tr>
-                    <td id=roleid>${rights.roleId}</td>
+                <td><input type="checkbox"
+							name="selectedGMMaster" value="${rights.role.gmName}"></td>
+                    <%-- <td id=roleid>${rights.roleId}</td> --%>
                      <td id=rolename>${rights.role.gmName}</td>
                     <td id=pagename>${rights.page.gmName}</td>
                     <td>${rights.addRights == 0 ? 'Yes' : 'No'}</td>

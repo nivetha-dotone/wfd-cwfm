@@ -237,6 +237,7 @@
    <%-- </c:if>
     <c:if test="${userRights[0].deleteRights == 0}"> --%>
     <button type="submit"   class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedGMTYPE()">Delete Selected</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMTYPECSV()">Export</button>
 <%-- </c:if> --%>
 <!-- <div>
 <form action="/CWFM/generalController/saveGMType" method="post">
@@ -277,6 +278,7 @@
                     <td>${gmType.gmType}</td>
                 </tr>
             </c:forEach>
+          <div id="error-gmType" style="display: none; color: red; font-weight: bold;"></div>
         </tbody>
     </table>
 </div>

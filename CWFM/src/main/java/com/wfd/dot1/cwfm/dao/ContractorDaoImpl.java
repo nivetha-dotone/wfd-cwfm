@@ -43,6 +43,37 @@ public class ContractorDaoImpl implements ContractorDao{
 	 public String getWorkOrderQuery() {
 		    return QueryFileWatcher.getQuery("GET_ALL_WORKORDER_BY_CONT");
 		}
+	 public String saveContractorDetails() {
+		    return QueryFileWatcher.getQuery("SAVE_INSERT_CONTRACTOR_DETAILS");
+		}
+	 public String getAllContractors() {
+		    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTORS");
+		}
+	 public String getContractorsDetails() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTOR_DETAILS");
+		}
+	 public String getAllContractorsDetailsView() {
+		    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTOR_DETAIL_VIEW");
+		}
+	 public String getAllRenewalContractors() {
+		    return QueryFileWatcher.getQuery("GET_ALL_RENEWAL_LIST_CONTRACTORS");
+		}
+	 public String getAllContractorsAdditionalDetails() {
+		    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTOR_ADD_DETAIL_VIEW");
+		}
+	 public String getRenewalView() {
+		    return QueryFileWatcher.getQuery("GET_RENEWAL_CONTRACTORS_VIEW");
+		}
+	 public String getRenewalContractorsView() {
+		    return QueryFileWatcher.getQuery("GET_RENEW_CONTRACTOR_ADD_DETAIL_VIEW");
+		}
+	 public String setRenewalDetails() {
+		    return QueryFileWatcher.getQuery("SET_RENEWAL_DETAILS");
+		}
+	 public String setuniqueregistrationid() {
+		    return QueryFileWatcher.getQuery("SET_UNIQUE_REGISTRATION_ID");
+		}
+	 
 	@Override
 	public Contractor getContractorById(String contractorId) {
 		String query=getContractorByIdQuery();
@@ -57,8 +88,6 @@ public class ContractorDaoImpl implements ContractorDao{
                     contractor.setBlocked(rs.getInt("ISBLOCKED") == 1);
                     return contractor;
                 }
-            
-       
         return null;
     }
 
@@ -86,9 +115,7 @@ public class ContractorDaoImpl implements ContractorDao{
 		log.info("Exiting from getAllWorkordersBasedOnPEAndContractor dao method "+woList.size());
 		return woList;
 	}
-
 	
-
 	@Override
 	public List<CmsContractorWC> getcontrsByContractorIdAndUnitIdAndLicenseType(String contractorId,
 			String principalEmployerId, String string) {
@@ -116,8 +143,6 @@ public class ContractorDaoImpl implements ContractorDao{
 		log.info("Exiting from getcontrsByContractorIdAndUnitIdAndLicenseType dao method "+contrWcList.size());
 		return contrWcList;
 	}
-
-
 
 	@Override
 	public List<CmsContractorWC> getMappingsByContractorIdAndUnitIdAndLicenseTypes(String contractorId,
@@ -178,33 +203,25 @@ public class ContractorDaoImpl implements ContractorDao{
 	        }
 			return null;
 	}
-	@Value("${SAVE_INSERT_CONTRACTOR_DETAILS}")
-	 private String saveContractorDetails;
+	
 	@Override
 	public String saveReg(ContractorRegistration contreg) {
 		String result = null; 
-
 		int status=0;
         Object[] parameters = new Object[] {contreg.getContractorregId(),contreg.getPrincipalEmployer(),contreg.getVendorCode(),contreg.getManagerName(),contreg.getLocofWork(),contreg.getTotalStrength(),contreg.getRcMaxEmp(),contreg.getPfNum(),contreg.getNatureOfWork(),contreg.getContractFrom(),contreg.getContractTo(),contreg.getContractType(),contreg.getRcVerified()}; 
-
         try {
-           status  = jdbcTemplate.update(saveContractorDetails, parameters);
+           status  = jdbcTemplate.update(saveContractorDetails(), parameters);
            return String.valueOf(status);
         } catch (Exception e) {
-            
         }
-    
-
     return String.valueOf(status);
 	}
-	
-	 @Value("${GET_ALL_CONTRACTORS}")
-	 private String getAllContractors;
 	
 	@Override
 	public List<ContractorRegistration> getContractorRegistrationList(String userId) {
 	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractors);
+	String query = getAllContractors();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	while(rs.next()) {
 		ContractorRegistration pe = new ContractorRegistration();
 		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
@@ -215,16 +232,15 @@ public class ContractorDaoImpl implements ContractorDao{
 		pe.setRequestType(rs.getString("TYPE"));
 		
 		peList.add(pe);
-	
 	}
 	return peList;
 	}
-	 @Value("${GET_CONTRACTOR_DETAILS}")
-	 private String getContractorsDetails;
+	
 	@Override
 	public ContractorRenewal getContractorDetails(String contractorRenewId) {
 		ContractorRenewal contr = null;
-			SqlRowSet rs = jdbcTemplate.queryForRowSet(getContractorsDetails, contractorRenewId);
+		String query = getContractorsDetails();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query, contractorRenewId);
 			if (rs.next()) {
 	            contr = new ContractorRenewal();
 	            contr.setContractorRenewId(rs.getString("CONTRACTORREGID"));
@@ -245,18 +261,18 @@ public class ContractorDaoImpl implements ContractorDao{
 	        }
 			return null;
 	}
-
+	
 	@Override
 	public List<ContractorRegistration> getContractorRegistrationList() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	 @Value("${GET_ALL_CONTRACTOR_DETAIL_VIEW}")
-	 private String getAllContractorsDetailsView;
+	
 	@Override
 	public ContractorRegistration viewContractorDetails(String contractorregId) {
 		ContractorRegistration contr = new ContractorRegistration();
-			SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractorsDetailsView,contractorregId);
+		String query = getAllContractorsDetailsView();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorregId);
 			if (rs.next()) {
 	            contr = new ContractorRegistration();
 	            contr.setContractorregId(rs.getString("CONTRACTORREGID"));
@@ -276,12 +292,11 @@ public class ContractorDaoImpl implements ContractorDao{
 	        }
 			return contr;
 	}
-	@Value("${GET_ALL_RENEWAL_LIST_CONTRACTORS}")
-	 private String getAllRenewalContractors;
 	@Override
 	public List<ContractorRegistration> getContractorRenewalList(String userId) {
 	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllRenewalContractors);
+	String query = getAllRenewalContractors();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	while(rs.next()) {
 		ContractorRegistration pe = new ContractorRegistration();
 		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
@@ -289,19 +304,16 @@ public class ContractorDaoImpl implements ContractorDao{
 		pe.setVendorCode(rs.getString("CODE"));
 		pe.setContractName(rs.getString("CONTRACTORNAME"));
 		pe.setStatus(rs.getString("STATUS"));
-		
-		
 		peList.add(pe);
-	
 	}
 	return peList;
 	}
-	@Value("${GET_ALL_CONTRACTOR_ADD_DETAIL_VIEW}")
-	 private String getAllContractorsAdditionalDetails;
+	
 	@Override
 	public List<ContractorRegistration> viewContractorAddDetails(String userId) {
 	List<ContractorRegistration> conList= new ArrayList<ContractorRegistration>();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(getAllContractorsAdditionalDetails);
+	String query = getAllContractorsAdditionalDetails();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	while(rs.next()) {
 		ContractorRegistration pe = new ContractorRegistration();
 		pe.setWorkOrderNum(rs.getString("WONUMBER"));
@@ -314,16 +326,15 @@ public class ContractorDaoImpl implements ContractorDao{
 		pe.setAttachments(rs.getString("ATTACHMENTNAME"));
 		
 		conList.add(pe);
-	
 	}
 	return conList;
 	}
-	@Value("${GET_RENEWAL_CONTRACTORS_VIEW}")
-	 private String getRenewalView;
+	
 	@Override
 	public ContractorRenewal viewContractorRenewDetails(String contractorRenewId) {
 		ContractorRenewal contr = new ContractorRenewal();
-			SqlRowSet rs = jdbcTemplate.queryForRowSet(getRenewalView,contractorRenewId);
+		String query = getRenewalView();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorRenewId);
 			if (rs.next()) {
 	            contr = new ContractorRenewal();
 	            contr.setContractorRenewId(rs.getString("CONTRACTORREGID"));
@@ -341,20 +352,17 @@ public class ContractorDaoImpl implements ContractorDao{
 	            contr.setContractorValidTo(rs.getString("CONTRACTVALIDTILL"));
 	            contr.setContractorClass(rs.getString("SERVICES"));
 	            contr.setContractorType(rs.getString("CONTTYPE"));
-	            
-	           
 	        }
 			return contr;
 	}
-	@Value("${GET_RENEW_CONTRACTOR_ADD_DETAIL_VIEW}")
-	 private String getRenewalContractorsView;
+	
 	@Override
 	public List<ContractorRenewal> viewContractorRenewAddDetails(String userId) {
 	List<ContractorRenewal> conList= new ArrayList<ContractorRenewal>();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(getRenewalContractorsView);
+	String query = getRenewalContractorsView();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	while(rs.next()) {
 		ContractorRenewal pe = new ContractorRenewal();
-		
 		pe.setDocumentType(rs.getString("LICENCETYPE"));
 		pe.setDocumentNumber(rs.getString("WCCODE"));
 		pe.setCoverage(rs.getString("WCTOTAL"));
@@ -381,9 +389,7 @@ public class ContractorDaoImpl implements ContractorDao{
 		pe.setContactNumber(rs.getString("ContactNumber"));
 		pe.setRoleName(rs.getString("RoleName"));
 		
-		
 		peList.add(pe);
-	
 	}
 	return peList;
 	}
@@ -392,44 +398,33 @@ public class ContractorDaoImpl implements ContractorDao{
 	@Override
 	public String saveRole(MasterUser user) {
 		String result = null; 
-
 		int status=0;
         Object[] parameters = new Object[] {user.getFirstName(),user.getLastName(),user.getUserId(),user.getEmailId(),user.getContactNumber(),user.getPassword(),user.getRoleName()}; 
-
         try {
            status  = jdbcTemplate.update(ContractorQueryBank.SAVE_ROLE_FORM, parameters);
            return String.valueOf(status);
         } catch (Exception e) {
-            
         }
-    
-
     return String.valueOf(status);
 	}
-	@Value("${SET_RENEWAL_DETAILS}")
-	 private String setRenewalDetails;
+	
 	@Override
 	public String saveRenew(ContractorRenewal contrenew) {
 		String result = null; 
-
+		String query = setRenewalDetails();
 		int status=0;
         Object[] parameters = new Object[] {contrenew.getContractorRenewId(),contrenew.getUnitCode(),contrenew.getOrganisation(),contrenew.getContractorCode(),contrenew.getContractorName(),contrenew.getManagerName(),contrenew.getLocationOfWork(),contrenew.getSupervisorName(),contrenew.getPfCode(),contrenew.getEmailAdd(),contrenew.getMobileNumber(),contrenew.getEsicReg(),contrenew.getContractorValidTo(),contrenew.getContractorClass(),contrenew.getContractorType()}; 
-
         try {
-           status  = jdbcTemplate.update(setRenewalDetails, parameters);
+           status  = jdbcTemplate.update(query, parameters);
            return String.valueOf(status);
         } catch (Exception e) {
-            
         }
-    
-
     return String.valueOf(status);
 	}
-	@Value("${SET_UNIQUE_REGISTRATION_ID}")
-	private String setuniqueregistrationid;
+	
 	@Override
     public boolean checkIfIdExists(String contractorregId) {
-        String sql = setuniqueregistrationid;
+        String sql = setuniqueregistrationid();
         Integer count = jdbcTemplate.queryForObject(sql, new Object[]{contractorregId}, Integer.class);
         return count != null && count > 0; // True if the ID exists
     }

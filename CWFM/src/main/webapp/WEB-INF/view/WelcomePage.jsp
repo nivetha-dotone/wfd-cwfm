@@ -811,17 +811,23 @@ function deleteGMManager(gmId,gmTypeId) {
 }
 function saveGMMaster() {
     const gmTypeId = document.getElementById('gmTypeId').value;
-    const masterName = document.getElementById('masterName').value;
-    const masterValue = document.getElementById('masterValue').value;
+    const masterName = document.getElementById('masterName').value.trim();
+    const masterValue = document.getElementById('masterValue').value.trim();
+    const errorBox = document.getElementById("error-gmMaster"); // Error message div
+
+    // Hide previous error messages
+    errorBox.style.display = "none";
 
     // Validate fields
     if (!gmTypeId) {
-        alert('Please select GMType.');
+        errorBox.innerText = "Please select GM Type.";
+        errorBox.style.display = "block";
         return;
     }
 
     if (!masterName || !masterValue) {
-        alert('Please enter Name and Value.');
+        errorBox.innerText = "Please enter Name and Value.";
+        errorBox.style.display = "block";
         return;
     }
 
@@ -831,29 +837,26 @@ function saveGMMaster() {
         gmDescription: masterValue,
     });
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/CWFM/generalController/saveGeneralMaster", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-        	document.getElementById("mainContent").innerHTML = xhr.responseText; 
-            // Redirect to the updated list page
-            /* document.open();
-            document.write(xhr.responseText);
-            document.close(); */
+    fetch("/CWFM/generalController/saveGeneralMaster", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: data
+    })
+    .then(response => response.text()) // Read response as text
+    .then(responseText => {
+        if (responseText.includes("Error: Master Name already exists")) {
+            errorBox.innerText = "Warning: Master Name already exists for this GM Type!";
+            errorBox.style.display = "block";
         } else {
-            alert("Error: " + xhr.statusText);
+            document.getElementById("mainContent").innerHTML = responseText;
         }
-    };
-  //
-
-    xhr.onerror = function () {
-        alert("An error occurred while saving the General Master.");
-    };
-
-    xhr.send(data);
+    })
+    .catch(() => {
+        errorBox.innerText = "Failed to communicate with the server.";
+        errorBox.style.display = "block";
+    });
 }
+
 
 function addNewRowFromTemplate() {
     const placeholder = document.getElementById('placeholderRow');
@@ -878,25 +881,70 @@ function addNewRow1() {
 }
 
 function saveRoleRights() {
-    const form = document.getElementById('roleRightsForm'); // Now selects a <form>
-    const formData = new FormData(form);
+    const roleId = document.getElementById('roleId').value;
+    const pageId = document.getElementById('pageId').value;
+    const errorBox = document.getElementById("error-message");
 
-    fetch('/CWFM/roleRights/saveRoleRights', {
-        method: 'POST',
-        body: formData,
+    // Hide previous error messages
+    if (errorBox) errorBox.style.display = "none";
+
+    // Collect selected permissions
+    const permissions = [];
+    document.querySelectorAll('input[name="permissions"]:checked').forEach((checkbox) => {
+        permissions.push(checkbox.value);
+    });
+
+    // Validate inputs
+    if (!roleId || !pageId) {
+        if (errorBox) {
+            errorBox.innerText = "Please select a Role and a Page.";
+            errorBox.style.display = "block";
+        }
+        return;
+    }
+
+    if (permissions.length === 0) {
+        if (errorBox) {
+            errorBox.innerText = "Please select at least one permission.";
+            errorBox.style.display = "block";
+        }
+        return;
+    }
+
+    const data = {
+        roleRights: [{
+            roleId: roleId,
+            pageId: pageId,
+            permissions: permissions
+        }]
+    };
+
+    fetch("/CWFM/roleRights/saveRoleRights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
     })
-    .then(response => {
-        if (response.ok) {
-            // Load the specific list page with default styles
-            loadCommonList('/roleRights/roleRightsList', 'Role Rights');
+    .then(response => response.text())
+    .then(responseText => {
+        if (responseText.includes("Error: Duplicate Role-Page combination detected")) {
+            if (errorBox) {
+                errorBox.innerText = responseText;
+                errorBox.style.display = "block";
+            }
         } else {
-            console.error('Failed to save role rights.');
+            alert("Role rights saved successfully!");
+            location.reload();
         }
     })
     .catch(error => {
-        console.error('Error saving role rights:', error);
+        console.error("Error:", error);
+        if (errorBox) {
+            errorBox.innerText = "Failed to save role rights.";
+            errorBox.style.display = "block";
+        }
     });
 }
+
 
 
 
@@ -3072,29 +3120,195 @@ table th {
     }
 
     function submitGMTYPE() {
-        const data = new FormData();
-        const gmTypeName = document.getElementById("gmTypeName").value.trim(); // Sanitize input
+        const gmTypeName = document.getElementById("gmTypeName").value.trim().toUpperCase();
+        const errorBox = document.getElementById("error-gmType"); // Error message div
+
+        // Hide previous error messages
+        errorBox.style.display = "none";
+
+        // Check if input is empty
+        if (!gmTypeName) {
+            errorBox.innerText = "GM Type name cannot be empty!";
+            errorBox.style.display = "block";
+            return;
+        }
+
+        const data = new URLSearchParams();
         data.append("gmTypeName", gmTypeName);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/CWFM/generalController/saveGMType", true);
-
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                console.log("Data saved successfully:", xhr.responseText);
+        fetch("/CWFM/generalController/saveGMType", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: data
+        })
+        .then(response => response.json().catch(() => null).then(result => ({ response, result })))
+        .then(({ response, result }) => {
+            if (response.status === 400 || response.status === 409) {
+                // Display error message if GM Type is duplicate or invalid
+                errorBox.innerText = result.message || "An error occurred.";
+                errorBox.style.display = "block";
+            } else if (response.ok) {
+                // Save successful, no message needed, refresh the list
                 loadCommonList('/generalController/gmType', 'General Type');
             } else {
-                console.error("Error saving data:", xhr.status, xhr.responseText);
+                throw new Error("Unexpected server response");
             }
-        };
-
-        xhr.onerror = function () {
-            console.error("Request failed");
-        };
-
-        xhr.send(data);
+        })
+        .catch(() => {
+            errorBox.innerText = "Failed to communicate with the server.";
+            errorBox.style.display = "block";
+        });
     }
 
+    function exportGMTYPECSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedGMTIds"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "GMTYPENMAE\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "GMTypeName.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+    function toggleSelectAllGMMaster() {
+        const checkboxes = document.querySelectorAll('input[name="selectedGMMaster"]');
+        checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllGMMCheckbox').checked);
+    }
+    function exportGMMasterCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "GMTYPE,MASTERNAME,MASTERVALUE\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3),td:nth-child(4)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "GMMaster.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+    function exportToRoleCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "ROLENAME,PAGENAME,ADDRIGHTS,EDITRIGHTS,DELETERIGHTS,IMPORTRIGHTS,EXPORTRIGHTS,VIEWRIGHTS,LISTRIGHTS\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3),td:nth-child(4),td:nth-child(5),td:nth-child(6),td:nth-child(7),td:nth-child(8),td:nth-child(9),td:nth-child(10)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "ROLERIGHTS.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+    function exportOrgLevelCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedOrgLevels"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "ORGLEVELNAME,SHORTNAME,HIERARCHY\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3),td:nth-child(4)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "OrgLevel.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+    function exportOrgLevelEntryCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "ENTRYNAME,DESCRIPTION\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "OrgLevelEntry.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+    function exportOrgLevelMapCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "SHORTNAME,LONGDESCRIPTION\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "OrgLevelMap.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+    
     </script>
 </body>
 

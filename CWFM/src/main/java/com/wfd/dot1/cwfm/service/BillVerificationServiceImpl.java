@@ -41,4 +41,9 @@ public class BillVerificationServiceImpl implements BillVerificationService{
 		// TODO Auto-generated method stub
 	        return billDao.viewbillprecomments(transactionId);
 	    }
+	@Override
+	 public BillVerification viewbilleicDetails( String transactionId) {
+		// TODO Auto-generated method stub
+	        return billDao.viewbilleicDetails(transactionId);
+	    }
 }

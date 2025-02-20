@@ -8,6 +8,7 @@
 <head>
  <title>General Master</title>
 <script >
+
 function editRow(gmId) {
     // Enable editing of the input fields
     const nameInput = document.getElementById(`editName-${gmId}`);
@@ -153,16 +154,20 @@ function editRow(gmId) {
 
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveGMMaster()">Save</button>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">Cancel</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Export</button>
             <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}">
             <input type="hidden" id="existingMasterValues" value="${existingMasterValues.join(',')}">
-            
+          <div id="error-gmMaster" style="display: none; color: red; font-weight: bold;"></div>  
     </div>
 
     <h3>Existing General Masters</h3>
     <table border="1" >
         <thead>
             <tr>
-                <th>ID</th>
+            <td>
+                        <input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()">
+                    </td> 
+               <!--  <th>ID</th> -->
                 <th>GM Type</th>
                 <th>Master Name</th>
                 <th>Master Value</th>
@@ -174,7 +179,9 @@ function editRow(gmId) {
             <c:when test="${not empty generalMasters}">
                 <c:forEach var="entry" items="${generalMasters}">
                     <tr id="row-${entry.gmId}">
-                        <td>${entry.gmId}</td>
+                    <td><input type="checkbox"
+							name="selectedGMMaster" value="${entry.gmTypeName}"></td>
+                        <%-- <td>${entry.gmId}</td> --%>
                         <td>${entry.gmTypeName}</td>
                         <td><input type="text" id="name" value="${entry.gmName}"readonly  style="width: 100%;height: 35px;"/></td>
                         <td><input type="text"  id="value" value="${entry.gmDescription}" readonly  style="width: 100%;height: 35px;"/></td>             
@@ -185,13 +192,13 @@ function editRow(gmId) {
                         <td>
                         <!-- Action Buttons -->
                         <div id="action-edit-${entry.gmId}">
-                            <button type="button" class="btn btn-primary" 
+                            <%-- <button type="button" class="btn btn-primary" 
                                     onclick="editRow('${entry.gmId}')">Edit</button>
                             <button type="button" class="btn btn-danger" 
                                     onclick="deleteGMManager(${entry.gmId}, ${gmTypeId})">Delete</button>
                        
                             <button type="button" class="btn btn-success" 
-                                    onclick="saveRow('${entry.gmId}')">Save</button>
+                                    onclick="saveRow('${entry.gmId}')">Save</button> --%>
                             <button type="button" class="btn btn-secondary" 
                                     onclick="cancelEdit('${entry.gmId}')">Cancel</button>
                         </div>

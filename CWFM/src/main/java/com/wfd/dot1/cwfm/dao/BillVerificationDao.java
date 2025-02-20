@@ -16,4 +16,7 @@ public interface BillVerificationDao {
 	public BillVerification viewbillhrclearanceDetails(String transactionId);
 
 	public BillVerification viewbillprecomments(String transactionId);
+
+	public BillVerification viewbilleicDetails(String transactionId);
 }
+

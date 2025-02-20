@@ -26,6 +26,6 @@ public interface BillVerificationService {
 	
 	public BillVerification viewbillprecomments(String transactionId);
 		
-	
+	public BillVerification viewbilleicDetails(String transactionId);
 
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.queries.MasterUserQueryBank;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 @Repository
 public class MasterUserDaoImpl implements MasterUserDao{
 
@@ -18,18 +19,26 @@ public class MasterUserDaoImpl implements MasterUserDao{
 	 @Autowired
 	 private JdbcTemplate jdbcTemplate;
 	 
-	 @Value("${GET_MASTERUSER_BY_USERNAME_AND_PASSWROD}")
-	    private String getMasterUserByUsernameAndPassword;
+	 public String getMasterUserByUsernameAndPassword() {
+		    return QueryFileWatcher.getQuery("GET_MASTERUSER_BY_USERACCOUNT");
+	    }
+	 public String getMasterUserByUserAccount() {
+		    return QueryFileWatcher.getQuery("GET_MASTERUSER_BY_USERACCOUNT");
+	    }
+	 public String getPasswordByUserIdQuery() {
+		    return QueryFileWatcher.getQuery("GET_PASSWORD_BY_USERID");
+	    }
+	 public String updatePasswordQuery() {
+		    return QueryFileWatcher.getQuery("GET_UPDATE_PASSWORD");
+	    }
 	 
-	 @Value("${GET_MASTERUSER_BY_USERACCOUNT}")
-	 private String getMasterUserByUserAccount;
-	
 	@Override
 	public MasterUser findMasterUserDetailsByUserName(String username, String password) {
+		 String query = getMasterUserByUsernameAndPassword();
 		log.info("Entering into findMasterUserDetailsByUserName dao method "+username+" "+password);
 		MasterUser user =null;
-		log.info("Query to findMasterUserDetailsByUserName "+getMasterUserByUsernameAndPassword);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(getMasterUserByUsernameAndPassword, username,password);
+		log.info("Query to findMasterUserDetailsByUserName "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, username,password);
 		if (rs.next()) {
 			user = new MasterUser();
 			user.setUserId(rs.getInt("UserId"));
@@ -47,9 +56,10 @@ public class MasterUserDaoImpl implements MasterUserDao{
 	}
 	@Override
 	public MasterUser findMasterUserDetailsByUserName(String ua) {
+		String query = getMasterUserByUserAccount();
 		MasterUser user =null;
-		log.info("Query to findMasterUserDetailsByUserName "+getMasterUserByUserAccount);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(getMasterUserByUserAccount, ua);
+		log.info("Query to findMasterUserDetailsByUserName "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, ua);
 		if (rs.next()) {
 			user = new MasterUser();
 			user.setUserId(rs.getInt("UserId"));
@@ -68,14 +78,14 @@ public class MasterUserDaoImpl implements MasterUserDao{
 	
 	@Override
     public String getPasswordByUserId(String userId) {
-        String sql = "SELECT Password FROM MASTERUSER WHERE UserId = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, String.class);
+		 String query = getPasswordByUserIdQuery();
+        return jdbcTemplate.queryForObject(query, new Object[]{userId}, String.class);
     }
 
     @Override
     public void updatePassword(String userId, String newPassword) {
-        String sql = "UPDATE MASTERUSER SET Password = ? WHERE UserId = ?";
-        jdbcTemplate.update(sql, newPassword, userId);
+    	 String query = updatePasswordQuery();
+        jdbcTemplate.update(query, newPassword, userId);
     }
 }
 

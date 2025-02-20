@@ -241,6 +241,7 @@
         <button type="button" class="btn btn-default"  onclick="addNewRow()">Add New Row</button>
         <button type="submit" class="btn btn-default" onclick="submitOrgLevel()">Save</button>
         <button type="submit" class="btn btn-default" onclick="deleteSelectedOrgLevel()">Delete Selected</button>
+        <button type="submit" class="btn btn-default" onclick="exportOrgLevelCSV()">Export</button>
     </div>
 
        <div class="table-container">
@@ -262,7 +263,7 @@
                     <tr data-row-id="${orgLevel.orgLevelDefId}">
                         <td class="checkbox-cell">
                         <input type="hidden" name="orgLevelDefId[]" value="${orgLevel.orgLevelDefId}">
-                            <input type="checkbox" name="selectedOrgLevels" value="${orgLevel.orgLevelDefId}" data-row-id="${orgLevel.orgLevelDefId}">
+                            <input type="checkbox" name="selectedOrgLevels" value="${orgLevel.name}" data-row-id="${orgLevel.orgLevelDefId}">
                         </td>
                         <td><input type="text" name="orgLevelName[]" value="${orgLevel.name}" required></td>
                         <td><input type="text" name="shortName[]" value="${orgLevel.shortName}" required></td>

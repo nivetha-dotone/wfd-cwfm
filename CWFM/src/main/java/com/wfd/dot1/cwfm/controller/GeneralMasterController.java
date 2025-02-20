@@ -90,18 +90,34 @@ public class GeneralMasterController {
 //    }
 
     
-    
-    @PostMapping("/saveGMType")
-    public String saveGMType(@RequestParam("gmTypeName") String gmTypeName, RedirectAttributes redirectAttributes) {
-        if (!commonService.isGMTypeNameDuplicate(gmTypeName)) {
-            commonService.saveGMType(gmTypeName);
-            redirectAttributes.addFlashAttribute("successMessage", "GM Type saved successfully!");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "GM Type name already exists!");
-        }
-        return "redirect:/generalController/gmType";
-    }
 
+    
+
+        @PostMapping("/saveGMType")
+        public ResponseEntity<Map<String, String>> saveGMType(@RequestParam("gmTypeName") String gmTypeName) {
+            Map<String, String> response = new HashMap<>();
+
+            // Trim and check if input is empty
+            if (gmTypeName.trim().isEmpty()) {
+                response.put("status", "error");
+                response.put("message", "GM Type name cannot be empty!");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Check if GM Type is a duplicate
+            if (commonService.isGMTypeNameDuplicate(gmTypeName)) {
+                response.put("status", "error");
+                response.put("message", "Warning: GM Type name already exists!");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            }
+
+            // Save GM Type if it's valid (NO SUCCESS MESSAGE RETURNED)
+            commonService.saveGMType(gmTypeName);
+            return ResponseEntity.ok().build(); // No response needed on success
+        }
+    
+
+    
     
     // Delete GMType hibernate
 //    @PostMapping("/deleteGMType")
@@ -206,6 +222,7 @@ public class GeneralMasterController {
          model.addAttribute("gmTypes", gmTypes); 
         return "generalMaster/generalMaster";
     }
+    
     @PostMapping("/saveGeneralMaster")
     public String saveGeneralMaster(
             @RequestBody GeneralMasterDTO generalMasterDTO,
@@ -224,18 +241,28 @@ public class GeneralMasterController {
                 return "generalMaster/generalMaster";
             }
 
-            // Save the General Master
+            // Check for duplicate Master Name under the same GM Type
+            boolean isDuplicate = commonService.isMasterNameDuplicate(
+                generalMasterDTO.getGmTypeId(), 
+                generalMasterDTO.getGmName()
+            );
+
+            if (isDuplicate) {
+                model.addAttribute("error", "Error: Master Name already exists for this GM Type!");
+                return "generalMaster/generalMaster"; // Return with error message
+            }
+
+            // Save the General Master if not duplicate
             commonService.saveGeneralMaster(generalMasterDTO);
 
-            // Fetch the updated data
-            List<GeneralMasterDTO> updatedMasters =commonService.getGeneralMastersWithTypeName(generalMasterDTO.getGmTypeId());
+            // Fetch updated data
+            List<GeneralMasterDTO> updatedMasters = commonService.getGeneralMastersWithTypeName(generalMasterDTO.getGmTypeId());
             List<CMSGMType> gmTypes = commonService.getAllGMTypes();
 
             model.addAttribute("gmTypes", gmTypes);
             model.addAttribute("generalMasters", updatedMasters);
             model.addAttribute("gmTypeId", generalMasterDTO.getGmTypeId());
 
-             
             return "generalMaster/generalMaster"; // Return the updated list view
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,6 +270,7 @@ public class GeneralMasterController {
             return "generalMaster/generalMaster";
         }
     }
+
 
 
     @PostMapping("/deleteGmData")

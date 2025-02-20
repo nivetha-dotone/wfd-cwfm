@@ -107,8 +107,17 @@ public class BillVerification {
 	 private String preMonWageDate;
 	 private String actionPlan ;
 	 private String precomments ;
+	 private String availableeic;
 	 
-	 public String getPrecomments() {
+	 public String getAvailableeic() {
+		return availableeic;
+	}
+
+	public void setAvailableeic(String availableeic) {
+		this.availableeic = availableeic;
+	}
+
+	public String getPrecomments() {
 		return precomments;
 	}
 

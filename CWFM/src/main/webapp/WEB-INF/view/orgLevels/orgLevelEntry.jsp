@@ -141,6 +141,7 @@
         </option>
     </c:forEach>
 </select>
+ <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportOrgLevelEntryCSV()">Export</button>
 </div>
 
 <!-- Form for Adding/Editing Entries -->
@@ -163,7 +164,8 @@
 <table border="1" id="table-body">
     <thead>
         <tr>
-            <th>ID</th>
+        <td><input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()"></td> 
+            <!-- <th>ID</th> -->
             <th>Entry Name</th>
             <th>Description</th>
             <th>Actions</th>
@@ -174,7 +176,9 @@
             <c:when test="${not empty entries}">
                 <c:forEach var="entry" items="${entries}">
                     <tr id="row-${entry.orgLevelEntryId}">
-                        <td>${entry.orgLevelEntryId}</td>
+                    <td><input type="checkbox"
+							name="selectedGMMaster" value="${entry.name}"></td>
+                       <%--  <td>${entry.orgLevelEntryId}</td> --%>
                         <td>${entry.name}</td>
                         <td>${entry.description}</td>
                         <td>

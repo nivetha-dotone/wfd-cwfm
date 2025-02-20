@@ -265,5 +265,9 @@ public class CommonServiceImpl implements CommonService {
 		return commonDAO.getRoleRightsByRoleAndPage(selectedRoleId,pageId);
 
 	}
-    
+	@Override
+    public boolean isMasterNameDuplicate(Long gmTypeId, String gmName) {
+        CmsGeneralMaster gmType = commonDAO.findByGMName(gmTypeId,gmName);
+        return gmType != null;  // Return true if the name already exists
+    }
 }
