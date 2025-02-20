@@ -6,6 +6,14 @@ public class SectionDto {
     private Long sectionId;
     private String sectionName;
     private List<PageDto> pages;
+    private String sectionIcon;
+    public String getSectionIcon() {
+        return sectionIcon;
+    }
+
+    public void setSectionIcon(String sectionIcon) {
+        this.sectionIcon = sectionIcon;
+    }
 	public Long getSectionId() {
 		return sectionId;
 	}

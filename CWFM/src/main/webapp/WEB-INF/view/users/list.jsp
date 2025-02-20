@@ -1,16 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+ <title>Users List</title>
+  <!--   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMSPRINCIPALEMPLOYER List</title>
+    <title>Role Rights List</title>
     <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
+    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
  <style>
  
  
@@ -176,15 +180,22 @@
     </form>
     <div>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUserAdd()">Add</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Delete</button>
+     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersEdit()">Edit</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="usersExportToCSV()">Export</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersView()">View</button>
+        
 </div>
 </div>
-<form id="updateForm" action="/CWFM/roleRights/update" method="POST" >
+<form  >
     <div class="table-container">
         <table border="1">
         <thead>
              <tr>
-                <th>User ID</th>
+                <!-- <th>User ID</th> -->
+                <th class="checkbox-cell">
+                    <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers()">
+                </th>
                 <th>User Account</th>
                 <th>Email</th>
                 <th>Full Name</th>
@@ -196,7 +207,10 @@
         <tbody>
             <c:forEach var="user" items="${users}">
                 <tr>
-                    <td>${user.userId}</td>
+                 <%--    <td>${user.userId}</td> --%>
+                  <td class="checkbox-cell">
+                        <input type="checkbox" name="selectedUserIds" value="${user.userId}">
+                    </td>
                     <td>${user.userAccount}</td>
                     <td>${user.emailId}</td>
                     <td>${user.firstName} ${user.lastName}</td>

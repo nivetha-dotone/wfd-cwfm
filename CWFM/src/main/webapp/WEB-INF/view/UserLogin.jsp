@@ -51,7 +51,7 @@ box-shadow:0 0 10px 0 rgba(0,0,0,0.3);
 </div>
   <button type="submit" style="background-color: #005151;" class="btn text-white col-md-12">Login</button>
 </form>
-<br>Don't have an account? <a href="signup.jsp" class="clink">create one</a>
+<!-- <br>Don't have an account? <a href="signup.jsp" class="clink">create one</a> -->
 </div>
 </div>
 </div>

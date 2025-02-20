@@ -307,7 +307,7 @@ function deleteSelectedOrgLevel() {
         data: JSON.stringify(selectedIds), // Send array of IDs as JSON
         success: function(response) {
             console.log("Successfully updated (set inactive) org levels:", response);
-            alert(response); // Optional: Alert the success message
+           // alert(response); // Optional: Alert the success message
             // Optionally refresh the table or remove rows from the DOM
            loadCommonList('/org-level/list', 'Org Levels');
             const failedOrgLevels = response.failedOrgLevels || [];
@@ -980,7 +980,6 @@ function validateRRForm() {
     return true;
 }
 function redirectToRRAdd() {
-	alert(1);
 	    // Fetch the content of add.jsp using AJAX
 	    var xhr = new XMLHttpRequest();
 	    xhr.onreadystatechange = function() {
@@ -1003,7 +1002,7 @@ function redirectToUserAdd() {
 	    xhr.open("GET", "/CWFM/usersController/new", true);
 	    xhr.send();
 	}
-function saveUser() {
+/* function saveUser() {
     const form = document.getElementById('userFormID');
     const formData = new FormData(form);
 
@@ -1049,7 +1048,124 @@ function saveUser() {
             }
         })
         .catch(error => console.error('Error saving user:', error));
+} */
+function showError(field, message) {
+    console.log(`showError called for: ${field}`);  // Debugging line
+
+    const errorElement = document.getElementById(field + 'Error');
+    if (errorElement) {
+        errorElement.innerText = message;
+        errorElement.style.color = "red";
+    } else {
+        console.error(`❌ Error: Element '${field}Error' not found in HTML!`);
+    }
 }
+function checkUserExists(userAccount) {
+    if (!userAccount.trim()) {
+        showError("userAccount", "User Account is required.");
+        return Promise.resolve(false);  // Return a resolved promise with 'false'
+    }
+
+    return fetch("/CWFM/usersController/checkUserExists?userAccount=" + userAccount)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.statusText}`);
+            }
+            return response.json(); // Ensure JSON response
+        })
+        .then(data => {
+            console.log("User exists check response:", data);
+            return data.exists; // Ensure it's a boolean
+        })
+        .catch(error => {
+            console.error("Error checking user account:", error);
+            return false;  // Return false on error
+        });
+}
+
+
+function saveUser() {
+    const form = document.getElementById('userFormID');
+    if (!form) {
+        console.error("Error: Form not found!");
+        return;
+    }
+
+    // Fetch input values
+    const firstName = form.elements['firstName'] ? form.elements['firstName'].value.trim() : "";
+    const lastName = form.elements['lastName'] ? form.elements['lastName'].value.trim() : "";
+    const emailId = form.elements['emailId'] ? form.elements['emailId'].value.trim() : "";
+    const contactNumber = form.elements['contactNumber'] ? form.elements['contactNumber'].value.trim() : "";
+    const password = form.elements['password'] ? form.elements['password'].value.trim() : "";
+    const userAccount = form.elements['userAccount'] ? form.elements['userAccount'].value.trim() : "";
+
+    let isValid = true;
+    document.querySelectorAll(".error-message").forEach(e => e.innerText = "");
+
+    if (!firstName) { showError("firstName", "First Name is required."); isValid = false; }
+    if (!lastName) { showError("lastName", "Last Name is required."); isValid = false; }
+    if (!emailId || !/\S+@\S+\.\S+/.test(emailId)) { showError("emailId", "Enter a valid email."); isValid = false; }
+    if (!contactNumber || !/^\d{10}$/.test(contactNumber)) { showError("contactNumber", "Enter a valid 10-digit phone number."); isValid = false; }
+  //  if (!password || password.length < 8) { showError("password", "Password must be at least 8 characters long."); isValid = false; }
+   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+    	showError("password", "Weak password! Must be 8+ chars, A-Z, a-z, 0-9, and special character.");
+        isValid = false;
+    } 
+  if (!userAccount) { showError("userAccount", "User Account is required."); isValid = false; }
+
+    // Role selection validation
+    const roleErrorElement = document.getElementById('roleError');
+    roleErrorElement.innerText = "";
+    const roleIds = [];
+    form.querySelectorAll('input[name="roleIds"]:checked').forEach(input => {
+        roleIds.push(Number(input.value));
+    });
+
+    if (roleIds.length === 0) {
+        roleErrorElement.innerText = "Please select at least one role.";
+        return;
+    }
+
+    if (!isValid) return;
+
+    // Check if user exists before submitting
+    checkUserExists(userAccount).then(exists => {
+        if (exists) {
+            showError("userAccount", "User Account already exists.");
+            return;
+        }
+
+        const user = { firstName, lastName, emailId, contactNumber, password, userAccount };
+        const payload = { user, roleIds };
+
+        fetch('/CWFM/usersController/saveUsers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        })
+        .then(response => {
+            console.log('Fetch response received:', response);
+            return response.text();  // Read response as text
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text); // Try parsing as JSON
+                alert(data.message); // Show success message
+            } catch (e) {
+                alert(text); // If not JSON, show plain text response
+            }
+            loadCommonList('/usersController/userList', 'Users');
+        })
+        .catch(error => {
+            console.error('Error saving user:', error);
+            alert(`Error: ${error.message}`);
+        });
+    });
+}
+
+
+
 function updateSidebar(sections, selectedRole) {
     if (!selectedRole) {
         console.warn("Skipping sidebar update: No role selected.");
@@ -1077,8 +1193,16 @@ function updateSidebar(sections, selectedRole) {
 
         // Section icon
         const icon = document.createElement('i');
-        icon.classList.add('fa', 'fa-cog', 'nav-icon');
+if (section.sectionIcon) {
+    section.sectionIcon.split(' ').forEach(cls => icon.classList.add(cls.trim())); 
+} else {
+    icon.classList.add('fa', 'fa-cog'); // Default icon if not found
+}
+icon.classList.add('nav-icon'); // Ensures additional class is applied
         sectionLink.appendChild(icon);
+       /*  const icon = document.createElement('i');
+        icon.classList.add('fa', 'fa-cog', 'nav-icon');
+        sectionLink.appendChild(icon); */
 
         // Section name
         const sectionText = document.createElement('span');
@@ -1165,7 +1289,6 @@ window.onload = function() {
 };
 
 function changeRole(selectedRoleId, selectedRoleName) {
-    alert(selectedRoleName);  // To check the selected role name
     if (selectedRoleId) {
     	 localStorage.setItem("selectedRoleId", selectedRoleId);
          localStorage.setItem("selectedRoleName", selectedRoleName);
@@ -1398,6 +1521,9 @@ function fetchSectionData() {
 	    };
 	    xhr.open("GET", "/CWFM/generalController/addSection", true);
 	    xhr.send();
+}
+function convertToUppercase(element) {
+    element.value = element.value.toUpperCase();
 }
 </script>
 <script>
@@ -1727,7 +1853,54 @@ function redirectToOrgMapEdit() {
     xhr.open("GET", "/CWFM/org-level-mapping/edit?id=" + selectedId, true);
     xhr.send();
 }
+ async function fetchIntData() {
+    const apiUrl = document.getElementById('apiUrl').value;
+    const accessToken = document.getElementById('accessToken').value;
+    const csvFileName = document.getElementById('csvFileName').value;
 
+    if (!apiUrl || !accessToken || !csvFileName) {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    try {
+        // Fetch data from API
+          const response = await fetch(`/api/data/fetch-data?apiUrl=${apiUrl}&accessToken=${accessToken}`);
+            const data = await response.json();
+            
+
+        // Display data
+        const responseDataDiv = document.getElementById('responseData');
+        responseDataDiv.innerHTML = JSON.stringify(data, null, 2);
+
+        // Export data to CSV
+        exportToCSV(data, csvFileName);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
+ 
+// Function to export JSON data to CSV
+function exportToCSV(data, fileName) {
+    const json = JSON.parse(data);
+    const csv = convertToCSV(json);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName + ".csv";
+    a.click();
+}
+
+// Helper function to convert JSON to CSV
+function convertToCSV(json) {
+    const keys = Object.keys(json[0]);
+    const csv = [
+        keys.join(','), // header row
+        ...json.map(row => keys.map(key => row[key]).join(','))
+    ].join('\n');
+    return csv;
+}
     </script>
     <style>
     
@@ -2375,7 +2548,14 @@ table th {
 .sub-menu li {
     padding: 2px 0;
 }
-
+.error-message {
+    display: block;
+    color: red;
+    font-size: 12px;
+    max-width: 200px; /* Set a max width */
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word;
+}
     </style>
 </head>
 <body>
@@ -2463,7 +2643,7 @@ table th {
             <c:forEach var="section" items="${sessionScope.sections}">
     <li>
         <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
-            <i class="fa fa-folder nav-icon"></i>
+            <i class="${section.sectionIcon} nav-icon"></i>
             <span class="nav-text">${section.sectionName}</span>
             <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
             <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
@@ -2485,7 +2665,7 @@ table th {
             <c:forEach var="section" items="${sessionScope.sections}">
                 <li>
                     <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
-                        <i class="fa fa-folder nav-icon"></i>
+                        <i class="${section.sectionIcon} nav-icon"></i>
                         <span class="nav-text">${section.sectionName}</span>
                         <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
             <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
@@ -2506,8 +2686,8 @@ table th {
         <ul id="adminMenu" style="display:none;">
          <li>
             <a href="#" class="nav-link" onclick="toggleGeneralManagementSubMenu(this)">
-                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
-                <span class="nav-text">General Management</span>
+                <i class="fa fa-user nav-icon"></i> <!-- Icon for General Management -->
+                <span class="nav-text">Administrator Setup</span>
                 <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
                 <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
             </a>
@@ -2517,6 +2697,9 @@ table th {
 <li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
 <li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
 <li><a href="#" onclick="loadCommonList('/generalController/addSection', 'Sections')">Sections</a></li>
+<li><a href="#" onclick="loadCommonList('/usersController/loadResetPwdPage', 'Reset Password')">Reset Password</a></li>
+<!-- <li><a href="#" onclick="loadCommonList('/api/data/integration', 'Integrations')">Integrations</a></li> -->
+
             </ul>
         </li>
     </ul>
@@ -3050,10 +3233,10 @@ table th {
         xhttp.send();
     }
 
-    function loadChangePassword() {
+   /*  function loadChangePassword() {
         console.log("Change Password clicked");
         window.location.href = window.location.origin + '/CWFM/changePassword'; 
-     }
+     } */
     function loadLogout() {
     	console.log("Logout clicked");
         document.cookie = "JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -3069,7 +3252,7 @@ table th {
     function resetSessionTimer() {
         // Placeholder for session timer reset logic
     }
-    function changePassword() {
+   /*  function changePassword() {
         const oldPassword = document.getElementById("oldPassword").value.trim();
         const newPassword = document.getElementById("newPassword").value.trim();
         const confirmPassword = document.getElementById("confirmPassword").value.trim();
@@ -3117,7 +3300,7 @@ table th {
                 console.error("Error:", error);
                 messageElement.innerText = "Failed to change password. Please try again.";
             });
-    }
+    } */
 
     function submitGMTYPE() {
         const gmTypeName = document.getElementById("gmTypeName").value.trim().toUpperCase();
@@ -3158,6 +3341,266 @@ table th {
             errorBox.innerText = "Failed to communicate with the server.";
             errorBox.style.display = "block";
         });
+    }
+    function changePassword() {
+    	var password = document.getElementById("newPassword").value;
+        var message = document.getElementById("passwordMessage").innerHTML;
+        
+        if (message !== "") {
+            alert("Please enter a strong password!");
+            return;
+        }
+
+        var data = {
+            userAccount: document.getElementById("userAccount").value,
+            oldPassword: document.getElementById("oldPassword").value,
+            newPassword: password
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/CWFM/usersController/changePassword",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(response) {
+                alert("Password changed successfully!");
+                document.getElementById("mainContent").innerHTML ='';
+            },
+            error: function(xhr) {
+                alert("Error: " + xhr.responseText);
+            }
+        });
+    }
+    function loadChangePassword() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Update the mainContent element with the fetched content
+                document.getElementById("mainContent").innerHTML = xhr.responseText;
+            }
+        };
+        xhr.open("GET", "/CWFM/usersController/loadChangePwdPage", true);
+        xhr.send();
+    }
+   
+    function resetPassword() {
+    	var password = document.getElementById("resetNewPassword").value;
+        var message = document.getElementById("resetPasswordMessage").innerHTML;
+        
+        if (message !== "") {
+            alert("Please enter a strong password!");
+            return;
+        }
+
+        var data = {
+            userAccount: document.getElementById("resetUserAccount").value,
+            newPassword: password
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/CWFM/usersController/resetPassword",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(response) {
+                alert("Password reset successfully!");
+                document.getElementById("mainContent").innerHTML ='';
+                updateHeading('Contract Labor Management System');
+            },
+            error: function(xhr) {
+                alert("Error: " + xhr.responseText);
+            }
+        });
+    }
+    function validatePassword() {
+        var password = document.getElementById("newPassword").value;
+        var message = document.getElementById("passwordMessage");
+        
+        var regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+        
+        if (!regex.test(password)) {
+            message.innerHTML = "Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.";
+        } else {
+            message.innerHTML = "";
+        }
+    }
+    function validateResetPassword() {
+        var password = document.getElementById("resetNewPassword").value;
+        var message = document.getElementById("resetPasswordMessage");
+
+        var regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+
+        if (!regex.test(password)) {
+            message.innerHTML = "Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.";
+        } else {
+            message.innerHTML = "";
+        }
+    }
+    function redirectToUsersView() {
+        var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (selectedCheckboxes.length !== 1) {
+            alert("Please select exactly one row to view.");
+            return;
+        }
+        
+        var selectedRow = selectedCheckboxes[0].closest('tr');
+        var userId = selectedRow.querySelector('[name="selectedUserIds"]').value.trim();
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById("mainContent").innerHTML = xhr.responseText;
+            }
+        };
+        xhr.open("GET", "/CWFM/usersController/userview/" + userId , true);
+        xhr.send();
+    } 
+    function toggleSelectAllUsers() {
+        const checkboxes = document.querySelectorAll('input[name="selectedUserIds"]');
+        checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllUsers').checked);
+    }
+    function goBackToUserList() {
+    	 loadCommonList('/usersController/userList', 'Users');
+    }
+    
+    function redirectToUsersEdit() {
+        var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (selectedCheckboxes.length !== 1) {
+            alert("Please select exactly one row to edit.");
+            return;
+        }
+        
+        var selectedRow = selectedCheckboxes[0].closest('tr');
+        var userId = selectedRow.querySelector('[name="selectedUserIds"]').value.trim();
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById("mainContent").innerHTML = xhr.responseText;
+            }
+        };
+        xhr.open("GET", "/CWFM/usersController/edit/" + userId , true);
+        xhr.send();
+    }
+    function updateUser() {
+        const form = document.getElementById('userEditFormID');
+        const formData = new FormData(form);
+
+        // Prepare user object
+        const user = {
+            userId: form.elements['userId'].value.trim(),  // Ensure userId is included
+            firstName: form.elements['firstName'].value,
+            lastName: form.elements['lastName'].value,
+            emailId: form.elements['emailId'].value,
+            contactNumber: form.elements['contactNumber'].value,
+            password: form.elements['password'].value,
+            userAccount: form.elements['userAccount'].value,
+        };
+        // Prepare role IDs
+        const roleIds = [];
+        form.querySelectorAll('input[name="roleIds"]:checked').forEach(input => {
+            roleIds.push(Number(input.value));
+        });
+
+        // Construct payload
+        const payload = {
+            user,
+            roleIds,
+        };
+
+        console.log('Payload:', payload);
+
+        // Make PUT request
+        fetch('/CWFM/usersController/updateUser', {
+            method: 'POST',  // Should be PUT, but keeping POST for consistency
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('User updated successfully!');
+                    loadCommonList('/usersController/userList', 'Users');
+                } else {
+                    response.text().then(text => alert(`Failed to update user: ${text}`));
+                }
+            })
+            .catch(error => console.error('Error updating user:', error));
+    }
+    function deleteSelectedUsers() {
+        let selectedUserIds = [];
+        document.querySelectorAll("input[name='selectedUserIds']:checked").forEach(checkbox => {
+            selectedUserIds.push(checkbox.value);
+        });
+
+        if (selectedUserIds.length === 0) {
+            alert("Please select at least one user to delete.");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete the selected users?")) {
+            return;
+        }
+
+        fetch('/CWFM/usersController/deleteUsers', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userIds: selectedUserIds })
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert("Users deleted successfully!");
+            loadCommonList('/usersController/userList', 'Users');
+        })
+        .catch(error => {
+            console.error("Error deleting users:", error);
+            alert("An error occurred while deleting users.");
+        });
+    }
+    function usersExportToCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedUserIds"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var userIds = Array.from(selectedRows).map(row => row.value);
+
+        fetch('/CWFM/usersController/getUserRoles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userIds: userIds })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(roleData => {
+            var csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "User Account,Email,Full Name,Contact Number,Status,Roles\n";
+
+            selectedRows.forEach(row => {
+                var rowData = row.closest("tr").querySelectorAll("td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6)");
+                var rowArray = [];
+
+                rowData.forEach(cell => rowArray.push(cell.innerText.trim()));
+
+                var userId = row.value;
+                var roles = roleData[userId] ? roleData[userId].join(" | ") : "N/A";
+                rowArray.push(roles);
+
+                csvContent += rowArray.join(",") + "\n";
+            });
+
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "UserList.csv");
+            document.body.appendChild(link);
+            link.click();
+        })
+        .catch(error => console.error("Error fetching roles:", error));
     }
 
     function exportGMTYPECSV() {

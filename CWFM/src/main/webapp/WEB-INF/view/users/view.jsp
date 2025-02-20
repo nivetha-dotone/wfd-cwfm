@@ -1,17 +1,22 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-    <%@ page isELIgnored="false" %>
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
+ <title>Users View</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="resources/js/jquery.min.js"></script>
+    <!-- <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/commonjs.js"></script> 
+    <script src="resources/js/commonjs.js"></script>  -->
 
     <style>
          body {
@@ -148,8 +153,8 @@ textarea {
     
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
-<!--  <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveUser()">Save</button>
- --></div>
+  <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToUserList()">Return</button>
+</div>
    <form id="userFormID">
     <table class="ControlLayout">
         <!-- Form fields -->
@@ -160,44 +165,52 @@ textarea {
                 <td><input type="text" name="contractTo" value="${principalEmployer.contractTo}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
             </tr> --%>
         <tr>
-            <th><label class="custom-label"><span class="required-field">*</span>First Name:</label></th>
+            <th><label class="custom-label"><span class="required-field"></span>First Name:</label></th>
             <td><input type="text" name="firstName" value="${users.firstName}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
-            <th><label class="custom-label"><span class="required-field">*</span>Last Name:</label></th>
+            <th><label class="custom-label"><span class="required-field"></span>Last Name:</label></th>
             <td><input type="text" name="lastName" value="${users.lastName}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
         </tr>
         <tr>
-             <th><label class="custom-label"><span class="required-field">*</span>Email:</label></th>
+             <th><label class="custom-label"><span class="required-field"></span>Email:</label></th>
         <td><input type="email" name="emailId" value="${users.emailId}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
-            <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
+            <th><label class="custom-label"><span class="required-field"></span>Contact Number:</label></th>
             <td><input type="text" name="contactNumber" value="${users.contactNumber}" style="height: 20px;" size="30" maxlength="30"  readonly /></td>
         </tr>
         <tr>
-            <th><label class="custom-label"><span class="required-field">*</span>Password:</label></th>
+            <th><label class="custom-label"><span class="required-field"></span>Password:</label></th>
             <td><input type="password" name="password" value="${users.password}" style="height: 20px;" size="30" maxlength="30"  readonly /></td>
-            <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
+            <th><label class="custom-label"><span class="required-field"></span>User Account:</label></th>
             <td><input type="text" name="userAccount" value="${users.userAccount}" style="height: 20px;" size="30" maxlength="30"  readonly /></td>
         </tr>
-        <tr>
-            <th><label class="custom-label"><span class="required-field">*</span>Roles:</label></th>
-            <td>
-                <table style="width: 100%;">
-                    <tr>
-                        <th style="text-align: left;">Select</th>
-                        <th style="text-align: left;">Role Name</th>
-                    </tr>
-                    <c:forEach var="role" items="${roles}" varStatus="status">
-                        <c:if test="${status.index % 3 == 0}">
-                            <tr>
-                        </c:if>
-                        <td><input type="checkbox" name="roleIds" value="${role.gmId}" /></td>
-                        <td>${role.gmName}</td>
-                        <c:if test="${status.index % 3 == 2 || status.last}">
-                            </tr>
-                        </c:if>
-                    </c:forEach>
-                </table>
-            </td>
-        </tr>
+        <tr> 
+    <th><label class="custom-label"><span class="required-field"></span>Roles:</label></th>
+    <td>
+        <table style="width: 100%;">
+            <tr>
+                <th style="text-align: left;">Select</th>
+                <th style="text-align: left;">Role Name</th>
+            </tr>
+            <c:forEach var="role" items="${roles}">
+                <c:set var="isChecked" value="false"/>
+                
+                <!-- Loop through assignedRoles to check if the role is assigned -->
+                <c:forEach var="assignedRole" items="${assignedRoles}">
+                    <c:if test="${assignedRole == role.gmId}">
+                        <c:set var="isChecked" value="true"/>
+                    </c:if>
+                </c:forEach>
+
+                <tr>
+                    <td>
+                        <input type="checkbox" name="roleIds" value="${role.gmId}" 
+                               <c:if test="${isChecked}">checked</c:if> disabled />
+                    </td>
+                    <td>${role.gmName}</td>
+                </tr>
+            </c:forEach>
+        </table>
+    </td>
+</tr>
     </table>
 </form>
 

@@ -625,6 +625,8 @@ public class CommonDaoImpl implements CommonDao {
 		public List<SectionDto> getAllSectionsWithPages() {
 			String query = getallsectionswithpages();
 		    List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+
+
 		    if (rows.isEmpty()) {
 		        return Collections.emptyList();
 		    }
@@ -635,6 +637,10 @@ public class CommonDaoImpl implements CommonDao {
 		                SectionDto sectionDto = new SectionDto();
 		                sectionDto.setSectionId(((Number) sectionRows.get(0).get("sectionId")).longValue());
 		                sectionDto.setSectionName((String) sectionRows.get(0).get("sectionName"));
+
+		                sectionDto.setSectionIcon((String) sectionRows.get(0).get("sectionIcon"));
+
+
 		                List<PageDto> pages = sectionRows.stream()
 		                    .filter(row -> row.get("pageId") != null)
 		                    .map(row -> {
@@ -655,6 +661,7 @@ public class CommonDaoImpl implements CommonDao {
 		public List<SectionDto> getSectionsByRoleId(String roleId) {
 			String query = getsectionsbyroleid();
 				    List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, roleId);
+
 				    if (rows.isEmpty()) {
 				        return Collections.emptyList();
 				    }
@@ -666,6 +673,9 @@ public class CommonDaoImpl implements CommonDao {
 				                SectionDto sectionDto = new SectionDto();
 				                sectionDto.setSectionId(((Number) sectionRows.get(0).get("sectionId")).longValue());
 				                sectionDto.setSectionName((String) sectionRows.get(0).get("sectionName"));
+
+				                sectionDto.setSectionIcon((String) sectionRows.get(0).get("sectionIcon"));
+
 				                // Collect pages for this section
 				                List<PageDto> pages = sectionRows.stream()
 				                    .filter(row -> row.get("pageId") != null)

@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,6 +11,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import com.wfd.dot1.cwfm.dto.ChangePasswordDTO;
+import com.wfd.dot1.cwfm.dto.ResetPasswordDTO;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
@@ -39,6 +42,8 @@ public class UserDAOImpl implements UserDAO {
     public String saveusers() {
 	    return QueryFileWatcher.getQuery("SAVE_USER");
     }
+    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$";
+
     @Override
     public MasterUser getUserById(String userId) {
     	String query=getuserbyid();
@@ -60,7 +65,9 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public List<MasterUser> getAllUsers() {
     	String query=getallusers();
+    	
         return jdbcTemplate.query(query, (rs, rowNum) -> {
+
             MasterUser user = new MasterUser();
             user.setUserId(rs.getInt("userId"));
             user.setUserAccount(rs.getString("userAccount"));
@@ -117,14 +124,7 @@ public class UserDAOImpl implements UserDAO {
     public void saveUser(MasterUser user, List<Long> roleIds) {
         String query=saveusers();
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        System.out.println("UserId: " + user.getUserId());
-        System.out.println("FirstName: " + user.getFirstName());
-        System.out.println("LastName: " + user.getLastName());
-        System.out.println("EmailId: " + user.getEmailId());
-        System.out.println("ContactNumber: " + user.getContactNumber());
-        System.out.println("Password: " + user.getPassword());
-        System.out.println("Status: " + user.getStatus());
-        System.out.println("UserAccount: " + user.getUserAccount());
+
         // Encrypt password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         // Insert the user and retrieve the generated key
@@ -150,5 +150,133 @@ public class UserDAOImpl implements UserDAO {
         }
 
     }
+
+
+    @Override
+    public boolean changeUserPassword(ChangePasswordDTO changePasswordDTO) {
+    	 if (!isValidPassword(changePasswordDTO.getNewPassword())) {
+             throw new IllegalArgumentException("Password does not meet security requirements!");
+         }
+        String selectQuery = "SELECT password FROM MASTERUSER WHERE userAccount = ? AND Status='A' ";
+
+        try {
+            @SuppressWarnings("deprecation")
+			List<String> passwords = jdbcTemplate.query(selectQuery, new Object[]{changePasswordDTO.getUserAccount()},
+                (rs, rowNum) -> rs.getString("password"));
+
+            if (passwords.isEmpty()) {
+                System.out.println("User not found or inactive.");
+                return false;  // No user found
+            }
+
+            String storedPassword = passwords.get(0);
+
+            if (passwordEncoder.matches(changePasswordDTO.getOldPassword(), storedPassword)) {
+                // If old password matches, update to the new password
+                String updateQuery = "UPDATE MASTERUSER SET password = ? WHERE userAccount = ? AND Status='A' ";
+                jdbcTemplate.update(updateQuery, passwordEncoder.encode(changePasswordDTO.getNewPassword()), changePasswordDTO.getUserAccount());
+                return true;
+            } else {
+                System.out.println("Old password does not match.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return false;
+    }
+    public boolean resetUserPassword(ResetPasswordDTO resetPasswordDTO) {
+    	if (!isValidPassword(resetPasswordDTO.getNewPassword())) {
+            throw new IllegalArgumentException("Password does not meet security requirements!");
+        }
+        String selectQuery = "SELECT COUNT(*) FROM MASTERUSER WHERE userAccount = ? AND Status='A'";
+
+        int count = jdbcTemplate.queryForObject(selectQuery, new Object[]{resetPasswordDTO.getUserAccount()}, Integer.class);
+
+        if (count > 0) {
+            String updateQuery = "UPDATE MASTERUSER SET password = ? WHERE userAccount = ? AND Status='A'";
+            jdbcTemplate.update(updateQuery, passwordEncoder.encode(resetPasswordDTO.getNewPassword()), resetPasswordDTO.getUserAccount());
+            return true;
+        }
+        return false;
+    }
+    private boolean isValidPassword(String password) {
+        return Pattern.matches(PASSWORD_REGEX, password);
+    }
+    public String viewUserDetailsQuery() {
+	    return QueryFileWatcher.getQuery("GET_VIEW_USER_DETAILS");
+    }
+ @Override
+    public MasterUser viewUserDetails(String unitId) {
+    	String query = viewUserDetailsQuery();
+        return jdbcTemplate.queryForObject(query, new Object[]{unitId}, (rs, rowNum) -> {
+            MasterUser user = new MasterUser();
+            user.setUserId(Integer.parseInt(unitId));
+            user.setFirstName(rs.getString("firstName"));
+            user.setLastName(rs.getString("lastName"));
+            user.setEmailId(rs.getString("emailId"));
+            user.setContactNumber(rs.getString("contactNumber"));
+            user.setPassword(rs.getString("password"));
+            user.setUserAccount(rs.getString("userAccount"));
+            
+            return user;
+        });
+    }
+ public List<Long> getUserRoleIds(Long userId) {
+	    String query = "SELECT RoleId FROM UserRoleMapping WHERE UserId = ?";
+	    return jdbcTemplate.queryForList(query, Long.class, userId);
+	}
+ 
+
+
+@Override
+public List<Long> getUserRoleIds(String userId) {
+	 String query = "SELECT RoleId FROM UserRoleMapping WHERE UserId = ?";
+	    return jdbcTemplate.queryForList(query, Long.class, userId);
+}
+@Override
+public void updateUser(MasterUser user, List<Long> roleIds) {
+    String sql = "UPDATE MASTERUSER SET userAccount = ?, EmailId = ?, FirstName = ?, LastName = ?, ContactNumber = ?, Password = ? WHERE UserId = ?";
+    jdbcTemplate.update(sql, 
+        user.getUserAccount(),
+        user.getEmailId(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getContactNumber(),
+        user.getPassword(),
+        user.getUserId()
+    );
+
+    String deleteRolesSql = "DELETE FROM UserRoleMapping WHERE UserId = ?";
+    jdbcTemplate.update(deleteRolesSql, user.getUserId());
+
+    String insertRoleSql = "INSERT INTO UserRoleMapping (UserId, RoleId) VALUES (?, ?)";
+    for (Long roleId : roleIds) {
+        jdbcTemplate.update(insertRoleSql, user.getUserId(), roleId);
+    }
+}
+public void deleteUsers(List<Integer> userIds) {
+    String sql = "UPDATE MASTERUSER SET status = 'NA' WHERE UserId = ?";
+    for (Integer userId : userIds) {
+        jdbcTemplate.update(sql, userId);
+    }
+}
+
+@Override
+public List<String> getRolesByUserId(Long userId) {
+    String sql = """
+        SELECT STRING_AGG(gm.GMNAME, '; ') AS RoleNames
+        FROM UserRoleMapping urm
+        JOIN CMSGENERALMASTER gm ON urm.RoleId = gm.GMID
+        WHERE urm.UserId = ?
+    """;
+
+    return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("RoleNames"), userId);
+}
+
+public boolean doesUserExist(String userAccount) {
+    String sql = "SELECT COUNT(*) FROM MASTERUSER WHERE userAccount = ? AND Status='A'";
+    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userAccount);
+    return count != null && count > 0;
+}
     
 }

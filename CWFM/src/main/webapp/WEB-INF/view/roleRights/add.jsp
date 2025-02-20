@@ -1,17 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page isELIgnored="false" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+ <title>Role Rights Add</title>
+  <!--   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Rights List</title>
     <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
+    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
 
     <style>
         .form-control-rounded {
@@ -174,10 +177,7 @@
 
 </head>
 <body>
-       <div class="page-header"> 
-       </div>
-        <!-- <h1 class="page-header">Role Rights Add Page</h1> method="post" action="/CWFM/roleRights/saveRoleRights"-->
-
+      
   <form id="roleRightsForm" >
     <div id="roleRightsForm">
         <div class="table-container">

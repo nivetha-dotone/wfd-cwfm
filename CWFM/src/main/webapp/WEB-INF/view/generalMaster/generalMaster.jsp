@@ -192,15 +192,17 @@ function editRow(gmId) {
                         <td>
                         <!-- Action Buttons -->
                         <div id="action-edit-${entry.gmId}">
-                            <%-- <button type="button" class="btn btn-primary" 
-                                    onclick="editRow('${entry.gmId}')">Edit</button>
+
+                           <%--  <button type="button" class="btn btn-primary" 
+                                    onclick="editRow('${entry.gmId}')">Edit</button> --%>
                             <button type="button" class="btn btn-danger" 
                                     onclick="deleteGMManager(${entry.gmId}, ${gmTypeId})">Delete</button>
                        
-                            <button type="button" class="btn btn-success" 
-                                    onclick="saveRow('${entry.gmId}')">Save</button> --%>
+                           <%--  <button type="button" class="btn btn-success" 
+                                    onclick="saveRow('${entry.gmId}')">Save</button>
+
                             <button type="button" class="btn btn-secondary" 
-                                    onclick="cancelEdit('${entry.gmId}')">Cancel</button>
+                                    onclick="cancelEdit('${entry.gmId}')">Cancel</button> --%>
                         </div>
                     </td>
                     </tr>

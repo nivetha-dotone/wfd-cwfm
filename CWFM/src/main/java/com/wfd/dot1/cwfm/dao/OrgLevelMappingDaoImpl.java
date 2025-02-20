@@ -226,6 +226,7 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
         public List<OrgLevelMapping> findAllMaps() {
         	String query=findallmaps();
             List<OrgLevelMapping> result = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+
             System.out.println("Fetched OrgLevelMappings: " + result);  // Log the fetched data
             return result;
         }

@@ -38,10 +38,14 @@ box-shadow:0 0 10px 0 rgba(0,0,0,0.3);
 <div class="card-body">
 
 <p class="fs-4 text-center">User Login</p>
-<c:if test="${not empty msg }">
+<c:if test="${not empty msg}">
+    <h5 class="text-danger">${msg}</h5>
+    <% session.removeAttribute("msg"); %>  <!-- Remove msg from session -->
+</c:if>
+<%-- <c:if test="${not empty msg }">
 							<h5 class="text-success">${msg }</h5>
 							<c:remove var="msg" />
-						</c:if>
+						</c:if> --%>
 <form action="userlogin" method="post">
 <!-- <form action="UserProfile.jsp" method="post"> -->
 <div class="mb-3">
@@ -57,7 +61,7 @@ box-shadow:0 0 10px 0 rgba(0,0,0,0.3);
 </div>
   <button type="submit" style="background-color: #005151;" class="btn text-white col-md-12">Login</button>
 </form>
-<br>Don't have an account? <a href="signup.jsp" class="clink">create one</a>
+<!-- <br>Don't have an account? <a href="signup.jsp" class="clink">create one</a> -->
 </div>
 </div>
 </div>

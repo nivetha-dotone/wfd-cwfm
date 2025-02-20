@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
- <title>Users Add</title>
+ <title>Users Edit</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="resources/js/jquery.min.js"></script>
@@ -66,20 +66,13 @@ th label {
     color: red; /* Change this to your desired color */
     margin-right: 4px; 
 }
-          .page-header {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; 
-    gap: 10px; 
-        padding: 8px; 
-        background-color: #FFFFFF; /* White background */
-        border-bottom: 1px solid #ccc; /* Subtle border for separation */
-    }
+        
 
-    .page-header > div {
-        display: flex;
-        gap: 10px; /* Space between buttons */
-    }
+        .header-buttons {
+            float: right;
+          /*   margin-top: -40px; */
+            margin-right: 10px;
+        }
         .error-message {
     color: red;
     font-family: Arial, sans-serif;
@@ -109,7 +102,21 @@ th label {
         outline: 0;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
-    
+      .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; 
+    gap: 10px; 
+        padding: 8px; 
+        background-color: #FFFFFF; /* White background */
+        border-bottom: 1px solid #ccc; /* Subtle border for separation */
+    }
+
+    .page-header > div {
+        display: flex;
+        gap: 10px; /* Space between buttons */
+    }
+
     </style>
 </head>
 
@@ -117,79 +124,61 @@ th label {
     
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
- <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveUser()">Save</button>
- <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToUserList()">Cancel</button>
+ <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="updateUser()">Save</button>
+ <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToUserList()">Cancel</button>
  
 </div>
-   <form id="userFormID">
+   <form id="userEditFormID">
     <table class="ControlLayout">
         <!-- Form fields -->
+       <input type="hidden" name="userId" id="userId" value="${user.userId}" />
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>First Name:</label></th>
-            <td><input type="text" name="firstName" style="height: 20px;" size="30" maxlength="30" />
-             <span id="firstNameError" class="error-message"></span>
-             </td>
-           
+            <td><input type="text" name="firstName" style="height: 20px;" size="30" maxlength="30" value="${user.firstName}" /></td>
             <th><label class="custom-label"><span class="required-field">*</span>Last Name:</label></th>
-            <td><input type="text" name="lastName" style="height: 20px;" size="30" maxlength="30" />
-            <span id="lastNameError" class="error-message"></span>
-            </td>
-            
+            <td><input type="text" name="lastName" style="height: 20px;" size="30" maxlength="30" value="${user.lastName}" /></td>
         </tr>
         <tr>
              <th><label class="custom-label"><span class="required-field">*</span>Email:</label></th>
-        <td><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" />
-        <span id="emailIdError" class="error-message"></span>
-        </td>
-        
+        <td><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" value="${user.emailId}" /></td>
             <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
-            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" />
-            <span id="contactNumberError" class="error-message"></span>
-            </td>
-             
+            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" value="${user.contactNumber}" /></td>
         </tr>
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>Password:</label></th>
-            <td><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" autocomplete="new-password" />
-            <span id="passwordError" class="error-message"></span>
-            </td>
-            
+            <td><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" value="${user.password}" /></td>
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
-            <td><input type="text" name="userAccount" style="height: 20px;" size="30" maxlength="30" autocomplete="new-userAccount"/>
-            <span id="userAccountError" class="error-message"></span>
-            </td>
-        
+            <td><input type="text" name="userAccount" style="height: 20px;" size="30" maxlength="30" value="${user.userAccount}" /></td>
         </tr>
-        <tr>
-        </tr>
-        <tr>
-            <th><label class="custom-label"><span class="required-field">*</span>Roles:</label></th>
-            <td>
-                <table style="width: 100%;">
+       <tr> 
+    <th><label class="custom-label"><span class="required-field">*</span>Roles:</label></th>
+    <td>
+        <table style="width: 100%;">
+            <tr>
+                <th style="text-align: left;">Select</th>
+                <th style="text-align: left;">Role Name</th>
+            </tr>
+            <c:forEach var="role" items="${roles}">
+                <c:set var="isChecked" value="false"/>
                 
-                    <tr>
-                        <th style="text-align: left;">Select</th>
-                        <th style="text-align: left;">Role Name </th>
-                         
-                    </tr>
-                    
-                    
-                    <c:forEach var="role" items="${roles}">
+                <!-- Check if this role is already assigned to the user -->
+                <c:forEach var="assignedRole" items="${assignedRoles}">
+                    <c:if test="${assignedRole == role.gmId}">
+                        <c:set var="isChecked" value="true"/>
+                    </c:if>
+                </c:forEach>
+
                 <tr>
-               
-                    <td><input type="checkbox" name="roleIds" value="${role.gmId}" /></td>
+                    <td>
+                        <input type="checkbox" name="roleIds" value="${role.gmId}" 
+                               <c:if test="${isChecked}">checked</c:if> />
+                    </td>
                     <td>${role.gmName}</td>
                 </tr>
-                
             </c:forEach>
-            <tr>
-                    <td>
-                    </td>
-                     <th><span id="roleError" class="error-message" style="color: red;"></span></th>
-                    </tr>
-                </table>
-            </td>
-        </tr>
+        </table>
+    </td>
+</tr>
     </table>
 </form>
 
