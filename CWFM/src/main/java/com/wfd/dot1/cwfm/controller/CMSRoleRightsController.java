@@ -1,7 +1,10 @@
 package com.wfd.dot1.cwfm.controller;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,17 +14,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.RoleRightsForm;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -97,30 +99,180 @@ public class CMSRoleRightsController {
         return 1L; // Default user ID for testing or fallback
     }
    
+    
+
     @PostMapping("/saveRoleRights")
     @ResponseBody
-    public ResponseEntity<?> saveRoleRights(@RequestBody RoleRightsForm roleRights) {
+    public ResponseEntity<Map<String, Object>> saveRoleRights(@RequestBody RoleRightsForm roleRights) {
+        Map<String, Object> response = new HashMap<>();
+        List<String> errorMessages = new ArrayList<>();
+
+        // Validate before saving
+        for (CMSRoleRights roleRight : roleRights.getRoleRights()) {
+            boolean isDuplicate = commonService.checkDuplicateRoleRight(roleRight.getRoleId(), roleRight.getPageId());
+
+            if (isDuplicate) {
+                CmsGeneralMaster roleMaster = commonService.findByGMId(roleRight.getRoleId());
+                CmsGeneralMaster pageMaster = commonService.findByGMId(roleRight.getPageId());
+
+                String roleName = (roleMaster != null) ? roleMaster.getGmName() : "Unknown Role";
+                String pageName = (pageMaster != null) ? pageMaster.getGmName() : "Unknown Page";
+
+                errorMessages.add("Duplicate Role-Page combination detected for Role: " + roleName + " and Page: " + pageName);
+            }
+        }
+
+        // Stop saving if any row has an error
+        if (!errorMessages.isEmpty()) {
+            response.put("status", "error");
+            response.put("errors", errorMessages);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        // Save all valid rows
         try {
             for (CMSRoleRights roleRight : roleRights.getRoleRights()) {
-                // Check for duplicate Role-Page combination
-                boolean isDuplicate = commonService.checkDuplicateRoleRight(roleRight.getRoleId(), roleRight.getPageId());
-
-                if (isDuplicate) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT)
-                            .body("Error: Duplicate Role-Page combination detected for Role ID: " 
-                                  + roleRight.getRoleId() + " and Page ID: " + roleRight.getPageId());
-                }
-
-                // Save if no duplicate
+                processRoleRight(roleRight, getCurrentUserId());
                 commonService.saveRoleRights(roleRight);
             }
-            return ResponseEntity.ok("Role rights saved successfully!");
+            response.put("status", "success");
+            response.put("message", "Role rights saved successfully!");
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to save role rights. Error: " + e.getMessage());
+            response.put("status", "error");
+            response.put("message", "Failed to save role rights. Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<?> saveOrUpdateRoleRights(@RequestBody RoleRightsForm roleRightsForm) {
+        try {
+            System.out.println("Received Role Rights: " + roleRightsForm); 
+            ObjectMapper objectMapper = new ObjectMapper();
+            String receivedJson = objectMapper.writeValueAsString(roleRightsForm);
+            System.out.println("Raw JSON Received: " + receivedJson);
+
+            if (roleRightsForm == null || roleRightsForm.getRoleRights() == null || roleRightsForm.getRoleRights().isEmpty()) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "No role rights provided."));
+            }
+
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Collections.singletonMap("message", "User is not authorized."));
+            }
+
+            for (CMSRoleRights roleRight : roleRightsForm.getRoleRights()) {
+                processRoleRight(roleRight, currentUserId);
+                System.out.println("Before saving:");
+                System.out.println("RoleRight ID: " + roleRight.getRoleRightId());
+                System.out.println("Role ID: " + roleRight.getRoleId());
+                System.out.println("Page ID: " + roleRight.getPageId());
+                System.out.println("Values: " +
+                		roleRight.getAddRights() + ", " +
+                		roleRight.getEditRights() + ", " +
+                		roleRight.getDeleteRights() + ", " +
+	        	        roleRight.getImportRights() + ", " +
+	        	        roleRight.getExportRights() + ", " +
+	        	        roleRight.getViewRights() + ", " +
+	        	        roleRight.getListRights() + ", " +
+	        	        roleRight.getEnabledFlag() + ", " +
+	        	        roleRight.getDeletedFlag() + ", " +
+	        	        roleRight.getCreatedBy() + ", " +
+	        	        roleRight.getCreationDate() + ", " +
+	        	        roleRight.getLastUpdatedBy() + ", " +
+	        	        roleRight.getLastUpdatedDate() + ", " +
+	        	        roleRight.getRoleRightId()
+	        	);
+                System.out.println("Before saving, RoleRight ID: " + roleRight.getRoleRightId());
+                commonService.saveRoleRights(roleRight);
+            }
+
+            return ResponseEntity.ok(Collections.singletonMap("message", "Role rights saved/updated successfully!"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("message", "Failed to save/update role rights."));
+        }
+    }
+    @PostMapping("/export")
+    public ResponseEntity<?> exportRoleRights(@RequestBody RoleRightsForm request) {
+        System.out.println("Received export request: " + request);
+        if (request == null || request.getRoleRights().isEmpty()) {
+            System.out.println("ERROR: No data received in the backend!");
+            return ResponseEntity.badRequest().body("No data received");
+        }
+        return ResponseEntity.ok(request);
+    }
+    @PutMapping("/deleteRights")
+    public ResponseEntity<String> deleteRights(@RequestBody Map<String, List<Integer>> request) {
+        List<Integer> roleIds = request.get("roleIds");
+
+        if (roleIds == null || roleIds.isEmpty()) {
+            return ResponseEntity.badRequest().body("No Role Right selected for deletion.");
+        }
+
+        commonService.deleteRoleRights(roleIds);
+        return ResponseEntity.ok("Role Rights deleted successfully!");
+    }
+
+
+
+
+//    @RequestMapping(value = "/saveRoleRights", method = RequestMethod.POST)
+//    public String saveRoleRights(RoleRightsForm roleRights, RedirectAttributes redirectAttributes) {
+//        try {
+//            for (CMSRoleRights roleRight : roleRights.getRoleRights()) {
+//                if (!isDuplicateRoleRight(roleRight)) {
+//                    processRoleRight(roleRight, getCurrentUserId()); // Additional processing if needed
+//                    commonService.saveRoleRights(roleRight);
+//                } else {
+//                    redirectAttributes.addFlashAttribute("error", "Duplicate Role-Page combination detected for Role: " 
+//                                                         + roleRight.getRoleId() + " and Page: " + roleRight.getPageId());
+//                    return "redirect:/roleRights/roleRightsList";
+//                }
+//            }
+//            redirectAttributes.addFlashAttribute("success", "Role rights saved successfully!");
+//        } catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("error", "Failed to save role rights. Error: " + e.getMessage());
+//        }
+//
+//        // Redirect back to the role rights list
+//        return "redirect:/roleRights/roleRightsList";
+//    }
+//
+//    @PostMapping("/saveRoleRights")
+//    @ResponseBody
+//    public ResponseEntity<Map<String, Object>> saveRoleRights(@RequestBody RoleRightsForm roleRights) {
+//        Map<String, Object> response = new HashMap<>();
+//        
+//        try {
+//            for (CMSRoleRights roleRight : roleRights.getRoleRights()) {
+//                // Check for duplicate Role-Page combination
+//                boolean isDuplicate = commonService.checkDuplicateRoleRight(roleRight.getRoleId(), roleRight.getPageId());
+//
+//                if (isDuplicate) {
+//                    response.put("status", "error");
+//                    response.put("message", "Duplicate Role-Page combination detected for Role ID: " 
+//                            + roleRight.getRoleId() + " and Page ID: " + roleRight.getPageId());
+//                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+//                }
+//
+//                // Save if no duplicate
+//                commonService.saveRoleRights(roleRight);
+//            }
+//            response.put("status", "success");
+//            response.put("message", "Role rights saved successfully!");
+//            return ResponseEntity.ok(response);
+//
+//        } catch (Exception e) {
+//            response.put("status", "error");
+//            response.put("message", "Failed to save role rights. Error: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        }
+//    }
 
 
 	/*
@@ -165,14 +317,28 @@ public class CMSRoleRightsController {
         roleRight.setEnabledFlag(1);
         roleRight.setDeletedFlag(0);
 
-        // Set default rights
-        roleRight.setAddRights(roleRight.getAddRights() != null ? roleRight.getAddRights() : 1);
-        roleRight.setEditRights(roleRight.getEditRights() != null ? roleRight.getEditRights() : 1);
-        roleRight.setDeleteRights(roleRight.getDeleteRights() != null ? roleRight.getDeleteRights() : 1);
-        roleRight.setViewRights(roleRight.getViewRights() != null ? roleRight.getViewRights() : 1);
-        roleRight.setImportRights(roleRight.getImportRights() != null ? roleRight.getImportRights() : 1);
-        roleRight.setExportRights(roleRight.getExportRights() != null ? roleRight.getExportRights() : 1);
-        roleRight.setListRights(roleRight.getListRights() != null ? roleRight.getListRights() : 0);
+        if (roleRight.getAddRights() == null) {
+            roleRight.setAddRights(0); // Or keep it unchanged
+        }
+        if (roleRight.getEditRights() == null) {
+            roleRight.setEditRights(0);
+        }
+        if (roleRight.getDeleteRights() == null) {
+            roleRight.setDeleteRights(0);
+        }
+        if (roleRight.getViewRights() == null) {
+            roleRight.setViewRights(0);
+        }
+        if (roleRight.getImportRights() == null) {
+            roleRight.setImportRights(0);
+        }
+        if (roleRight.getExportRights() == null) {
+            roleRight.setExportRights(0);
+        }
+        if (roleRight.getListRights() == null) {
+            roleRight.setListRights(0);
+        }
+
 
         // Fetch page information
         if (roleRight.getPage() != null && roleRight.getPage().getGmId() != null) {
@@ -180,6 +346,7 @@ public class CMSRoleRightsController {
             roleRight.setPage(page);
         }
     }
+
 
 //    @PostMapping("/saveRoleRights")
 //    public ModelAndView saveRoleRights(@ModelAttribute("roleRightsForm") RoleRightsForm roleRightsForm) {

@@ -26,7 +26,7 @@ public interface CommonService {
 		CMSGMType findById(Long gmTypeId);
 //		List<CMSPerson> getAllPersons();
 //		List<CMSPerson> getAllPersonsByPrincipalEmployerAndContractor(Long principalEmployerId, Long contractorId);
-		CmsGeneralMaster findByGMId(Integer bloodGroupId);
+		CmsGeneralMaster findByGMId(Long id);
 		List<CmsGeneralMaster> getCmsGeneralMasterOptionsByName(String string);
 		 boolean isGMTypeNameDuplicate(String gmTypeName);
 		    boolean isCmsGeneralMasterDuplicate(String masterName, String masterValue);
@@ -76,6 +76,8 @@ public interface CommonService {
 
 			List<CMSRoleRights> getRoleRightsByRoleIdAndPageId(Long selectedRoleId, Long pageId);
 			boolean isMasterNameDuplicate(Long gmTypeId, String gmName);
+			void deleteRoleRights(List<Integer> roleIds);
+			boolean isDuplicateGMName(Long gmTypeId, String gmName);
 
 			
 }

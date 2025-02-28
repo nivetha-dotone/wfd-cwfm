@@ -74,7 +74,7 @@ public class CommonServiceImpl implements CommonService {
 //	}
 
 	@Override
-	public CmsGeneralMaster findByGMId(Integer bloodGroupId) {
+	public CmsGeneralMaster findByGMId(Long bloodGroupId) {
 		return commonDAO.findByGMId(bloodGroupId);
 	}
 
@@ -217,7 +217,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 	@Override
 	public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
-		return commonDAO.checkDuplicateRoleRight(roleId,roleId);
+		return commonDAO.checkDuplicateRoleRight(roleId,pageId);
 	}
 	@Override
 	public List<CmsGeneralMaster> getRolesByUserId(Integer userId) {
@@ -270,4 +270,12 @@ public class CommonServiceImpl implements CommonService {
         CmsGeneralMaster gmType = commonDAO.findByGMName(gmTypeId,gmName);
         return gmType != null;  // Return true if the name already exists
     }
+	@Override
+	public void deleteRoleRights(List<Integer> roleIds) {
+		commonDAO.deleteRoleRights(roleIds);		
+	}
+	@Override
+	public boolean isDuplicateGMName(Long gmTypeId, String gmName) {
+		return commonDAO.isDuplicateGMName(gmTypeId,gmName);
+	}
 }

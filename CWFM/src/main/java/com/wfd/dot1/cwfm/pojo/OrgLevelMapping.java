@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 public class OrgLevelMapping {
-    private int orgLevelEntryId;
-    private int orgAcctSetId;
+    private long orgLevelEntryId;
+    private long orgAcctSetId;
     private Date updatedTm;
     private String shortName; // Short name for display
     private String longDescription; // Long description for display
@@ -33,20 +33,20 @@ public class OrgLevelMapping {
     }
 
     // Getter and Setter methods
-    public int getOrgLevelEntryId() {
+    public long getOrgLevelEntryId() {
         return orgLevelEntryId;
     }
 
-    public void setOrgLevelEntryId(int orgLevelEntryId) {
-        this.orgLevelEntryId = orgLevelEntryId;
+    public void setOrgLevelEntryId(long l) {
+        this.orgLevelEntryId = l;
     }
 
-    public int getOrgAcctSetId() {
+    public long getOrgAcctSetId() {
         return orgAcctSetId;
     }
 
-    public void setOrgAcctSetId(int orgAcctSetId) {
-        this.orgAcctSetId = orgAcctSetId;
+    public void setOrgAcctSetId(long l) {
+        this.orgAcctSetId = l;
     }
 
     public Date getUpdatedTm() {

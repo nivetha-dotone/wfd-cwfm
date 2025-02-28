@@ -132,6 +132,7 @@ function editRow(gmId) {
             background-color: #ffffff;
             color: #000;
         }
+        
     </style>
 </head>
 <body>
@@ -153,11 +154,12 @@ function editRow(gmId) {
         <input type="text" id="masterValue" name="masterValue" required>
 
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveGMMaster()">Save</button>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">Cancel</button>
+        <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">Cancel</button> -->
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Export</button>
             <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}">
             <input type="hidden" id="existingMasterValues" value="${existingMasterValues.join(',')}">
-          <div id="error-gmMaster" style="display: none; color: red; font-weight: bold;"></div>  
+         <!--  <div id="error-gmMaster" style="display: none; color: red; font-weight: bold;"></div>   -->
+          <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
 
     <h3>Existing General Masters</h3>

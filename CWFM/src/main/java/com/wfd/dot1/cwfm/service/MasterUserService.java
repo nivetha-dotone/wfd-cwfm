@@ -12,5 +12,7 @@ public interface MasterUserService {
 
 	MasterUser findMasterUserDetailsByUserName(String username);
 
+	public boolean existsByUserAccount(String name);
+
 	
 }

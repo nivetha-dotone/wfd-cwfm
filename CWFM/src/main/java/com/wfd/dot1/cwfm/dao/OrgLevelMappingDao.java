@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
@@ -21,4 +22,13 @@ public interface OrgLevelMappingDao {
 		List<OrgLevelMapping> findSelectedMappings(Long id);
 		OrgLevelMapping findBasicInfo(Long id);
 		List<OrgLevelMapping> findAllMaps();
+		boolean existsByShortName(String name);
+		List<OrgLevelMapping> getOrgLevelMappingById(Long id);
+		List<OrgLevelEntryDTO> getSelectedEntries(Long id, Long orgLevelDefId);
+		List<OrgLevelEntryDTO> getAvailableEntries(Long id, Long orgLevelDefId);
+		void updateOrgLevelEntries(Long orgLevelDefId, List<Long> newSelectedEntries);
+		boolean doesOrgLevelEntryExist(Integer entryId);
+		void saveOrgLevelMapping(long orgAcctSetId, Integer entryId);
+		void deleteOrgLevelMapping(long orgAcctSetId, Integer entryId);
+		Set<Integer> getExistingMappings(long orgAcctSetId);
 }

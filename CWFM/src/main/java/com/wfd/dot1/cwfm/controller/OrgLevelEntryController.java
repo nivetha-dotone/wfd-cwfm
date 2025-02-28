@@ -100,7 +100,12 @@ public class OrgLevelEntryController {
             if (orgLevelEntry.getOrgLevelDefId() == 0 ) {
                 throw new IllegalArgumentException("Organization Level is required.");
             }
-
+            boolean isDuplicate = orgLevelService.isDuplicateEntry(orgLevelEntry.getOrgLevelDefId(), orgLevelEntry.getName());
+            if (isDuplicate) {
+                response.put("success", false);
+                response.put("message", "Duplicate Entry Name is not allowed for this Organization Level.");
+                return response;
+            }
             if (orgLevelEntry.getOrgLevelEntryId() == 0) {
                 orgLevelService.saveOrgLevelEntry(orgLevelEntry);
             } else {

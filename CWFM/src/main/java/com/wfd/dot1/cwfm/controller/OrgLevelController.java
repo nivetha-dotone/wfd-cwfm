@@ -27,55 +27,47 @@ import com.wfd.dot1.cwfm.service.OrgLevelService;
 public class OrgLevelController {
     @Autowired
     private OrgLevelService orgLevelService;
-
     @PostMapping("/save")
     public ResponseEntity<?> saveOrgLevels(@RequestBody List<OrgLevelDefDTO> orgLevels) throws Exception {
-    	System.out.println("Received orgLevels: " + orgLevels);
+        System.out.println("Received orgLevels: " + orgLevels);
+
         List<OrgLevelDefDTO> validEntries = new ArrayList<>();
         List<OrgLevelDefDTO> duplicateEntries = new ArrayList<>();
         List<OrgLevelDefDTO> updates = new ArrayList<>();
         List<OrgLevelDefDTO> newEntries = new ArrayList<>();
+        List<OrgLevelDefDTO> invalidIdEntries = new ArrayList<>();
 
-        // Track duplicates locally and against the database
         Set<String> seen = new HashSet<>();
+
         System.out.println("Total orgLevels: " + orgLevels.size());
-        orgLevels.forEach(orgLevel -> {
-            System.out.println("Org Level Name: " + orgLevel.getName() +
-                               ", Short Name: " + orgLevel.getShortName() +
-                               ", Hierarchy: " + orgLevel.getOrgHierarchyLevel());
-        });
 
         for (OrgLevelDefDTO orgLevel : orgLevels) {
-            System.out.println("Processing OrgLevel with ID: " + orgLevel.getOrgLevelDefId());
+            System.out.println("Processing OrgLevel: " + orgLevel);
 
             String key = (orgLevel.getName() + "|" + orgLevel.getShortName() + "|" + orgLevel.getOrgHierarchyLevel()).toLowerCase();
-            System.out.println("Generated key: " + key);
 
             if (orgLevel.getOrgLevelDefId() != null && orgLevel.getOrgLevelDefId() > 0) {
-                // Handle existing record with ID
-                System.out.println("orgLevelDefId is present and greater than 0. Checking if exists by ID...");
+                // Check if the ID exists for update
                 if (orgLevelService.existsById(orgLevel.getOrgLevelDefId())) {
-                    System.out.println("Record with ID: " + orgLevel.getOrgLevelDefId() + " found. Marking for update.");
-                    updates.add(orgLevel); // If the record exists, mark for update
+                    System.out.println("Updating record with ID: " + orgLevel.getOrgLevelDefId());
+                    updates.add(orgLevel);
                 } else {
-                    System.out.println("Record with ID: " + orgLevel.getOrgLevelDefId() + " not found. Marking as duplicate.");
-                    duplicateEntries.add(orgLevel); // If the ID is not found, mark as duplicate
+                    System.out.println("Invalid ID detected: " + orgLevel.getOrgLevelDefId());
+                    invalidIdEntries.add(orgLevel);  // Instead of marking as duplicate
                 }
-            } if (orgLevel.getOrgLevelDefId() == null || orgLevel.getOrgLevelDefId() <= 0) {
-                // Handle new entry
-                System.out.println("orgLevelDefId is null or <= 0. Checking for duplicates based on Name, ShortName, and Hierarchy...");
-                if (seen.contains(key) || orgLevelService.existsByNameShortNameAndHierarchy(orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel())) {
-                    System.out.println("Duplicate detected for Name: " + orgLevel.getName() + ", Short Name: " + orgLevel.getShortName() + ", Hierarchy Level: " + orgLevel.getOrgHierarchyLevel());
+            } else {
+                // Handle new entries
+                if (seen.contains(key) || orgLevelService.existsByNameShortNameAndHierarchy(
+                        orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel())) {
+                    System.out.println("Duplicate detected: " + key);
                     duplicateEntries.add(orgLevel);
                 } else {
-                    System.out.println("New entry detected for Name: " + orgLevel.getName() + ", Short Name: " + orgLevel.getShortName() + ", Hierarchy Level: " + orgLevel.getOrgHierarchyLevel());
-                    newEntries.add(orgLevel); // If the entry is valid and new, add to the newEntries
+                    System.out.println("New entry detected: " + key);
+                    newEntries.add(orgLevel);
                     seen.add(key);
                 }
             }
         }
-
-
 
         // Save new entries
         if (!newEntries.isEmpty()) {
@@ -84,22 +76,96 @@ public class OrgLevelController {
 
         // Update existing entries
         if (!updates.isEmpty()) {
-            orgLevelService.updateOrgLevel(updates); // Ensure this method can accept a list
+            orgLevelService.updateOrgLevel(updates);
         }
 
         // Prepare response
         Map<String, Object> response = new HashMap<>();
-        if (!duplicateEntries.isEmpty()) {
+        if (!duplicateEntries.isEmpty() || !invalidIdEntries.isEmpty()) {
             response.put("status", "partial");
-            response.put("message", "Some entries were not saved due to duplicates or invalid updates.");
+            response.put("message", "Some entries were not processed due to duplicates or invalid IDs.");
             response.put("duplicates", duplicateEntries);
+            response.put("invalidIds", invalidIdEntries);
         } else {
             response.put("status", "success");
-            response.put("message", "All entries saved successfully.");
+            response.put("message", "All entries processed successfully.");
         }
 
         return ResponseEntity.ok(response);
     }
+
+//    @PostMapping("/save")
+//    public ResponseEntity<?> saveOrgLevels(@RequestBody List<OrgLevelDefDTO> orgLevels) throws Exception {
+//    	System.out.println("Received orgLevels: " + orgLevels);
+//        List<OrgLevelDefDTO> validEntries = new ArrayList<>();
+//        List<OrgLevelDefDTO> duplicateEntries = new ArrayList<>();
+//        List<OrgLevelDefDTO> updates = new ArrayList<>();
+//        List<OrgLevelDefDTO> newEntries = new ArrayList<>();
+//
+//        // Track duplicates locally and against the database
+//        Set<String> seen = new HashSet<>();
+//        System.out.println("Total orgLevels: " + orgLevels.size());
+//        orgLevels.forEach(orgLevel -> {
+//            System.out.println("Org Level Name: " + orgLevel.getName() +
+//                               ", Short Name: " + orgLevel.getShortName() +
+//                               ", Hierarchy: " + orgLevel.getOrgHierarchyLevel());
+//        });
+//
+//        for (OrgLevelDefDTO orgLevel : orgLevels) {
+//            System.out.println("Processing OrgLevel with ID: " + orgLevel.getOrgLevelDefId());
+//
+//            String key = (orgLevel.getName() + "|" + orgLevel.getShortName() + "|" + orgLevel.getOrgHierarchyLevel()).toLowerCase();
+//            System.out.println("Generated key: " + key);
+//
+//            if (orgLevel.getOrgLevelDefId() != null && orgLevel.getOrgLevelDefId() > 0) {
+//                // Handle existing record with ID
+//                System.out.println("orgLevelDefId is present and greater than 0. Checking if exists by ID...");
+//                if (orgLevelService.existsById(orgLevel.getOrgLevelDefId())) {
+//                    System.out.println("Record with ID: " + orgLevel.getOrgLevelDefId() + " found. Marking for update.");
+//                    updates.add(orgLevel); // If the record exists, mark for update
+//                } else {
+//                    System.out.println("Record with ID: " + orgLevel.getOrgLevelDefId() + " not found. Marking as duplicate.");
+//                    duplicateEntries.add(orgLevel); // If the ID is not found, mark as duplicate
+//                }
+//            } if (orgLevel.getOrgLevelDefId() == null || orgLevel.getOrgLevelDefId() <= 0) {
+//                // Handle new entry
+//                System.out.println("orgLevelDefId is null or <= 0. Checking for duplicates based on Name, ShortName, and Hierarchy...");
+//                if (seen.contains(key) || orgLevelService.existsByNameShortNameAndHierarchy(orgLevel.getName(), orgLevel.getShortName(), orgLevel.getOrgHierarchyLevel())) {
+//                    System.out.println("Duplicate detected for Name: " + orgLevel.getName() + ", Short Name: " + orgLevel.getShortName() + ", Hierarchy Level: " + orgLevel.getOrgHierarchyLevel());
+//                    duplicateEntries.add(orgLevel);
+//                } else {
+//                    System.out.println("New entry detected for Name: " + orgLevel.getName() + ", Short Name: " + orgLevel.getShortName() + ", Hierarchy Level: " + orgLevel.getOrgHierarchyLevel());
+//                    newEntries.add(orgLevel); // If the entry is valid and new, add to the newEntries
+//                    seen.add(key);
+//                }
+//            }
+//        }
+//
+//
+//
+//        // Save new entries
+//        if (!newEntries.isEmpty()) {
+//            orgLevelService.saveOrgLevels(newEntries);
+//        }
+//
+//        // Update existing entries
+//        if (!updates.isEmpty()) {
+//            orgLevelService.updateOrgLevel(updates); // Ensure this method can accept a list
+//        }
+//
+//        // Prepare response
+//        Map<String, Object> response = new HashMap<>();
+//        if (!duplicateEntries.isEmpty()) {
+//            response.put("status", "partial");
+//            response.put("message", "Some entries were not saved due to duplicates or invalid updates.");
+//            response.put("duplicates", duplicateEntries);
+//        } else {
+//            response.put("status", "success");
+//            response.put("message", "All entries saved successfully.");
+//        }
+//
+//        return ResponseEntity.ok(response);
+//    }
 
 
 

@@ -16,12 +16,17 @@
     <h1>Org Level Mapping</h1>
     
      <!-- Form to enter Name and Description -->
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
+     <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <span id="nameError" class="error-message"></span>
+    </div>
 
-    <label for="description">Description:</label>
-    <input type="text" id="description" name="description" required>
-
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+        <span id="descriptionError" class="error-message"></span>
+    </div>
     <button type="button" onclick="saveOrgLevelMapping()">Save</button>
 
 <div id="orgMappingContainer">
@@ -41,7 +46,7 @@
                         <label for="available-${orgLevel.orgLevelDefId}" class="multi-select-label">Available Entries</label>
                         <select id="available-${orgLevel.orgLevelDefId}" class="multi-select-box" style="height:200px;width:250px;" multiple>
                             <c:forEach var="entry" items="${orgLevel.availableEntries}">
-                                <option value="${entry.orgLevelEntryId}">${entry.orgLevelEntryId}-${entry.name}</option>
+                                <option value="${entry.orgLevelEntryId}">${entry.name}</option>
                             </c:forEach>
                         </select>
                     </div>

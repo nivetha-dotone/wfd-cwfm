@@ -189,7 +189,7 @@
     <table border="1">
                 <thead>
                     <tr>
-                    <td><input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()"></td>
+                    <td><input type="checkbox" id="selectAllOrgMapCheckbox" onchange="toggleSelectAllOrgMap()"></td>
                         <th>Short Name</th>
                         <th>Long Description</th>
                     </tr>
@@ -197,7 +197,7 @@
                 <tbody>
                     <c:forEach var="map" items="${mappings}">
                         <tr>
-                         <td ><input type="checkbox" name="selectedGMMaster" value="${map.orgAcctSetId}"></td>
+                         <td ><input type="checkbox" name="selectedOrgMap" value="${map.orgAcctSetId}"></td>
                             <td>${map.shortName}</td>
                             <td>${map.longDescription}</td>
                         </tr>

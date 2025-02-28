@@ -39,71 +39,61 @@
    
    </head>
 <body>
- <div class="page-header">
-        Principal Employer Edit Page
-        <div class="header-buttons">
-            <button type="submit" onclick="editPEData(contextPath, '${principalEmployer.UNITID}')">Save</button>
-        </div>
-    </div>
-<input type="hidden" name="id" value="${basicInfo.orgAcctSetId}" />
+<div class="page-header">
+ <input type="hidden" name="orgAcctSetId" value="${basicInfo.orgAcctSetId}" />
 <label>Short Name:</label>
-<input type="text" name="shortName" value="${basicInfo.shortName}" required />
-
+<input type="text" id="name" name="name" value="${basicInfo.shortName}" readonly required />
 <label>Long Description:</label>
-<input type="text" name="longDescription" value="${basicInfo.longDescription}" required />
-
-<!-- Dynamic Tabs -->
-
-<div id="tabs">
-    <ul>
-        <c:forEach var="level" items="${orgLevelDefs}">
-            <li><a href="#tab-${level.orgLevelDefId}">${level.name}</a></li>
-        </c:forEach>
-    </ul>
-
-    <c:forEach var="level" items="${orgLevelDefs}">
-        <div id="tab-${level.orgLevelDefId}" class="tab-content" style="display: none;">
-            <h3>${level.name} Mappings</h3>
-
-            <div class="multi-select-container">
-                <!-- Available Entries -->
-                <div class="multi-select-group">
-                    <label for="available-${level.orgLevelDefId}" class="multi-select-label">Available Entries</label>
-                    <select id="available-${level.orgLevelDefId}" class="multi-select-box" size="10" multiple>
-                        <c:forEach var="entry" items="${level.availableEntries}">
-                            <option value="${entry.orgLevelEntryId}">${entry.orgLevelEntryId} - ${entry.shortName}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-
-                <!-- Buttons to Move Items -->
-                <div class="button-group">
-                    <button type="button" onclick="moveRight('${level.orgLevelDefId}')">&gt;</button>
-                    <button type="button" onclick="moveLeft('${level.orgLevelDefId}')">&lt;</button>
-                </div>
-
-                <!-- Selected Entries -->
-                <div class="multi-select-group">
-                    <label for="selected-${level.orgLevelDefId}" class="multi-select-label">Selected Entries</label>
-                    <select id="selected-${level.orgLevelDefId}" class="multi-select-box" size="10" multiple>
-                        <%-- <c:forEach var="mapping" items="${selectedMappings}">
-                            <c:if test="${mapping.orgLevelEntryId == level.orgLevelDefId}">
-                                <option value="${mapping.orgAcctSetId}">${mapping.shortName} - ${mapping.longDescription}</option>
-                            </c:if>
-                        </c:forEach> --%>
-                        <c:forEach var="mapping" items="${selectedMappings}">
-    <option value="${mapping.orgAcctSetId}">${mapping.shortName} - ${mapping.longDescription}</option>
-</c:forEach>
-                        
-                    </select>
-                    <c:forEach var="mapping" items="${selectedMappings}">
-    <p>Mapping Entry ID: ${mapping.orgLevelEntryId} | Level Def ID: ${level.orgLevelDefId}</p>
-</c:forEach>
-                </div>
-            </div>
-        </div>
-    </c:forEach>
+<input type="text" id="description" name="description" readonly value="${basicInfo.longDescription}" required />
+        <button type="submit"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="editOrgLevelMapping()">Save</button>
 </div>
 
 
-<button type="submit">Save Changes</button>
+<!-- Dynamic Tabs -->
+<div id="orgMappingContainer">
+    <div id="tabs">
+        <ul>
+            <c:forEach var="orgLevel" items="${orgLevels}">
+                <li><a href="#tab-${orgLevel.orgLevelDefId}">${orgLevel.name}</a></li>
+            </c:forEach>
+        </ul>
+
+        <c:forEach var="orgLevel" items="${orgLevels}">
+            <div id="tab-${orgLevel.orgLevelDefId}" class="tab-content" style="display: none;">
+                <h3>${orgLevel.name}</h3>
+
+                <div class="multi-select-container">
+                    <!-- Available Entries -->
+                    <div class="multi-select-group">
+                        <label for="available-${orgLevel.orgLevelDefId}" class="multi-select-label">Available Entries</label>
+                        <select id="available-${orgLevel.orgLevelDefId}" class="multi-select-box" style="height:200px;width:250px;" multiple>
+                            <c:forEach var="entry" items="${orgLevel.availableEntries}">
+                                <option value="${entry.orgLevelEntryId}">${entry.name}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <!-- Move Buttons -->
+                    <div class="button-group">
+                        <button type="button" onclick="moveRight('${orgLevel.orgLevelDefId}')">&gt;</button>
+                        <button type="button" onclick="moveLeft('${orgLevel.orgLevelDefId}')">&lt;</button>
+                    </div>
+
+                    <!-- Selected Entries -->
+                    <div class="multi-select-group">
+                        <label for="selected-${orgLevel.orgLevelDefId}" class="multi-select-label">Selected Entries</label>
+                        <select id="selected-${orgLevel.orgLevelDefId}" class="multi-select-box" style="height:200px;width:250px;" multiple>
+                            <c:forEach var="entry" items="${orgLevel.selectedEntries}">
+                                <option value="${entry.orgLevelEntryId}" selected>${entry.name}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </c:forEach>
+    </div>
+</div>
+
+
+
+

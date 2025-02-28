@@ -181,49 +181,72 @@
     </form>
     <div>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToRRAdd()">Add</button>
+    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" id="editButton" onclick="redirectToRREdit()">Edit</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedRoleRights()">Delete</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToRoleCSV()">Export</button>
+<button type="submit" id="saveButton" class="btn btn-default" style="display: none;" onclick="saveUpdatedRoleRights()">Save</button>
+
 </div>
 </div>
-<form id="updateForm" action="/CWFM/roleRights/update" method="POST" >
+<form id="updateForm" action="/CWFM/roleRights/update" method="POST">
+   <!--  <button type="button" id="editButton">Edit</button>  
+    <button type="submit" id="saveButton" style="display: none;">Save</button>   -->
+
     <div class="table-container">
-        <table border="1">
+    <table border="1">
         <thead>
             <tr>
                 <td>
-                        <input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()">
+                    <input type="checkbox" id="selectAllRightsCheckbox" onchange="toggleSelectRoleRights()">
                 </td> 
-               <!--  <th>Role ID</th> -->
                 <th>Role Name</th>
                 <th>Page Name</th>
                 <th>Add Rights</th>
                 <th>Edit Rights</th>
                 <th>Delete Rights</th>
-                <th>Import Rights</th>
                 <th>Export Rights</th>
                 <th>View Rights</th>
                 <th>List Rights</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="roleRightsTableBody">
             <c:forEach var="rights" items="${roleRightsList}">
-                <tr>
-                <td><input type="checkbox"
-							name="selectedGMMaster" value="${rights.role.gmName}"></td>
-                    <%-- <td id=roleid>${rights.roleId}</td> --%>
-                     <td id=rolename>${rights.role.gmName}</td>
-                    <td id=pagename>${rights.page.gmName}</td>
-                    <td>${rights.addRights == 0 ? 'Yes' : 'No'}</td>
-    <td>${rights.editRights == 0 ? 'Yes' : 'No'}</td>
-    <td>${rights.deleteRights == 0 ? 'Yes' : 'No'}</td>
-    <td>${rights.importRights == 0 ? 'Yes' : 'No'}</td>
-    <td>${rights.exportRights == 0 ? 'Yes' : 'No'}</td>
-    <td>${rights.viewRights == 0 ? 'Yes' : 'No'}</td>
-    <td>${rights.listRights == 0 ? 'Yes' : 'No'}</td>
+                <tr data-roleRightId="${rights.roleRightId}">
+                    <td>
+                        <input type="checkbox" name="selectedRoleRights" value="${rights.roleRightId}" onchange="toggleRowSelection(this)">
+                    </td>
+                    <td>${rights.role.gmName}</td>
+                    <td>${rights.page.gmName}</td>
+
+                    <td class="editable">
+                        <input type="checkbox" class="rights-checkbox" name="canAdd" ${rights.addRights == 1 ? 'checked' : ''} disabled>
+                    </td>
+
+                    <td class="editable">
+                        <input type="checkbox" class="rights-checkbox" name="canEdit" ${rights.editRights == 1 ? 'checked' : ''} disabled>
+                    </td>
+
+                    <td class="editable">
+                        <input type="checkbox" class="rights-checkbox" name="canDelete" ${rights.deleteRights == 1 ? 'checked' : ''} disabled>
+                    </td>
+
+                    <td class="editable">
+                        <input type="checkbox" class="rights-checkbox" name="canExport" ${rights.exportRights == 1 ? 'checked' : ''} disabled>
+                    </td>
+
+                    <td class="editable">
+                        <input type="checkbox" class="rights-checkbox" name="canView" ${rights.viewRights == 1 ? 'checked' : ''} disabled>
+                    </td>
+
+                    <td class="editable">
+                        <input type="checkbox" class="rights-checkbox" name="canList" ${rights.listRights == 1 ? 'checked' : ''} disabled>
+                    </td>
                 </tr>
             </c:forEach>
         </tbody>
     </table>
-    </div>
+</div>
+
 </form>
 </body>
 </html>

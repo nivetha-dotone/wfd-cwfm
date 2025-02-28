@@ -1,17 +1,19 @@
 package com.wfd.dot1.cwfm.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import com.wfd.dot1.cwfm.dao.OrgLevelDao;
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
+import com.wfd.dot1.cwfm.service.MasterUserService;
 import com.wfd.dot1.cwfm.service.OrgLevelMappingService;
 import com.wfd.dot1.cwfm.service.OrgLevelService;
 
@@ -33,7 +36,8 @@ public class OrgLevelMappingController {
     private OrgLevelDao orgLevelDao;
     @Autowired
     private OrgLevelMappingService orgLevelMappingService;
-
+    @Autowired
+	MasterUserService masterUserService;
 	/*
 	 * @GetMapping("/list") public String listMappings(Model model) {
 	 * List<OrgLevelMapping> mappings = orgLevelMappingService.listMappings();
@@ -126,7 +130,18 @@ public class OrgLevelMappingController {
         orgLevelMappingService.save(mapping);
         return "redirect:/org-level-mapping/list";
     }
+    @PostMapping("/validate-name")
+    public ResponseEntity<Map<String, Boolean>> validateName(@RequestBody Map<String, String> requestData) {
+        String name = requestData.get("name");
+        boolean validUser = masterUserService.existsByUserAccount(name); // Check if user exists
+        boolean duplicate = orgLevelMappingService.existsByShortName(name); // Check for duplicates
 
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("validUser", validUser);
+        response.put("duplicate", duplicate);
+        
+        return ResponseEntity.ok(response);
+    }
 	/*
 	 * @GetMapping("/edit/{id}") public String editMapping(@PathVariable("id") int
 	 * id, Model model) { OrgLevelMapping mapping =
@@ -137,33 +152,112 @@ public class OrgLevelMappingController {
     
     @GetMapping("/edit")
     public String editOrgMapping(@RequestParam("id") Long id, Model model) {
-        System.out.println("🔍 Received edit request for ID: " + id);
-    	 System.out.println("Received request to edit OrgLevelMapping with ID: " + id);
-    //    OrgLevelMapping selectedMapping = orgLevelMappingService.getMappingById(id);
-    	 OrgLevelMapping basicInfo = orgLevelMappingService.findBasicInfo(id); 
-    	  System.out.println("Basic Info: " + basicInfo);
-        List<OrgLevelMapping> availableMappings = orgLevelMappingService.findAvailableMappings(id);
-        List<OrgLevelMapping> selectedMappings = orgLevelMappingService.findSelectedMappings(id);
-        for (OrgLevelMapping mapping : selectedMappings) {
-            System.out.println("Mapping Data: EntryId = " + mapping.getOrgLevelEntryId() + ", DefId = " + mapping.getOrgAcctSetId());
-        }
-        availableMappings.forEach(mapping -> 
-        System.out.println("Available Mapping: " + mapping)
-    );
-    
-    selectedMappings.forEach(mapping -> 
-        System.out.println("Selected Mapping: " + mapping)
-    );
-       // List<OrgLevelDef> orgLevelDefs = orgLevelMappingService.findOrgLevelDefinitions(); // Fetch dynamic tabs
+        OrgLevelMapping basicInfo = orgLevelMappingService.findBasicInfo(id);
+        System.out.println("Basic Info: " + basicInfo);
+        List<OrgLevelMapping> orgLevelMapping = orgLevelMappingService.getOrgLevelMappingById(id);
+        model.addAttribute("orgLevelMapping", orgLevelMapping);
+
+        // Fetch all active Org Levels
         List<OrgLevelDefDTO> orgLevels = orgLevelService.getActiveOrgLevels();
-      //  model.addAttribute("selectedMapping", selectedMapping);
+
+        for (OrgLevelDefDTO orgLevel : orgLevels) {
+            // Fetch Available Entries
+            List<OrgLevelEntryDTO> availableEntries = orgLevelMappingService.getAvailableEntries(id,orgLevel.getOrgLevelDefId());
+            orgLevel.setAvailableEntries(availableEntries);
+
+            // Fetch Selected Entries based on OrgLevelMapping ID and OrgLevelDefId
+            List<OrgLevelEntryDTO> selectedEntries = orgLevelMappingService.getSelectedEntries(id, orgLevel.getOrgLevelDefId());
+            orgLevel.setSelectedEntries(selectedEntries);
+        }
+
+        model.addAttribute("orgLevels", orgLevels);
         model.addAttribute("basicInfo", basicInfo);
-        model.addAttribute("availableMappings", availableMappings);
-        model.addAttribute("selectedMappings", selectedMappings);
-        model.addAttribute("orgLevelDefs", orgLevels); 
+        
         return "orgLevelMapping/edit";  // Returns the JSP page
     }
-   
+
+    @PostMapping("/updateOrgLevelEntries")
+    public ResponseEntity<String> updateOrgLevelEntries(@RequestBody List<OrgLevelMapping> dataList) {
+        if (dataList == null || dataList.isEmpty()) {
+            return ResponseEntity.badRequest().body("No data received.");
+        }
+
+        // Extract a single name and description (assuming they are the same for all)
+        String name = dataList.get(0).getShortName();
+        String description = dataList.get(0).getLongDescription();
+        long orgAcctSetId = dataList.get(0).getOrgAcctSetId(); // Existing OrgAcctSetId
+        System.out.println("name Info: " + name);
+        System.out.println("description Info: " + description);
+        System.out.println("orgAcctSetId Info: " + orgAcctSetId);
+        // Step 1: Update OrgAcctSet entry
+       // orgLevelMappingService.updateOrgAcctSet(orgAcctSetId, name, description);
+
+        // Step 2: Collect existing mappings from DB
+        Set<Integer> existingEntryIds = orgLevelMappingService.getExistingMappings(orgAcctSetId);
+
+        // Step 3: Collect new unique selectedEntryIds
+        Set<Integer> newEntryIds = new HashSet<>();
+        for (OrgLevelMapping data : dataList) {
+            if (data.getSelectedEntryIds() != null) {
+                for (String entryId : data.getSelectedEntryIds()) {
+                    newEntryIds.add(Integer.parseInt(entryId));
+                }
+            }
+        }
+
+        // Step 4: Find entries to DELETE (existing in DB but not in new list)
+        Set<Integer> toDelete = new HashSet<>(existingEntryIds);
+        toDelete.removeAll(newEntryIds);
+
+        // Step 5: Find entries to INSERT (new ones not in DB)
+        Set<Integer> toInsert = new HashSet<>(newEntryIds);
+        toInsert.removeAll(existingEntryIds);
+
+        // Step 6: Delete old mappings
+        for (Integer entryId : toDelete) {
+            orgLevelMappingService.deleteOrgLevelMapping(orgAcctSetId, entryId);
+        }
+
+        // Step 7: Insert new mappings (with validation)
+        for (Integer entryId : toInsert) {
+            if (!orgLevelMappingService.doesOrgLevelEntryExist(entryId)) {
+                System.err.println("❌ ERROR: ORGLEVELENTRYID does not exist: " + entryId);
+                continue; // Skip invalid entry
+            }
+            orgLevelMappingService.saveOrgLevelMapping(orgAcctSetId, entryId);
+        }
+
+        return ResponseEntity.ok("Data updated successfully!");
+    }
+
+
+//    @GetMapping("/edit")
+//    public String editOrgMapping(@RequestParam("id") Long id, Model model) {
+//        System.out.println("🔍 Received edit request for ID: " + id);
+//    	 System.out.println("Received request to edit OrgLevelMapping with ID: " + id);
+//    //    OrgLevelMapping selectedMapping = orgLevelMappingService.getMappingById(id);
+//    	 OrgLevelMapping basicInfo = orgLevelMappingService.findBasicInfo(id); 
+//    	  System.out.println("Basic Info: " + basicInfo);
+//        List<OrgLevelMapping> availableMappings = orgLevelMappingService.findAvailableMappings(id);
+//        List<OrgLevelMapping> selectedMappings = orgLevelMappingService.findSelectedMappings(id);
+//        for (OrgLevelMapping mapping : selectedMappings) {
+//            System.out.println("Mapping Data: EntryId = " + mapping.getOrgLevelEntryId() + ", DefId = " + mapping.getOrgAcctSetId());
+//        }
+//        availableMappings.forEach(mapping -> 
+//        System.out.println("Available Mapping: " + mapping)
+//    );
+//    
+//    selectedMappings.forEach(mapping -> 
+//        System.out.println("Selected Mapping: " + mapping)
+//    );
+//        List<OrgLevelDefDTO> orgLevels = orgLevelService.getActiveOrgLevels();
+//        model.addAttribute("basicInfo", basicInfo);
+//        model.addAttribute("availableMappings", availableMappings);
+//        model.addAttribute("selectedMappings", selectedMappings);
+//        model.addAttribute("orgLevelDefs", orgLevels); 
+//        return "orgLevelMapping/edit";  // Returns the JSP page
+//    }
+//   
 
     
   

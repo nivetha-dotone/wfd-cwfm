@@ -12,5 +12,7 @@ public interface MasterUserDao {
 	
 	public MasterUser findMasterUserDetailsByUserName(String ua);
 
+	public boolean existsByUserAccount(String name);
+
 	
 }

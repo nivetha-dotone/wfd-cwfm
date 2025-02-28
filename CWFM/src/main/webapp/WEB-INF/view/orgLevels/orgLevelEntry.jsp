@@ -123,6 +123,15 @@
             background-color: #ffffff;
             color: #000;
         }
+        .error-message {
+    color: red;
+    font-size: 14px;
+    display: inline-block; /* Keeps it in a single row */
+    white-space: nowrap; /* Prevents line breaks */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds "..." if text is too long */
+    max-width: 100%; /* Adjust width based on layout */
+}
     </style>
 </head>
 
@@ -149,7 +158,7 @@
 <div>
     <input type="hidden" name="orgLevelEntryId" id="orgLevelEntryId" value="0">
     <input type="hidden" name="orgLevelDefId" id="orgLevelDefId" value="${param.orgLevelDefId}">
-
+ <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     <label for="entryName">Entry Name:</label>
     <input type="text" name="entryName" id="entryName" required>
 

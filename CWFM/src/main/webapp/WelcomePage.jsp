@@ -1300,6 +1300,118 @@ function saveMapping() {
     }
 }
 
+function saveRoleRights() {
+    const errorBox = document.getElementById("error-message");
+    errorBox.style.display = "none";
+    errorBox.innerText = "";
+
+    const rows = document.querySelectorAll("#roleRightsTable tbody tr");
+    let selectedCombinations = new Set();
+    let roleRights = [];
+    let validationErrors = [];
+
+    rows.forEach((row, index) => {
+        const roleSelect = row.querySelector(".roleId");
+        const pageSelect = row.querySelector(".pageId");
+
+        if (!roleSelect || !pageSelect) {
+            console.error("Row " + (index + 1) + ": Role/Page dropdown NOT found!");
+            return;
+        }
+
+        const roleId = roleSelect.value ? roleSelect.value.trim() : "";
+        const pageId = pageSelect.value ? pageSelect.value.trim() : "";
+
+        if (!roleId || !pageId) {
+            validationErrors.push("Row " + (index + 1) + ": Please select both Role and Page.");
+            return;
+        }
+        const key = roleId + "-" + pageId;
+        if (selectedCombinations.has(key)) {
+            validationErrors.push("Row " + (index + 1) + ": Duplicate Role-Page combination detected.");
+            return;
+        } else {
+            selectedCombinations.add(key);
+        }
+
+        let permissions = [];
+        let permissions = [];
+        
+        document.querySelectorAll("#roleRightsTable tbody tr").forEach((row, index) => {
+            let pageId = row.querySelector("input[name='roleRights[" + index + "].pageId']").value;
+            let roleId = document.getElementById("roleDropdown").value; // Assuming a dropdown for role selection
+
+            let roleRight = {
+                roleId: roleId,
+                pageId: pageId,
+                addRights: row.querySelector("input[name='roleRights[" + index + "].addRights']").checked ? "1" : "0",
+                editRights: row.querySelector("input[name='roleRights[" + index + "].editRights']").checked ? "1" : "0",
+                deleteRights: row.querySelector("input[name='roleRights[" + index + "].deleteRights']").checked ? "1" : "0",
+                viewRights: row.querySelector("input[name='roleRights[" + index + "].viewRights']").checked ? "1" : "0",
+                importRights: row.querySelector("input[name='roleRights[" + index + "].importRights']").checked ? "1" : "0",
+                exportRights: row.querySelector("input[name='roleRights[" + index + "].exportRights']").checked ? "1" : "0"
+            };
+
+            permissions.push(roleRight);
+        });
+
+        console.log("Permissions Data Sent:", permissions); // Debugging: Check data in console before sending
+        if (permissions.length === 0) {
+            validationErrors.push("Row " + (index + 1) + ": Please select at least one permission.");
+            return;
+        }
+        // Wrap inside RoleRightsForm
+        let roleRightsForm = {
+            roleRights: permissions
+        };
+        /* row.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            permissions.push(cb.name.split('.').pop());
+        }); */
+
+        
+
+        roleRights.push({ roleId, pageId, permissions });
+    });
+
+    // **If validation errors exist, show them in the UI**
+    if (validationErrors.length > 0) {
+        errorBox.innerHTML = validationErrors.join("<br>");
+        errorBox.style.display = "block";
+        return;
+    }
+
+    if (roleRights.length > 0) {
+        fetch("/CWFM/roleRights/saveRoleRights", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ roleRights })
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status !== 200) {
+                throw body;
+            }
+            if (body.status === "error") {
+                errorBox.innerHTML = body.errors ? body.errors.join("<br>") : body.message;
+                errorBox.style.display = "block";
+            } else {
+                alert(body.message); // Show success message
+                loadCommonList('/roleRights/roleRightsList', 'Role Rights List'); 
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            if (error.errors && error.errors.length > 0) {
+                errorBox.innerHTML = error.errors.join("<br>");
+            } else if (error.message) {
+                errorBox.innerHTML = error.message;
+            } else {
+                errorBox.innerHTML = "An unexpected error occurred. Please try again.";
+            }
+            errorBox.style.display = "block";
+        });
+    }
+}
 
 
 

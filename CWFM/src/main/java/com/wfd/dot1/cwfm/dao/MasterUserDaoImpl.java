@@ -31,6 +31,9 @@ public class MasterUserDaoImpl implements MasterUserDao{
 	 public String updatePasswordQuery() {
 		    return QueryFileWatcher.getQuery("GET_UPDATE_PASSWORD");
 	    }
+	 public String getMasterUserAccount() {
+		    return QueryFileWatcher.getQuery("GET_MASTER_USERACCOUNT");
+	    }
 	 
 	@Override
 	public MasterUser findMasterUserDetailsByUserName(String username, String password) {
@@ -87,5 +90,11 @@ public class MasterUserDaoImpl implements MasterUserDao{
     	 String query = updatePasswordQuery();
         jdbcTemplate.update(query, newPassword, userId);
     }
+	@Override
+	public boolean existsByUserAccount(String userAccount) {
+		 String sql = getMasterUserAccount();
+	        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userAccount);
+	        return count != null && count > 0;
+	}
 }
 

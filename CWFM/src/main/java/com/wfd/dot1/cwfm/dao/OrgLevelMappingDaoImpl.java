@@ -4,10 +4,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -209,18 +215,52 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
         
         public List<OrgLevelMapping> findAvailableMappings(Long id) {
         	String query=findavailablemappings();
-            return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevelMapping.class), id);
+          //  return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevelMapping.class), id);
+            return jdbcTemplate.query(query, (rs, rowNum) -> {
+                OrgLevelMapping mapping = new OrgLevelMapping();
+                mapping.setOrgLevelEntryId(rs.getLong("ORGLEVELENTRYID"));
+                mapping.setOrgAcctSetId(rs.getLong("ORGACCTSETID"));
+                mapping.setShortName(rs.getString("SHORTNM")); // Ensure getter/setter exist
+                mapping.setLongDescription(rs.getString("LONGDSC")); // Ensure getter/setter exist
+                return mapping;
+            }, id);
         }
 
         public List<OrgLevelMapping> findSelectedMappings(Long id) {
-        	String query=findselectedmappings();
-        return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevelMapping.class), id);
-         }
-        
-        public OrgLevelMapping findBasicInfo(Long id) {
-        	String query=findbasicinformation();
-            return jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
+            String query = findselectedmappings();
+            return jdbcTemplate.query(query, new RowMapper<OrgLevelMapping>() {
+                @Override
+                public OrgLevelMapping mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    OrgLevelMapping mapping = new OrgLevelMapping();
+                    mapping.setOrgLevelEntryId(rs.getLong("ORGLEVELENTRYID"));
+                    mapping.setOrgAcctSetId(rs.getLong("ORGACCTSETID")); // Ensure this is Long
+                    mapping.setShortName(rs.getString("SHORTNM")); // Map SHORTNM to shortName
+                    mapping.setLongDescription(rs.getString("LONGDSC")); // Map LONGDSC to longDescription
+                    return mapping;
+                }
+            }, id);
         }
+        
+        @SuppressWarnings("deprecation")
+        public OrgLevelMapping findBasicInfo(Long id) {
+            String query = findbasicinformation();
+
+            try {
+                return jdbcTemplate.queryForObject(query, new Object[]{id}, (rs, rowNum) -> {
+                    OrgLevelMapping mapping = new OrgLevelMapping();
+                    mapping.setOrgAcctSetId(rs.getLong("ORGACCTSETID"));
+                    mapping.setShortName(rs.getString("SHORTNM"));
+                    mapping.setLongDescription(rs.getString("LONGDSC"));
+                    return mapping;
+                });
+            } catch (EmptyResultDataAccessException e) {
+                return null; // No record found
+            } catch (IncorrectResultSizeDataAccessException e) {
+                throw new RuntimeException("Expected one record, but found multiple for ID: " + id);
+            }
+        }
+
+
         
         @Override
         public List<OrgLevelMapping> findAllMaps() {
@@ -230,5 +270,112 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
             System.out.println("Fetched OrgLevelMappings: " + result);  // Log the fetched data
             return result;
         }
-		
+		@Override
+		public boolean existsByShortName(String name) {
+			 String sql = "SELECT COUNT(*) FROM ORGACCTSET WHERE SHORTNM = ?";
+		        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name);
+		        return count != null && count > 0;
+		}
+		@SuppressWarnings("deprecation")
+		public List<OrgLevelMapping> getOrgLevelMappingById(Long orgAcctSetId) {
+		    String sql = "SELECT om.ORGLEVELENTRYID, om.ORGACCTSETID, os.SHORTNM, os.LONGDSC " +
+		                 "FROM OLACCTSETMM om " +
+		                 "LEFT JOIN ORGACCTSET os ON om.ORGACCTSETID = os.ORGACCTSETID " +
+		                 "WHERE om.ORGACCTSETID = ?";
+
+		    return jdbcTemplate.query(sql, new Object[]{orgAcctSetId}, (rs, rowNum) -> {
+		        OrgLevelMapping mapping = new OrgLevelMapping();
+		        mapping.setOrgLevelEntryId(rs.getLong("ORGLEVELENTRYID"));
+		        mapping.setOrgAcctSetId(rs.getLong("ORGACCTSETID"));
+		        mapping.setShortName(rs.getString("SHORTNM"));
+		        mapping.setLongDescription(rs.getString("LONGDSC"));
+		        return mapping;
+		    });
+		}
+
+		@SuppressWarnings("deprecation")
+		public List<OrgLevelEntryDTO> getSelectedEntries(Long orgLevelMappingId, Long orgLevelDefId) {
+		    String sql = "SELECT oe.ORGLEVELENTRYID, oe.NAME, oe.DESCRIPTION " +
+		                 "FROM OLACCTSETMM om " +
+		                 "JOIN ORGLEVELENTRY oe ON om.ORGLEVELENTRYID = oe.ORGLEVELENTRYID " + // Ensure correct mapping
+		                 "WHERE om.ORGACCTSETID = ? AND oe.ORGLEVELDEFID = ?";
+
+		    return jdbcTemplate.query(sql, new Object[]{orgLevelMappingId, orgLevelDefId}, (rs, rowNum) -> {
+		        OrgLevelEntryDTO entry = new OrgLevelEntryDTO();
+		        entry.setOrgLevelEntryId(rs.getLong("ORGLEVELENTRYID"));
+		        entry.setName(rs.getString("NAME"));
+		        entry.setDescription(rs.getString("DESCRIPTION"));
+		        return entry;
+		    });
+		}
+
+		@SuppressWarnings("deprecation")
+		public List<OrgLevelEntryDTO> getAvailableEntries(Long orgLevelMappingId, Long orgLevelDefId) {
+		    String sql = "SELECT oe.ORGLEVELENTRYID, oe.NAME, oe.DESCRIPTION " +
+		                 "FROM ORGLEVELENTRY oe " +
+		                 "WHERE oe.ORGLEVELDEFID = ? " +  
+		                 "AND NOT EXISTS ( " +
+		                 "    SELECT 1 FROM OLACCTSETMM om " +
+		                 "    WHERE om.ORGLEVELENTRYID = oe.ORGLEVELENTRYID " +
+		                 "    AND om.ORGACCTSETID = ? " +
+		                 ")"; 
+
+		    return jdbcTemplate.query(sql, new Object[]{orgLevelDefId, orgLevelMappingId}, (rs, rowNum) -> {
+		        OrgLevelEntryDTO entry = new OrgLevelEntryDTO();
+		        entry.setOrgLevelEntryId(rs.getLong("ORGLEVELENTRYID"));
+		        entry.setName(rs.getString("NAME"));
+		        entry.setDescription(rs.getString("DESCRIPTION"));
+		        return entry;
+		    });
+		}
+		@Override
+		public void updateOrgLevelEntries(Long orgLevelEntryId, List<Long> selectedOrgAcctSetIds) {
+		    if (selectedOrgAcctSetIds == null || selectedOrgAcctSetIds.isEmpty()) {
+		        System.out.println("No updates required as selectedOrgAcctSetIds is empty.");
+		        return;
+		    }
+
+		    // DELETE: Remove entries NOT in the selected list
+		    String deleteSql = "DELETE FROM OLACCTSETMM WHERE ORGLEVELENTRYID = ? AND ORGACCTSETID NOT IN (" +
+		                       selectedOrgAcctSetIds.stream().map(id -> "?").collect(Collectors.joining(",")) + ")";
+		    
+		    List<Object> params = new ArrayList<>();
+		    params.add(orgLevelEntryId);
+		    params.addAll(selectedOrgAcctSetIds);
+
+		    jdbcTemplate.update(deleteSql, params.toArray());
+
+		    // INSERT: Add new entries if they do not exist
+		    String checkSql = "SELECT COUNT(*) FROM OLACCTSETMM WHERE ORGLEVELENTRYID = ? AND ORGACCTSETID = ?";
+		    String insertSql = "INSERT INTO OLACCTSETMM (ORGLEVELENTRYID, ORGACCTSETID, UPDATEDTM) VALUES (?, ?, GETDATE())";
+
+		    for (Long orgAcctSetId : selectedOrgAcctSetIds) {
+		        Integer count = jdbcTemplate.queryForObject(checkSql, new Object[]{orgLevelEntryId, orgAcctSetId}, Integer.class);
+		        if (count == null || count == 0) {
+		            jdbcTemplate.update(insertSql, orgLevelEntryId, orgAcctSetId);
+		        }
+		    }
+		}
+		 public boolean doesOrgLevelEntryExist(Integer entryId) {
+		        String query = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE ORGLEVELENTRYID = ?";
+		        Integer count = jdbcTemplate.queryForObject(query, Integer.class, entryId);
+		        return count != null && count > 0;
+		    }
+
+		    public void saveOrgLevelMapping(long orgAcctSetId, Integer entryId) {
+		        String query = "INSERT INTO OLACCTSETMM (ORGLEVELENTRYID, ORGACCTSETID, UPDATEDTM) VALUES (?, ?, GETDATE())";
+		        jdbcTemplate.update(query, entryId, orgAcctSetId);
+		    }
+
+		    public void deleteOrgLevelMapping(long orgAcctSetId, Integer entryId) {
+		        String query = "DELETE FROM OLACCTSETMM WHERE ORGACCTSETID = ? AND ORGLEVELENTRYID = ?";
+		        jdbcTemplate.update(query, orgAcctSetId, entryId);
+		    }
+
+		    public Set<Integer> getExistingMappings(long orgAcctSetId) {
+		        String query = "SELECT ORGLEVELENTRYID FROM OLACCTSETMM WHERE ORGACCTSETID = ?";
+		        return new HashSet<>(jdbcTemplate.queryForList(query, Integer.class, orgAcctSetId));
+		    }
+
+
 }

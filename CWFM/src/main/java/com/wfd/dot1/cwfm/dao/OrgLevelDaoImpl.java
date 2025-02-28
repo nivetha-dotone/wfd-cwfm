@@ -318,6 +318,13 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		    	String query=findbasicinfo();
 		        return jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(OrgLevelMapping.class));
 		    }
+			@Override
+			public boolean isDuplicateEntry(int orgLevelDefId, String name) {
+				 String query = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ? AND NAME=? AND INACTIVE = 1 ";
+				    Integer count = jdbcTemplate.queryForObject(query, new Object[]{orgLevelDefId, name}, Integer.class);
+
+				    return count != null && count > 0; 
+			}
 
 }
 

@@ -29,7 +29,7 @@ public interface  CommonDao {
 //		List<CMSPerson> getAllPersons();
 //		List<CMSPerson> getAllPersonsByPrincipalEmployerAndContractor(Long principalEmployerId, Long contractorId);
 //		List<CMSPersonCustomData> getCustomDataByEmployeeId(Long employeeId);
-		CmsGeneralMaster findByGMId(Integer bloodGroupId);
+		CmsGeneralMaster findByGMId(Long bloodGroupId);
 		List<CmsGeneralMaster> getCmsGeneralMasterOptionsByName(String string);
 		 boolean isGMTypeNameDuplicate(String gmTypeName);
 		    boolean isCmsGeneralMasterDuplicate(String masterName, String masterValue);
@@ -75,4 +75,6 @@ public interface  CommonDao {
 
 					List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId);
 					CmsGeneralMaster findByGMName(Long gmTypeId, String gmName);
+					void deleteRoleRights(List<Integer> roleIds);
+					boolean isDuplicateGMName(Long gmTypeId, String gmName);
 }

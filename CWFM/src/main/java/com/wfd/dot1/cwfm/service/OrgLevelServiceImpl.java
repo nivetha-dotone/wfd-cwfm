@@ -86,8 +86,11 @@ public class OrgLevelServiceImpl implements OrgLevelService {
 	}
 	@Override
 	public OrgLevelEntryDTO getOrgLevelEntryById(int orgLevelEntryId) {
-		// TODO Auto-generated method stub
 		return orgLevelDao.getOrgLevelEntryById(orgLevelEntryId);
+	}
+	@Override
+	public boolean isDuplicateEntry(int orgLevelDefId, String name) {
+		return orgLevelDao.isDuplicateEntry(orgLevelDefId,name);
 	}
 	
 }

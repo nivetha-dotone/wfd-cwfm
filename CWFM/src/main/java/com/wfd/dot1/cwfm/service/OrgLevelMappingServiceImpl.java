@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,6 +88,51 @@ public class OrgLevelMappingServiceImpl implements OrgLevelMappingService {
 	@Override
 	public List<OrgLevelMapping> findAllMaps() {
 		return orgLevelMappingDao.findAllMaps();
+	}
+
+	@Override
+	public boolean existsByShortName(String name) {
+		return orgLevelMappingDao.existsByShortName(name);
+	}
+
+	@Override
+	public List<OrgLevelMapping> getOrgLevelMappingById(Long id) {
+		return orgLevelMappingDao.getOrgLevelMappingById(id);
+	}
+
+	@Override
+	public List<OrgLevelEntryDTO> getSelectedEntries(Long id, Long orgLevelDefId) {
+		return orgLevelMappingDao.getSelectedEntries(id,orgLevelDefId);
+	}
+
+	@Override
+	public List<OrgLevelEntryDTO> getAvailableEntries(Long id, Long orgLevelDefId) {
+		return orgLevelMappingDao.getAvailableEntries(id,orgLevelDefId);
+	}
+
+	@Override
+	public void updateOrgLevelEntries(Long orgLevelDefId, List<Long> newSelectedEntries) {
+		orgLevelMappingDao.updateOrgLevelEntries(orgLevelDefId,newSelectedEntries);	
+	}
+
+	@Override
+	public boolean doesOrgLevelEntryExist(Integer entryId) {
+		return orgLevelMappingDao.doesOrgLevelEntryExist(entryId);
+	}
+
+	@Override
+	public void saveOrgLevelMapping(long orgAcctSetId, Integer entryId) {
+		orgLevelMappingDao.saveOrgLevelMapping(orgAcctSetId,entryId);
+	}
+
+	@Override
+	public void deleteOrgLevelMapping(long orgAcctSetId, Integer entryId) {
+		orgLevelMappingDao.deleteOrgLevelMapping(orgAcctSetId, entryId);
+	}
+
+	@Override
+	public Set<Integer> getExistingMappings(long orgAcctSetId) {
+		return orgLevelMappingDao.getExistingMappings(orgAcctSetId);
 	}
     
     

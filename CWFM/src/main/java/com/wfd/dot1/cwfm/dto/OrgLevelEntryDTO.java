@@ -4,13 +4,13 @@ import java.util.List;
 
 public class OrgLevelEntryDTO {
 
-    private Integer orgLevelEntryId;  // Primary Key
+    private long orgLevelEntryId;  // Primary Key
     private int orgLevelDefId;    // Foreign Key to ORGLEVELDEF
     private String name;          // Name of the entry
     private String description;   // Description of the entry
     private boolean inactive;     // Active or inactive status (mapped to 1 for active, 0 for inactive)
     private int updatedByUsrAcctId;  // ID of the user who last updated the record
-
+    private List<Long> selectedEntryIds; 
     // Default constructor
     public OrgLevelEntryDTO() {}
 
@@ -26,12 +26,12 @@ public class OrgLevelEntryDTO {
 
     // Getters and setters for each field
 
-    public int getOrgLevelEntryId() {
-        return orgLevelEntryId;
+    public long getOrgLevelEntryId() {
+    	return orgLevelEntryId;
     }
 
-    public void setOrgLevelEntryId(int orgLevelEntryId) {
-        this.orgLevelEntryId = orgLevelEntryId;
+    public void setOrgLevelEntryId(long l) {
+        this.orgLevelEntryId = l;
     }
 
     public int getOrgLevelDefId() {
@@ -74,6 +74,14 @@ public class OrgLevelEntryDTO {
         this.updatedByUsrAcctId = updatedByUsrAcctId;
     }
 
+    public List<Long> getSelectedEntryIds() {
+        return selectedEntryIds;
+    }
+
+    public void setSelectedEntryIds(List<Long> selectedEntryIds) {
+        this.selectedEntryIds = selectedEntryIds;
+    }
+
     @Override
     public String toString() {
         return "OrgLevelEntryDTO{" +
@@ -83,6 +91,7 @@ public class OrgLevelEntryDTO {
                 ", description='" + description + '\'' +
                 ", inactive=" + inactive +
                 ", updatedByUsrAcctId=" + updatedByUsrAcctId +
+                ", selectedEntryIds=" + selectedEntryIds +
                 '}';
     }
    

@@ -37,4 +37,8 @@ public class MasterUserServiceImpl implements MasterUserService{
 	public MasterUser findMasterUserDetailsByUserName(String username) {
 		return masterUserDao.findMasterUserDetailsByUserName(username);
 	}
+	@Override
+	public boolean existsByUserAccount(String name) {
+		return masterUserDao.existsByUserAccount(name);
+	}
 }

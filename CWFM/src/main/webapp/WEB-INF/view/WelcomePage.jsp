@@ -8,6 +8,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Latest Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
       <!--  <script src="resources/js/commonjs.js"></script> -->
     <script src="resources/js/cms/principalEmployer.js"></script>
@@ -331,7 +334,7 @@ function deleteSelectedOrgLevel() {
         }
     });
 }
-function submitOrgLevel() {
+/* function submitOrgLevel() {
     const orgLevelRows = document.querySelectorAll('#orgLevelTable tbody tr'); // Select all rows in the table
     let orgLevelsData = [];
     let validData = true; // Track validity of the entire form
@@ -395,7 +398,98 @@ function submitOrgLevel() {
         }
     });
 }
+ */
 
+ function submitOrgLevel() {
+	    const orgLevelRows = document.querySelectorAll('#orgLevelTable tbody tr'); 
+	    let orgLevelsData = [];
+	    let validData = true;
+	    
+	    let nameSet = new Set();  // Track unique Org Level Names
+	    let shortNameSet = new Set();  // Track unique Short Names
+	    let hierarchySet = new Set();  // Track unique Hierarchy Levels
+
+	    orgLevelRows.forEach((row, index) => {
+	        const orgLevelDefIdElem = row.querySelector('input[name="orgLevelDefId[]"]');
+	        const orgLevelNameElem = row.querySelector('input[name="orgLevelName[]"]');
+	        const shortNameElem = row.querySelector('input[name="shortName[]"]');
+	        const hierarchyElem = row.querySelector('input[name="hierarchy[]"]');
+
+	        const orgLevelDefId = orgLevelDefIdElem ? orgLevelDefIdElem.value.trim() : null;
+	        const orgLevelName = orgLevelNameElem ? orgLevelNameElem.value.trim() : '';
+	        const shortName = shortNameElem ? shortNameElem.value.trim() : '';
+	        const hierarchy = hierarchyElem ? hierarchyElem.value.trim() : '';
+
+	        console.log(`Processing Row ${index + 1}:`);
+	        console.log('OrgLevelDefId:', orgLevelDefId || 'New Entry (null)');
+	        console.log('Name:', orgLevelName || 'Not Found');
+	        console.log('Short Name:', shortName || 'Not Found');
+	        console.log('Hierarchy:', hierarchy || 'Not Found');
+
+	        // Validation: Check for empty fields
+	        if (!orgLevelName || !shortName || !hierarchy) {
+	            console.error(`Row ${index + 1} is missing required fields.`);
+	            row.style.backgroundColor = '#ffdddd'; // Highlight invalid row
+	            validData = false;
+	            return;
+	        } else {
+	            row.style.backgroundColor = ''; // Reset color if valid
+	        }
+
+	        // **Duplicate Check**
+	        const duplicateName = nameSet.has(orgLevelName);
+	        const duplicateShort = shortNameSet.has(shortName);
+	        const duplicateHierarchy = hierarchySet.has(hierarchy);
+
+	        if (duplicateName || duplicateShort || duplicateHierarchy) {
+	            console.error(`Duplicate detected in Row ${index + 1}`);
+	            row.style.backgroundColor = '#ffcccb'; // Highlight duplicate row
+	            alert(`Duplicate entry found in row ${index + 1}. Please correct before submitting.`);
+	            validData = false;
+	            return;
+	        }
+
+	        // Add to Sets to track unique values
+	        nameSet.add(orgLevelName);
+	        shortNameSet.add(shortName);
+	        hierarchySet.add(hierarchy);
+
+	        orgLevelsData.push({
+	            orgLevelDefId: orgLevelDefId && !isNaN(orgLevelDefId) ? parseInt(orgLevelDefId) : null,
+	            name: orgLevelName,
+	            shortName: shortName,
+	            orgHierarchyLevel: parseInt(hierarchy, 10)
+	        });
+	    });
+
+	    if (!validData || orgLevelsData.length === 0) {
+	        alert('Please fix errors before submitting.');
+	        return;
+	    }
+
+	    console.log('Final Data Sent:', orgLevelsData);
+
+	    // AJAX request to send data to the server
+	    $.ajax({
+	        type: 'POST',
+	        url: '/CWFM/org-level/save',
+	        contentType: 'application/json',
+	        data: JSON.stringify(orgLevelsData),
+	        success: function (response) {
+	            console.log('Server Response:', response);
+	            if (response.status === 'partial') {
+	                alert('Some entries were duplicates and not saved.');
+	            } else {
+	                alert('Org Levels saved successfully!');
+	            }
+	            loadCommonList('/org-level/list', 'Org Levels');
+	        },
+	        error: function (xhr) {
+	            console.error('Error:', xhr.responseText);
+	            alert('Error: ' + xhr.responseText);
+	        }
+	    });
+	}
 
 
 
@@ -517,17 +611,40 @@ function navigateToOrgLevel() {
 function saveOrgEntries() {
     const orgLevelEntryId = document.getElementById('orgLevelEntryId').value;
     const orgLevelDefId = document.getElementById('orgLevelDefId').value;
-    const entryName = document.getElementById('entryName').value;
-    const description = document.getElementById('description').value;
+    const entryName = document.getElementById('entryName').value.trim();
+    const description = document.getElementById('description').value.trim();
 
-    // Validate the orgLevelDefId
-    if (!orgLevelDefId) {
-        alert('Please select an Organization Level.');
+    const errorBox = document.getElementById("formErrorMessage");
+
+    if (!errorBox) {
+        console.error("Error: formErrorMessage element is missing in the HTML.");
         return;
     }
 
-    if (entryName === '' || description === '') {
-        alert('Please enter Name and Description.');
+    errorBox.style.display = "none"; // Hide previous errors
+    errorBox.innerText = ''; // Clear previous messages
+
+    let errorMessages = []; // Array to store all error messages
+
+    // Validate Org Level
+    if (!orgLevelDefId) {
+        errorMessages.push('Please select an Organization Level.');
+    }
+
+    // Validate Entry Name
+    if (entryName === '') {
+        errorMessages.push('Entry Name is required.');
+    }
+
+    // Validate Description
+    if (description === '') {
+        errorMessages.push('Description is required.');
+    }
+
+    // If there are errors, display all messages and stop submission
+    if (errorMessages.length > 0) {
+        errorBox.innerHTML = errorMessages.join('<br>'); // Show all errors
+        errorBox.style.display = "block";
         return;
     }
 
@@ -544,27 +661,28 @@ function saveOrgEntries() {
 
     xhr.onload = function() {
         if (xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText); // Parse response data
+            var response = JSON.parse(xhr.responseText); 
             if (response.success) {
-                alert(response.message); // Display success message
-                updateTable(); // Call the updateTable function to refresh the table content
+                updateTable(); 
             } else {
-                console.error("Failed to save entry: " + response.message);
-                alert("Failed to save entry. Please try again.");
+                errorBox.innerHTML = response.message;
+                errorBox.style.display = "block";
             }
         } else {
-            console.error("Request error: " + xhr.statusText);
-            alert("An error occurred while saving the Org Level Entry.");
+            errorBox.innerHTML = "An error occurred while saving the Org Level Entry.";
+            errorBox.style.display = "block";
         }
     };
 
     xhr.onerror = function() {
-        console.error("Request error");
-        alert("An error occurred while saving the Org Level Entry.");
+        errorBox.innerHTML = "An error occurred while saving the Org Level Entry.";
+        errorBox.style.display = "block";
     };
 
     xhr.send(data);
 }
+
+
 
 function updateTable() {
     const orgLevelDefId = document.getElementById('orgLevelDefId').value;
@@ -725,7 +843,7 @@ function moveRight(orgLevelDefId) {
 function moveLeft(orgLevelDefId) {
     moveOptions('selected-' + orgLevelDefId, 'available-' + orgLevelDefId);
 }
-function saveOrgLevelMappings() {
+/* function saveOrgLevelMappings() {
     var formData = [];
 
     // Loop through all select elements with class 'selected-options'
@@ -763,7 +881,7 @@ function saveOrgLevelMappings() {
 
     xhr.send(JSON.stringify(formData));
 }
-
+ */
 
 
 function fetchGmData() {
@@ -810,15 +928,15 @@ function deleteGMManager(gmId,gmTypeId) {
     }
 }
 function saveGMMaster() {
+    console.log("🚀 saveGMMaster() function called!"); // Check if function runs
+
     const gmTypeId = document.getElementById('gmTypeId').value;
     const masterName = document.getElementById('masterName').value.trim();
     const masterValue = document.getElementById('masterValue').value.trim();
-    const errorBox = document.getElementById("error-gmMaster"); // Error message div
+    const errorBox = document.getElementById("error-gmMaster");
 
-    // Hide previous error messages
-    errorBox.style.display = "none";
+    errorBox.style.display = "none"; // Hide previous errors
 
-    // Validate fields
     if (!gmTypeId) {
         errorBox.innerText = "Please select GM Type.";
         errorBox.style.display = "block";
@@ -831,31 +949,59 @@ function saveGMMaster() {
         return;
     }
 
-    const data = JSON.stringify({
-        gmTypeId: gmTypeId,
-        gmName: masterName,
-        gmDescription: masterValue,
+    console.log("📌 Valid Input:", { gmTypeId, masterName, masterValue }); // Log data
+
+    // **Duplicate Check in Existing Table**
+    const existingNames = [];
+    const existingValues = [];
+    document.querySelectorAll("tbody tr").forEach((row) => {
+        const nameInput = row.querySelector("input[id='name']");
+        const descInput = row.querySelector("input[id='value']");
+        if (nameInput && descInput) {
+            existingNames.push(nameInput.value.trim());
+            existingValues.push(descInput.value.trim());
+        }
     });
 
-    fetch("/CWFM/generalController/saveGeneralMaster", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: data
-    })
-    .then(response => response.text()) // Read response as text
-    .then(responseText => {
-        if (responseText.includes("Error: Master Name already exists")) {
-            errorBox.innerText = "Warning: Master Name already exists for this GM Type!";
-            errorBox.style.display = "block";
-        } else {
-            document.getElementById("mainContent").innerHTML = responseText;
-        }
-    })
-    .catch(() => {
-        errorBox.innerText = "Failed to communicate with the server.";
+    if (existingNames.includes(masterName)) {
+        errorBox.innerText = "Duplicate Name found. Please enter a unique Name.";
         errorBox.style.display = "block";
-    });
+        return;
+    }
+
+   /*  if (existingValues.includes(masterValue)) {
+        errorBox.innerText = "Duplicate Value found. Please enter a unique Value.";
+        errorBox.style.display = "block";
+        return;
+    } */
+
+    // **Proceed with Saving Data**
+    const data = "gmTypeId=" + encodeURIComponent(gmTypeId) + 
+                 "&gmName=" + encodeURIComponent(masterName) + 
+                 "&gmDescription=" + encodeURIComponent(masterValue);
+
+    console.log("📤 Sending Data:", data); // Log request data
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/generalController/saveGeneralMaster", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onload = function() {
+        console.log("🔄 Response Received", xhr.status, xhr.responseText); // Log response
+        if (xhr.status === 200) {
+            document.getElementById("mainContent").innerHTML = xhr.responseText; // Reload content
+        } else {
+            alert("Failed to save entry. Please try again.");
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error("❌ Error sending request");
+    };
+
+    xhr.send(data);
 }
+
 
 
 function addNewRowFromTemplate() {
@@ -865,8 +1011,6 @@ function addNewRowFromTemplate() {
     const tableBody = document.getElementById('roleRightsTable').querySelector('tbody');
     tableBody.appendChild(newRow);
 }
-var rowIndex = 0; // Initial row index
-
 function addNewRow1() {
     var table = document.getElementById('roleRightsTable').getElementsByTagName('tbody')[0];
     var newRow = table.rows[0].cloneNode(true); // Clone the first row
@@ -875,80 +1019,133 @@ function addNewRow1() {
     // Update the index for cloned rows
     newRow.querySelectorAll('input, select').forEach(function(element) {
         element.name = element.name.replace(/\[\d+\]/, '[' + rowIndex + ']'); // Update the index
+        if (element.type === "checkbox") {
+            element.checked = false; // Ensure checkboxes are cleared
+        } else if (element.tagName === "SELECT") {
+            element.selectedIndex = 0; // Reset dropdowns
+        }
     });
 
     table.appendChild(newRow);
 }
 
 function saveRoleRights() {
-    const roleId = document.getElementById('roleId').value;
-    const pageId = document.getElementById('pageId').value;
     const errorBox = document.getElementById("error-message");
+    errorBox.style.display = "none";
+    errorBox.innerText = "";
 
-    // Hide previous error messages
-    if (errorBox) errorBox.style.display = "none";
+    const rows = document.querySelectorAll("#roleRightsTable tbody tr");
+    let selectedCombinations = new Set();
+    let roleRightsList = [];
+    let validationErrors = [];
 
-    // Collect selected permissions
-    const permissions = [];
-    document.querySelectorAll('input[name="permissions"]:checked').forEach((checkbox) => {
-        permissions.push(checkbox.value);
+    rows.forEach((row, index) => {
+        const roleSelect = row.querySelector(".roleId");
+        const pageSelect = row.querySelector(".pageId");
+
+        if (!roleSelect || !pageSelect) {
+            console.error("Row " + (index + 1) + ": Role/Page dropdown NOT found!");
+            return;
+        }
+
+        const roleId = roleSelect.value ? roleSelect.value.trim() : "";
+        const pageId = pageSelect.value ? pageSelect.value.trim() : "";
+
+        if (!roleId || !pageId) {
+            validationErrors.push("Row " + (index + 1) + ": Please select both Role and Page.");
+            return;
+        }
+
+        // Prevent duplicate Role-Page combinations
+        const key = roleId + "-" + pageId;
+        if (selectedCombinations.has(key)) {
+            validationErrors.push("Row " + (index + 1) + ": Duplicate Role-Page combination detected.");
+            return;
+        } else {
+            selectedCombinations.add(key);
+        }
+
+        let addCheckbox = row.querySelector("input[name='roleRights[" + index + "].addRights']");
+        console.log("Row:", index + 1, "Checkbox:", addCheckbox); // Check if the checkbox exists
+        console.log("Row:", index + 1, "Checked?:", addCheckbox ? addCheckbox.checked : "Checkbox Not Found");
+
+        let roleRight = {
+                roleId: roleId,
+                pageId: pageId,
+                addRights: row.querySelector("input[name='roleRights[" + index + "].addRights'][type='checkbox']")?.checked ? "1" : "0",
+                editRights: row.querySelector("input[name='roleRights[" + index + "].editRights'][type='checkbox']")?.checked ? "1" : "0",
+                deleteRights: row.querySelector("input[name='roleRights[" + index + "].deleteRights'][type='checkbox']")?.checked ? "1" : "0",
+                viewRights: row.querySelector("input[name='roleRights[" + index + "].viewRights'][type='checkbox']")?.checked ? "1" : "0",
+                importRights: row.querySelector("input[name='roleRights[" + index + "].importRights'][type='checkbox']")?.checked ? "1" : "0",
+                exportRights: row.querySelector("input[name='roleRights[" + index + "].exportRights'][type='checkbox']")?.checked ? "1" : "0"
+            };
+
+            console.log("Row:", index + 1, "Checkbox (Corrected):", roleRight.addRights);
+
+
+        if (
+            roleRight.addRights === "0" &&
+            roleRight.editRights === "0" &&
+            roleRight.deleteRights === "0" &&
+            roleRight.viewRights === "0" &&
+            roleRight.importRights === "0" &&
+            roleRight.exportRights === "0"
+        ) {
+            validationErrors.push("Row " + (index + 1) + ": Please select at least one permission.");
+            return;
+        }
+
+        roleRightsList.push(roleRight);
     });
 
-    // Validate inputs
-    if (!roleId || !pageId) {
-        if (errorBox) {
-            errorBox.innerText = "Please select a Role and a Page.";
-            errorBox.style.display = "block";
-        }
+    // **Show validation errors if any**
+    if (validationErrors.length > 0) {
+        errorBox.innerHTML = validationErrors.join("<br>");
+        errorBox.style.display = "block";
         return;
     }
 
-    if (permissions.length === 0) {
-        if (errorBox) {
-            errorBox.innerText = "Please select at least one permission.";
-            errorBox.style.display = "block";
-        }
-        return;
-    }
-
-    const data = {
-        roleRights: [{
-            roleId: roleId,
-            pageId: pageId,
-            permissions: permissions
-        }]
+    // **Prepare JSON payload**
+    let roleRightsForm = {
+        roleRights: roleRightsList
     };
 
+    console.log("Payload Sent:", JSON.stringify(roleRightsForm)); // Debugging: Check data in console before sending
+
+    // **Send to backend**
     fetch("/CWFM/roleRights/saveRoleRights", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(roleRightsForm)
     })
-    .then(response => response.text())
-    .then(responseText => {
-        if (responseText.includes("Error: Duplicate Role-Page combination detected")) {
-            if (errorBox) {
-                errorBox.innerText = responseText;
-                errorBox.style.display = "block";
-            }
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(({ status, body }) => {
+        if (status !== 200) {
+            throw body;
+        }
+        if (body.status === "error") {
+            errorBox.innerHTML = body.errors ? body.errors.join("<br>") : body.message;
+            errorBox.style.display = "block";
         } else {
-            alert("Role rights saved successfully!");
-            location.reload();
+            alert(body.message); // Show success message
+            loadCommonList('/roleRights/roleRightsList', 'Role Rights List'); 
         }
     })
     .catch(error => {
         console.error("Error:", error);
-        if (errorBox) {
-            errorBox.innerText = "Failed to save role rights.";
-            errorBox.style.display = "block";
+        if (error.errors && error.errors.length > 0) {
+            errorBox.innerHTML = error.errors.join("<br>");
+        } else if (error.message) {
+            errorBox.innerHTML = error.message;
+        } else {
+            errorBox.innerHTML = "An unexpected error occurred. Please try again.";
         }
+        errorBox.style.display = "block";
     });
 }
 
 
-
-
-/* function removeRow(button) {
+/* function removeRow(button) { 
     const row = button.closest('tr');
     row.remove();
 } */
@@ -1753,10 +1950,102 @@ function moveLeft(orgLevelDefId) {
     console.log("After moveLeft, available options:", 
         Array.from(availableSelect.options).map(opt => ({ id: opt.value, name: opt.text })));
 }
+function clearErrors() {
+    document.querySelectorAll("span[id$='Error']").forEach(span => span.innerText = "");
+}
+
+function saveOrgLevelMapping() {
+    clearErrors();
+    
+    let name = document.getElementById('name').value.trim();
+    let description = document.getElementById('description').value.trim();
+    
+    if (name === "") {
+        showError("name", "Name cannot be empty");
+        return;
+    }
+    if (description === "") {
+        showError("description", "Description cannot be empty");
+        return;
+    }
+
+    // AJAX call to check if name exists in MASTERUSER table and if it's a duplicate
+    $.ajax({
+        url: '/CWFM/org-level-mapping/validate-name',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ name }),
+        success: function(response) {
+            if (!response.validUser) {
+                showError("name", "Name must match a user account");
+                return;
+            }
+            if (response.duplicate) {
+                showError("name", "Duplicate name not allowed");
+                return;
+            }
+            
+            // Proceed with saving if no validation errors
+            submitOrgLevelMapping();
+        },
+        error: function() {
+            alert("Validation failed. Try again.");
+        }
+    });
+}
+
+
+function submitOrgLevelMapping() {
+    let data = [];
+
+    const shortName = document.getElementById('name').value;
+    const longDescription = document.getElementById('description').value;
+
+    document.querySelectorAll('.tab-content').forEach(function(tabContent) {
+        const orgLevelDefId = tabContent.id.split('-')[1];
+
+        const selectedElement = document.getElementById('selected-' + orgLevelDefId);
+        if (!selectedElement) {
+            console.warn(`No 'selected' list found for orgLevelDefId: ${orgLevelDefId}`);
+            return;
+        }
+
+        const selectedOptions = Array.from(selectedElement.options)
+            .map(option => option.value)
+            .filter(value => value !== "0");
+
+        if (selectedOptions.length > 0) {
+            data.push({
+                shortName,
+                longDescription,
+                selectedEntryIds: selectedOptions
+            });
+        }
+    });
+
+    if (data.length === 0) {
+        showError("name", "Please select at least one entry before submitting.");
+        return;
+    }
+
+    $.ajax({
+        url: '/CWFM/org-level-mapping/saveOrgLevelEntries',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function() {
+            alert("Data saved successfully!");
+            loadCommonList('/org-level-mapping/list', 'Users');
+        },
+        error: function() {
+            alert("Failed to save data.");
+        }
+    });
+}
 
 
 //Function to handle the save button click and send the selected data to the server
-function saveOrgLevelMapping() {
+/* function saveOrgLevelMapping() {
     let data = [];
 
     const shortName = document.getElementById('name').value;
@@ -1809,7 +2098,7 @@ function saveOrgLevelMapping() {
     });
 }
 
-
+ */
 
 
 // Validate if the name matches the user account (e.g., check with a session variable or user profile)
@@ -1835,7 +2124,7 @@ function isDuplicateName(name) {
     return isDuplicate;
 }
 function redirectToOrgMapEdit() {
-    var selectedCheckbox = document.querySelector('input[name="selectedmapId"]:checked');
+    var selectedCheckbox = document.querySelector('input[name="selectedOrgMap"]:checked');
 
     if (!selectedCheckbox) {
         alert("Please select a record to edit.");
@@ -2556,6 +2845,21 @@ table th {
     white-space: normal; /* Allow text to wrap */
     word-wrap: break-word;
 }
+.form-group {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between elements */
+        }
+
+        .form-group label {
+            width: 100px; /* Fixed width for labels */
+            text-align: left;
+        }
+
+     /*    .form-group input {
+            flex: 1; /* Inputs take available space */
+            padding: 5px;
+        } */
     </style>
 </head>
 <body>
@@ -3656,29 +3960,66 @@ table th {
         link.click();
     }
     function exportToRoleCSV() {
-        var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+        var selectedRows = document.querySelectorAll('input[name="selectedRoleRights"]:checked');
         if (selectedRows.length === 0) {
             alert("Please select at least one record to export.");
             return;
         }
 
         var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "ROLENAME,PAGENAME,ADDRIGHTS,EDITRIGHTS,DELETERIGHTS,IMPORTRIGHTS,EXPORTRIGHTS,VIEWRIGHTS,LISTRIGHTS\n"; // Add headers here
+        csvContent += "Role Name,Page Name,Add Rights,Edit Rights,Delete Rights,Export Rights,View Rights,List Rights\n"; // Headers
+
         selectedRows.forEach(function(row) {
-            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3),td:nth-child(4),td:nth-child(5),td:nth-child(6),td:nth-child(7),td:nth-child(8),td:nth-child(9),td:nth-child(10)'); // Adjust column indices as needed
+            var rowData = row.closest("tr").querySelectorAll("td:nth-child(2), td:nth-child(3), td:nth-child(4) input, td:nth-child(5) input, td:nth-child(6) input, td:nth-child(7) input, td:nth-child(8) input, td:nth-child(9) input");
             var rowArray = [];
-            rowData.forEach(function(cell) {
-                rowArray.push(cell.innerText);
+
+            rowData.forEach(function(cell, index) {
+                if (index < 2) {
+                    rowArray.push(cell.innerText.trim()); // Role Name & Page Name
+                } else {
+                    rowArray.push(cell.checked ? "Yes" : "No"); // Checkbox values
+                }
             });
+
             csvContent += rowArray.join(",") + "\n";
         });
+
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "ROLERIGHTS.csv");
+        link.setAttribute("download", "Role_Rights.csv");
         document.body.appendChild(link);
         link.click();
     }
+
+
+
+    	// Function to get checkbox value (1 if checked, 0 if unchecked)
+    	function getCheckboxState(row, index) {
+    // Accessing the checkbox with a dynamic name based on the index
+    let checkbox = row.querySelector(`input[name='canAdd_${index}']`);
+    
+    if (checkbox) {
+        return checkbox.checked ? 1 : 0;
+    }
+    console.log(`Checkbox with name 'canAdd_${index}' not found`);
+    return 0; // Default if not found
+}
+
+
+
+  /*   // Function to fetch checkbox value properly
+    function getCheckboxValue(parentRow, name) {
+        var checkbox = parentRow.querySelector(`td input[name="${name}"]`);
+        if (!checkbox) {
+            console.warn(`Checkbox '${name}' not found inside row:`, parentRow);  
+            return "No";  
+        }
+        return checkbox.checked || checkbox.hasAttribute("checked") ? "Yes" : "No";
+    } */
+
+
+
     function exportOrgLevelCSV() {
         var selectedRows = document.querySelectorAll('input[name="selectedOrgLevels"]:checked');
         if (selectedRows.length === 0) {
@@ -3751,7 +4092,265 @@ table th {
         document.body.appendChild(link);
         link.click();
     }
+    function toggleSelectAllOrgMap() {
+        const checkboxes = document.querySelectorAll('input[name="selectedOrgMap"]');
+        checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllOrgMapCheckbox').checked);
+    }
     
+    function editOrgLevelMapping() {
+        clearErrors();
+        
+        // Name and Description are now read-only, no need for validation
+        document.getElementById('name').readOnly = true;
+        document.getElementById('description').readOnly = true;
+
+        // Proceed with updating values directly
+        updateOrgLevelMapping();
+    }
+
+    function updateOrgLevelMapping() {
+        let data = [];
+
+        const shortName = document.getElementById('name').value;
+        const longDescription = document.getElementById('description').value;
+        const orgAcctSetId = document.querySelector('input[name="orgAcctSetId"]').value; // Get hidden orgAcctSetId
+
+        document.querySelectorAll('.tab-content').forEach(function(tabContent) {
+            const orgLevelDefId = tabContent.id.split('-')[1];
+
+            const selectedElement = document.getElementById('selected-' + orgLevelDefId);
+            if (!selectedElement) return;
+
+            const selectedOptions = Array.from(selectedElement.options)
+                .map(option => option.value)
+                .filter(value => value !== "0");
+
+            if (selectedOptions.length > 0) {
+                data.push({
+                    shortName, // Include shortName
+                    longDescription, // Include longDescription
+                    orgAcctSetId: parseInt(orgAcctSetId, 10), // Ensure number format
+                    orgLevelDefId,
+                    selectedEntryIds: selectedOptions
+                });
+            }
+        });
+
+        console.log("Sending data:", JSON.stringify(data)); // Debugging
+
+        $.ajax({
+            url: '/CWFM/org-level-mapping/updateOrgLevelEntries',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function() {
+                alert("Data updated successfully!");
+                loadCommonList('/org-level-mapping/list', 'Users');
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Request Failed:", error);
+                console.error("Status:", status);
+                console.error("Response Text:", xhr.responseText);
+                alert("Error: " + xhr.responseText);
+            }
+        });
+    }
+
+    function deleteSelectedRoleRights() {
+        let selectedUserIds = [];
+        document.querySelectorAll("input[name='selectedRoleRights']:checked").forEach(checkbox => {
+            selectedUserIds.push(checkbox.value);
+        });
+
+        if (selectedUserIds.length === 0) {
+            alert("Please select at least one Role Right to delete.");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete the selected Role Rights?")) {
+            return;
+        }
+
+        fetch('/CWFM/roleRights/deleteRights', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roleIds: selectedUserIds })
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert("Role Rights deleted successfully!");
+            loadCommonList('/roleRights/roleRightsList', 'Role Rights List'); 
+        })
+        .catch(error => {
+            alert("An error occurred while deleting Role Rights.");
+        });
+    }
+    function toggleSelectRoleRights() {
+        const checkboxes = document.querySelectorAll('input[name="selectedRoleRights"]');
+        checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllRightsCheckbox').checked);
+    }
+   /*  function redirectToRREdit() {
+        const checkboxes = document.querySelectorAll("input[name='selectedRoleRights']:checked");
+        
+        if (checkboxes.length === 0) {
+            alert("Please select at least one row to edit.");
+            return;
+        }
+
+        checkboxes.forEach(cb => {
+            const row = cb.closest("tr");
+            row.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+                checkbox.disabled = false; // Enable editing
+            });
+        });
+
+        document.getElementById("saveChanges").style.display = "block"; // Show save button
+    } */
+
+   /*  function saveUpdatedRoleRights() {
+        const selectedRows = document.querySelectorAll("input[name='selectedRoleRights']:checked");
+        
+        if (selectedRows.length === 0) {
+            alert("No rows selected for updating.");
+            return;
+        }
+
+        let updatedRoleRights = [];
+
+        selectedRows.forEach(cb => {
+            const row = cb.closest("tr");
+
+            const roleName = row.querySelector("#rolename").innerText;
+            const pageName = row.querySelector("#pagename").innerText;
+            
+            updatedRoleRights.push({
+                roleName,
+                pageName,
+                addRights: row.querySelector("td:nth-child(4) input").checked ? 0 : 1,
+                editRights: row.querySelector("td:nth-child(5) input").checked ? 0 : 1,
+                deleteRights: row.querySelector("td:nth-child(6) input").checked ? 0 : 1,
+                exportRights: row.querySelector("td:nth-child(7) input").checked ? 0 : 1,
+                viewRights: row.querySelector("td:nth-child(8) input").checked ? 0 : 1,
+                listRights: row.querySelector("td:nth-child(9) input").checked ? 0 : 1
+            });
+        });
+
+        fetch("/CWFM/roleRights/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedRoleRights)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload(); // Refresh page after update
+        })
+        .catch(error => {
+            console.error("Update Error:", error);
+            alert("Failed to update role rights.");
+        });
+    } */
+    function redirectToRREdit() {
+        let selectedRows = document.querySelectorAll("input[name='selectedRoleRights']:checked");
+
+        if (selectedRows.length === 0) {
+            alert("Please select at least one row to edit.");
+            return;
+        }
+
+        selectedRows.forEach(selectedCheckbox => {
+            let row = selectedCheckbox.closest("tr"); // Get the selected row
+            row.classList.add("editing");
+
+            let checkboxes = row.querySelectorAll(".rights-checkbox");
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = false; // Enable checkboxes
+            });
+        });
+
+        // Show Save button, Hide Edit button
+        document.getElementById("editButton").style.display = "none";
+        document.getElementById("saveButton").style.display = "inline";
+    }
+
+    function toggleRowSelection(roleCheckbox) {
+        let row = roleCheckbox.closest("tr");
+        row.classList.toggle("selected", roleCheckbox.checked);
+    }
+
+    function saveUpdatedRoleRights() {
+        let editedRows = document.querySelectorAll("tr.editing");
+
+        if (editedRows.length === 0) {
+            alert("Please select a row to edit before saving.");
+            return;
+        }
+
+        let roleRightsUpdates = [];
+
+        editedRows.forEach(row => {
+            let roleRightId = row.getAttribute("data-roleRightId");
+            let roleName = row.cells[1].textContent.trim();
+            let pageName = row.cells[2].textContent.trim();
+
+            // Get checkbox values (1 if checked, 0 if unchecked)
+            let canAdd = row.querySelector("input[name='canAdd']").checked ? 1 : 0;
+            let canEdit = row.querySelector("input[name='canEdit']").checked ? 1 : 0;
+            let canDelete = row.querySelector("input[name='canDelete']").checked ? 1 : 0;
+            let canExport = row.querySelector("input[name='canExport']").checked ? 1 : 0;
+            let canView = row.querySelector("input[name='canView']").checked ? 1 : 0;
+            let canList = row.querySelector("input[name='canList']").checked ? 1 : 0;
+
+           
+            roleRightsUpdates.push({
+                roleRightId: roleRightId,
+                roleName: roleName,
+                pageName: pageName,
+                addRights: canAdd,   // Change `canAdd` → `addRights`
+                editRights: canEdit, // Change `canEdit` → `editRights`
+                deleteRights: canDelete,
+                exportRights: canExport,
+                viewRights: canView,
+                listRights: canList
+            });
+            // Disable checkboxes after saving
+            row.querySelectorAll(".rights-checkbox").forEach(checkbox => {
+                checkbox.disabled = true;
+            });
+
+            row.classList.remove("editing");
+        });
+
+        console.log("Final Payload:", JSON.stringify({ roleRights: roleRightsUpdates }));
+        console.log("Final Payload:", JSON.stringify({ roleRights: roleRightsUpdates }, null, 2));
+
+        fetch("/CWFM/roleRights/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ roleRights: roleRightsUpdates })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert("Role rights updated successfully!");
+            loadCommonList('/roleRights/roleRightsList', 'Role Rights List'); 
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to update role rights.");
+        });
+
+        // Show Edit button, Hide Save button
+        document.getElementById("editButton").style.display = "inline";
+        document.getElementById("saveButton").style.display = "none";
+    }
+
+
+
     </script>
 </body>
 

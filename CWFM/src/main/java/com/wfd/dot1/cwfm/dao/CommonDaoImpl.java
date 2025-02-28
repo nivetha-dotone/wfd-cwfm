@@ -245,7 +245,7 @@ public class CommonDaoImpl implements CommonDao {
 
 	    
 	    @Override
-	    public CmsGeneralMaster findByGMId(Integer bloodGroupId) {
+	    public CmsGeneralMaster findByGMId(Long bloodGroupId) {
 	        String query = findByGMId();
 	        return jdbcTemplate.queryForObject(query, new Object[]{bloodGroupId}, (rs, rowNum) -> {
 	            CmsGeneralMaster cmsGeneralMaster = new CmsGeneralMaster();
@@ -431,10 +431,26 @@ public class CommonDaoImpl implements CommonDao {
 	            Long generatedId = jdbcTemplate.queryForObject("SELECT SCOPE_IDENTITY()", Long.class);
 	            roleRights.setRoleRightId(generatedId);
 	        } else {
+	        	System.out.println("Updating action rights for RoleRight ID: " + roleRights.getRoleRightId());
+	        	System.out.println("SQL Query: " + query1);
+	        	System.out.println("Values: " +
+	        	        roleRights.getAddRights() + ", " +
+	        	        roleRights.getEditRights() + ", " +
+	        	        roleRights.getDeleteRights() + ", " +
+	        	        roleRights.getImportRights() + ", " +
+	        	        roleRights.getExportRights() + ", " +
+	        	        roleRights.getViewRights() + ", " +
+	        	        roleRights.getListRights() + ", " +
+	        	        roleRights.getEnabledFlag() + ", " +
+	        	        roleRights.getDeletedFlag() + ", " +
+	        	        roleRights.getCreatedBy() + ", " +
+	        	        roleRights.getCreationDate() + ", " +
+	        	        roleRights.getLastUpdatedBy() + ", " +
+	        	        roleRights.getLastUpdatedDate() + ", " +
+	        	        roleRights.getRoleRightId()
+	        	);
 	            // Update existing entry
 	            jdbcTemplate.update(query1,
-	                    roleRights.getRoleId(),
-	                    roleRights.getPageId(),
 	                    roleRights.getAddRights(),
 	                    roleRights.getEditRights(),
 	                    roleRights.getDeleteRights(),
@@ -527,8 +543,8 @@ public class CommonDaoImpl implements CommonDao {
 		 @Override
 		    public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
 			 String query = checkduplicateroleright();
-		        Integer count = jdbcTemplate.queryForObject(query, new Object[] { roleId, pageId }, Integer.class);
-		        return count > 0;
+			 Integer count = jdbcTemplate.queryForObject(query, Integer.class, roleId, pageId);
+			 return count != null && count > 0;
 		    }
 		
 		@Override
@@ -726,6 +742,7 @@ public class CommonDaoImpl implements CommonDao {
 			return personOrgList;
 		}
 		
+		@SuppressWarnings("deprecation")
 		public List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId) {
 			String query = getrolerightsbyroleandpage();
 		    return jdbcTemplate.query(query, new Object[]{roleId, pageId}, (rs, rowNum) -> {
@@ -761,9 +778,24 @@ public class CommonDaoImpl implements CommonDao {
 		public CmsGeneralMaster findByGMName(Long gmTypeId, String gmName) {
 			String query = getduplicategmmaster();
 	        try {
-	            return jdbcTemplate.queryForObject(query, new Object[]{gmTypeId,gmName}, new BeanPropertyRowMapper<>(CmsGeneralMaster.class));
+	            return jdbcTemplate.queryForObject(query, new Object[]{gmName,gmTypeId}, new BeanPropertyRowMapper<>(CmsGeneralMaster.class));
 	        } catch (EmptyResultDataAccessException e) {
 	            return null;  // Return null or handle the absence of a result in your service layer
 	        }
 	    }
+		public boolean isDuplicateGMName(Long gmTypeId, String gmName) {
+		    String query = "SELECT COUNT(*) from CMSGMTYPE cgt join CMSGENERALMASTER cgm on cgt.GMTYPEID=cgm.GMTYPEID where cgm.GMNAME=? and cgt.GMTYPEID=? and cgm.ISACTIVE=1 ";
+		    Integer count = jdbcTemplate.queryForObject(query, new Object[]{gmName, gmTypeId}, Integer.class);
+
+		    return count != null && count > 0; 
+		}
+		
+		public void deleteRoleRights(List<Integer> roleIds) {
+		    String sql = "UPDATE CMSROLERIGHTS SET DELETED_FLAG = '1' WHERE ROLE_RIGHT_ID = ?";
+		    for (Integer roleId : roleIds) {
+		    	 System.out.println("Updating ROLE_RIGHT_ID: " + roleId);
+		    	    int updatedRows = jdbcTemplate.update(sql, roleId);
+		    	    System.out.println("Rows affected: " + updatedRows);
+		    }
+		}
 }

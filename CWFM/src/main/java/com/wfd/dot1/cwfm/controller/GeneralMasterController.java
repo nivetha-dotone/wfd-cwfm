@@ -1,5 +1,6 @@
 package com.wfd.dot1.cwfm.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
 import com.wfd.dot1.cwfm.dto.SaveMappingRequest;
@@ -224,51 +224,68 @@ public class GeneralMasterController {
     }
     
     @PostMapping("/saveGeneralMaster")
-    public String saveGeneralMaster(
-            @RequestBody GeneralMasterDTO generalMasterDTO,
-            Model model) {
-        try {
-            // Log the received data
-            System.out.println("Received gmTypeId: " + generalMasterDTO.getGmTypeId());
-            System.out.println("Received masterName: " + generalMasterDTO.getGmName());
-            System.out.println("Received masterValue: " + generalMasterDTO.getGmDescription());
+    public String saveGeneralMaster(@RequestParam Long gmTypeId, 
+                                    @RequestParam String gmName, 
+                                    @RequestParam String gmDescription, 
+                                    Model model) {
+        System.out.println("🚀 saveGeneralMaster() called!"); // Log function call
+        System.out.println("📩 Received gmTypeId: " + gmTypeId);
+        System.out.println("📩 Received gmName: " + gmName);
+        System.out.println("📩 Received gmDescription: " + gmDescription);
 
-            // Validate input
-            if (generalMasterDTO.getGmTypeId() == null || 
-                generalMasterDTO.getGmName() == null || 
-                generalMasterDTO.getGmDescription() == null) {
-                model.addAttribute("error", "All fields are required.");
+        try {
+            if (gmName.isEmpty() || gmDescription.isEmpty()) {
+                model.addAttribute("errorMessage", "Error: Name and Value are required!");
                 return "generalMaster/generalMaster";
             }
 
-            // Check for duplicate Master Name under the same GM Type
-            boolean isDuplicate = commonService.isMasterNameDuplicate(
-                generalMasterDTO.getGmTypeId(), 
-                generalMasterDTO.getGmName()
-            );
-
+            boolean isDuplicate = commonService.isDuplicateGMName(gmTypeId, gmName);
             if (isDuplicate) {
-                model.addAttribute("error", "Error: Master Name already exists for this GM Type!");
-                return "generalMaster/generalMaster"; // Return with error message
+                model.addAttribute("errorMessage", "Error: Master Name already exists!");
+            } else {
+                GeneralMasterDTO generalMasterDTO = new GeneralMasterDTO();
+                generalMasterDTO.setGmTypeId(gmTypeId);
+                generalMasterDTO.setGmName(gmName);
+                generalMasterDTO.setGmDescription(gmDescription);
+
+                commonService.saveGeneralMaster(generalMasterDTO);
+                System.out.println("✅ General Master saved successfully!");
+                model.addAttribute("successMessage", "Master saved successfully!");
             }
 
-            // Save the General Master if not duplicate
-            commonService.saveGeneralMaster(generalMasterDTO);
-
-            // Fetch updated data
-            List<GeneralMasterDTO> updatedMasters = commonService.getGeneralMastersWithTypeName(generalMasterDTO.getGmTypeId());
             List<CMSGMType> gmTypes = commonService.getAllGMTypes();
+            List<GeneralMasterDTO> updatedMasters = commonService.getGeneralMastersWithTypeName(gmTypeId);
 
             model.addAttribute("gmTypes", gmTypes);
             model.addAttribute("generalMasters", updatedMasters);
-            model.addAttribute("gmTypeId", generalMasterDTO.getGmTypeId());
+            model.addAttribute("gmTypeId", gmTypeId);
 
-            return "generalMaster/generalMaster"; // Return the updated list view
+            return "generalMaster/generalMaster"; // Reload updated list
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("error", "Failed to save General Master.");
+            model.addAttribute("errorMessage", "Failed to save General Master.");
             return "generalMaster/generalMaster";
         }
+    }
+
+    @GetMapping("/getGeneralMasters")
+    public String getGeneralMasters(@RequestParam Long gmTypeId, Model model) {
+        List<GeneralMasterDTO> updatedMasters = commonService.getGeneralMastersWithTypeName(gmTypeId); 
+        model.addAttribute("generalMasters", updatedMasters);
+        return "generalMaster/gmMasterTableFragment"; // Return only table rows
+    }
+
+    private String loadGeneralMasterPage(Model model, Long gmTypeId) {
+        List<CMSGMType> gmTypes = commonService.getAllGMTypes(); // Ensure dropdown is always loaded
+        List<GeneralMasterDTO> generalMasters = (gmTypeId != null) 
+            ? commonService.getGeneralMastersWithTypeName(gmTypeId) 
+            : Collections.emptyList();
+
+        model.addAttribute("gmTypes", gmTypes);
+        model.addAttribute("generalMasters", generalMasters);
+        model.addAttribute("gmTypeId", gmTypeId); // Maintain the selected GM Type
+
+        return "generalMaster/generalMaster";
     }
 
 
@@ -329,8 +346,6 @@ public class GeneralMasterController {
     @RequestMapping(value = "/saveMapping", method = RequestMethod.POST)
     public ResponseEntity<String> saveMapping(@RequestBody SaveMappingRequest request) {
         try {
-            System.out.println("Section ID: " + request.getSectionId());
-            System.out.println("Page IDs: " + request.getPageIds());
 
             if (request.getPageIds() == null || request.getPageIds().isEmpty()) {
                 return ResponseEntity.badRequest().body("Page IDs cannot be null or empty.");
