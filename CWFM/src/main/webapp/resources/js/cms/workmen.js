@@ -662,7 +662,7 @@ function fileUpload(){
     }
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
-    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
+    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
 
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -670,7 +670,7 @@ function fileUpload(){
             document.getElementById("mainContent").innerHTML = xhr.responseText;
         }
     };
-    xhr.open("GET", "/CWFM/contractworkmen/view/" + gatePassId, true);
+    xhr.open("GET", "/CWFM/contractworkmen/view/" + transactionId, true);
     xhr.send();
 }
 
@@ -693,6 +693,7 @@ function fileUpload(){
 			approverId : $("#userId").val().trim(),
 			comments : $("#approvercomments").val().trim(),
 			status : status,
+			transactionId : $("#transactionId").val().trim(),
 			gatePassId : $("#gatePassId").val().trim(),
 			approverRole : $("#roleName").val().trim(),
 			roleId :$("#roleId").val().trim(),
@@ -770,6 +771,7 @@ function fileUpload(){
     if (basicValid && employmentValid && otherValid && wagesValid && documentValid) {
         const data = new FormData();
         const jsonData = {
+			transactionId:$("#transactionId").val().trim(),
             aadhaarNumber: $("#aadharNumber").val().trim(),
             firstName: $("#firstName").val().trim(),
             lastName: $("#lastName").val().trim(),
@@ -877,11 +879,11 @@ for (const [key, value] of data.entries()) {
     }
 }
 	
-	function downloadDoc(gatePassId, userId, docType) {
+	function downloadDoc(transactionId, userId, docType) {
     const baseUrl = '/CWFM/contractworkmen/downloadFile';
     
     // Construct the URL based on gatePassId, userId, and docType
-    const url = `${baseUrl}/${gatePassId}/${userId}/${docType}`;
+    const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
 	alert("url is"+url);
     // Create a temporary anchor element
     const a = document.createElement('a');
@@ -1637,8 +1639,9 @@ function previewImage(event,inputId,displayId) {
 					            if (response.length > 0) {
 					                $.each(response, function(index, wo) {
 					                    var row = '<tr  >' +
-												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
-					                              '<td  >' + wo.gatePassId + '</td>' +
+												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+												'<td  >' + wo.transactionId + '</td>' +
+												 '<td  >' + wo.gatePassId + '</td>' +
 					                              '<td  >' + wo.firstName + '</td>' +
 												  '<td  >' + wo.lastName + '</td>' +	
 												  
@@ -1967,3 +1970,101 @@ function previewImage(event,inputId,displayId) {
 
 										    xhr.send();
 										}
+										function draftGatePass(userId) {
+										const data = new FormData();
+										        const jsonData = {
+													transactionId:$("#transactionId").val().trim(),
+										            aadhaarNumber: $("#aadharNumber").val().trim(),
+										            firstName: $("#firstName").val().trim(),
+										            lastName: $("#lastName").val().trim(),
+										            dateOfBirth: $("#dateOfBirth").val().trim(),
+										            gender: $("#gender").val(),
+										            relationName: $("#relationName").val().trim(),
+										            idMark: $("#idMark").val().trim(),
+										            mobileNumber: $("#mobileNumber").val().trim(),
+										            maritalStatus: $("#maritalStatus").val(),
+										            principalEmployer: $("#principalEmployer").val(),
+										            contractor: $("#contractor").val(),
+										            workorder: $("#workorder").val(),
+										            trade: $("#trade").val(),
+										            skill: $("#skill").val(),
+										            department: $("#department").val(),
+										            subdepartment: $("#subdepartment").val(),
+										            eic: $("#eic").val(),
+										            natureOfJob: $("#natureOfJob").val().trim(),
+										            wcEsicNo: $("#wc").val(),
+										            hazardousArea: $("#hazardousArea").val(),
+										            accessArea: $("#accessArea").val(),
+										            uanNumber: $("#uanNumber").val().trim(),
+										            healthCheckDate: $("#healthCheckDate").val().trim(),
+										            bloodGroup: $("#bloodGroup").val(),
+										            accommodation: $("#accommodation").val(),
+										            academic: $("#academic").val(),
+										            technical: $("#technical").val(),
+										            ifscCode: $("#ifscCode").val().trim(),
+										            accountNumber: $("#accountNumber").val().trim(),
+										            emergencyName: $("#emergencyName").val().trim(),
+										            emergencyNumber: $("#emergencyNumber").val().trim(),
+										            wageCategory: $("#wageCategory").val(),
+										            bonusPayout: $("#bonusPayout").val(),
+										            pfCap: $("#pfCap").val(),
+										            zone: $("#zone").val(),
+										            basic: $("#basic").val().trim(),
+										            da: $("#da").val().trim(),
+										            hra: $("#hra").val().trim(),
+										            washingAllowance: $("#washingAllowance").val().trim(),
+										            otherAllowance: $("#otherAllowance").val().trim(),
+										            uniformAllowance: $("#uniformAllowance").val().trim(),
+										            userId: userId,
+										            gatePassAction: "save",
+										            comments: $("#comments").val().trim(),
+													address:$("#address").val().trim(),
+													doj:$("#doj").val(),
+										        };
+
+										        // Serialize the JSON object to a string
+												const jsonString = JSON.stringify(jsonData);
+
+												// Append the JSON data to FormData
+												data.append("jsonData", jsonString);
+										   const xhr = new XMLHttpRequest();
+										        xhr.open("POST", "/CWFM/contractworkmen/draftGatePass", true);
+
+										        xhr.onload = function () {
+										            if (xhr.status === 200) {
+										                console.log("Data saved successfully:", xhr.responseText);
+										                loadCommonList('/contractworkmen/list', 'On-Boarding List');
+														
+										            } else {
+										                console.error("Error saving data:", xhr.status, xhr.responseText);
+										            }
+										        };
+
+										        xhr.onerror = function () {
+										            console.error("Request failed");
+										        };
+
+										        // Send the FormData object
+										        xhr.send(data);
+										    } 
+											
+												
+												function redirectToWorkmenEdit() {
+											    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+											    if (selectedCheckboxes.length !== 1) {
+											        alert("Please select exactly one row to view.");
+											        return;
+											    }
+											    
+											    var selectedRow = selectedCheckboxes[0].closest('tr');
+											    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+											    var xhr = new XMLHttpRequest();
+											    xhr.onreadystatechange = function() {
+											        if (xhr.readyState == 4 && xhr.status == 200) {
+											            document.getElementById("mainContent").innerHTML = xhr.responseText;
+											        }
+											    };
+											    xhr.open("GET", "/CWFM/contractworkmen/getDraftDetails/" + transactionId, true);
+											    xhr.send();
+											}

@@ -57,4 +57,12 @@ public int getGatePassTypeId() {
 public void setGatePassTypeId(int gatePassTypeId) {
 	this.gatePassTypeId = gatePassTypeId;
 }
+
+private String transactionId;
+public String getTransactionId() {
+	return transactionId;
+}
+public void setTransactionId(String transactionId) {
+	this.transactionId = transactionId;
+}
 }

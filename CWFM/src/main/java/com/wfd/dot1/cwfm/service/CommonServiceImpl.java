@@ -278,4 +278,9 @@ public class CommonServiceImpl implements CommonService {
 	public boolean isDuplicateGMName(Long gmTypeId, String gmName) {
 		return commonDAO.isDuplicateGMName(gmTypeId,gmName);
 	}
+	
+	@Override
+	public CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription) {
+		return commonDAO.hasPageActionPermissionForRole(roleId, pageDescription);
+	}
 }

@@ -78,6 +78,7 @@ public interface CommonService {
 			boolean isMasterNameDuplicate(Long gmTypeId, String gmName);
 			void deleteRoleRights(List<Integer> roleIds);
 			boolean isDuplicateGMName(Long gmTypeId, String gmName);
+			CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription);
 
 			
 }

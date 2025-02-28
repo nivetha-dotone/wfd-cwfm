@@ -157,7 +157,7 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
     </form>
     <div>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenEdit()">Edit</button>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
     </div>
@@ -204,6 +204,7 @@
                         <input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()" >
                     </td> 
                     <!-- Add more table headers for each column -->
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.firstName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
@@ -220,7 +221,11 @@
         <tbody>
             <c:forEach items="${contractorWorkmen}" var="wo">
                <tr>
-                 <td style="border: 1px solid black;"><input type="checkbox" name="selectedWOs" value="${wo.gatePassId}"></td>
+                 <td style="border: 1px solid black;">
+                 	<input type="checkbox" name="selectedWOs" value="${wo.transactionId}">
+                
+                 </td>
+                 	<td style="border: 1px solid black;">${wo.transactionId}</td>
                     <td style="border: 1px solid black;">${wo.gatePassId}</td>
                     <td style="border: 1px solid black;">${wo.firstName}</td>
                     <td style="border: 1px solid black;">${wo.lastName}</td>

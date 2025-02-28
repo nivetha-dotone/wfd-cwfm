@@ -30,6 +30,7 @@ import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.State;
@@ -201,6 +202,10 @@ public class CommonDaoImpl implements CommonDao {
 	 public String getduplicategmmaster() {
 		    return QueryFileWatcher.getQuery("CHECK_DUPLICATE_GMMASTER");
 		}
+	 
+	 public String getPageActionPermissionForRoleQuery() {
+		 return QueryFileWatcher.getQuery("HAS_PAGE_ACTION_PERMISSION_FOR_ROLE");
+	 }
 	@Autowired
 	  private CommonService commonService;
 
@@ -798,4 +803,20 @@ public class CommonDaoImpl implements CommonDao {
 		    	    System.out.println("Rows affected: " + updatedRows);
 		    }
 		}
+		@Override
+		public CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription) {
+		    String query=getPageActionPermissionForRoleQuery();
+		    CMSRoleRights rr = new CMSRoleRights();
+			SqlRowSet rs = jdbcTemplate.queryForRowSet(query,pageDescription,roleId);
+			if(rs.next()) {
+				rr.setAddRights(rs.getBoolean("ADD_RIGHTS")? 1 : 0);  // Changed getInt() to getBoolean()
+		        rr.setEditRights(rs.getBoolean("EDIT_RIGHTS")? 1 : 0);
+		        rr.setDeleteRights(rs.getBoolean("DELETE_RIGHTS")? 1 : 0);
+		        rr.setImportRights(rs.getBoolean("IMPORT_RIGHTS")? 1 : 0);
+		        rr.setExportRights(rs.getBoolean("EXPORT_RIGHTS")? 1 : 0);
+		        rr.setViewRights(rs.getBoolean("VIEW_RIGHTS")? 1 : 0);
+			}
+			return rr;
+		}
+		
 }

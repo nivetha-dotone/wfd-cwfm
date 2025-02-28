@@ -79,7 +79,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	@Override
 	public String saveGatePass(GatePassMain gatePassMain) {
-		String gatePassId =null;
+		String transactionId =null;
 		try {
 			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getPrincipalEmployer());
 			gatePassMain.setWorkFlowType(workFlowTypeId);
@@ -91,22 +91,25 @@ public class WorkmenServiceImpl implements WorkmenService{
 			gatePassMain.setDot(dot);
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
-				gatePassId = workmenDao.saveGatePass(gatePassMain); 
+				 transactionId = workmenDao.saveGatePass(gatePassMain); 
+				 String gatePassId = workmenDao.updateGatePassIdByTransactionId(transactionId);
 				gatePassMain.setGatePassId(gatePassId);
 				GatePassStatusLogDto dto =new GatePassStatusLogDto();
+				dto.setTransactionId(transactionId);
 				dto.setGatePassId(gatePassId);
 				dto.setGatePassType(GatePassType.CREATE.getStatus());
 				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
 				dto.setComments(gatePassMain.getComments());
 				dto.setUpdatedBy(gatePassMain.getUserId());
 				workmenDao.saveGatePassStatusLog(dto);
-				return gatePassId;
+				return transactionId;
 			}else {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
-				gatePassId = workmenDao.saveGatePass(gatePassMain);
-				gatePassMain.setGatePassId(gatePassId);
+				transactionId = workmenDao.saveGatePass(gatePassMain);
+				gatePassMain.setGatePassId(" ");
 				GatePassStatusLogDto dto =new GatePassStatusLogDto();
-				dto.setGatePassId(gatePassId);
+				dto.setTransactionId(transactionId);
+				dto.setGatePassId(" ");
 				dto.setGatePassType(GatePassType.CREATE.getStatus());
 				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
 				dto.setComments(gatePassMain.getComments());
@@ -136,7 +139,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		}catch(Exception e) {
 			
 		}
-		return gatePassId;
+		return transactionId;
 	}
 	
 	@Override
@@ -149,8 +152,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 			return workmenDao.getGatePassListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
 	@Override
-	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId) {
-		return workmenDao.getIndividualContractWorkmenDetails(gatePassId);
+	public GatePassMain getIndividualContractWorkmenDetails(String transactionId) {
+		return workmenDao.getIndividualContractWorkmenDetails(transactionId);
 	}
 	@Override
 	public List<CmsGeneralMaster> getAllGeneralMasterForGatePass(GatePassMain gatePassMainObj) {
@@ -158,11 +161,13 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	@Override
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto) {
-		GatePassMain gpm = workmenDao.getIndividualContractWorkmenDetails(dto.getGatePassId());
+		
+		GatePassMain gpm = workmenDao.getIndividualContractWorkmenDetailsByTransId(dto.getTransactionId());
 		String result=null;
 		//if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gpm.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus())) {
 		 result = workmenDao.approveRejectGatePass(dto);
 		GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
+		statusLog.setTransactionId(dto.getTransactionId());
 		statusLog.setGatePassId(dto.getGatePassId());
 		statusLog.setGatePassType(dto.getGatePassType());
 		statusLog.setStatus(Integer.parseInt(dto.getStatus()));
@@ -185,7 +190,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
 				//rollback status and type to create
 				}else {
-				status = workmenDao.updateGatePassMainStatus(dto.getGatePassId(),dto.getStatus());
+					//create gatepassId on final approval
+					String gatePassId = workmenDao.updateGatePassIdByTransactionId(dto.getTransactionId());
+				status = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
 				}
 			}
 		}
@@ -353,15 +360,45 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return dot;
 	}
 	@Override
-	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId) {
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId) {
 		// TODO Auto-generated method stub
-		return workmenDao.getApprovalDetails( gatePassId);
+		return workmenDao.getApprovalDetails( transactionId);
 	}
 	
 	@Override
 	public List<Contractor> getAllContractorForAdmin(String unitId) {
 		
 		return workmenDao.getAllContractorForAdmin(unitId);
+	}
+	
+	@Override
+	public String draftGatePass(GatePassMain gatePassMain) {
+		String transactionId =null;
+		try {
+			
+				gatePassMain.setGatePassStatus(GatePassStatus.DRAFT.getStatus());
+				gatePassMain.setGatePassId(" ");
+				transactionId = workmenDao.draftGatePass(gatePassMain); 
+				return transactionId;
+		}catch(Exception e) {
+			
+		}
+		return transactionId;
+	}
+	
+	@Override
+	public String generateTransactionId() {
+		return workmenDao.generateTransationId();
+	}
+	
+	@Override
+	public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionId) {
+		return workmenDao.getIndividualContractWorkmenDraftDetails(transactionId);
+	}
+	@Override
+	public int getWorkFlowTYpe(String principalEmployer) {
+		// TODO Auto-generated method stub
+		return workmenDao.getWorkFlowTYpe(principalEmployer);
 	}
 
 }

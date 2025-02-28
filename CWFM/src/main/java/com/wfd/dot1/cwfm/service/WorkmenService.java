@@ -60,5 +60,13 @@ public interface WorkmenService {
 
 	public List<Contractor> getAllContractorForAdmin(String principalEmployerId);
 
+	String draftGatePass(GatePassMain gatePassMain);
+
+	String generateTransactionId();
+
+	GatePassMain getIndividualContractWorkmenDraftDetails(String transactionId);
+
+	public int getWorkFlowTYpe(String principalEmployer);
+
 
 }	

@@ -44,4 +44,11 @@ public class GatePassStatusLogDto {
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
+	private String transactionId;
+	public String getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
 }

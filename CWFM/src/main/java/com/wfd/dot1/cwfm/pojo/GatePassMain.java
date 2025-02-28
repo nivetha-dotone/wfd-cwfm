@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class GatePassMain {
 
+	private String transactionId;
 	private String gatePassId;
 	public String getGatePassId() {
 		return gatePassId;
@@ -458,4 +459,12 @@ public class GatePassMain {
 	public void setDot(String dot) {
 		this.dot = dot;
 	}
+	public String getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
+	
+	
 }

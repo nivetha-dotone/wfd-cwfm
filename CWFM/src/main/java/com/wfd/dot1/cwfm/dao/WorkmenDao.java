@@ -83,8 +83,18 @@ public interface WorkmenDao {
 
 	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId);
 
-	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId);
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId);
 
 	public List<Contractor> getAllContractorForAdmin(String unitId);
+
+	String draftGatePass(GatePassMain gatePassMain);
+	
+	public  String generateTransationId();
+
+	GatePassMain getIndividualContractWorkmenDraftDetails(String transactionId);
+
+	public String updateGatePassIdByTransactionId(String transactionId);
+
+	GatePassMain getIndividualContractWorkmenDetailsByTransId(String transactionId);
 
 }

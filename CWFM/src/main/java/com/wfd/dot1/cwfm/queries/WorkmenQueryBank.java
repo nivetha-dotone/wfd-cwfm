@@ -45,17 +45,24 @@ public interface WorkmenQueryBank {
 	String GET_ALL_CMSGENERALMASTER="select cgm.GMID,cgm.GMNAME, cgt.GMTYPE from CMSGENERALMASTER cgm "
 			+ " join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID ";
 	
-	 String GET_MAX_GATEPASS_ID = "SELECT COALESCE(MAX(GatePassId), 9100000000) + 1 AS newGatepassId FROM GATEPASSMAIN";
+	 String GET_MAX_GATEPASS_ID = "SELECT COALESCE("
+	 		+ "    CAST(MAX(TRY_CAST(GatePassId AS BIGINT)) AS NVARCHAR), "
+	 		+ "    '710000000' "
+	 		+ " ) + 1 AS newGatepassId "
+	 		+ " FROM GATEPASSMAIN "
+	 		+ " WHERE TRY_CAST(GatePassId AS BIGINT) IS NOT NULL";
+	 
+	 String GET_MAX_TRANSACTION_ID = "SELECT COALESCE(MAX(TransactionId), 9100000000) + 1 AS newTransactionId FROM GATEPASSMAIN";
 	   
 	 String SAVE_CONTRACT_WORKMEN = " INSERT INTO GATEPASSMAIN "
-	 		+ " (GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName,  "
+	 		+ " (TransactionId,GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName,  "
 	 		+ " IdMark, MobileNumber , MaritalStatus , UnitId, ContractorId, WorkorderId, TradeId, SkillId, DepartmentId, AreaId, EicId, NatureOfJob, WcEsicNo, HazardousArea,   "
 	 		+ " AccessAreaId, UanNumber, HealthCheckDate, BloodGroupId, Accommodation, AcademicId, Technical, IfscCode, AccountNumber,   "
 	 		+ " EmergencyContactName,EmergencyContactNumber, WorkmenWageCategoryId, BonusPayoutId, PfCap,ZoneId, Basic, DA, HRA, WashingAllowance, OtherAllowance, UniformAllowance,   "
 	 		+ " AadharDocName, PhotoName, BankDocName, PoliceVerificationDocName, IdProof2DocName, MedicalDocName, EducationDocName, Form11DocName,   "
 	 		+ " TrainingDocName, OtherDocName,WorkFlowType,Comments,Address,DOJ, DOT,UpdatedBy, UpdatedDate)   "
 	 		+ " VALUES  "
-	 		+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+	 		+ "(?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?,?, "
 	 		+ "			  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
@@ -126,7 +133,7 @@ public interface WorkmenQueryBank {
 	 		+ " JOIN CMSSKILL cs on cs.SKILLID = gpm.SkillId "
 	 		+ " join MASTERUSER mu on mu.UserId = gpm.EicId "
 	 		+ " join CMSCONTRACTOR_WC ccwc on ccwc.WCID = gpm.WcEsicNo "
-	 		+ " where  gpm.GatePassId=?";
+	 		+ " where  gpm.transactionId=?";
 	 
 	 String GET_ALL_CMSGENERALMASTER_FOR_GATE_PASS="select cgm.GMID,cgm.GMNAME, cgt.GMTYPE from CMSGENERALMASTER cgm "
 				+ " join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID "
@@ -149,7 +156,7 @@ public interface WorkmenQueryBank {
 	 
 	 String SAVE_GATE_PASS_APPROVER="INSERT INTO GATEPASSAPPROVERINFO(GatePassId,UserRole,UserId,[Index],Status,CreatedBy,CreatedDate) VALUES (?,?, ?, ?, ?,?,GETDATE())";
 
-	String SAVE_GATEPASS_APPROVAL_STATUS = "INSERT INTO GATEPASSAPPROVALSTATUS(GatePassId,UserId,UserRole,Status,Comments,GatePassTypeId,RoleId,LastUpdatedDate) VALUES (?,?,?,?,?,?,?,GETDATE())";
+	String SAVE_GATEPASS_APPROVAL_STATUS = "INSERT INTO GATEPASSAPPROVALSTATUS(TransactionId,GatePassId,UserId,UserRole,Status,Comments,GatePassTypeId,RoleId,LastUpdatedDate) VALUES (?,?,?,?,?,?,?,?,GETDATE())";
 	
 	 String GET_WORKFLOW_TYPE_BY_BT ="select distinct gpwft.WorkflowType "
 		 		+ " from  GATEPASSWORKFLOWTYPE gpwft  WHERE gpwft.BusinessTypeId=?";
@@ -165,8 +172,8 @@ public interface WorkmenQueryBank {
 	 
 	 String UPDATE_GATE_PASS_ACTION = "update GATEPASSMAIN set GatePassTypeId=?,GatePassStatus=?,UpdatedBy=?,UpdatedDate=GETDATE(),Comments=? where GatePassId=?";
 
-	 String SAVE_GATEPASS_STATUSLOG = "INSERT INTO dbo.GATEPASSSTATUSLOG (GatePassId,GatePassType,Status,Comments,UpdatedBy,LastUpdatedDate) "
-	 		+ " VALUES (?,?,?,?,?,GETDATE())";
+	 String SAVE_GATEPASS_STATUSLOG = "INSERT INTO dbo.GATEPASSSTATUSLOG (TransactionId,GatePassId,GatePassType,Status,Comments,UpdatedBy,LastUpdatedDate) "
+	 		+ " VALUES (?,?,?,?,?,?,GETDATE())";
 	 
 	 String GET_ALL_GATE_PASS_ACTION_FOR_CREATOR = "select gpm.TransactionId,gpm.GatePassId,gpm.GatePassTypeId,gpm.FirstName, "
 		 		+ " gpm.LastName,cgm.GMNAME,gpm.DOB,gpm.AadharNumber, cc.NAME as ContractorName, "
@@ -198,5 +205,55 @@ public interface WorkmenQueryBank {
 			+ "      ,LastUpdatedDate"
 			+ "      ,GatePassTypeId"
 			+ "  FROM GATEPASSAPPROVALSTATUS where GatePassId=? and GatePassTypeId='1'";
+	
+	String GET_CONTRACT_WORKMEN_DRAFT_DETAILS = "SELECT TransactionId,GatePassId,GatePassTypeId,GatePassStatus,AadharNumber,gpm.FirstName,gpm.LastName,DOB,Gender, "
+	 		+ " RelativeName,IdMark,MobileNumber,MaritalStatus,gpm.UnitId as peId "
+	 		+ " ,gpm.UnitId as UnitId,gpm.ContractorId as ContractorId,gpm.WorkorderId as WorkorderId,gpm.TradeId as TradeId,gpm.SkillId AS SkillId,DepartmentId,AreaId, "
+	 		+ " CONCAT(mu.FirstName,' ',mu.LastName) as EicId,NatureOfJob,gpm.WcEsicNo as WcEsicNo,HazardousArea, "
+	 		+ " AccessAreaId,UanNumber,HealthCheckDate "
+	 		+ " ,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName, "
+	 		+ " WorkmenWageCategoryId,BonusPayoutId "
+	 		+ " ,ZoneId,Basic,DA,HRA,WashingAllowance,OtherAllowance,UniformAllowance,PfCap,AadharDocName,PhotoName,BankDocName, "
+	 		+ " PoliceVerificationDocName,IdProof2DocName "
+	 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy,gpm.Comments,gpm.Address,gpm.DOJ,gpm.DOT  "
+	 		+ " FROM GATEPASSMAIN gpm "
+	 		+ " left join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID  = gpm.UnitId "
+	 		+ " left JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
+	 		+ " left join CMSWORKORDER cwo ON cwo.WORKORDERID = gpm.WorkorderId "
+	 		+ " left join CMSTRADE ct on ct.TRADEID = gpm.TradeId "
+	 		+ " left JOIN CMSSKILL cs on cs.SKILLID = gpm.SkillId "
+	 		+ " left join MASTERUSER mu on mu.UserId = gpm.EicId "
+	 		+ " left join CMSCONTRACTOR_WC ccwc on ccwc.WCID = gpm.WcEsicNo "
+	 		+ " where  gpm.TransactionId=?";
+	
+	 String UPDATE_CONTRACT_WORKMEN = " update GATEPASSMAIN "
+		 		+ " set GatePassTypeId=?, GatePassStatus=?, AadharNumber=?, FirstName=?, LastName=?, DOB=?, Gender=?, RelativeName=?,  "
+		 		+ " IdMark=?, MobileNumber=? , MaritalStatus=? , UnitId=?, ContractorId=?, WorkorderId=?, TradeId=?, SkillId=?, DepartmentId=?, AreaId=?, EicId=?, NatureOfJob=?, WcEsicNo=?, HazardousArea=?,   "
+		 		+ " AccessAreaId=?, UanNumber=?, HealthCheckDate=?, BloodGroupId=?, Accommodation=?, AcademicId=?, Technical=?, IfscCode=?, AccountNumber=?,   "
+		 		+ " EmergencyContactName=?,EmergencyContactNumber=?, WorkmenWageCategoryId=?, BonusPayoutId=?, PfCap=?,ZoneId=?, Basic=?, DA=?, HRA=?, WashingAllowance=?, OtherAllowance=?, UniformAllowance=?,   "
+		 		+ " AadharDocName=?, PhotoName=?, BankDocName=?, PoliceVerificationDocName=?, IdProof2DocName=?, MedicalDocName=?, EducationDocName=?, Form11DocName=?,   "
+		 		+ " TrainingDocName=?, OtherDocName=?,WorkFlowType=?,Comments=?,Address=?,DOJ=?, DOT=?,UpdatedBy=?, UpdatedDate=GETDATE() where transactionId=?   ";
+		
+	 String UPDATE_GATEPASSID="update GATEPASSMAIN SET GatePassId=? where TransactionId=?";
+	 
+	 String GET_CONTRACT_WORKMEN_DETAILS_BY_TRANSID = "SELECT TransactionId,GatePassId,GatePassTypeId,GatePassStatus,AadharNumber,gpm.FirstName,gpm.LastName,DOB,Gender, "
+		 		+ " RelativeName,IdMark,MobileNumber,MaritalStatus,gpm.UnitId as peId "
+		 		+ " ,cpe.NAME as UnitId,cc.NAME as ContractorId,cwo.NAME as WorkorderId,ct.NAME as TradeId,cs.SKILLNM AS SkillId,DepartmentId,AreaId, "
+		 		+ " CONCAT(mu.FirstName,' ',mu.LastName) as EicId,NatureOfJob,ccwc.WC_CODE as WcEsicNo,HazardousArea, "
+		 		+ " AccessAreaId,UanNumber,HealthCheckDate "
+		 		+ " ,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName, "
+		 		+ " WorkmenWageCategoryId,BonusPayoutId "
+		 		+ " ,ZoneId,Basic,DA,HRA,WashingAllowance,OtherAllowance,UniformAllowance,PfCap,AadharDocName,PhotoName,BankDocName, "
+		 		+ " PoliceVerificationDocName,IdProof2DocName "
+		 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy,gpm.Comments,gpm.Address,gpm.DOJ,gpm.DOT  "
+		 		+ " FROM GATEPASSMAIN gpm "
+		 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID  = gpm.UnitId "
+		 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
+		 		+ " join CMSWORKORDER cwo ON cwo.WORKORDERID = gpm.WorkorderId "
+		 		+ " join CMSTRADE ct on ct.TRADEID = gpm.TradeId "
+		 		+ " JOIN CMSSKILL cs on cs.SKILLID = gpm.SkillId "
+		 		+ " join MASTERUSER mu on mu.UserId = gpm.EicId "
+		 		+ " join CMSCONTRACTOR_WC ccwc on ccwc.WCID = gpm.WcEsicNo "
+		 		+ " where  gpm.TransactionId=?";
 	 
 }
