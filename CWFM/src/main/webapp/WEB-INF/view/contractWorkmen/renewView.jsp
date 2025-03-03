@@ -279,12 +279,14 @@ textarea {
             width: 300px; /* Optional width */
             height: 150px; /* Optional height */
         }
+         
     </style>
      <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
      String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
-     String roleId = user!=null?user.getRoleId():"";
         String roleName = user != null ? user.getRoleName() : "";
+        String roleId = user!=null?user.getRoleId():"";
+        String contextPath =  request.getContextPath() ;
 		%>
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -389,18 +391,15 @@ textarea {
             <button data-target="tab3" onclick="showTabNew('tab3')">Other Information</button>
             <button data-target="tab4" onclick="showTabNew('tab4')">Wages</button>
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
+            <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button>
         </div>
          <div class="action-buttons" >
-          <c:if test="${GatePassObj.gatePassAction eq '1' }">
-         <% if (user != null && "Contractor".equals(roleName)) { %>
-             <button id="actionButton"   type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitBlack('${sessionScope.loginuser.userId}','6')">Blacklist GatePass</button> 
-           <% } %> 
-         </c:if>
+            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="renewGatePass('${sessionScope.loginuser.userId}')">Save</button>
             <% if (user != null && !"Contractor".equals(roleName)) { %>
-    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBlack('4','6')">Approve</button>
-   				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBlack('5','6')">Reject</button>
+    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('4','2')">Approve</button>
+   				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('5','2')">Reject</button>
 			<% } %>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/blackListFilter', 'Black List');">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/renewFilter', 'Renew List');">Cancel</button>
         </div> 
     </div>
 
@@ -414,20 +413,14 @@ textarea {
                 </c:if>
             </div>
             <div id="tab1" class="tab-content active">
+            
+            
+            <table cellspacing="0" cellpadding="0">
+            <tr><td>
     <table cellspacing="0" cellpadding="0">
         <tbody>
-       <!--  <tr>
-    <th><label class="custom-label"><span class="required-field">*</span>Entry Pass Type</label></th>
-    <td>
-        <input type="radio" name="entryPassType" id="quickOnboarding" value="quickOnboarding">
-        <label class="custom-label-inline" for="quickOnboarding"> Quick Onboarding</label>
-    </td>
-    <td>
-        <input type="radio" name="entryPassType" id="regular" value="regular">
-        <label class="custom-label-inline" for="regular"> Regular</label>
-    </td>
-</tr> -->
-<tr>
+       
+            <tr>
             
             <th>
             
@@ -442,15 +435,12 @@ textarea {
    
             	</td>
             	</tr>
-            <tr>
-            
-            
-    <th>
+    
     		<input type="hidden" id="userId" name="userId" value="<%= userId %>">
 			<input type="hidden" id="roleName" name="roleName" value="<%= roleName %>">
-			 <input type="hidden" id="roleId" name="roleId" value="<%= roleId %>">
-			<input type="hidden" id="gatePassId" name="gatePassId" value="${GatePassObj.gatePassId}">
-    <label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
+			<input type="hidden" id="roleId" name="roleId" value="<%= roleId %>">
+		<tr>	
+    <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
     <td>
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.aadhaarNumber }" readonly>
     </td>
@@ -502,10 +492,20 @@ textarea {
                 	<input id="maritalStatus" name="maritalStatus" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.maritalStatus }" readonly>
                 	 </td>
             </tr>
-           
+           <tr>
+           	 <th><label class="custom-label"><spring:message code="label.address"/></label></th>
+                <td>
+                	<input id="address" name="address" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.address }" readonly>
+                	<label id="error-address" style="color: red;display: none;">Address is required</label>
+                </td>
+           </tr>
         </tbody>
-    </table>
-   
+    </table></td>
+    <td></td>
+    <td>
+                   		 <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
+        					<img class="target" src="/imageinline/${GatePassObj.createdBy }/${GatePassObj.transactionId}/${GatePassObj.photoName }" alt="Image" style="max-width: 100%; height: auto;">
+    					</div></td></tr></table>
 </div>
 
             <div id="tab2" class="tab-content">
@@ -558,6 +558,19 @@ textarea {
                             <td>
                             	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.healthCheckDate }" readonly>
                             	</td>
+                        </tr>
+                        <tr>
+                         <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
+                        	<td>
+    				<input id="doj" name="doj" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
+     value="${GatePassObj.doj }" readonly>
+			</td>
+			
+			 <th><label class="custom-label"><spring:message code="label.dateOfTermination"/></label></th>
+                        	<td>
+    				<input id="dot" name="dot" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
+     value="${GatePassObj.dot }" readonly>
+			</td>
                         </tr>
                     </tbody>
                 </table>
@@ -670,24 +683,32 @@ textarea {
             <div id="tab5" class="tab-content">
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
+                     
+                    <tr>
+                		<td style="color:black"><spring:message code="label.profilePhoto"/></td>
+                <td>
+                   <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','${GatePassObj.photoName }')">Download Photo</a>
+                </td>
+            		</tr> 
+            		
                    <tr>
                 		<td style="color:black"><spring:message code="label.aadharDocument"/></td>
                 <td>
-                   <a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','aadhar')">Download Aadhar</a>
+                   <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','aadhar')">Download Aadhar</a>
                 </td>
             		</tr>
             		
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>
-                    <a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','police')">Download Police Verification Document</a>
+                    <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','police')">Download Police Verification Document</a>
                 </td>
             		</tr>
             		<c:if test="${not empty GatePassObj.bankDocName}">
             		<tr>
                 		<td style="color:black"><spring:message code="label.bankDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','bank')">Download Bank Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','bank')">Download Bank Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -696,7 +717,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.trainingDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','training')">Download Training Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','training')">Download Training Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -705,7 +726,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.otherDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','other')">Download Other Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','other')">Download Other Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -714,7 +735,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.idProof2Document"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','id2')">Download Id Proof2 Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','id2')">Download Id Proof2 Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -723,7 +744,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.medicalDcocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','medical')">Download Medical Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','medical')">Download Medical Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -732,7 +753,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.educationDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','education')">Download Education Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','education')">Download Education Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -741,7 +762,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.form11Document"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','form11')">Download Form11 Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','form11')">Download Form11 Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -758,30 +779,15 @@ textarea {
         <tr>
         <th><label class="custom-label"><spring:message code="label.contractorSupervisorComment"/></label></th>
         <td>
-        <% if (user != null && !"Contractor".equals(roleName)) { %>
         <textarea id="comments" name="comments" readonly>${GatePassObj.comments}</textarea>
-        <% } %>
-         <% if (user != null && "Contractor".equals(roleName)) { %>
-        <textarea id="comments" name="comments" >${GatePassObj.comments}</textarea>
-        <% } %>
         </td>
         </tr>
         </c:if>
-         <c:if test="${  empty GatePassObj.comments}">
-        <tr>
-        <th><label class="custom-label"><spring:message code="label.contractorSupervisorComment"/></label></th>
-        <td>
-        <textarea id="comments" name="comments" ></textarea>
-        <label id="error-comments" style="color: red;display: none;">Comments is required</label>
-        </td>
-        </tr>
-        </c:if>
-        
         <tr>
 				<!-- <th><label class="custom-label">Previous Comment</label></th>
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
 				 -->
-				 <% if (user != null && !"Contractor".equals(roleName)) { %>
+				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
 				 <th><label class="custom-label"><spring:message code="label.approveComment"/></label></th>
 				<td><textarea id="approvercomments"  name="approvercomments" placeholder="Type here..."></textarea>
 				<label id="error-approvercomments" style="color: red;display: none;">Comments is required</label>
@@ -796,10 +802,39 @@ textarea {
                 </tbody>
                 </table>
             </div>
+            
+            
+            
+            <div id="tab6" class="tab-content">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
+                   
+        <thead>
+            <tr style=" border: 1px solid #ddd;">
+                <th><label class="custom-label"><spring:message code="label.role"/></label></th>
+                <th><label class="custom-label"><spring:message code="label.status"/></label></th>
+                <th><label class="custom-label"><spring:message code="label.comments"/></label></th>
+                <th><label class="custom-label"><spring:message code="label.timestamp"/></label></th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="approver" items="${approvers}" varStatus="status">
+                <tr style=" border: 1px solid #ddd;background-color: ${status.index % 2 == 0 ? '#f9f9f9' : '#ffffff'};">
+                    
+                    <td style="color:black">${approver.userRole}</td>
+                    <td style="color:black">
+                      ${approver.status}
+                    </td >
+                    <td style="color:black">${approver.comments}</td>
+                    <td style="color:black">${approver.timestamp != null ? approver.timestamp : 'N/A'}</td>
+                </tr>
+            </c:forEach>
+        </tbody>
+                </table>
+            </div>
         </f:form>
     </div>
    
-   
+  
 </body>
  
 </html>

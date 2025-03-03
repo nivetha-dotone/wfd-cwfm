@@ -97,4 +97,11 @@ public interface WorkmenDao {
 
 	GatePassMain getIndividualContractWorkmenDetailsByTransId(String transactionId);
 
+	List<GatePassListingDto> getRenewListingDetails(String userId, String gatePassTypeId, String gatePassStatus,
+			String deptId, String unitId);
+
+	String renewGatePass(GatePassMain gatePassMain);
+
+	GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatePassId);
+
 }

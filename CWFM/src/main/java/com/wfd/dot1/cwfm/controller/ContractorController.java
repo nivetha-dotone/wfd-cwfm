@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
@@ -24,6 +25,7 @@ import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
+import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.ContractorService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
@@ -44,6 +46,9 @@ public class ContractorController {
 
 	@Autowired
 	ContractorService contrService;
+	
+	@Autowired
+	CommonService commonService;
 
 	@GetMapping("/list")
 	public String getAllPrincipalEmployer(HttpServletRequest request, HttpServletResponse response) {
@@ -52,16 +57,24 @@ public class ContractorController {
 		
 		//List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
 		
-
+		CMSRoleRights rr =new CMSRoleRights();
 		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
         if(user!=null) {
         if(user.getRoleName().equals("System Admin")) {
         	peList = peService.getAllPrincipalEmployerForAdmin();
+        	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+		        rr.setEditRights(1);
+		        rr.setDeleteRights(1);
+		        rr.setImportRights(1);
+		        rr.setExportRights(1);
+		        rr.setViewRights(1);
         }else {
         	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractor/list");
         }
         }
         request.setAttribute("principalEmployers", peList);
+        request.setAttribute("UserPermission", rr);
 		return "contractors/list";
 	}
 //	@GetMapping("/list")

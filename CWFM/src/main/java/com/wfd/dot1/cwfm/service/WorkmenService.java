@@ -68,5 +68,10 @@ public interface WorkmenService {
 
 	public int getWorkFlowTYpe(String principalEmployer);
 
+	List<GatePassListingDto> getRenewListingDetails(String userId, String gatePassTypeId, String gatePassStatus,
+			String deptId, String unitId);
+
+	String renewGatePass(GatePassMain gatePassMain);
+
 
 }	

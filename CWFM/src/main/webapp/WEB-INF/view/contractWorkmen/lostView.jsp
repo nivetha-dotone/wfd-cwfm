@@ -423,6 +423,21 @@ textarea {
         <label class="custom-label-inline" for="regular"> Regular</label>
     </td>
 </tr> -->
+<tr>
+            
+            <th>
+            
+            <label class="custom-label"><span class="required-field">*</span><spring:message code="label.transactionId"/></label></th>
+            	<td>
+            	<input id="transactionId" name="transactionId" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.transactionId }" readonly>
+   
+            	</td>
+            	<th>    	<label class="custom-label"><span class="required-field">*</span><spring:message code="label.gatePassId"/></label></th>
+            	<td>
+            	<input id="gatePassId" name="gatePassId" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.gatePassId }" readonly>
+   
+            	</td>
+            	</tr>
             <tr>
             
             

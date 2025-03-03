@@ -7,8 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contractors List</title>
-    <script src="resources/js/cms/contractor.js"></script>
+    <title>Renew List</title>
+    <script src="resources/js/cms/workmen.js"></script>
 
 
     <style>
@@ -138,7 +138,7 @@
     }
 
     table {
-        width: 30%;
+        width: 100%;
         border-collapse: collapse;
     }
 
@@ -221,57 +221,75 @@
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
     </style>
-
 </head>
 <body>
 <div class="page-header">
-   <!--  <form id="searchForm"> -->
-    <div>
+   <!--  <form id="searchForm">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
+    </form> -->
+        <div>
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
          <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
          <option value="">Select Principal Employer</option>
-    <c:forEach items="${principalEmployers}" var="principalEmployer">
-        <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+    <c:forEach items="${principalEmployers}" var="pe">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
             ${principalEmployer.name}
-        </option>
+        </option> --%>
+        <option value="${pe.id}">${pe.description}</option>
     </c:forEach>
 </select>
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchContractorsBasedOnPE()">Search</button>
+
+<label for="departmentId" style=" color: darkcyan;"   >Department:</label>
+         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
+         <option value="">Select Department</option>
+    <c:forEach items="${Dept}" var="dept">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${dept.id}">${dept.description}</option>
+    </c:forEach>
+</select>
+<input type="hidden" id="deptId" name="deptId">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchRenew()">Search</button>
   </div>
-   <!--  </form> -->
     <div>
-    <c:if test="${UserPermission.addRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
-         </c:if>
-         <c:if test="${UserPermission.editRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
-       </c:if>
-       <c:if test="${UserPermission.viewRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContrView()">View</button>
-        </c:if>
-       <c:if test="${UserPermission.exportRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
-     </c:if> 
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewEdit()">Edit</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
     </div>
 </div>
- 
 
-   <table border="1"  id="contractorTable" style="width:100%;">
+     <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
+                         <div class="table-container">
+    <table id="workmenTable"  cellspacing="0" cellpadding="0" >
         <thead>
-            <tr>
-             <td >
-                        <input type="checkbox" id="selectAllCheckedbox" onchange="toggleSelectAllContrcators()">
+<tr >
+                    <td >
+                        <input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()" >
                     </td> 
-                <th ><spring:message code="label.contractorCode"/></th>
-                  <th ><spring:message code="label.name"/></th>
-               <th><spring:message code="label.address"/></th>
+                    <!-- Add more table headers for each column -->
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.firstName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.gender"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.dateOfBirth"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.status"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th> 
             </tr>
         </thead>
         <tbody>
-        
             
         </tbody>
     </table>
+    
+                        </form>
+                         </div>
 </body>
 </html>

@@ -89,6 +89,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 			String dot = this.getDOT(gatePassMain);
 			gatePassMain.setDot(dot);
+			gatePassMain.setGatePassAction(GatePassType.CREATE.getStatus());
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
 				 transactionId = workmenDao.saveGatePass(gatePassMain); 
@@ -190,8 +191,12 @@ public class WorkmenServiceImpl implements WorkmenService{
 					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
 				//rollback status and type to create
 				}else {
-					//create gatepassId on final approval
-					String gatePassId = workmenDao.updateGatePassIdByTransactionId(dto.getTransactionId());
+					String gatePassId=dto.getGatePassId();
+					if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
+						//create gatepassId on final approval
+						gatePassId= workmenDao.updateGatePassIdByTransactionId(dto.getTransactionId());
+					}
+					
 				status = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
 				}
 			}
@@ -207,7 +212,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		try {
 			
 			//approver logic needs to be added
-			 GatePassMain gatePassMain = workmenDao.getIndividualContractWorkmenDetails(dto.getGatePassId());
+			 GatePassMain gatePassMain = workmenDao.getIndividualContractWorkmenDetailsByGatePassId(dto.getGatePassId());
 			if((gatePassMain.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
 					||dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()) || dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())
 					) {
@@ -220,6 +225,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 				 if(null!=result) {
 						GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
 						statusLog.setGatePassId(dto.getGatePassId());
+						statusLog.setTransactionId(dto.getTransactionId());;
 						statusLog.setGatePassType(dto.getGatePassType());
 						statusLog.setStatus(Integer.parseInt(dto.getGatePassStatus()));
 						statusLog.setComments(dto.getComments());
@@ -232,6 +238,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 				 if(null!=result) {
 						GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
 						statusLog.setGatePassId(dto.getGatePassId());
+						statusLog.setTransactionId(dto.getTransactionId());
 						statusLog.setGatePassType(dto.getGatePassType());
 						statusLog.setStatus(Integer.parseInt(dto.getGatePassStatus()));
 						statusLog.setComments(dto.getComments());
@@ -378,6 +385,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 				gatePassMain.setGatePassStatus(GatePassStatus.DRAFT.getStatus());
 				gatePassMain.setGatePassId(" ");
+				gatePassMain.setGatePassAction(GatePassType.CREATE.getStatus());
 				transactionId = workmenDao.draftGatePass(gatePassMain); 
 				return transactionId;
 		}catch(Exception e) {
@@ -401,4 +409,55 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.getWorkFlowTYpe(principalEmployer);
 	}
 
+	@Override
+	public List<GatePassListingDto> getRenewListingDetails(String userId,String gatePassTypeId,String gatePassStatus,String deptId,String unitId) {
+		return workmenDao.getRenewListingDetails( userId, gatePassTypeId, gatePassStatus, deptId, unitId) ;
+	}
+	
+	@Override
+	public String renewGatePass(GatePassMain gatePassMain) {
+		String transactionId =gatePassMain.getTransactionId();
+		try {
+			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getPrincipalEmployer());
+			gatePassMain.setWorkFlowType(workFlowTypeId);
+			
+			int dotTypeId = workmenDao.getDOTTYpe(gatePassMain.getPrincipalEmployer());
+			gatePassMain.setDotType(dotTypeId);
+			
+			String dot = this.getDOT(gatePassMain);
+			gatePassMain.setDot(dot);
+			gatePassMain.setGatePassAction(GatePassType.RENEW.getStatus());
+			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
+				 transactionId = workmenDao.renewGatePass(gatePassMain); 
+				 //String gatePassId = workmenDao.updateGatePassIdByTransactionId(transactionId);
+				//gatePassMain.setGatePassId(gatePassId);
+				GatePassStatusLogDto dto =new GatePassStatusLogDto();
+				dto.setTransactionId(transactionId);
+				dto.setGatePassId(gatePassMain.getGatePassId());
+				dto.setGatePassType(GatePassType.RENEW.getStatus());
+				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
+				dto.setComments(gatePassMain.getComments());
+				dto.setUpdatedBy(gatePassMain.getUserId());
+				workmenDao.saveGatePassStatusLog(dto);
+				return transactionId;
+			}else {
+				gatePassMain.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
+				transactionId = workmenDao.renewGatePass(gatePassMain);
+				GatePassStatusLogDto dto =new GatePassStatusLogDto();
+				dto.setTransactionId(transactionId);
+				dto.setGatePassId(gatePassMain.getGatePassId());
+				dto.setGatePassType(GatePassType.RENEW.getStatus());
+				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
+				dto.setComments(gatePassMain.getComments());
+				dto.setUpdatedBy(gatePassMain.getUserId());
+				workmenDao.saveGatePassStatusLog(dto);
+	
+				
+			}
+		}catch(Exception e) {
+			
+		}
+		return transactionId;
+	}
 }

@@ -35,6 +35,7 @@ import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
@@ -574,6 +575,8 @@ public class WorkmenController {
             	}else if(dto.getGatePassType().equals(GatePassType.LOSTORDAMAGE.getStatus()))
             	{
             		result="contractWorkmen/lostView";
+            	}else if(dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
+            		result="contractWorkmen/renewView";
             	}
          		return new ResponseEntity<>(result,HttpStatus.OK);
          	}
@@ -879,12 +882,12 @@ public class WorkmenController {
     		return "contractWorkmen/cancelView";
     	
     }
-    @GetMapping("/blockview/{gatePassId}")
-    public String blockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    @GetMapping("/blockview/{transactionId}")
+    public String blockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		
@@ -917,17 +920,17 @@ public class WorkmenController {
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	
     		return "contractWorkmen/blockView";
     	
     }
-    @GetMapping("/unblockview/{gatePassId}")
-    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    @GetMapping("/unblockview/{transactionId}")
+    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		
@@ -960,17 +963,17 @@ public class WorkmenController {
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	
     		return "contractWorkmen/unblockView";
     	
     }
-    @GetMapping("/blackview/{gatePassId}")
-    public String blackviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    @GetMapping("/blackview/{transactionId}")
+    public String blackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		
@@ -1003,18 +1006,18 @@ public class WorkmenController {
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	
     		return "contractWorkmen/blackView";
     	
     }
     
-    @GetMapping("/deblackview/{gatePassId}")
-    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    @GetMapping("/deblackview/{transactionId}")
+    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		
@@ -1047,17 +1050,17 @@ public class WorkmenController {
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	
     		return "contractWorkmen/deblackView";
     	
     }
-    @GetMapping("/lostordamageview/{gatePassId}")
-    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    @GetMapping("/lostordamageview/{transactionId}")
+    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		
@@ -1090,7 +1093,7 @@ public class WorkmenController {
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	
     		return "contractWorkmen/lostView";
     	
@@ -1255,4 +1258,181 @@ public class WorkmenController {
 	 
     return "contractWorkmen/quickOBAdd";
 }
+    
+    @GetMapping("/renewFilter")
+   	public String renewFilter(HttpServletRequest request, HttpServletResponse response) {
+   		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+   		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+   		
+   		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+       	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+       			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+       	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       	request.setAttribute("principalEmployers", peList);
+       	  request.setAttribute("Dept", departments);
+   		return "contractWorkmen/renewListing";
+   	}
+    
+    @PostMapping("/renewList")
+    public ResponseEntity<List<GatePassListingDto>> renewList(
+    		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
+    		@RequestParam(value = "deptId", required = false) String deptId,
+    		HttpServletRequest request,HttpServletResponse response) {
+    	
+    	try {
+			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
+			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    		//write union for renewal pending and renewed
+				listDto= workmenService.getRenewListingDetails( String.valueOf(user.getUserId()), GatePassType.CREATE.getStatus(), GatePassStatus.APPROVED.getStatus(), deptId, principalEmployerId) ;
+    		}else {	
+    			listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.RENEW.getStatus());
+    		}	
+				if (listDto.isEmpty()) {
+					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				}
+			
+			return new ResponseEntity<>(listDto, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+    }
+    
+    @GetMapping("/renew/{transactionId}")
+    public String renew(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
+
+	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+    MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+	log.info("Entered into getDraftGatePass"+user.getUserId());
+	
+	//String transactionId= workmenService.generateTransactionId();
+	//request.setAttribute("transactionId", transactionId);
+	
+	List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+	request.setAttribute("PrincipalEmployer", peList);
+	  request.setAttribute("Dept", departments);
+      request.setAttribute("Subdept", subdepartments);
+      
+    //Skills
+	List<Skill> skillList = workmenService.getAllSkill();
+	request.setAttribute("Skills", skillList);
+	
+	List<CmsGeneralMaster> gmList2 = workmenService.getAllGeneralMaster();
+
+	// Grouping the CmsGeneralMaster objects by gmType
+	Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList2.stream()
+	        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+	// Define the types and their corresponding request attribute names
+	Map<String, String> attributeMapping = Map.of(
+	        "GENDER", "GenderOptions",
+	        "BLOODGROUP", "BloodGroup",
+	        "ACCESSAREA", "AccessArea",
+	        "ACADEMICS", "Academics",
+	        "WAGECATEGORY", "WageCategory",
+	        "BONUSPAYOUT", "BonusPayout",
+	        "ZONE", "Zone"
+	);
+
+	// Iterate over the attribute mappings and set the request attributes dynamically
+	attributeMapping.forEach((type, attributeName) -> {
+	    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+	    request.setAttribute(attributeName, gmList1);
+	});
+
+	GatePassMain gatePassMainObj = workmenService.getIndividualContractWorkmenDraftDetails(transactionId);
+	request.setAttribute("transactionId", gatePassMainObj.getTransactionId());
+	request.setAttribute("GatePassObj", gatePassMainObj);
+	
+	List<Contractor> contractors= workmenService.getAllContractorBasedOnPE(gatePassMainObj.getUnitId(),user.getUserAccount());
+	request.setAttribute("Contractors", contractors);	
+	 List<Workorder> workorders = workmenService.getAllWorkordersBasedOnPEAndContractor(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor());
+	 request.setAttribute("Workorders", workorders);
+	 List<Trade> trades = workmenService.getAllTradesBasedOnPE(gatePassMainObj.getUnitId());
+	 request.setAttribute("Trades", trades);
+	 List<MasterUser> eicList = workmenService.getAllEicManager(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
+	 request.setAttribute("Eic", eicList);
+	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor());
+	 request.setAttribute("Wcs", wcs);
+	 
+    return "contractWorkmen/renew";
+}
+    
+    @PostMapping("/renewGatePass")
+    public ResponseEntity<String> renewGatePass(
+            @RequestParam("jsonData") String jsonData,
+            @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
+            @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
+            @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
+            @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
+            HttpServletRequest request, HttpServletResponse response) {
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+        String transactionId = null;
+        GatePassMain gatePassMain;
+
+        try {
+            // Convert the JSON string back to the GatePassMain object
+            ObjectMapper objectMapper = new ObjectMapper();
+            gatePassMain = objectMapper.readValue(jsonData, GatePassMain.class);
+            
+            // Log the received GatePassMain object
+            log.info("Received GatePassMain: {}", gatePassMain);
+
+            gatePassMain.setCreatedBy(String.valueOf(user.getUserId()));
+            gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
+            gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
+            gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
+         // Mapping document types to their corresponding setter methods
+            Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
+            docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
+            docTypeSetterMap.put("Id2", gatePassMain::setIdProof2DocName);
+            docTypeSetterMap.put("Other", gatePassMain::setOtherDocName);
+            docTypeSetterMap.put("Medical", gatePassMain::setMedicalDocName);
+            docTypeSetterMap.put("Education", gatePassMain::setEducationDocName);
+            docTypeSetterMap.put("Training", gatePassMain::setTrainingDocName);
+            docTypeSetterMap.put("Form11", gatePassMain::setForm11DocName);
+            if(additionalFiles != null && !additionalFiles.isEmpty()) {
+            // Set document names based on additionalFiles and documentTypes
+            for (int i = 0; i < additionalFiles.size(); i++) {
+                String docType = documentTypes.get(i);
+                if (docType != null) {
+                    Consumer<String> setter = docTypeSetterMap.get(docType);
+                    if (setter != null) {
+                        setter.accept(docType);
+                    }
+                }
+            }
+            }
+            transactionId = workmenService.renewGatePass(gatePassMain);
+            if (transactionId != null) {
+                if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
+                    uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+                }
+                // Upload additional files
+                if (additionalFiles != null && documentTypes != null) {
+                    uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
+                }
+                return new ResponseEntity<>("contractWorkmen/renewList", HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            
+        } catch (Exception e) {
+            log.error("Error saving data: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Error saving data: " + e.getMessage());
+        }
+    }
+
 }

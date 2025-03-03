@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -125,6 +125,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 
 	 public String getTransactionIdExistsQuery() {
 		 return  QueryFileWatcher.getQuery("TRANSACTION_ID_EXISTS");
+	 }
+	 
+	 public String getMaxGatePassIdQuery() {
+		 return QueryFileWatcher.getQuery("GET_NEXT_GATEPASSID_SEQ");
+	 }
+	 
+	 public String getAllRenewForContractor() {
+		 return QueryFileWatcher.getQuery("GET_ALL_RENEW_FOR_CREATOR");
 	 }
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
@@ -360,11 +368,25 @@ public class WorkmenDaoImpl implements WorkmenDao{
 
 	private String generateGatePassId() {
 	    String gatePassId = null;
+	    String maxTestReqId = null;	
+	    DecimalFormat decimalFormat = new DecimalFormat("00");
 	    try {
-	        SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_MAX_GATEPASS_ID);
-	        if (rs.next()) {
-	            gatePassId = rs.getString("newGatepassId");
-	        }
+	    	String query = getMaxGatePassIdQuery();
+	        SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+	        if(rs.next()){
+				
+				maxTestReqId=String.valueOf(rs.getInt(1));
+				log.info("maxTestReqId"+maxTestReqId);
+				
+			}
+	        if(maxTestReqId==null  || maxTestReqId.equals("0")){
+				
+	        	gatePassId ="GP700001";
+			}else{
+							
+				long incrMaxId = Long.parseLong(maxTestReqId)+1;
+				gatePassId = "GP" + decimalFormat.format(incrMaxId);
+			}
 	    } catch (Exception e) {
 	        log.error("Error generating GatePassId", e);
 	    }
@@ -1118,7 +1140,7 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	    return new Object[]{
 	    		transId,
 	    		gatePassMain.getGatePassId(),
-	        GatePassType.CREATE.getStatus(),
+	        gatePassMain.getGatePassAction(),
 	       gatePassMain.getGatePassStatus(),
 	        gatePassMain.getAadhaarNumber()!=null? gatePassMain.getAadhaarNumber():" ",
 	        gatePassMain.getFirstName()!=null? gatePassMain.getFirstName():" ",
@@ -1337,7 +1359,7 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
 	
     return new Object[]{
     		
-        GatePassType.CREATE.getStatus(),
+        gatePassMain.getGatePassAction(),
         gatePassMain.getGatePassStatus(),
         gatePassMain.getAadhaarNumber(),
         gatePassMain.getFirstName(),
@@ -1475,6 +1497,160 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setDot(rs.getString("DOT"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
+	return dto;
+}
+
+@Override
+public List<GatePassListingDto> getRenewListingDetails(String userId,String gatePassTypeId,String gatePassStatus,String deptId,String unitId) {
+	log.info("Entering into getRenewListingDetails dao method ");
+	List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
+	String query =getAllRenewForContractor();
+	log.info("Query to getRenewListingDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,gatePassStatus,deptId,unitId);
+	while(rs.next()) {
+		GatePassListingDto dto = new GatePassListingDto();
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId((rs.getString("GatePassId")));
+		dto.setFirstName(rs.getString("firstName"));
+		dto.setLastName(rs.getString("lastName"));
+		dto.setGender(rs.getString("GMNAME"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setContractorName(rs.getString("ContractorName"));
+		dto.setVendorCode(rs.getString("VendorCode"));
+		dto.setUnitName(rs.getString("UnitName"));
+		String gatePassType = rs.getString("GatePassTypeId");
+		if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+			dto.setGatePassType("Create");
+		}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+			dto.setGatePassType("Block");
+		}
+		else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+			dto.setGatePassType("Unblock");
+		}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+			dto.setGatePassType("Blacklist");
+		}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+			dto.setGatePassType("Deblacklist");
+		}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+			dto.setGatePassType("Cancel");
+		}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+			dto.setGatePassType("Lost/Damage");
+		}
+		else if(gatePassType.equals(GatePassType.RENEW.getStatus())) {
+			dto.setGatePassType("Renew");
+		}
+		String status =rs.getString("GatePassStatus");
+		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+			dto.setStatus("Approval Pending");
+		}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+			dto.setStatus("Approved");
+		}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+			dto.setStatus("Rejected");
+		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+			dto.setStatus("Draft");
+		}
+		listDto.add(dto);
+	}
+	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
+	return listDto;
+}
+
+@Override
+public String renewGatePass(GatePassMain gatePassMain) {
+    log.info("Entering into saveGatePass dao method");
+    String transId=gatePassMain.getTransactionId();
+   
+	
+    
+    	
+    	Object[] parameters = prepareGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
+    	 try {
+	            int result = jdbcTemplate.update(WorkmenQueryBank.UPDATE_CONTRACT_WORKMEN, parameters);
+	            if (result > 0) {
+	            	transId=gatePassMain.getTransactionId();
+	                log.info("GatePass saved successfully for transId: " + transId);
+	            } else {
+	                log.warn("Failed to save GatePass for transId: " + transId);
+	            }
+	        } catch (Exception e) {
+	            log.error("Error saving GatePass for transId: " + transId, e);
+	            return null;
+	        }
+   
+    return transId;
+}
+
+@Override
+public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatePassId) {
+	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
+	GatePassMain dto = null;
+	log.info("Query to getIndividualContractWorkmenDetails "+WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS_BY_GPID);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS_BY_GPID,gatePassId);
+	if(rs.next()) {
+		dto = new GatePassMain();
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId(rs.getString("GatePassId"));
+		dto.setUnitId(rs.getString("peId"));
+		dto.setGatePassAction(rs.getString("GatePassTypeId"));
+		dto.setGatePassStatus(rs.getString("GatePassStatus"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setFirstName(rs.getString("FirstName"));
+		dto.setLastName(rs.getString("LastName"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setGender(rs.getString("Gender"));
+		dto.setRelationName(rs.getString("RelativeName"));
+		dto.setIdMark(rs.getString("IdMark"));
+		dto.setMobileNumber(rs.getString("MobileNumber"));
+		dto.setMaritalStatus(rs.getString("MaritalStatus"));
+		dto.setPrincipalEmployer(rs.getString("UnitId"));
+		dto.setContractor(rs.getString("ContractorId"));
+		dto.setWorkorder(rs.getString("WorkorderId"));
+		dto.setTrade(rs.getString("TradeId"));
+		dto.setSkill(rs.getString("SkillId"));
+		dto.setDepartment(rs.getString("DepartmentId"));
+		dto.setSubdepartment(rs.getString("AreaId"));
+		dto.setEic(rs.getString("EicId"));
+		dto.setNatureOfJob(rs.getString("NatureOfJob"));
+		dto.setWcEsicNo(rs.getString("WcEsicNo"));
+		dto.setHazardousArea(rs.getString("HazardousArea"));
+		dto.setAccessArea(rs.getString("AccessAreaId"));
+		dto.setUanNumber(rs.getString("UanNumber"));
+		dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+		dto.setBloodGroup(rs.getString("BloodGroupId"));
+		dto.setAccommodation(rs.getString("Accommodation"));
+		dto.setAcademic(rs.getString("AcademicId"));
+		dto.setTechnical(rs.getString("Technical"));
+		dto.setIfscCode(rs.getString("IfscCode"));
+		dto.setAccountNumber(rs.getString("AccountNumber"));
+		dto.setEmergencyName(rs.getString("EmergencyContactName"));
+		dto.setEmergencyNumber(rs.getString("EmergencyContactNumber"));
+		dto.setWageCategory(rs.getString("WorkmenWageCategoryId"));
+		dto.setBonusPayout(rs.getString("BonusPayoutId"));
+		dto.setZone(rs.getString("ZoneId"));
+		dto.setBasic(new BigDecimal(rs.getString("Basic")));
+		dto.setDa(new BigDecimal(rs.getString("DA")));
+		dto.setHra(new BigDecimal(rs.getString("HRA")));
+		dto.setWashingAllowance(new BigDecimal(rs.getString("WashingAllowance")));
+		dto.setOtherAllowance(new BigDecimal(rs.getString("OtherAllowance")));
+		dto.setUniformAllowance(new BigDecimal(rs.getString("UniformAllowance")));
+		dto.setPfCap(rs.getString("PfCap"));
+		dto.setCreatedBy(rs.getString("UpdatedBy"));
+		dto.setAadharDocName(rs.getString("AadharDocName"));
+		dto.setPhotoName(rs.getString("PhotoName"));
+		dto.setPoliceVerificationDocName(rs.getString("PoliceVerificationDocName"));
+		dto.setBankDocName(rs.getString("BankDocName"));
+		dto.setIdProof2DocName(rs.getString("IdProof2DocName"));
+		dto.setMedicalDocName(rs.getString("MedicalDocName"));
+		dto.setForm11DocName(rs.getString("Form11DocName"));
+		dto.setOtherDocName(rs.getString("OtherDocName"));
+		dto.setTrainingDocName(rs.getString("TrainingDocName"));
+		dto.setEducationDocName(rs.getString("EducationDocName"));
+		dto.setComments(rs.getString("Comments"));
+		dto.setAddress(rs.getString("Address"));
+		dto.setDoj(rs.getString("DOJ"));
+		dto.setDot(rs.getString("DOT"));
+	}
+	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
 }
 

@@ -135,6 +135,26 @@ public interface WorkmenQueryBank {
 	 		+ " join CMSCONTRACTOR_WC ccwc on ccwc.WCID = gpm.WcEsicNo "
 	 		+ " where  gpm.transactionId=?";
 	 
+	 String GET_CONTRACT_WORKMEN_DETAILS_BY_GPID = "SELECT TransactionId,GatePassId,GatePassTypeId,GatePassStatus,AadharNumber,gpm.FirstName,gpm.LastName,DOB,Gender, "
+		 		+ " RelativeName,IdMark,MobileNumber,MaritalStatus,gpm.UnitId as peId "
+		 		+ " ,cpe.NAME as UnitId,cc.NAME as ContractorId,cwo.NAME as WorkorderId,ct.NAME as TradeId,cs.SKILLNM AS SkillId,DepartmentId,AreaId, "
+		 		+ " CONCAT(mu.FirstName,' ',mu.LastName) as EicId,NatureOfJob,ccwc.WC_CODE as WcEsicNo,HazardousArea, "
+		 		+ " AccessAreaId,UanNumber,HealthCheckDate "
+		 		+ " ,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName, "
+		 		+ " WorkmenWageCategoryId,BonusPayoutId "
+		 		+ " ,ZoneId,Basic,DA,HRA,WashingAllowance,OtherAllowance,UniformAllowance,PfCap,AadharDocName,PhotoName,BankDocName, "
+		 		+ " PoliceVerificationDocName,IdProof2DocName "
+		 		+ " ,MedicalDocName,EducationDocName,Form11DocName,TrainingDocName,OtherDocName,UpdatedDate,gpm.UpdatedBy,gpm.Comments,gpm.Address,gpm.DOJ,gpm.DOT  "
+		 		+ " FROM GATEPASSMAIN gpm "
+		 		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID  = gpm.UnitId "
+		 		+ " JOIN CMSCONTRACTOR cc ON cc.CONTRACTORID=gpm.ContractorId "
+		 		+ " join CMSWORKORDER cwo ON cwo.WORKORDERID = gpm.WorkorderId "
+		 		+ " join CMSTRADE ct on ct.TRADEID = gpm.TradeId "
+		 		+ " JOIN CMSSKILL cs on cs.SKILLID = gpm.SkillId "
+		 		+ " join MASTERUSER mu on mu.UserId = gpm.EicId "
+		 		+ " join CMSCONTRACTOR_WC ccwc on ccwc.WCID = gpm.WcEsicNo "
+		 		+ " where  gpm.gatePassId=?";
+	 
 	 String GET_ALL_CMSGENERALMASTER_FOR_GATE_PASS="select cgm.GMID,cgm.GMNAME, cgt.GMTYPE from CMSGENERALMASTER cgm "
 				+ " join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID "
 				+ " where cgm.GMID in (?,?,?,?,?,?,?,?,?)";
