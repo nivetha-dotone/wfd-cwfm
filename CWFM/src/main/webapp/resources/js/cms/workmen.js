@@ -2342,3 +2342,24 @@ if(isValid){
 		//error 
 	}
 	}//eofunc
+	
+
+		function redirectToWorkmenRenewView() {
+	    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+	    if (selectedCheckboxes.length !== 1) {
+	        alert("Please select exactly one row to view.");
+	        return;
+	    }
+	    
+	    var selectedRow = selectedCheckboxes[0].closest('tr');
+	    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+	    var xhr = new XMLHttpRequest();
+	    xhr.onreadystatechange = function() {
+	        if (xhr.readyState == 4 && xhr.status == 200) {
+	            document.getElementById("mainContent").innerHTML = xhr.responseText;
+	        }
+	    };
+	    xhr.open("GET", "/CWFM/contractworkmen/renewview/" + transactionId, true);
+	    xhr.send();
+	}

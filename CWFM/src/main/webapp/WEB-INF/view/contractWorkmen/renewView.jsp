@@ -391,7 +391,7 @@ textarea {
             <button data-target="tab3" onclick="showTabNew('tab3')">Other Information</button>
             <button data-target="tab4" onclick="showTabNew('tab4')">Wages</button>
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
-            <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button>
+          <!--   <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> -->
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="renewGatePass('${sessionScope.loginuser.userId}')">Save</button>
@@ -805,7 +805,7 @@ textarea {
             
             
             
-            <div id="tab6" class="tab-content">
+            <%-- <div id="tab6" class="tab-content">
             <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
                    
         <thead>
@@ -830,7 +830,7 @@ textarea {
             </c:forEach>
         </tbody>
                 </table>
-            </div>
+            </div> --%>
         </f:form>
     </div>
    

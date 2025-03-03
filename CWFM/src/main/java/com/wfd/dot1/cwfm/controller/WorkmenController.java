@@ -1434,5 +1434,49 @@ public class WorkmenController {
                                  .body("Error saving data: " + e.getMessage());
         }
     }
+    
+    @GetMapping("/renewview/{transactionId}")
+    public String renewviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
+    	GatePassMain gatePassMainObj =null;
+    	try {
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+          
+    		
+    		//Get All GeneralMaster
+    		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
+    		for (CmsGeneralMaster generalMaster : gmList) {
+    		    String gmType = generalMaster.getGmType();
+    		if ("GENDER".equals(gmType)) {
+    	        gatePassMainObj.setGender(generalMaster.getGmName()); 
+    	    } else if ("BLOODGROUP".equals(gmType)) {
+    	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
+    	    } else if ("ACADEMIC".equals(gmType)) {
+    	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
+    	    } else if ("ZONE".equals(gmType)) {
+    	        gatePassMainObj.setZone(generalMaster.getGmName()); 
+    	    } else if ("ACCESSAREA".equals(gmType)) {
+    	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
+    	    } else if ("WAGECATEGORY".equals(gmType)) {
+    	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
+    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
+    	    } else if("DEPARTMENT".equals(gmType)){
+    	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
+    	    } else if("AREA".equals(gmType)) {
+    	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
+    	    }
+    		}
+    		
+    		 
+    	}catch(Exception e) {
+    		log.error("Error getting workmen details ", e);
+    	}
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
+    	
+    		return "contractWorkmen/renewView";
+    	
+    }
 
 }

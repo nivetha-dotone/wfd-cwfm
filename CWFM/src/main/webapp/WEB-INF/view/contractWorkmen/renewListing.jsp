@@ -256,7 +256,7 @@
   </div>
     <div>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewEdit()">Edit</button>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewView()">View</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
     </div>
 </div>
