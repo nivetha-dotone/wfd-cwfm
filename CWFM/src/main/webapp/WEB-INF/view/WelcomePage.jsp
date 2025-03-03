@@ -62,6 +62,32 @@ function loadCommonList(path,heading) {
     	        yearRange: "0:+100", 
     	        minDate: 0              // Prevent selecting future dates
     	    });
+            
+            
+            
+            const successMessage = sessionStorage.getItem("successMessage");
+            const errorMessage = sessionStorage.getItem("errorMessage");
+            const messageDiv = document.getElementById("messageDiv");
+
+            if (messageDiv) {
+                if (successMessage) {
+                    messageDiv.innerHTML = successMessage;
+                    messageDiv.style.color = "green";
+                    sessionStorage.removeItem("successMessage"); // Clear message after displaying
+                } else if (errorMessage) {
+                    messageDiv.innerHTML = errorMessage;
+                    messageDiv.style.color = "red";
+                    sessionStorage.removeItem("errorMessage"); // Clear message after displaying
+                }
+             // Clear message after displaying
+                sessionStorage.removeItem("successMessage");
+                sessionStorage.removeItem("errorMessage");
+
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    messageDiv.style.display = "none";
+                }, 50000);
+            }
               resetSessionTimer();
         }
     };

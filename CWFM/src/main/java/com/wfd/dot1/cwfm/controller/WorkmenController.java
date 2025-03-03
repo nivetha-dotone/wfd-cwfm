@@ -1179,8 +1179,10 @@ public class WorkmenController {
 //                if (additionalFiles != null && documentTypes != null) {
 //                    uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), gatePassId);
 //                }
+            	request.setAttribute("SUCCESS_MSG", "Gatepass drafted sucessfully.");
                 return new ResponseEntity<>("contractWorkmen/list", HttpStatus.OK);
             }
+            request.setAttribute("FAILED_MSG", "Failed to draft gatepass.");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             
         } catch (Exception e) {

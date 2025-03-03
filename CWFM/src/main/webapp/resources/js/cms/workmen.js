@@ -706,15 +706,18 @@ function fileUpload(){
         if (xhr.status === 200) {
             // Handle successful response
             console.log("Data saved successfully:", xhr.responseText);
+			sessionStorage.setItem("successMessage", "Gatepass approved/rejected successfully!");
             loadCommonList('/contractworkmen/list', 'Quick On-Bording List');
         } else {
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
+			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
         }
     };
     
     xhr.onerror = function() {
         console.error("Request failed");
+		sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
     };
     
     // Send the data object as a JSON string
@@ -861,15 +864,18 @@ for (const [key, value] of data.entries()) {
         xhr.onload = function () {
             if (xhr.status === 200) {
                 console.log("Data saved successfully:", xhr.responseText);
+				sessionStorage.setItem("successMessage", "Gatepass saved successfully!");
                 loadCommonList('/contractworkmen/list', 'On-Boarding List');
 				
             } else {
                 console.error("Error saving data:", xhr.status, xhr.responseText);
+				sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
             }
         };
 
         xhr.onerror = function () {
             console.error("Request failed");
+			sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
         };
 
         // Send the FormData object
@@ -983,16 +989,18 @@ if(isValid){
        if (xhr.status === 200) {
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
-		  
+		   sessionStorage.setItem("successMessage", "Gatepass cancel request raised successfully!");
          loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
        } else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
+		   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass cancel request!");
        }
    };
    
    xhr.onerror = function() {
        console.error("Request failed");
+	   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass cancel request!");
    };
    
    // Send the data object as a JSON string
@@ -1028,15 +1036,18 @@ if(isValid){
        if (xhr.status === 200) {
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
+		   sessionStorage.setItem("successMessage", "Gatepass cancel request approved/rejected successfully!");
          loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
        } else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
+		   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass cancel request!");
        }
    };
    
    xhr.onerror = function() {
        console.error("Request failed");
+	   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass cancel request!");
    };
    
    // Send the data object as a JSON string
@@ -1069,16 +1080,18 @@ if(isValid){
 	       if (xhr.status === 200) {
 	           // Handle successful response
 	           console.log("Data saved successfully:", xhr.responseText);
-			  
+			   sessionStorage.setItem("successMessage", "Gatepass block request raised successfully!");
 	         loadCommonList('/contractworkmen/blockListFilter', 'Block List');
 	       } else {
 	           // Handle error response
 	           console.error("Error saving data:", xhr.statusText);
+			   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass block request!");
 	       }
 	   };
 	   
 	   xhr.onerror = function() {
 	       console.error("Request failed");
+		   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass block request!");
 	   };
 	   
 	   // Send the data object as a JSON string
@@ -1114,10 +1127,12 @@ if(isValid){
 	       if (xhr.status === 200) {
 	           // Handle successful response
 	           console.log("Data saved successfully:", xhr.responseText);
+			   sessionStorage.setItem("successMessage", "Gatepass block request approved/rejected successfully!");
 	         loadCommonList('/contractworkmen/blockListFilter', 'Block List');
 	       } else {
 	           // Handle error response
 	           console.error("Error saving data:", xhr.statusText);
+			   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass block request!");
 	       }
 	   };
 	   
@@ -1155,16 +1170,18 @@ if(isValid){
 			       if (xhr.status === 200) {
 			           // Handle successful response
 			           console.log("Data saved successfully:", xhr.responseText);
-					  
+					   sessionStorage.setItem("successMessage", "Gatepass unblock request raised successfully!");
 			         loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
 			       } else {
 			           // Handle error response
 			           console.error("Error saving data:", xhr.statusText);
+					   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass unblock request!");
 			       }
 			   };
 			   
 			   xhr.onerror = function() {
 			       console.error("Request failed");
+				   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass unblock request!");
 			   };
 			   
 			   // Send the data object as a JSON string
@@ -1200,15 +1217,18 @@ if(isValid){
 		       if (xhr.status === 200) {
 		           // Handle successful response
 		           console.log("Data saved successfully:", xhr.responseText);
+				   sessionStorage.setItem("successMessage", "Gatepass unblock approved/rejected successfully!");
 		         loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
 		       } else {
 		           // Handle error response
 		           console.error("Error saving data:", xhr.statusText);
+				   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass unblock request!");
 		       }
 		   };
 		   
 		   xhr.onerror = function() {
 		       console.error("Request failed");
+			   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass unblock request!");
 		   };
 		   
 		   // Send the data object as a JSON string
@@ -1241,16 +1261,18 @@ xhr.onload = function() {
     if (xhr.status === 200) {
         // Handle successful response
         console.log("Data saved successfully:", xhr.responseText);
-		  
+		sessionStorage.setItem("successMessage", "Gatepass blacklist request raised successfully!");
       loadCommonList('/contractworkmen/blackListFilter', 'Black List');
     } else {
         // Handle error response
         console.error("Error saving data:", xhr.statusText);
+		sessionStorage.setItem("errorMessage", "Failed to raise Gatepass blacklist request!");
     }
 };
 
 xhr.onerror = function() {
     console.error("Request failed");
+	sessionStorage.setItem("errorMessage", "Failed to raise Gatepass blacklist request!");
 };
 
 // Send the data object as a JSON string
@@ -1286,6 +1308,7 @@ const data = {
 					       if (xhr.status === 200) {
 					           // Handle successful response
 					           console.log("Data saved successfully:", xhr.responseText);
+							   sessionStorage.setItem("successMessage", "Gatepass blacklist request approved/rejected successfully!");
 					         loadCommonList('/contractworkmen/blackListFilter', 'Black List');
 					       } else {
 					           // Handle error response
@@ -1295,10 +1318,12 @@ const data = {
 					   
 					   xhr.onerror = function() {
 					       console.error("Request failed");
+						   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass blacklist request!");
 					   };
 					   
 					   // Send the data object as a JSON string
 					   xhr.send(JSON.stringify(data));
+					   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass blacklist request!");
 }else{
 	//error 
 }
@@ -1327,16 +1352,18 @@ function submitDeblack(userId,gatePassType){
 			    if (xhr.status === 200) {
 			        // Handle successful response
 			        console.log("Data saved successfully:", xhr.responseText);
-					  
+					sessionStorage.setItem("successMessage", "Gatepass deblacklist request raised successfully!");
 			      loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
 			    } else {
 			        // Handle error response
 			        console.error("Error saving data:", xhr.statusText);
+					sessionStorage.setItem("errorMessage", "Failed to raise Gatepass deblacklist request!");
 			    }
 			};
 			
 			xhr.onerror = function() {
 			    console.error("Request failed");
+				sessionStorage.setItem("errorMessage", "Failed to raise Gatepass deblacklist request!");
 			};
 			
 			// Send the data object as a JSON string
@@ -1372,15 +1399,18 @@ function approveRejectDeblacklist(status,gatePassType){
 		    if (xhr.status === 200) {
 		        // Handle successful response
 		        console.log("Data saved successfully:", xhr.responseText);
+				sessionStorage.setItem("successMessage", "Gatepass deblacklist request approved/rejected successfully!");
 		      loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
 		    } else {
 		        // Handle error response
 		        console.error("Error saving data:", xhr.statusText);
+				sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass deblacklist request!");
 		    }
 		};
 		
 		xhr.onerror = function() {
 		    console.error("Request failed");
+			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass deblacklist request!");
 		};
 		
 		// Send the data object as a JSON string
@@ -1413,16 +1443,18 @@ xhr.onload = function() {
     if (xhr.status === 200) {
         // Handle successful response
         console.log("Data saved successfully:", xhr.responseText);
-	  
+		sessionStorage.setItem("successMessage", "Gatepass lost or damage request raised successfully!");
 	   loadCommonList('/contractworkmen/lostordamageFilter', 'Lost or Damage List');
     } else {
         // Handle error response
         console.error("Error saving data:", xhr.statusText);
+		sessionStorage.setItem("errorMessage", "Failed to raise Gatepass lost or damage request!");
     }
 };
 
 xhr.onerror = function() {
     console.error("Request failed");
+	sessionStorage.setItem("errorMessage", "Failed to raise Gatepass lost or damage request!");
 };
 
 // Send the data object as a JSON string
@@ -2050,15 +2082,20 @@ function previewImage(event,inputId,displayId) {
 										        xhr.onload = function () {
 										            if (xhr.status === 200) {
 										                console.log("Data saved successfully:", xhr.responseText);
+														sessionStorage.setItem("successMessage", "Gatepass drafted successfully!");
 										                loadCommonList('/contractworkmen/list', 'On-Boarding List');
 														
 										            } else {
 										                console.error("Error saving data:", xhr.status, xhr.responseText);
+														sessionStorage.setItem("errorMessage", "Failed to draft Gatepass!");
+														loadCommonList('/contractworkmen/list', 'On-Boarding List');
 										            }
 										        };
 
 										        xhr.onerror = function () {
 										            console.error("Request failed");
+													sessionStorage.setItem("errorMessage", "Failed to draft Gatepass!");
+													loadCommonList('/contractworkmen/list', 'On-Boarding List');
 										        };
 
 										        // Send the FormData object
@@ -2075,7 +2112,13 @@ function previewImage(event,inputId,displayId) {
 											    
 											    var selectedRow = selectedCheckboxes[0].closest('tr');
 											    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+												var gatePassType = selectedRow.cells[11].innerText.trim(); // Adjust index if needed
+												   var status = selectedRow.cells[12].innerText.trim(); // Adjust index if needed
 
+												   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "draft") {
+												       alert("Edit is only allowed when Gate Pass Type is 'Create' and Status is 'Draft'.");
+												       return;
+												   }
 											    var xhr = new XMLHttpRequest();
 											    xhr.onreadystatechange = function() {
 											        if (xhr.readyState == 4 && xhr.status == 200) {
@@ -2138,7 +2181,13 @@ function redirectToWorkmenRenewEdit() {
 																 
 	var selectedRow = selectedCheckboxes[0].closest('tr');
 	var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+	var gatePassType = selectedRow.cells[11].innerText.trim(); // Adjust index if needed
+	   var status = selectedRow.cells[12].innerText.trim(); // Adjust index if needed
 
+	   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+	       alert("Edit is only allowed when Gate Pass Type is 'Create' and Status is 'Approved'.");
+	       return;
+	   }
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function() {
 	if (xhr.readyState == 4 && xhr.status == 200) {
@@ -2280,15 +2329,18 @@ for (const [key, value] of data.entries()) {
         xhr.onload = function () {
             if (xhr.status === 200) {
                 console.log("Data saved successfully:", xhr.responseText);
+				sessionStorage.setItem("successMessage", "Gatepass renew request raised successfully!");
                 loadCommonList('/contractworkmen/renewFilter', 'Renew List');
 				
             } else {
                 console.error("Error saving data:", xhr.status, xhr.responseText);
+				sessionStorage.setItem("errorMessage", "Failed to raise Gatepass renew request!");
             }
         };
 
         xhr.onerror = function () {
             console.error("Request failed");
+			sessionStorage.setItem("errorMessage", "Failed to raise Gatepass renew request!");
         };
 
         // Send the FormData object
@@ -2325,15 +2377,18 @@ if(isValid){
        if (xhr.status === 200) {
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
+		   sessionStorage.setItem("successMessage", "Gatepass renew request approved/rejected successfully!");
          loadCommonList('/contractworkmen/renewFilter', 'Renew List');
        } else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
+		   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass renew request!");
        }
    };
    
    xhr.onerror = function() {
        console.error("Request failed");
+	   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass renew request!");
    };
    
    // Send the data object as a JSON string
