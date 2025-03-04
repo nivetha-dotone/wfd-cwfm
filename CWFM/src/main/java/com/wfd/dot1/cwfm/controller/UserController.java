@@ -1,5 +1,6 @@
 package com.wfd.dot1.cwfm.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +24,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wfd.dot1.cwfm.dto.ChangePasswordDTO;
 import com.wfd.dot1.cwfm.dto.ResetPasswordDTO;
 import com.wfd.dot1.cwfm.dto.UserDTO;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.service.CommonService;
+import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import com.wfd.dot1.cwfm.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +45,8 @@ public class UserController {
     private CommonService commonService;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+	PrincipalEmployerService peService;
     @GetMapping("/new")
     public String createUserForm(Model model) {
     	 List<CmsGeneralMaster> roles = commonService.getAllRoles();
@@ -52,7 +58,26 @@ public class UserController {
    
 
     @GetMapping("/userList")
-    public String listUsers(Model model) {
+    public String listUsers(Model model, HttpServletRequest request,HttpServletResponse response) {
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+        List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+		 CMSRoleRights rr =new CMSRoleRights();
+	       if(user!=null) {
+	       if(user.getRoleName().equals("System Admin")) {
+	       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+			        rr.setEditRights(1);
+			        rr.setDeleteRights(1);
+			        rr.setImportRights(1);
+			        rr.setExportRights(1);
+			        rr.setViewRights(1);
+	       	peList = peService.getAllPrincipalEmployerForAdmin();
+	       }else {
+	       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/usersController/userList");
+	       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+	       }
+	       }
+	       request.setAttribute("UserPermission", rr);
         model.addAttribute("users", userService.getAllUsers());
         List<CmsGeneralMaster> roles = commonService.getAllRoles();
    	 model.addAttribute("roles", roles);

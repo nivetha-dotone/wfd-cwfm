@@ -179,13 +179,31 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
     </form>
     <div>
+    <c:if test="${UserPermission.addRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUserAdd()">Add</button> 
+    </c:if>
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersEdit()">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersView()">View</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="usersExportToCSV()">Export</button>
+    	</c:if>
+    	<c:if test="${UserPermission.deleteRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Delete</button>
+    	</c:if>
+    </div>
+    <!-- <div>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUserAdd()">Add</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Delete</button>
      <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersEdit()">Edit</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="usersExportToCSV()">Export</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersView()">View</button>
         
-</div>
+</div> -->
 </div>
 <form  >
     <div class="table-container">

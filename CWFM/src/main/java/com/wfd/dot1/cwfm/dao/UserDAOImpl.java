@@ -76,7 +76,7 @@ public class UserDAOImpl implements UserDAO {
 	    return QueryFileWatcher.getQuery("DELETE_USER");
     }
     public String getRolesByUserId() {
-	    return QueryFileWatcher.getQuery("GET_ROLES_BY_USER_ID");
+	    return QueryFileWatcher.getQuery("GET_ROLES_BY_USER");
     }
     public String doesUserExist() {
 	    return QueryFileWatcher.getQuery("DOES_USER_EXIST");
