@@ -283,4 +283,5 @@ public class CommonServiceImpl implements CommonService {
 	public CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription) {
 		return commonDAO.hasPageActionPermissionForRole(roleId, pageDescription);
 	}
+	
 }

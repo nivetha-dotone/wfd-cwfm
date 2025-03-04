@@ -237,6 +237,7 @@
                                         </option>
                                     </c:forEach>
                                 </select>
+
                             </td> --%>
                             <td>
     <input type="hidden" name="roleRights[${status.index}].addRights" value="0">
@@ -262,6 +263,7 @@
     <input type="hidden" name="roleRights[${status.index}].exportRights" value="0">
     <input type="checkbox" name="roleRights[${status.index}].exportRights" value="1" <c:if test="${roleRight.exportRights}">checked</c:if>>
 </td>
+
                             <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">-</button></td>
                         </tr>
                     </c:forEach>

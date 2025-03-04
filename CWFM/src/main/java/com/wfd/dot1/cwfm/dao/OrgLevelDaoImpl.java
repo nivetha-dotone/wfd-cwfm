@@ -2,8 +2,10 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +19,7 @@ import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
 public class OrgLevelDaoImpl implements OrgLevelDao {
+	private static final Logger LOGGER = LoggerFactory.getLogger(OrgLevelDaoImpl.class);
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
@@ -89,7 +92,18 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
     public String findbasicinfo() {
 	    return QueryFileWatcher.getQuery("FIND_BASIC_INFO");
     }
-    
+    public String isDuplicateEntry() {
+	    return QueryFileWatcher.getQuery("IS_DUPLICATE_ENTRY");
+    }
+    public String dependencyOrglevelCheckSql() {
+	    return QueryFileWatcher.getQuery("DEPENDENCEY_ORGLEVEL_CHECK");
+	}
+ public String dependencyOrglevelUpdateSql() {
+	    return QueryFileWatcher.getQuery("DEPENDENCY_ORGLEVEL_UPDATE");
+	}
+ public String getAllOrgLevelQuery() {
+	    return QueryFileWatcher.getQuery("GET_ALL_ORG_LEVELS");
+	}
     @Override
     public void saveOrgLevel(OrgLevelDefDTO orgLevel) {
     	 System.out.println("Saving org level: " + orgLevel.getName() + ", " + orgLevel.getShortName() + ", " + orgLevel.getOrgHierarchyLevel());
@@ -320,11 +334,33 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		    }
 			@Override
 			public boolean isDuplicateEntry(int orgLevelDefId, String name) {
-				 String query = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ? AND NAME=? AND INACTIVE = 1 ";
+				String query=isDuplicateEntry();
+				 //String query = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE ORGLEVELDEFID = ? AND NAME=? AND INACTIVE = 1 ";
 				    Integer count = jdbcTemplate.queryForObject(query, new Object[]{orgLevelDefId, name}, Integer.class);
 
 				    return count != null && count > 0; 
 			}
-
+			public void deleteOrgLevel(List<Long> orgLevelDefId) {
+		        List<Long> undeletableIds = new ArrayList<>();
+		        String CheckSql = dependencyOrglevelCheckSql();
+		        String updateSql = dependencyOrglevelUpdateSql();
+		        for (Long orgLevelDefIds : orgLevelDefId) {
+		            Integer count = jdbcTemplate.queryForObject(CheckSql, Integer.class, orgLevelDefIds);
+		            if (count != null && count > 0) {
+		                undeletableIds.add(orgLevelDefIds); // Add to list of undeletable IDs if dependencies exist
+		            } else {
+		               jdbcTemplate.update(updateSql, orgLevelDefIds);
+		                LOGGER.info("Org Level deleted with orgLevelDefId: {}", orgLevelDefIds);
+		            }
+		        }
+		        if (!undeletableIds.isEmpty()) {
+		            throw new DataIntegrityViolationException("Cannot delete Org Level due to dependencies: " + undeletableIds);
+		        }
+		    }
+			@Override
+		    public List<OrgLevel> getAllOrgLevel() {
+		    	String query = getAllOrgLevelQuery();
+		        return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevel.class));
+		    }
 }
 

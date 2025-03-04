@@ -24,6 +24,7 @@ import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
 import com.wfd.dot1.cwfm.dto.SaveMappingRequest;
 import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.OrgLevel;
 import com.wfd.dot1.cwfm.service.CommonService;
 
 @Controller
@@ -360,7 +361,7 @@ public class GeneralMasterController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving mapping");
         }
     }
-
-
+    
+   
 
 }

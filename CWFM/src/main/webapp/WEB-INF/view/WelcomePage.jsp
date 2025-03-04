@@ -959,7 +959,7 @@ function saveGMMaster() {
     const gmTypeId = document.getElementById('gmTypeId').value;
     const masterName = document.getElementById('masterName').value.trim();
     const masterValue = document.getElementById('masterValue').value.trim();
-    const errorBox = document.getElementById("error-gmMaster");
+    const errorBox = document.getElementById("formErrorMessage");
 
     errorBox.style.display = "none"; // Hide previous errors
 
@@ -1153,10 +1153,13 @@ function saveRoleRights() {
             errorBox.innerHTML = body.errors ? body.errors.join("<br>") : body.message;
             errorBox.style.display = "block";
         } else {
+
             alert(body.message); // Show success message
             loadCommonList('/roleRights/roleRightsList', 'Role Rights List'); 
+
         }
     })
+    
     .catch(error => {
         console.error("Error:", error);
         if (error.errors && error.errors.length > 0) {
@@ -3963,21 +3966,32 @@ table th {
     }
     function exportGMMasterCSV() {
         var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+
         if (selectedRows.length === 0) {
             alert("Please select at least one record to export.");
             return;
         }
 
         var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "GMTYPE,MASTERNAME,MASTERVALUE\n"; // Add headers here
-        selectedRows.forEach(function(row) {
-            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3),td:nth-child(4)'); // Adjust column indices as needed
-            var rowArray = [];
-            rowData.forEach(function(cell) {
-                rowArray.push(cell.innerText);
-            });
-            csvContent += rowArray.join(",") + "\n";
+        csvContent += "GMTYPE,MASTERNAME,MASTERVALUE\n"; // CSV Headers
+
+        selectedRows.forEach(function(checkbox) {
+            var row = checkbox.closest("tr"); // Get the parent <tr> of the checkbox
+
+            if (row) {
+                var gmType = row.querySelector("td:nth-child(2)").innerText.trim(); // Extract GM Type (text inside <td>)
+                var masterName = row.querySelector('input[id="name"]').value.trim(); // Extract Master Name (from <input>)
+                var masterValue = row.querySelector('input[id="value"]').value.trim(); // Extract Master Value (from <input>)
+
+                var rowArray = [gmType, masterName, masterValue];
+                console.log("Extracted Data:", rowArray); // Debugging
+
+                csvContent += rowArray.join(",") + "\n";
+            }
         });
+
+        console.log("Final CSV Content:\n", csvContent); // Debugging
+
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -3985,6 +3999,7 @@ table th {
         document.body.appendChild(link);
         link.click();
     }
+
     function exportToRoleCSV() {
         var selectedRows = document.querySelectorAll('input[name="selectedRoleRights"]:checked');
         if (selectedRows.length === 0) {
@@ -4048,21 +4063,33 @@ table th {
 
     function exportOrgLevelCSV() {
         var selectedRows = document.querySelectorAll('input[name="selectedOrgLevels"]:checked');
+
         if (selectedRows.length === 0) {
             alert("Please select at least one record to export.");
             return;
         }
 
         var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "ORGLEVELNAME,SHORTNAME,HIERARCHY\n"; // Add headers here
-        selectedRows.forEach(function(row) {
-            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2),td:nth-child(3),td:nth-child(4)'); // Adjust column indices as needed
-            var rowArray = [];
-            rowData.forEach(function(cell) {
-                rowArray.push(cell.innerText);
-            });
-            csvContent += rowArray.join(",") + "\n";
+        csvContent += "ORGLEVELNAME,SHORTNAME,HIERARCHY\n"; // CSV Headers
+
+        selectedRows.forEach(function(checkbox) {
+            var row = checkbox.closest("tr"); // Get the parent <tr> of the checkbox
+
+            if (row) {
+                // Extract values from input fields inside the row
+                var orgLevelName = row.querySelector('input[name="orgLevelName[]"]').value.trim();
+                var shortName = row.querySelector('input[name="shortName[]"]').value.trim();
+                var hierarchy = row.querySelector('input[name="hierarchy[]"]').value.trim();
+
+                var rowArray = [orgLevelName, shortName, hierarchy];
+                console.log("Extracted Data:", rowArray); // Debugging
+
+                csvContent += rowArray.join(",") + "\n";
+            }
         });
+
+        console.log("Final CSV Content:\n", csvContent); // Debugging
+
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -4070,6 +4097,7 @@ table th {
         document.body.appendChild(link);
         link.click();
     }
+
     function exportOrgLevelEntryCSV() {
         var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
         if (selectedRows.length === 0) {
@@ -4095,7 +4123,7 @@ table th {
         link.click();
     }
     function exportOrgLevelMapCSV() {
-        var selectedRows = document.querySelectorAll('input[name="selectedGMMaster"]:checked');
+        var selectedRows = document.querySelectorAll('input[name="selectedOrgMap"]:checked');
         if (selectedRows.length === 0) {
             alert("Please select at least one record to export.");
             return;
@@ -4374,7 +4402,35 @@ table th {
         document.getElementById("editButton").style.display = "inline";
         document.getElementById("saveButton").style.display = "none";
     }
+    function deleteOrgLevel() {
+        const selectedIds = Array.from(document.querySelectorAll('input[name="selectedOrgLevels"]:checked')).map(cb => parseInt(cb.value, 10));
+        if (selectedIds.length === 0) {
+            alert("Please select at least one Org Level to delete.");
+            return;
+        }
+        // Log the selected IDs to see what is being sent
+        console.log("Selected Org Level IDs:", selectedIds);
 
+        $.ajax({
+            type: 'POST',
+            url: '/CWFM/org-level/deleteOrgLevel',
+            contentType: 'application/json', // Set content type to JSON
+            data: JSON.stringify(selectedIds), // Send data as JSON string
+            success: function(response) {
+                if (response.success) {
+                    alert("Selected items deleted successfully.");
+                    loadCommonList('/org-level/list', 'Org Levels');
+                } else {
+                    alert(response.message || "Error deleting selected items.");
+                }
+            },
+            error: function(xhr, status, error) {
+                // Log the error response for debugging
+                console.error("Error details:", xhr.responseText, status, error);
+                alert("An unexpected error occurred. Please check the console for details.");
+            }
+        });
+    } 
 
 
     </script>

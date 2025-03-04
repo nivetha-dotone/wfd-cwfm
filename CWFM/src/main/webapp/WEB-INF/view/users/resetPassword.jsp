@@ -145,7 +145,8 @@ th label {
            <!--  <td><input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" /></td> -->
          <td>
                 <input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" onkeyup="validateResetPassword()" />
-                <span id="resetPasswordMessage" style="color: red;"></span>
+                <span id="resetPasswordMessage" style="color: red;"></span> 
+                
             </td>
         </tr>
     </table>

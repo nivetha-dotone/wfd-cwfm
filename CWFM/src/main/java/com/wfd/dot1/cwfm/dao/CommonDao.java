@@ -12,6 +12,7 @@ import com.wfd.dot1.cwfm.pojo.CMSGMType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.OrgLevel;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
@@ -78,4 +79,6 @@ public interface  CommonDao {
 					void deleteRoleRights(List<Integer> roleIds);
 					boolean isDuplicateGMName(Long gmTypeId, String gmName);
 					CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription);
+					void deleteOrgLevel(List<Long> orgLevelDefIds);
+					List<OrgLevel> getAllOrgLevels();
 }

@@ -318,7 +318,7 @@ console.log(formData);
             });
         }
         
-        function exportToCSV() {
+        function exportToPrincCSV() {
             var selectedRows = document.querySelectorAll('input[name="selectedUnitIds"]:checked');
             if (selectedRows.length === 0) {
                 alert("Please select at least one record to export.");

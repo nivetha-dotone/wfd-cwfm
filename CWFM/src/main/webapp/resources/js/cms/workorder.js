@@ -94,8 +94,8 @@ function searchWithPEContractorInWO(contextPath) {
  }
  
    function woListExportToCSV() {
-            var selectedRows = document.querySelectorAll('input[name="selectedWOs"]:checked');
-            if (selectedRows.length === 1) {
+            var selectedRows = document.querySelectorAll('input[name="selectedWorkorderIds"]:checked');
+            if (selectedRows.length === 0) {
                 alert("Please select at least one record to export.");
                 return;
             }

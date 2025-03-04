@@ -22,5 +22,6 @@ public interface OrgLevelService {
 	void deleteOrgLevelEntry(int orgLevelEntryId);
 	OrgLevelEntryDTO getOrgLevelEntryById(int orgLevelEntryId);
 	boolean isDuplicateEntry(int orgLevelDefId, String name);
-
+	void deleteOrgLevel(List<Long> orgLevelDefId);
+	 List<OrgLevel> getAllOrgLevel();
 }

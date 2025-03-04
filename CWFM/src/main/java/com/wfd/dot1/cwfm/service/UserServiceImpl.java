@@ -57,8 +57,8 @@ public class UserServiceImpl implements UserService {
 		return userDAO.resetUserPassword(resetPasswordDTO);
 	}
 	@Override
-	public MasterUser viewUserDetails(String userAccount) {
-		return userDAO.viewUserDetails(userAccount);	
+	public MasterUser viewUserDetails(String userId) {
+		return userDAO.viewUserDetails(userId);	
 	}
 
 	@Override

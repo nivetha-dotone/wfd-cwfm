@@ -2,15 +2,45 @@
     pageEncoding="ISO-8859-1"%>
     <%@ page isELIgnored="false" %>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+    <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
-    <script src="resources/js/jquery.min.js"></script>
-<style>
-    body {
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
+      <!--  <script src="resources/js/commonjs.js"></script> -->
+    <script src="resources/js/cms/principalEmployer.js"></script>
+    <script src="resources/js/cms/contractor.js"></script>
+    <script src="resources/js/cms/workorder.js"></script>
+       <script src="resources/js/cms/workmen.js"></script>
+    <script src="resources/js/cms/report.js"></script>
+    <style>
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+#principalEmployerContent {
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: calc(100vh - 60px); /* Adjust based on header height */
+}
+
+.page-header {
+    background-color: #005151;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-family: 'Noto Sans', sans-serif;
+    position: fixed;
+    width: 100%;
+    top: 0; body {
         margin: 0;
         overflow-x: hidden;
     }
@@ -53,17 +83,167 @@ th label {
 .custom-input-container {
     padding-left: 10px;
 }
-</style>
-<script>  
-var contextPath = '<%= request.getContextPath() %>';
+    left: 0;
+    z-index: 1000;
+}
 
+.header-buttons {
+    float: right;
+    margin-right: 20px;
+}
 
-</script>
-   </head>
+.tabs {
+    overflow: hidden;
+    border-bottom: 2px solid #005151;
+    margin-bottom: 20px;
+}
+
+.tabs button {
+    background-color: #fff; /* Tab background color */
+    border: 1px solid #ddd; /* Optional: add a border for visibility */
+     border-radius: 3px;
+    outline: none;
+    padding: 5px 10px;/* Reduced height */
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s, color 0.3s;
+    color: #005151; /* Tab text color */
+    font-family: 'Noto Sans', sans-serif;
+     margin-right: 5px;
+}
+  
+
+.tabs button.active {
+    background-color: #005151; /* Active tab background color */
+    color: #fff; /* Active tab text color */
+    border-bottom: 2px solid #fff;
+}
+
+.tab-content {
+    display: none;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.custom-label {
+    font-family: 'Noto Sans', sans-serif;
+    text-align: left;
+    display: block;
+    margin-bottom: 5px;
+    color: #898989;/* Label text color */
+    display: inline;
+  padding: .2em .6em .3em;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 1;
+    white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+}
+
+.custom-input-container {
+    padding-left: 10px;
+}
+
+.custom-input, .custom-input-checkbox {
+    height: 40px;
+    font-family: 'Noto Sans', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.required-field {
+    color: red;
+    margin-right: 4px;
+}
+
+  .tabs-container {
+        display: flex;
+        justify-content: space-between; /* Distribute space between tabs and buttons */
+        align-items: center; /* Align items vertically */
+    }
+
+    .tabs {
+        display: flex;
+        flex-wrap: nowrap; /* Prevent wrapping of tabs */
+    }
+
+    .tabs button {
+        margin-right: 10px; /* Space between tabs */
+    }
+
+    .action-buttons {
+        display: flex; /* Align buttons horizontally */
+        align-items: center; /* Center buttons vertically */
+    }
+
+    .action-buttons button {
+        margin-left: 10px; /* Space between buttons */
+    }
+
+table.ControlLayout {
+    border-collapse: separate; /* Ensure spacing is applied correctly */
+    border-spacing: 10px; /* Adjust the value for the desired gap between cells */
+}
+
+table.ControlLayout th,
+table.ControlLayout td {
+    padding: 10px; /* Add padding inside cells for spacing around content */
+    vertical-align: top; /* Align the content to the top of the cell */
+}
+    </style>
+    <script>
+        function showTab(tabId) {
+            // Hide all tab contents
+            var tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(function(content) {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            var tabs = document.querySelectorAll('.tabs button');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+
+            // Show the selected tab content and add active class to the clicked tab
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Set the default tab
+            showTab('tab1');
+        });
+    </script>
+</head>
 <body>
+    <!-- <div class="page-header">
+        Principal Employer View Page
+        <div class="header-buttons">
+            <button type="button" onclick="history.back()">Back</button>
+        </div>
+    </div> -->
 
-<div id="principalEmployerContent">
+    <div id="principalEmployerContent">
+        <div class="tabs-container">
+        <div class="tabs">
+            <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Unit Information</button>
+            <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
+        </div>
+       <div class="action-buttons" > 
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','WorkOrder')">Cancel</button>
+       </div>
+     </div>
 
+        <div id="tab1" class="tab-content active">
+          <form id="editForm" action="/CWFM/principalEmployer/view/${principalEmployer.unitId
+          }" method="post">
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
@@ -81,7 +261,7 @@ var contextPath = '<%= request.getContextPath() %>';
                               <div style="padding-right: 15px;">
                               <input type="text" name="name" value="${principalEmployer.name}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
-                              <td >  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','Work Order');">Cancel</button>
+                             <!--  <td >  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','Work Order');">Cancel</button> -->
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
@@ -124,59 +304,70 @@ var contextPath = '<%= request.getContextPath() %>';
                         </tr>
         </tbody>
     </table>
-    <div class="panel second-child">	
-	<table  class="Tabular" cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-					<th><spring:message code="label.job"/></th>
-					<th><spring:message code="label.serviceCode"/></th>
-					<th><spring:message code="label.trade"/></th>
-					<th><spring:message code="label.skill"/></th>
-					<th><spring:message code="label.itemQuantity"/></th>
-					<th><spring:message code="label.rate"/></th>
-					<th><spring:message code="label.serviceEntryQty"/></th>
-				    <th><spring:message code="label.wbsCode"/></th>
-				    <th><spring:message code="label.uom"/></th>
+   <!--  <div style="text-align: center;">
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-secondary" onclick="history.back();">Back</button>
+    </div> -->
+</form>
+
+        </div>
+        
+         <div id="tab2" class="tab-content">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
+                   
+       <thead>
+		<tr style=" border: 1px solid #ddd;">
+					<th style="color:gray;"><spring:message code="label.job"/></th>
+					<th style="color:gray;"><spring:message code="label.serviceCode"/></th>
+					<th style="color:gray;"><spring:message code="label.trade"/></th>
+					<th style="color:gray;"><spring:message code="label.skill"/></th>
+					<th style="color:gray;"><spring:message code="label.itemQuantity"/></th>
+					<th style="color:gray;"><spring:message code="label.rate"/></th>
+					<th style="color:gray;"><spring:message code="label.serviceEntryQty"/></th>
+				    <th style="color:gray;"><spring:message code="label.wbsCode"/></th>
+				    <th style="color:gray;"><spring:message code="label.uom"/></th>
 					
 		</tr>
 	</thead>
 	<tbody>
-	<tr>
-            <td>ENGG - BLR</td>
-            <td>5000001</td>
-            <td>Helper</td>
-            <td>Skilled</td>
-            <td>1</td>
-            <td>990</td>
-            <td>20</td>
-            <td>350</td>
-            <td>EA</td>
+	<tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
+            <td style="color:black ;text-align:left">ENGG - BLR</td>
+            <td style="color:black ;text-align:left">5000001</td>
+            <td style="color:black ;text-align:left">Helper</td>
+            <td style="color:black ;text-align:left">Skilled</td>
+            <td style="color:black ;text-align:left">1</td>
+            <td style="color:black ;text-align:left">990</td>
+            <td style="color:black ;text-align:left">20</td>
+            <td style="color:black ;text-align:left">350</td>
+            <td style="color:black ;text-align:left">EA</td>
         </tr>
-        <tr>
-            <td>HR - BLR</td>
-            <td>5000002</td>
-            <td>Fitter</td>
-            <td>Unskilled</td>
-            <td>20</td>
-            <td>18</td>
-            <td>20</td>
-            <td>270</td>
-            <td>M3</td>
+        <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
+            <td style="color:black ;text-align:left">HR - BLR</td>
+            <td style="color:black ;text-align:left">5000002</td>
+            <td style="color:black ;text-align:left">Fitter</td>
+            <td style="color:black ;text-align:left">Unskilled</td>
+            <td style="color:black ;text-align:left">20</td>
+            <td style="color:black ;text-align:left">18</td>
+            <td style="color:black ;text-align:left">20</td>
+            <td style="color:black ;text-align:left">270</td>
+            <td style="color:black ;text-align:left">M3</td>
         </tr>
-        <tr>
-            <td>QA - BLR</td>
-            <td>5000003</td>
-            <td>Welder</td>
-            <td>Semi Skilled</td>
-            <td>10</td>
-            <td>456</td>
-            <td>10</td>
-            <td>310</td>
-               <td>NOS</td>
+        <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
+            <td style="color:black ;text-align:left">QA - BLR</td>
+            <td style="color:black ;text-align:left">5000003</td>
+            <td style="color:black ;text-align:left">Welder</td>
+            <td style="color:black ;text-align:left">Semi Skilled</td>
+            <td style="color:black ;text-align:left">10</td>
+            <td style="color:black ;text-align:left">456</td>
+            <td style="color:black ;text-align:left">10</td>
+            <td style="color:black ;text-align:left">310</td>
+               <td style="color:black ;text-align:left">NOS</td>
         </tr>
 				
 	</tbody>
-</table>
-</div>
-</div>
-
+                </table>
+            </div>
+        
+    </div>
+</body>
+</html>

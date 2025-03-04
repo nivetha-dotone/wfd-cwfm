@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.wfd.dot1.cwfm.pojo.BillVerification;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.service.BillVerificationService;
@@ -52,8 +53,10 @@ public class BillVerificationController {
 
     		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
     		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
     		List<BillVerification> listDto = billService.getBillVerificationList(String.valueOf(user.getUserId()));
+    		
+    		
+    		
     		request.setAttribute("billlist", listDto);
     		return "bill/list";
 

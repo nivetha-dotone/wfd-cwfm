@@ -120,7 +120,29 @@
     margin-right: 4px;
 }
 
+  .tabs-container {
+        display: flex;
+        justify-content: space-between; /* Distribute space between tabs and buttons */
+        align-items: center; /* Align items vertically */
+    }
 
+    .tabs {
+        display: flex;
+        flex-wrap: nowrap; /* Prevent wrapping of tabs */
+    }
+
+    .tabs button {
+        margin-right: 10px; /* Space between tabs */
+    }
+
+    .action-buttons {
+        display: flex; /* Align buttons horizontally */
+        align-items: center; /* Center buttons vertically */
+    }
+
+    .action-buttons button {
+        margin-left: 10px; /* Space between buttons */
+    }
 
 table.ControlLayout {
     border-collapse: separate; /* Ensure spacing is applied correctly */
@@ -167,11 +189,29 @@ table.ControlLayout td {
     </div> -->
 
     <div id="principalEmployerContent">
+        <div class="tabs-container">
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Unit Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
+        
+        </div>     <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer');">Cancel</button> -->
+     <div class="action-buttons" > 
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer')">Cancel</button>
+     </div> 
+    </div>
+<!-- <div class="tabs-container">
+        <div class="tabs">
+            <button  data-target="tab1" onclick="showTab('tab1')">Basic Data</button>
+            <button data-target="tab2" onclick="showTab('tab2')">Employment Information</button>
+            <button data-target="tab3" onclick="showTab('tab3')">Other Information</button>
+            <button data-target="tab4" onclick="showTab('tab4')">Wages</button>
+            <button data-target="tab5" onclick="showTab('tab5')">Documents</button>
         </div>
-
+         <div class="action-buttons" >
+            <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRenewDetails()">Save</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Cancel</button>
+        </div> 
+    </div> --> 
         <div id="tab1" class="tab-content active">
           <form id="editForm" action="/CWFM/principalEmployer/view/${principalEmployer.unitId
           }" method="post">

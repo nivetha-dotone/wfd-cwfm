@@ -50,6 +50,8 @@ public class ContractorController {
 	@Autowired
 	CommonService commonService;
 
+	
+	
 	@GetMapping("/list")
 	public String getAllPrincipalEmployer(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
@@ -57,10 +59,17 @@ public class ContractorController {
 		
 		//List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
 		
-		CMSRoleRights rr =new CMSRoleRights();
+		
 		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+		 CMSRoleRights rr =new CMSRoleRights();
         if(user!=null) {
         if(user.getRoleName().equals("System Admin")) {
+        	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+		        rr.setEditRights(1);
+		        rr.setDeleteRights(1);
+		        rr.setImportRights(1);
+		        rr.setExportRights(1);
+		        rr.setViewRights(1);
         	peList = peService.getAllPrincipalEmployerForAdmin();
         	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
 		        rr.setEditRights(1);
@@ -69,6 +78,7 @@ public class ContractorController {
 		        rr.setExportRights(1);
 		        rr.setViewRights(1);
         }else {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractor/list");
         	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractor/list");
         }
@@ -200,7 +210,24 @@ public class ContractorController {
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 
 		List<ContractorRegistration> listDto = contrService.getContractorRegistrationList(String.valueOf(user.getUserId()));
+		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+		 CMSRoleRights rr =new CMSRoleRights();
+       if(user!=null) {
+       if(user.getRoleName().equals("System Admin")) {
+       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+		        rr.setEditRights(1);
+		        rr.setDeleteRights(1);
+		        rr.setImportRights(1);
+		        rr.setExportRights(1);
+		        rr.setViewRights(1);
+       	peList = peService.getAllPrincipalEmployerForAdmin();
+       }else {
+       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractor/contRegList");
+       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+       }
+       }
 		request.setAttribute("contractorlist", listDto);
+		request.setAttribute("UserPermission", rr);
 		return "contractors/contractorRegistrationList";
 
 	}

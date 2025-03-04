@@ -17,7 +17,7 @@ public interface UserDAO {
 	void saveUser(MasterUser user, List<Long> roleIds);
 	boolean changeUserPassword(ChangePasswordDTO changePasswordDTO);
 	boolean resetUserPassword(ResetPasswordDTO resetPasswordDTO);
-	MasterUser viewUserDetails(String userAccount);
+	MasterUser viewUserDetails(String userId);
 	List<Long> getUserRoleIds(String userId);
 	void updateUser(MasterUser user, List<Long> roleIds);
 	void deleteUsers(List<Integer> userIds);

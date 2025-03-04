@@ -255,9 +255,20 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE()">Search</button>
   </div>
     <div>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenEdit()">Edit</button>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
+    <c:if test="${UserPermission.addRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
+    </c:if>
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEView('${cmSPRINCIPALEMPLOYER.UNITID}')">View</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+    	</c:if>
+
     </div>
 </div>
 

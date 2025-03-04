@@ -12,18 +12,17 @@
     <script src="resources/js/cms/workorder.js"></script>
     <script src="resources/js/commonjs.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
-  <style>
+    <style>
  
  
     body {
         background-color: #FFFFFF; /* White background for the page */
-        font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
-        overflow-y: scroll; /* Adds a vertical scroll bar */
+         font-family: 'Noto Sans', sans-serif;
     }
 
     .action-bar {
         display: flex;
-        justify-content: space-between;
+        /* justify-content: space-between; */
         align-items: center;
         padding: 1rem;
         background-color: #f8f8f8;
@@ -63,7 +62,6 @@
         overflow-x: auto;
         margin: 0; /* Remove space before the table */
         padding: 0; /* Remove padding if any */
-        
     }
 
     table {
@@ -71,11 +69,28 @@
         border-collapse: collapse;
     }
 
-    th, td {
+    td {
         padding: 10px;
         text-align: left;
         border: 1px solid #ddd;
         font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+         font-family: 'Noto Sans', sans-serif;
+         
+    color: #898989;/* Label text color */
+  padding: .2em .6em .3em;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 1;
+    white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+    }
+     th {
+        padding: 10px;
+        text-align: left;
+       /*  border: 1px solid #ddd; */
+        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+          font-weight: bold;
     }
 
     th {
@@ -127,11 +142,12 @@
         font-family: 'Noto Sans', Arial, sans-serif; /* Font family similar to grid header */
         font-size: 14px; /* Adjusted font size to match typical grid header size */
         font-weight: 600; /* Bold text for prominence */
-        border: 1px solid #ddd; /* Lighter border for a cleaner look */
+        /* border: 1px solid #ddd; /* Lighter border for a cleaner look */ */
         white-space: nowrap; /* Prevent text from wrapping */
         padding: 8px 10px; /* Adjusted padding for better spacing */
           background-color: #E0E0E0;  /* Light background color to match grid header */
         color: #333; /* Text color for readability */
+          font-weight: bold;
     }
        table th {
         border-top: 0.0625rem solid var(--zed_sys_color_border_lowEmphasis); /* Top border color */
@@ -143,19 +159,20 @@
         line-height: 1.2rem; /* Reduced line height */
         letter-spacing: normal; /* Letter spacing */
         font-family: 'Noto Sans', sans-serif; /* Font family */
-        font-weight: 400; /* Font weight */
+         font-weight: bold;
         text-align: center; /* Center align text */
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
+   
 </style>
 </head>
 <body>
 <div class="page-header">
    <!--  <form id="searchForm"> -->
-    <div>
+   <!--  <div> -->
    <label for="principalEmployerId" style=" color: darkcyan;"   >Request Status</label>
-      <select id="requestType" name="requestType" style="width: 100%; height: 25px;color: black;" onchange="toggleMainContractorRow()">
+      <select id="requestType" name="requestType" style="width: 20%; height: 25px;" onchange="toggleMainContractorRow()">
          <option value="">Select Status</option>
          <option value="Draft">Draft</option>
          <option value="Submitted">Submitted</option>
@@ -172,24 +189,24 @@
         <tr>
            	   <th><label class="custom-label" style=" color: darkcyan;" ><span class="required-field"></span><spring:message code="label.workOrderNumber"/></label></th>
                 <td>
-                	<input id="workOrderNumber" name="workOrderNumber" style="width: 100%;height: 20px; color: black;" type="text" size="30" maxlength="30">
+                	<input id="workOrderNumber" name="workOrderNumber" style="width: 20%;height: 20px; color: black;" type="text" size="30" maxlength="30">
                 	<!-- <label id="error-workOrderNumber" style="color: red;display: none;">Contract From is required</label> -->
                 </td>
                <th><label class="custom-label" style=" color: darkcyan;" ><span class="required-field"></span><spring:message code="label.From"/></label></th>
                 <td>
-                	<input id="From" name="From" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                	<input id="From" name="From" style="width: 20%;height: 20px; color: black;" type="date" size="30" maxlength="30">
                 	<!-- <label id="error-From" style="color: red;display: none;">Contract To is required</label> -->
                 </td>
                  <th><label class="custom-label" style=" color: darkcyan;" ><span class="required-field"></span><spring:message code="label.To"/></label></th>
                <td>
-                	<input id="To" name="To" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                	<input id="To" name="To" style="width: 20%;height: 20px; color: black;" type="date" size="30" maxlength="30">
                 	<!-- <label id="error-To" style="color: red;display: none;">Contract To is required</label> -->
                 </td>
         </tr>
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
 <input type="hidden" id="contractorId" name="contractorId">
       
-  </div>
+  <!-- </div> -->
    <!--  </form> -->
     <div>
       <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  >Search</button>
@@ -203,8 +220,8 @@
  <div class="table-container">
    <table border="1"  id="workorderTable" >
         <thead>
-            <tr style="border: 1px solid black;">
-             <td style="border: 1px solid black;">
+            <tr>
+             <td >
                         <input type="checkbox" id="selectAllWOCheckbox" onchange="toggleSelectAllWOS()">
                     </td> 
                     <!-- Add more table headers for each column -->
@@ -230,19 +247,19 @@
            <tbody>
 				<c:forEach items="${billlist}" var="wo">
 					<tr>
-						<td style="border: 1px solid black;"><input type="checkbox"
+						<td ><input type="checkbox"
 							name="selectedWOs" value="${wo.transactionId}"></td>
-						<td style="border: 1px solid black;">${wo.transactionId}</td>
-						<td style="border: 1px solid black;">${wo.unitCode}</td>
-						<td style="border: 1px solid black;">${wo.vendorCode}</td>
-						<td style="border: 1px solid black;">${wo.contractorName}</td>
-						<td style="border: 1px solid black;">${wo.workOrderNumber}</td>
-						<td style="border: 1px solid black;">${wo.billStartDate}</td>
-						<td style="border: 1px solid black;">${wo.billEndDate}</td>
-						<td style="border: 1px solid black;">${wo.status}</td>
-						<td style="border: 1px solid black;">${wo.billCategory}</td>
-						<td style="border: 1px solid black;">${wo.lastApprover}</td>
-						<td style="border: 1px solid black;">${wo.nextApprover}</td>
+						<td>${wo.transactionId}</td>
+						<td>${wo.unitCode}</td>
+						<td>${wo.vendorCode}</td>
+						<td>${wo.contractorName}</td>
+						<td>${wo.workOrderNumber}</td>
+						<td>${wo.billStartDate}</td>
+						<td>${wo.billEndDate}</td>
+						<td>${wo.status}</td>
+						<td>${wo.billCategory}</td>
+						<td>${wo.lastApprover}</td>
+						<td>${wo.nextApprover}</td>
 						<%--<td style="border: 1px solid black;">${principalEmployer.NAME}</td>
                     <td style="border: 1px solid black;">${${wo.requestType}}</td> --%>
 					</tr>

@@ -9,93 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workorders List</title>
     <script src="resources/js/cms/workorder.js"></script>
-
-
-    <style>
-        /* Add your styles here */
-        .success {
-            color: green;
-            font-weight: bold;
-            padding: 10px;
-            background-color: #e0ffe0;
-            border: 1px solid green;
-            margin-bottom: 1rem;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-            padding: 10px;
-            background-color: #ffe0e0;
-            border: 1px solid red;
-            margin-bottom: 1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #DDF3FF;
-            color: #005151;
-        }
-
-        .checkbox-cell input[type="checkbox"] {
-            margin: 0;
-        }
-
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background-color: #f8f8f8;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-buttons button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-         .success {
-        color: green;
-        font-weight: bold;
-        padding: 10px;
-        background-color: #e0ffe0;
-        border: 1px solid green;
-        margin-bottom: 1rem;
-    }
-    .error {
-        color: red;
-        font-weight: bold;
-        padding: 10px;
-        background-color: #ffe0e0;
-        border: 1px solid red;
-        margin-bottom: 1rem;
-    }
- label {
-    color: black;
-}
+<style>
+ 
+ 
     body {
         background-color: #FFFFFF; /* White background for the page */
-        font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
+         font-family: 'Noto Sans', sans-serif;
     }
 
     .action-bar {
         display: flex;
-        justify-content: space-between;
+        /* justify-content: space-between; */
         align-items: center;
         padding: 1rem;
         background-color: #f8f8f8;
@@ -138,15 +62,32 @@
     }
 
     table {
-        width: 30%;
+        width: 100%;
         border-collapse: collapse;
     }
 
-    th, td {
+    td {
         padding: 10px;
         text-align: left;
         border: 1px solid #ddd;
         font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+         font-family: 'Noto Sans', sans-serif;
+         
+    color: #898989;/* Label text color */
+  padding: .2em .6em .3em;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 1;
+    white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+    }
+     th {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+          font-weight: bold;
     }
 
     th {
@@ -162,8 +103,7 @@
     .page-header {
         display: flex;
         align-items: center;
-        justify-content: flex-start; /* Align elements to the left */
-    gap: 10px;  /* Distribute space between search and buttons */
+        justify-content: space-between; /* Distribute space between search and buttons */
         padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
         border-bottom: 1px solid #ccc; /* Subtle border for separation */
@@ -181,7 +121,7 @@
         }
 
         #searchForm {
-            width: 100%; 
+            width: 100%; /* Full width for small screens */
             margin-right: 0; /* Remove margin on small screens */
         }
 
@@ -204,6 +144,7 @@
         padding: 8px 10px; /* Adjusted padding for better spacing */
           background-color: #E0E0E0;  /* Light background color to match grid header */
         color: #333; /* Text color for readability */
+          font-weight: bold;
     }
        table th {
         border-top: 0.0625rem solid var(--zed_sys_color_border_lowEmphasis); /* Top border color */
@@ -215,18 +156,19 @@
         line-height: 1.2rem; /* Reduced line height */
         letter-spacing: normal; /* Letter spacing */
         font-family: 'Noto Sans', sans-serif; /* Font family */
-        font-weight: 400; /* Font weight */
+         font-weight: bold;
         text-align: center; /* Center align text */
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-    </style>
+   
+</style>
 
 </head>
 <body>
 <div class="page-header">
    <!--  <form id="searchForm"> -->
-   <!--  <div> -->
+   <div> 
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
          <select id="principalEmployerId" name="principalEmployerId"  style="color:gray;padding:3px;" onchange="getContractorsForWorkorder(this.value, '${sessionScope.loginuser.userAccount}')">
          <option value="">Select Principal Employer</option>
@@ -246,13 +188,22 @@
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
 <input type="hidden" id="contractorId" name="contractorId">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchWorkordersBasedOnPEAndContr()">Search</button>
-  <!-- </div> -->
+   </div> 
    <!--  </form> -->
     <div>
-       <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
-        <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
+    <c:if test="${UserPermission.addRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
+    </c:if>
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWOView()">View</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="woListExportToCSV()">Export</button>
+    	</c:if>
     </div>
 </div>
  

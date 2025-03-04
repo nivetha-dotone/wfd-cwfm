@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.wfd.dot1.cwfm.dto.WorkorderResponseDto;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
+import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.ContractorService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
@@ -43,21 +45,31 @@ public class WorkorderController {
 	@Autowired
 	WorkorderService woService;
 	
+	@Autowired
+	CommonService commonService;
 	 @GetMapping("/list")
 	    public String getlist(@RequestParam(required = false) String principalEmployerId,@RequestParam(required = false)  String contractorId,HttpServletRequest request,HttpServletResponse response) {
 		 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
          MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 		 //List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
 	 		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
-	        if(user!=null) {
-	        if(user.getRoleName().equals("System Admin")) {
-	        	peList = peService.getAllPrincipalEmployerForAdmin();
-	        }else {
-	        	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
-	        }
-	        }
+	 		 CMSRoleRights rr =new CMSRoleRights();
+	 	       if(user!=null) {
+	 	       if(user.getRoleName().equals("System Admin")) {
+	 	       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+	 			        rr.setEditRights(1);
+	 			        rr.setDeleteRights(1);
+	 			        rr.setImportRights(1);
+	 			        rr.setExportRights(1);
+	 			        rr.setViewRights(1);
+	 	       	peList = peService.getAllPrincipalEmployerForAdmin();
+	 	       }else {
+	 	       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/workorders/list");
+	 	       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+	 	       }
+	 	       }
 	        request.setAttribute("principalEmployers", peList);
-		 
+	        request.setAttribute("UserPermission", rr);
 	        if (principalEmployerId != null) {
 	            request.setAttribute("selectedPrincipalEmployerId", principalEmployerId);
 	            

@@ -39,16 +39,19 @@ import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.service.CommonService;
+import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,6 +69,9 @@ public class WorkmenController {
 	
 	@Autowired
 	CommonService commonService;
+	
+	@Autowired
+	PrincipalEmployerService peService;
 	
 	@GetMapping("/addQuickOB")
     public String createGatePass(HttpServletRequest request,HttpServletResponse response) {
@@ -351,8 +357,15 @@ public class WorkmenController {
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
     	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/list");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
     	request.setAttribute("principalEmployers", peList);
     	  request.setAttribute("Dept", departments);
+    	  
 		return "contractWorkmen/approverList";
 	}
     
@@ -591,7 +604,11 @@ public class WorkmenController {
    	public String blockListFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   		List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/blockListFilter");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -611,6 +628,7 @@ public class WorkmenController {
     	try {
 			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus(),GatePassType.CREATE.getStatus());
@@ -632,7 +650,11 @@ public class WorkmenController {
    	public String unblockListFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   		List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/unblockListFilter");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -652,6 +674,7 @@ public class WorkmenController {
     	try {
 			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus(),GatePassType.BLOCK.getStatus());
@@ -675,7 +698,11 @@ public class WorkmenController {
    	public String blackListFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   		List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/blackListFilter");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -694,6 +721,7 @@ public class WorkmenController {
     	try {
 			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus(),GatePassType.CREATE.getStatus());
@@ -716,7 +744,11 @@ public class WorkmenController {
    	public String deblackListFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   		List<PrincipalEmployer> listDtos =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/deblackListFilter");
+   	    listDtos = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -757,7 +789,11 @@ public class WorkmenController {
    	public String cancelFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   		List<PrincipalEmployer> listDtos =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/cancelFilter");
+   	    listDtos = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -798,7 +834,11 @@ public class WorkmenController {
    	public String lostordamageFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   		List<PrincipalEmployer> listDtos =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/lostordamageFilter");
+   	    listDtos = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -818,6 +858,7 @@ public class WorkmenController {
     	try {
 			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus(),GatePassType.CREATE.getStatus());

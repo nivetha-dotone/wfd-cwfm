@@ -161,13 +161,21 @@ table th {
 </head>
 <body>
 	<div class="page-header">
+		 <div>
+    <c:if test="${UserPermission.addRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
+    </c:if>
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContractorView'${cmSPRINCIPALEMPLOYER.UNITID}')">View</button>
 
-		<button type="submit" class="btn btn-default "
-			onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button>
-		<button type="submit" class="btn btn-default"
-			onclick="redirectToContractorView()">View</button>
-		<button type="button" class="btn btn-default " onclick="exportToCSVFormat()">Export</button>
-
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSVFormat()">Export</button>
+    	</c:if>
+    </div>
 	</div>
 	<div class="table-container">
 		<table id="contractorlisttable" cellspacing="0" cellpadding="0">
@@ -209,5 +217,6 @@ table th {
 				</c:forEach>
 			</tbody>
 		</table>
+		</div>
 </body>
 </html>

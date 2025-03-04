@@ -92,6 +92,13 @@ public class OrgLevelServiceImpl implements OrgLevelService {
 	public boolean isDuplicateEntry(int orgLevelDefId, String name) {
 		return orgLevelDao.isDuplicateEntry(orgLevelDefId,name);
 	}
-	
+	 @Override
+	    public void deleteOrgLevel(List<Long> orgLevelDefId) {
+		 orgLevelDao.deleteOrgLevel(orgLevelDefId);
+	    }
+	 @Override
+	    public List<OrgLevel> getAllOrgLevel() {
+	        return orgLevelDao.getAllOrgLevel();
+	    }
 }
 

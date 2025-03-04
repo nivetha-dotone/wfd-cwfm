@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.pojo.OrgLevel;
@@ -330,6 +332,36 @@ public class OrgLevelController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("An error occurred: " + e.getMessage());
         }
+    }
+    @PostMapping("/deleteOrgLevel")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteOrgLevel(@RequestBody List<Long> orgLevelDefId) {
+        System.out.println("Received orgLevelDefId: " + orgLevelDefId);
+        Map<String, Object> response = new HashMap<>();
+        if (orgLevelDefId == null || orgLevelDefId.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "No IDs received.");
+            return ResponseEntity.badRequest().body(response);
+        }
+        try {
+        	orgLevelService.deleteOrgLevel(orgLevelDefId);
+            response.put("success", true);
+            response.put("message", "Selected deleteOrgLevel deleted successfully.");
+        } catch (DataIntegrityViolationException ex) {
+            response.put("success", false);
+            response.put("message", ex.getMessage());
+        } catch (Exception ex) { // Catch any other exceptions
+            response.put("success", false);
+            response.put("message", "An unexpected error occurred: " + ex.getMessage());
+            ex.printStackTrace(); // Print stack trace for debugging
+        }
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/showOrgLevelPage")
+    public String showOrgLevelPage(Model model) {
+        List<OrgLevel> name = orgLevelService.getAllOrgLevel();
+        model.addAttribute("name", name);
+        return "org-level/orgLevels";
     }
 
 

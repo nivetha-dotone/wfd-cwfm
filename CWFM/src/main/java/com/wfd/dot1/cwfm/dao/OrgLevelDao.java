@@ -30,6 +30,7 @@ public interface OrgLevelDao {
 	 List<OrgLevelEntryDTO> getAvailableEntries(Long orgLevelDefId);
 	    List<OrgLevelEntryDTO> getSelectedEntries(Long orgLevelDefId);
 		boolean isDuplicateEntry(int orgLevelDefId, String name);
-	    
+		void deleteOrgLevel(List<Long> orgLevelDefId);
+		 List<OrgLevel> getAllOrgLevel();
 }
 

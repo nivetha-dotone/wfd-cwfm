@@ -31,6 +31,7 @@ import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.OrgLevel;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.State;
@@ -202,10 +203,20 @@ public class CommonDaoImpl implements CommonDao {
 	 public String getduplicategmmaster() {
 		    return QueryFileWatcher.getQuery("CHECK_DUPLICATE_GMMASTER");
 		}
+	 public String getWorkOrdersByContractorIdAndUnitId() {
+		    return QueryFileWatcher.getQuery("GET_WORKORDERS_BY_CONTRACTORID_UNITID");
+		}
 	 
 	 public String getPageActionPermissionForRoleQuery() {
 		 return QueryFileWatcher.getQuery("HAS_PAGE_ACTION_PERMISSION_FOR_ROLE");
 	 }
+	 public String isDuplicateGMName() {
+		 return QueryFileWatcher.getQuery("IS_DUPLICATE_GM_NAME");
+	 }
+	 public String deleteRoleRights() {
+		 return QueryFileWatcher.getQuery("DELETE_ROLE_RIGHTS");
+	 }
+	
 	@Autowired
 	  private CommonService commonService;
 
@@ -232,7 +243,8 @@ public class CommonDaoImpl implements CommonDao {
 
 	    public List<Workorder> getWorkOrdersByContractorIdAndUnitId(Long contractorId, Long unitId) {
 	        List<Workorder> workOrders = new ArrayList<>();
-	        String sql = "SELECT WORKORDERID, SAP_WORKORDER_NUM, CONTRACTORID, VALIDFROM, VALIDDT, UNITID FROM Workorder WHERE CONTRACTORID = ? AND UNITID = ?";
+	        String query = getWorkOrdersByContractorIdAndUnitId();
+	       // String sql = "SELECT WORKORDERID, SAP_WORKORDER_NUM, CONTRACTORID, VALIDFROM, VALIDDT, UNITID FROM Workorder WHERE CONTRACTORID = ? AND UNITID = ?";
 	        return workOrders;
 	    }
 	    
@@ -789,17 +801,19 @@ public class CommonDaoImpl implements CommonDao {
 	        }
 	    }
 		public boolean isDuplicateGMName(Long gmTypeId, String gmName) {
-		    String query = "SELECT COUNT(*) from CMSGMTYPE cgt join CMSGENERALMASTER cgm on cgt.GMTYPEID=cgm.GMTYPEID where cgm.GMNAME=? and cgt.GMTYPEID=? and cgm.ISACTIVE=1 ";
+			String query = isDuplicateGMName();
+		   // String query = "SELECT COUNT(*) from CMSGMTYPE cgt join CMSGENERALMASTER cgm on cgt.GMTYPEID=cgm.GMTYPEID where cgm.GMNAME=? and cgt.GMTYPEID=? and cgm.ISACTIVE=1 ";
 		    Integer count = jdbcTemplate.queryForObject(query, new Object[]{gmName, gmTypeId}, Integer.class);
 
 		    return count != null && count > 0; 
 		}
 		
 		public void deleteRoleRights(List<Integer> roleIds) {
-		    String sql = "UPDATE CMSROLERIGHTS SET DELETED_FLAG = '1' WHERE ROLE_RIGHT_ID = ?";
+			String query = deleteRoleRights();
+		  //  String sql = "UPDATE CMSROLERIGHTS SET DELETED_FLAG = '1' WHERE ROLE_RIGHT_ID = ?";
 		    for (Integer roleId : roleIds) {
 		    	 System.out.println("Updating ROLE_RIGHT_ID: " + roleId);
-		    	    int updatedRows = jdbcTemplate.update(sql, roleId);
+		    	    int updatedRows = jdbcTemplate.update(query, roleId);
 		    	    System.out.println("Rows affected: " + updatedRows);
 		    }
 		}
@@ -818,5 +832,18 @@ public class CommonDaoImpl implements CommonDao {
 			}
 			return rr;
 		}
+
+		@Override
+		public void deleteOrgLevel(List<Long> orgLevelDefIds) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<OrgLevel> getAllOrgLevels() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 		
+	    
 }

@@ -16,29 +16,12 @@
   <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/commonjs.js"></script> 
     <script src="resources/js/jquery-3.6.0.min.js"></script> -->
- <style>
-  .success {
-        color: green;
-        font-weight: bold;
-        padding: 10px;
-        background-color: #e0ffe0;
-        border: 1px solid green;
-        margin-bottom: 1rem;
-    }
-    .error {
-        color: red;
-        font-weight: bold;
-        padding: 10px;
-        background-color: #ffe0e0;
-        border: 1px solid red;
-        margin-bottom: 1rem;
-    }
- label {
-    color: black;
-}
+    <style>
+ 
+ 
     body {
         background-color: #FFFFFF; /* White background for the page */
-        font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
+         font-family: 'Noto Sans', sans-serif;
     }
 
     .action-bar {
@@ -86,15 +69,32 @@
     }
 
     table {
-        width: 30%;
+        width: 100%;
         border-collapse: collapse;
     }
 
-    th, td {
+    td {
         padding: 10px;
         text-align: left;
         border: 1px solid #ddd;
         font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+         font-family: 'Noto Sans', sans-serif;
+         
+    color: #898989;/* Label text color */
+  padding: .2em .6em .3em;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 1;
+    white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+    }
+     th {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+          font-weight: bold;
     }
 
     th {
@@ -108,14 +108,15 @@
     }
 
     .page-header {
-        display: flex;
+        /* display: flex; */
         align-items: center;
-        justify-content: flex-start; 
-    gap: 10px; 
-        padding: 8px; 
+        justify-content: space-between; /* Distribute space between search and buttons */
+        padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
         border-bottom: 1px solid #ccc; /* Subtle border for separation */
+        gap: 10px;
     }
+    
 
     .page-header > div {
         display: flex;
@@ -152,6 +153,7 @@
         padding: 8px 10px; /* Adjusted padding for better spacing */
           background-color: #E0E0E0;  /* Light background color to match grid header */
         color: #333; /* Text color for readability */
+          font-weight: bold;
     }
        table th {
         border-top: 0.0625rem solid var(--zed_sys_color_border_lowEmphasis); /* Top border color */
@@ -163,11 +165,12 @@
         line-height: 1.2rem; /* Reduced line height */
         letter-spacing: normal; /* Letter spacing */
         font-family: 'Noto Sans', sans-serif; /* Font family */
-        font-weight: 400; /* Font weight */
+         font-weight: bold;
         text-align: center; /* Center align text */
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
+   
 </style>
 <style>
     #gmTypeName {
@@ -229,7 +232,7 @@
     <input type="text" id="selectedRoleId" value="${sessionScope.selectedRoleId}" />
 </form> --%>
 <div class="page-header">
-  <label for="gmTypeName">GM Type Name:</label>
+  <label for="gmTypeName"style=" color: darkcyan;">GM Type Name:</label>
   
         <input type="text" id="gmTypeName" name="gmTypeName" required  oninput="convertToUppercase(this)">
       <%--  <c:if test="${userRights[0].addRights == 0}"> --%>

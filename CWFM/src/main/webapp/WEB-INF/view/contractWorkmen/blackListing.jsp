@@ -255,8 +255,19 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchBlackList()">Search</button>
   </div>
     <div>
+    <c:if test="${UserPermission.addRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
+    </c:if>
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenBlackView()">View</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
+    	</c:if>
     </div>
 </div>
 
