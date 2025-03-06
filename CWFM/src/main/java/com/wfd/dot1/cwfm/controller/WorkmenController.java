@@ -634,7 +634,7 @@ public class WorkmenController {
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus(),GatePassType.CREATE.getStatus());
         		
 			}else {	
-				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLOCK.getStatus());
+				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLOCK.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -680,7 +680,7 @@ public class WorkmenController {
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus(),GatePassType.BLOCK.getStatus());
         		
 			}else {	
-				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
+				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -727,7 +727,7 @@ public class WorkmenController {
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus(),GatePassType.CREATE.getStatus());
         		
 			}else {	
-				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLACKLIST.getStatus());
+				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLACKLIST.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -772,7 +772,7 @@ public class WorkmenController {
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus());
         		
 			}else {	
-				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
+				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -817,7 +817,7 @@ public class WorkmenController {
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CANCEL.getStatus(),GatePassType.CREATE.getStatus());
         		
 			}else {	
-				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CANCEL.getStatus());
+				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.CANCEL.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -864,7 +864,7 @@ public class WorkmenController {
     			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus(),GatePassType.CREATE.getStatus());
         		
 			}else {	
-				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.LOSTORDAMAGE.getStatus());
+				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.LOSTORDAMAGE.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -1332,7 +1332,7 @@ public class WorkmenController {
     		//write union for renewal pending and renewed
 				listDto= workmenService.getRenewListingDetails( String.valueOf(user.getUserId()), GatePassType.CREATE.getStatus(), GatePassStatus.APPROVED.getStatus(), deptId, principalEmployerId) ;
     		}else {	
-    			listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.RENEW.getStatus());
+    			listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.RENEW.getStatus());
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);

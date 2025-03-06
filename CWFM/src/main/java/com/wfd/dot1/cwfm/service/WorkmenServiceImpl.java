@@ -184,8 +184,20 @@ public class WorkmenServiceImpl implements WorkmenService{
 			status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),GatePassStatus.APPROVED.getStatus(),GatePassType.CREATE.getStatus());
 			}
 		}else {
+			boolean isLastApprover=false;
+			int workFlowTypeId = workmenDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
+			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
+				 isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(),String.valueOf(dto.getGatePassType()));
+			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
+				if(GatePassType.CREATE.getStatus().equals(dto.getGatePassType())) {
+				 isLastApprover = workmenDao.isLastApproverForParallel(String.valueOf(dto.getGatePassType()),dto.getTransactionId(),dto.getRoleId());
+				}else {
+				 isLastApprover = workmenDao.isLastApproverForParallelGatePassAction(String.valueOf(dto.getGatePassType()),dto.getGatePassId(),dto.getRoleId());
+				}
+			}
+			
 			//check if last approver, if last approver change the status of gate pass main to approved
-			boolean isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(),String.valueOf(dto.getGatePassType()));
+			
 			if(isLastApprover) {
 				if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()) || dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
 					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
@@ -459,5 +471,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 		}
 		return transactionId;
+	}
+	
+	@Override
+	public List<GatePassListingDto> getGatePassActionListingForApprovers(String unitId ,String deptId,MasterUser user,String gatePassTypeId) {
+		int workFlowTypeId = workmenDao.getWorkFlowTYpe(unitId);
+			return workmenDao.getGatePassActionListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
 }

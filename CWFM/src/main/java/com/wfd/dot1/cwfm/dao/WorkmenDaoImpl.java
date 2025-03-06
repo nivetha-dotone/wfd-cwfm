@@ -134,6 +134,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 public String getAllRenewForContractor() {
 		 return QueryFileWatcher.getQuery("GET_ALL_RENEW_FOR_CREATOR");
 	 }
+	 
+	 public String getAllGatePassActionForSquential() {
+		    return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_ACTION_FOR_SEQUENTIAL_APPROVER");
+		}
+	 
+	 public String getAllGatePassActionForParallel() {
+		    return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_ACTION_FOR_PARALLEL_APPROVER");
+		}
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method "+userAccount);
@@ -513,11 +521,11 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			query=this.getAllGatePassForSquential();
 			log.info("Query to getGatePassListingForApprovers "+query);
 			
-			 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,roleId,gatePassTypeId,gatePassTypeId,deptId,unitId);
+			 rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,roleId,gatePassTypeId);
 		}else {
 			query=this.getAllGatePassForParallel();
 			log.info("Query to getGatePassListingForApprovers "+query);
-			 rs = jdbcTemplate.queryForRowSet(query,roleId,roleId,gatePassTypeId,deptId,unitId);
+			 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
 		}
 		
 		while(rs.next()) {
@@ -1653,5 +1661,168 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
 }
+
+@Override
+public List<GatePassListingDto> getGatePassActionListingForApprovers(String roleId,int workFlowType,String gatePassTypeId,String deptId,String unitId) {
+	log.info("Entering into getGatePassListingForApprovers dao method ");
+	List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
+	SqlRowSet rs =null;
+	String query=null;
+	if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
+		query=this.getAllGatePassActionForSquential();
+		log.info("Query to getGatePassListingForApprovers "+query);
+		
+		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,gatePassTypeId,gatePassTypeId,roleId,deptId,unitId);
+	}else {
+		query=this.getAllGatePassActionForParallel();
+		log.info("Query to getGatePassListingForApprovers "+query);
+		 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
+	}
+	
+	while(rs.next()) {
+		GatePassListingDto dto = new GatePassListingDto();
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId((rs.getString("GatePassId")));
+		dto.setFirstName(rs.getString("firstName"));
+		dto.setLastName(rs.getString("lastName"));
+		dto.setGender(rs.getString("GMNAME"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setContractorName(rs.getString("ContractorName"));
+		dto.setVendorCode(rs.getString("VendorCode"));
+		dto.setUnitName(rs.getString("UnitName"));
+		String gatePassType = rs.getString("GatePassTypeId");
+		if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+			dto.setGatePassType("Create");
+		}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+			dto.setGatePassType("Block");
+		}
+		else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+			dto.setGatePassType("Unblock");
+		}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+			dto.setGatePassType("Blacklist");
+		}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+			dto.setGatePassType("Deblacklist");
+		}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+			dto.setGatePassType("Cancel");
+		}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+			dto.setGatePassType("Lost/Damage");
+		}
+		String status =rs.getString("GatePassStatus");
+		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+			dto.setStatus("Approval Pending");
+		}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+			dto.setStatus("Approved");
+		}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+			dto.setStatus("Rejected");
+		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+			dto.setStatus("Draft");
+		}
+		listDto.add(dto);
+	}
+	log.info("Exiting from getGatePassListingForApprovers dao method "+listDto.size());
+	return listDto;
+}
+
+@Override
+public int getWorkFlowTYpeByTransactionId(String transactionId) {
+	log.info("Entering into getWorkFlowTYpe dao method ");
+	int workflowTypeId = 0;
+	String query = "select distinct gpwft.WorkflowType "
+			+ " from GATEPASSMAIN gpm  "
+			+ " join CMSPRINCIPALEMPLOYER CPE on cpe.UNITID=gpm.UnitId "
+			+ " join GATEPASSWORKFLOWTYPE gpwft on gpwft.BusinessTypeId = cpe.BUSINESSTYPE "
+			+ " WHERE gpm.TransactionId=? and gpwft.WorkflowType in ('1','2','3')";
+	log.info("Query to getWorkFlowTYpe "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
+	if(rs.next()) {
+		workflowTypeId = rs.getInt("WorkflowType");
+	}
+	log.info("Exiting from getWorkFlowTYpe dao method "+transactionId);
+	return workflowTypeId;
+}
+@Override
+public boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId) {
+    boolean status = false;
+
+    String query = "WITH RequiredApprovers AS (  "
+            + "    SELECT ROLE_ID   "
+            + "    FROM GATEPASSAPPROVERHIERARCHY   "
+            + "    WHERE ACTION_ID = ? AND [INDEX] != 0  "
+            + "),  "
+            + "ApprovedRoles AS (  "
+            + "    SELECT DISTINCT RoleId   "
+            + "    FROM GATEPASSAPPROVALSTATUS   "
+            + "    WHERE TransactionId = ? and GatePassTypeId=? "
+            + ")  "
+            + "SELECT CASE   "
+            + "         WHEN (SELECT COUNT(*) FROM ApprovedRoles) = (SELECT COUNT(*) FROM RequiredApprovers)  "
+            + "         AND EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?)  "
+            + "         THEN 'YES'   "
+            + "         ELSE 'NO'   "
+            + "       END AS IsLastApprover";
+
+    try {
+        // Ensure proper data type conversion
+        int actionId = Integer.parseInt(gatePassTypeId);
+        int approverRoleId = Integer.parseInt(roleId);
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, actionId, transactionId,actionId, approverRoleId);
+        if (rs.next()) {
+            String result = rs.getString("IsLastApprover");
+            status = "YES".equals(result);
+        }
+    } catch (NumberFormatException e) {
+        log.error("Invalid number format: gatePassTypeId={}, roleId={}", gatePassTypeId, roleId, e);
+    } catch (Exception e) {
+        log.error("Error executing isLastApproverForParallel query", e);
+    }
+
+    log.info("Exit from isLastApproverForParallel method = " + status);
+    return status;
+}
+
+@Override
+public boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId) {
+    boolean status = false;
+
+    String query = "WITH RequiredApprovers AS (  "
+            + "    SELECT ROLE_ID   "
+            + "    FROM GATEPASSAPPROVERHIERARCHY   "
+            + "    WHERE ACTION_ID = ? AND [INDEX] != 0  "
+            + "),  "
+            + "ApprovedRoles AS (  "
+            + "    SELECT DISTINCT RoleId   "
+            + "    FROM GATEPASSAPPROVALSTATUS   "
+            + "    WHERE GatePassId = ?  and GatePassTypeId=?"
+            + ")  "
+            + "SELECT CASE   "
+            + "         WHEN (SELECT COUNT(*) FROM ApprovedRoles) = (SELECT COUNT(*) FROM RequiredApprovers)  "
+            + "         AND EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?)  "
+            + "         THEN 'YES'   "
+            + "         ELSE 'NO'   "
+            + "       END AS IsLastApprover";
+
+    try {
+        // Ensure proper data type conversion
+        int actionId = Integer.parseInt(gatePassTypeId);
+        int approverRoleId = Integer.parseInt(roleId);
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, actionId, gatePassId,actionId, approverRoleId);
+        if (rs.next()) {
+            String result = rs.getString("IsLastApprover");
+            status = "YES".equals(result);
+        }
+    } catch (NumberFormatException e) {
+        log.error("Invalid number format: gatePassTypeId={}, roleId={}", gatePassTypeId, roleId, e);
+    } catch (Exception e) {
+        log.error("Error executing isLastApproverForParallel query", e);
+    }
+
+    log.info("Exit from isLastApproverForParallel method = " + status);
+    return status;
+}
+
+
 
 }

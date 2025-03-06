@@ -86,7 +86,7 @@ function loadCommonList(path,heading) {
                 // Hide message after 5 seconds
                 setTimeout(() => {
                     messageDiv.style.display = "none";
-                }, 50000);
+                }, 5000);
             }
               resetSessionTimer();
         }

@@ -1,16 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workmen Onboarding List</title>
-    <script src="resources/js/cms/workmen.js"></script>
-
-
+<title>Workflow</title>
+   <script src="resources/js/cms/workflow.js"></script>
     <style>
         /* Add your styles here */
         .success {
@@ -138,7 +136,7 @@
     }
 
     table {
-        width: 100%;
+        width: 30%;
         border-collapse: collapse;
     }
 
@@ -221,88 +219,70 @@
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
     </style>
+  
 </head>
 <body>
-<div class="page-header">
-   <!--  <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
-    </form> -->
-        <div>
-   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
-         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
-         <option value="">Select Principal Employer</option>
-    <c:forEach items="${principalEmployers}" var="pe">
-       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.name}
-        </option> --%>
-        <option value="${pe.id}">${pe.description}</option>
-    </c:forEach>
-</select>
-<input type="hidden" id="principalEmployerId" name="principalEmployerId">
 
-<label for="departmentId" style=" color: darkcyan;"   >Department:</label>
-         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
-         <option value="">Select Department</option>
-    <c:forEach items="${Dept}" var="dept">
-       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.name}
-        </option> --%>
-        <option value="${dept.id}">${dept.description}</option>
-    </c:forEach>
-</select>
-<input type="hidden" id="deptId" name="deptId">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE()">Search</button>
-  </div>
-    <div>
-    
-    <c:if test="${UserPermission.editRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenEdit()">Edit</button> 
-     </c:if>
-     <c:if test="${UserPermission.viewRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
+   
 
-     </c:if>
-       <c:if test="${UserPermission.exportRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
-    	</c:if>
+   <div class="page-header">
+   	 <label for="gmTypeId">Select Module:</label>
+         <select id="gmTypeId" name="gmTypeId" onchange="getModuleData()" required>
+        <option value="">-- Select Module --</option>
+        <c:forEach items="${Modules}" var="module">
+            <option value="${module.gmTypeId}" <c:if test="${module.gmTypeId == gmTypeId}">selected</c:if>>${module.gmType}</option>
+        </c:forEach>
+    </select>
+        <button type="button" class="btn btn-default"  onclick="addNewRow()">Add New Row</button>
+        <button type="submit" class="btn btn-default" onclick="submitOrgLevel()">Save</button>
+        <button type="submit" class="btn btn-default" onclick="deleteSelectedOrgLevel()">Delete Selected</button>
+        <button type="submit" class="btn btn-default" onclick="exportOrgLevelCSV()">Export</button>
+    </div>
+
+       <div class="table-container">
+        <form method="post" action="/save">
+    <table id="orgLevelTable">
+         <thead>
+                <tr>
+                    <th class="checkbox-cell">
+                        <input type="checkbox" id="selectAllOrgLevelCheckbox" onchange="toggleSelectAllOrgLevel()">
+                    </th>
+                    <th>Org Level Name</th>
+                    <th>Short Name</th>
+                    <th>Hierarchy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Render rows from server -->
+                <c:forEach items="${orgLevels}" var="orgLevel">
+                    <tr data-row-id="${orgLevel.orgLevelDefId}">
+                        <td class="checkbox-cell">
+                        <input type="hidden" name="orgLevelDefId[]" value="${orgLevel.orgLevelDefId}">
+                            <input type="checkbox" name="selectedOrgLevels" value="${orgLevel.name}" data-row-id="${orgLevel.orgLevelDefId}">
+                        </td>
+                        <td><input type="text" name="orgLevelName[]" value="${orgLevel.name}" required></td>
+                        <td><input type="text" name="shortName[]" value="${orgLevel.shortName}" required></td>
+                        <td><input type="number" name="hierarchy[]" value="${orgLevel.orgHierarchyLevel}" required></td>
+                        
+                    </tr>
+                </c:forEach>
+
+                <!-- Default empty row when no data -->
+                <c:if test="${orgLevels == null || orgLevels.isEmpty()}">
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" name="selectedOrgLevels">
+                        </td>
+                        <td><input type="text" name="orgLevelName[]" placeholder="Org Level Name" required></td>
+                        <td><input type="text" name="shortName[]" placeholder="Short Name" required></td>
+                        <td><input type="number" name="hierarchy[]" placeholder="Hierarchy" required></td>
+                    </tr>
+                </c:if>
+            </tbody>
+    </table>
+</form>
 
     </div>
-</div>
 
-     <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
-     <div id="messageDiv" style="font-weight: bold; margin-top: 10px;"></div>
-    
-     
-                         <div class="table-container">
-                        
-    <table id="workmenTable"  cellspacing="0" cellpadding="0" >
-        <thead>
-<tr >
-                    <td >
-                        <input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()" >
-                    </td> 
-                    <!-- Add more table headers for each column -->
-                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.firstName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.gender"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.dateOfBirth"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.status"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-            </tr>
-        </thead>
-        <tbody>
-            
-        </tbody>
-    </table>
-    
-                        </form>
-                         </div>
 </body>
 </html>

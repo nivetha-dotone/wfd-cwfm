@@ -104,4 +104,13 @@ public interface WorkmenDao {
 
 	GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatePassId);
 
+	List<GatePassListingDto> getGatePassActionListingForApprovers(String roleId, int workFlowType,
+			String gatePassTypeId, String deptId, String unitId);
+
+	int getWorkFlowTYpeByTransactionId(String transactionId);
+
+	boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId);
+
+	boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId);
+
 }

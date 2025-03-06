@@ -890,7 +890,7 @@ for (const [key, value] of data.entries()) {
     
     // Construct the URL based on gatePassId, userId, and docType
     const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
-	alert("url is"+url);
+	//alert("url is"+url);
     // Create a temporary anchor element
     const a = document.createElement('a');
     a.href = url;

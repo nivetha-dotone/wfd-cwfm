@@ -73,5 +73,8 @@ public interface WorkmenService {
 
 	String renewGatePass(GatePassMain gatePassMain);
 
+	List<GatePassListingDto> getGatePassActionListingForApprovers(String unitId, String deptId, MasterUser user,
+			String gatePassTypeId);
+
 
 }	
