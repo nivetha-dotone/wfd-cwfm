@@ -37,6 +37,7 @@
         th, td {
             padding: 10px;
             text-align: left;
+
             border: 1px solid #ddd;
         }
 
@@ -218,71 +219,114 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
+    
+    .error-row {
+    background-color: #ffcccc !important;
+}
+
+.error-message-row .error-message-cell {
+    color: red;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 6px 10px;
+    background-color: #ffe5e5;
+    border-top: none;
+}
+    
     </style>
-  
+  <script src="resources/js/cms/workflow.js"></script>
 </head>
 <body>
 
    
+<div class="page-header" method="POST" onsubmit="return validateMasterValue()">
+    
+    <label for="gmTypeId" style="color: darkcyan;">Principal Employer:</label>
+        <select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getBusinessType(this.value)" required>
+                                <option value="">Please select Principal Employer</option>
+								<c:forEach var="pe" items="${PrincipalEmployer}">
+                					<option value="${pe.unitId}">${pe.name}</option>
+            					</c:forEach>
+                                </select>
+        
+       
+  
+    
+    
+        <label for="masterName" style="color: darkcyan;">Business Type</label>
+         <select class="custom-select" id="businessType" name="businessTypeId" required>
+                                <option value="">Please select Business Type</option>
+								
+                                </select>
+       
 
-   <div class="page-header">
-   	 <label for="gmTypeId">Select Module:</label>
-         <select id="gmTypeId" name="gmTypeId" onchange="getModuleData()" required>
-        <option value="">-- Select Module --</option>
-        <c:forEach items="${Modules}" var="module">
-            <option value="${module.gmTypeId}" <c:if test="${module.gmTypeId == gmTypeId}">selected</c:if>>${module.gmType}</option>
-        </c:forEach>
-    </select>
-        <button type="button" class="btn btn-default"  onclick="addNewRow()">Add New Row</button>
-        <button type="submit" class="btn btn-default" onclick="submitOrgLevel()">Save</button>
-        <button type="submit" class="btn btn-default" onclick="deleteSelectedOrgLevel()">Delete Selected</button>
-        <button type="submit" class="btn btn-default" onclick="exportOrgLevelCSV()">Export</button>
+        <label for="masterValue" style="color: darkcyan;">Module:</label>
+         <select class="custom-select" id="module" name="moduleId"  required>
+                                <option value="">Please select Module</option>
+								<c:forEach var="pe" items="${Modules}">
+                					<option value="${pe.gmId}">${pe.gmName}</option>
+            					</c:forEach>
+                                </select>
+                                <label for="masterValue" style="color: darkcyan;">Action:</label>
+                                  <select class="custom-select" name="action" id="actionDropdown" onchange="onModuleChange()"  required>
+                        <option value="">Please select Action</option>
+                        <c:forEach var="pe" items="${Actions}">
+                            <option value="${pe.gmId}">${pe.gmName}</option>
+                        </c:forEach>
+                    </select>
+
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Export</button>
+         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Cancel</button>
+          <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
 
-       <div class="table-container">
-        <form method="post" action="/save">
-    <table id="orgLevelTable">
-         <thead>
-                <tr>
-                    <th class="checkbox-cell">
-                        <input type="checkbox" id="selectAllOrgLevelCheckbox" onchange="toggleSelectAllOrgLevel()">
-                    </th>
-                    <th>Org Level Name</th>
-                    <th>Short Name</th>
-                    <th>Hierarchy</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Render rows from server -->
-                <c:forEach items="${orgLevels}" var="orgLevel">
-                    <tr data-row-id="${orgLevel.orgLevelDefId}">
-                        <td class="checkbox-cell">
-                        <input type="hidden" name="orgLevelDefId[]" value="${orgLevel.orgLevelDefId}">
-                            <input type="checkbox" name="selectedOrgLevels" value="${orgLevel.name}" data-row-id="${orgLevel.orgLevelDefId}">
-                        </td>
-                        <td><input type="text" name="orgLevelName[]" value="${orgLevel.name}" required></td>
-                        <td><input type="text" name="shortName[]" value="${orgLevel.shortName}" required></td>
-                        <td><input type="number" name="hierarchy[]" value="${orgLevel.orgHierarchyLevel}" required></td>
-                        
-                    </tr>
-                </c:forEach>
+  <div style="padding:10px;">
 
-                <!-- Default empty row when no data -->
-                <c:if test="${orgLevels == null || orgLevels.isEmpty()}">
-                    <tr>
-                        <td class="checkbox-cell">
-                            <input type="checkbox" name="selectedOrgLevels">
-                        </td>
-                        <td><input type="text" name="orgLevelName[]" placeholder="Org Level Name" required></td>
-                        <td><input type="text" name="shortName[]" placeholder="Short Name" required></td>
-                        <td><input type="number" name="hierarchy[]" placeholder="Hierarchy" required></td>
-                    </tr>
-                </c:if>
-            </tbody>
+    <h3>Workflow Type</h3>
+    <label><input type="radio" name="workflowType" value="1" onchange="toggleHierarchyColumn()"> Auto</label>
+    <label><input type="radio" name="workflowType" value="2" onchange="toggleHierarchyColumn()"> Sequential</label>
+    <label><input type="radio" name="workflowType" value="3" onchange="toggleHierarchyColumn()"> Parallel</label>
+
+    <h3>Approver Hierarchy</h3>
+    <button type="button" onclick="addRow()">Add New Row</button>
+    <button type="button" onclick="deleteSelected()">Delete Selected</button>
+    <br><br>
+
+    <table id="approverTable" border="1">
+        <thead>
+            <tr>
+                <th>Select</th>
+                
+                <th>Role Name</th>
+                <th class="hierarchy-col">Hierarchy Index</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
     </table>
-</form>
 
+    <!-- Hidden Template Row -->
+    <table style="display: none;">
+        <tbody>
+            <tr id="templateRow">
+                <td><input type="checkbox" class="rowSelect"></td>
+                
+                <td>
+                    <select class="custom-select" name="role" required>
+                        <option value="">Please select Role</option>
+                        <c:forEach var="pe" items="${Roles}">
+                            <option value="${pe.gmId}">${pe.gmName}</option>
+                        </c:forEach>
+                    </select>
+                </td>
+                <td class="hierarchy-col">
+                    <input type="number" name="hierarchyIndex" required>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <button type="button" onclick="saveWorkflow()">Save Workflow</button>
     </div>
-
 </body>
 </html>

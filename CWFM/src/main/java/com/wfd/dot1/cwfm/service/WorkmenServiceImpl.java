@@ -81,7 +81,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public String saveGatePass(GatePassMain gatePassMain) {
 		String transactionId =null;
 		try {
-			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getPrincipalEmployer());
+			int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(gatePassMain.getPrincipalEmployer(),GatePassType.CREATE.getStatus());
 			gatePassMain.setWorkFlowType(workFlowTypeId);
 			
 			int dotTypeId = workmenDao.getDOTTYpe(gatePassMain.getPrincipalEmployer());
@@ -149,7 +149,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	@Override
 	public List<GatePassListingDto> getGatePassListingForApprovers(String unitId ,String deptId,MasterUser user,String gatePassTypeId) {
-		int workFlowTypeId = workmenDao.getWorkFlowTYpe(unitId);
+		int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(unitId,gatePassTypeId);
 			return workmenDao.getGatePassListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
 	@Override
@@ -185,7 +185,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			}
 		}else {
 			boolean isLastApprover=false;
-			int workFlowTypeId = workmenDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
+			int workFlowTypeId = workmenDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId(),dto.getGatePassType());
 			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 				 isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(),String.valueOf(dto.getGatePassType()));
 			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
@@ -229,7 +229,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 					||dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()) || dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())
 					) {
 				
-			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getUnitId());
+			int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(gatePassMain.getUnitId(),dto.getGatePassType());
 			
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId() || dto.getGatePassType().equalsIgnoreCase(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
@@ -475,7 +475,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	
 	@Override
 	public List<GatePassListingDto> getGatePassActionListingForApprovers(String unitId ,String deptId,MasterUser user,String gatePassTypeId) {
-		int workFlowTypeId = workmenDao.getWorkFlowTYpe(unitId);
+		int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(unitId,gatePassTypeId);
 			return workmenDao.getGatePassActionListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
 }

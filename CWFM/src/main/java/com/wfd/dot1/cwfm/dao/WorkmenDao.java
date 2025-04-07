@@ -107,10 +107,12 @@ public interface WorkmenDao {
 	List<GatePassListingDto> getGatePassActionListingForApprovers(String roleId, int workFlowType,
 			String gatePassTypeId, String deptId, String unitId);
 
-	int getWorkFlowTYpeByTransactionId(String transactionId);
+	int getWorkFlowTYpeByTransactionId(String transactionId,String actionId);
 
 	boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId);
 
 	boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId);
+
+	int getWorkFlowTYpeNew(String principalEmployer, String gatePassAction);
 
 }

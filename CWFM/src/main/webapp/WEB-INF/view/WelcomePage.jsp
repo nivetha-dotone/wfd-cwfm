@@ -19,13 +19,18 @@
        <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
      <script src="resources/js/cms/bill.js"></script>
+      <script src="resources/js/cms/workflow.js"></script>
    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   
-
+    function showSection(type) {
+        document.getElementById("sequentialSection").style.display = (type === 'sequential') ? 'block' : 'none';
+        document.getElementById("parallelSection").style.display = (type === 'parallel') ? 'block' : 'none';
+        document.getElementById("autoSection").style.display = (type === 'auto') ? 'block' : 'none';
+    }
 function redirectToPEAdd() {
     // Fetch the content of add.jsp using AJAX
     var xhr = new XMLHttpRequest();
@@ -2889,6 +2894,20 @@ table th {
             flex: 1; /* Inputs take available space */
             padding: 5px;
         } */
+        
+        .error-row {
+    background-color: #ffcccc !important;
+}
+
+.error-message-row .error-message-cell {
+    color: red;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 6px 10px;
+    background-color: #ffe5e5;
+    border-top: none;
+}
+        
     </style>
 </head>
 <body>

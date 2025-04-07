@@ -86,6 +86,10 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		    return QueryFileWatcher.getQuery("GET_WORKFLOW_TYPE_BY_PE");
 		}
 	 
+	 public String getWorkflowTypeNew() {
+		    return QueryFileWatcher.getQuery("GET_WORKFLOW_TYPE_BY_PE_ACTIONID");
+		}
+	 
 	 public String getDotType() {
 		    return QueryFileWatcher.getQuery("GET_DOT_TYPE_BY_PE");
 		}
@@ -323,6 +327,13 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		timestamp = new Timestamp(System.currentTimeMillis());
 		return timestamp;
 	}
+	public String getUpdateContractWorkmen() {
+		 return QueryFileWatcher.getQuery("UPDATE_CONTRACT_WORKMEN"); 
+	}
+	
+	public String getSaveContractWorkmen() {
+		 return QueryFileWatcher.getQuery("SAVE_CONTRACT_WORKMEN"); 
+	}
 	
 	@Override
 	public String saveGatePass(GatePassMain gatePassMain) {
@@ -340,7 +351,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	    	
 	    	Object[] parameters = prepareGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
 	    	 try {
-		            int result = jdbcTemplate.update(WorkmenQueryBank.UPDATE_CONTRACT_WORKMEN, parameters);
+	    		 String query = getUpdateContractWorkmen();
+		            int result = jdbcTemplate.update(query, parameters);
 		            if (result > 0) {
 		            	transId=gatePassMain.getTransactionId();
 		                log.info("GatePass saved successfully for transId: " + transId);
@@ -359,7 +371,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        Object[] parameters = prepareGatePassParameters(transId, gatePassMain); 
 
 	        try {
-	            int result = jdbcTemplate.update(WorkmenQueryBank.SAVE_CONTRACT_WORKMEN, parameters);
+	        	String query = getSaveContractWorkmen();
+	            int result = jdbcTemplate.update(query, parameters);
 	            if (result > 0) {
 	                log.info("GatePass saved successfully for transId: " + transId);
 	            } else {
@@ -573,12 +586,16 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return listDto;
 	}
 
+	public String getContractWorkmenDetails() {
+		 return QueryFileWatcher.getQuery("GET_CONTRACT_WORKMEN_DETAILS");
+	}
 	@Override
 	public GatePassMain getIndividualContractWorkmenDetails(String transactionId) {
 		log.info("Entering into getIndividualContractWorkmenDetails dao method ");
 		GatePassMain dto = null;
-		log.info("Query to getIndividualContractWorkmenDetails "+WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS,transactionId);
+		String query = getContractWorkmenDetails();
+		log.info("Query to getIndividualContractWorkmenDetails "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
 		if(rs.next()) {
 			dto = new GatePassMain();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -647,10 +664,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return dto;
 	}
 	
+	public String getAllCmsGeneralMasterForGatePass() {
+		return QueryFileWatcher.getQuery("GET_ALL_CMSGENERALMASTER_FOR_GATE_PASS");
+	}
 	@Override
 	public List<CmsGeneralMaster> getAllGeneralMastersForGatePass(GatePassMain gpm) {
 		log.info("Entering into getAllGeneralMastersForGatePass dao method ");
 		List<CmsGeneralMaster> gmList= new ArrayList<CmsGeneralMaster>();
+		String query = getAllCmsGeneralMasterForGatePass();
 		Object[] obj = new Object[] {gpm.getGender()!=null?gpm.getGender():' ',
 				gpm.getBloodGroup()!=null?gpm.getBloodGroup():' ',
 						gpm.getAccessArea()!=null?gpm.getAccessArea():' ',
@@ -658,8 +679,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 										gpm.getZone()!=null?gpm.getZone():' ',
 												gpm.getWageCategory()!=null?gpm.getWageCategory():' ',gpm.getBonusPayout()!=null?gpm.getBonusPayout():' ',
 														gpm.getDepartment()!=null?gpm.getDepartment():' ',gpm.getSubdepartment()!=null?gpm.getSubdepartment():' '};
-		log.info("Query to getAllGeneralMastersForGatePass "+WorkmenQueryBank.GET_ALL_CMSGENERALMASTER_FOR_GATE_PASS);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_ALL_CMSGENERALMASTER_FOR_GATE_PASS,obj);
+		log.info("Query to getAllGeneralMastersForGatePass "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,obj);
 		while(rs.next()) {
 			CmsGeneralMaster gm = new CmsGeneralMaster();
 			gm.setGmId(rs.getString("GMID"));
@@ -686,7 +707,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<MasterUser> getApproversForGatePass(String createdBy) {
+	public List<MasterUser> getApproversForGatePass(String createdBy) {//not required anymore
 		log.info("Entering into getApproversForGatePass dao method ");
 		List<MasterUser> approverList= new ArrayList<MasterUser>();
 		log.info("Query to getApproversForGatePass "+WorkmenQueryBank.GET_APPROVERS_FOR_GATE_PASS);
@@ -702,7 +723,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return approverList;
 	}
 	
-	@Override
+	@Override//not required anymore
 	public  void saveGatePassApprover(final String gatePassId, final List<MasterUser> approverList,final String createdBy){
 		log.info("Entering into getApproversForGatePass dao method ",gatePassId);
 		String SAVE_GP_APPROVER = WorkmenQueryBank.SAVE_GATE_PASS_APPROVER;
@@ -723,6 +744,9 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		});
 	}
 
+	public String getSaveGatepassApprovalStatus() {
+		return QueryFileWatcher.getQuery("SAVE_GATEPASS_APPROVAL_STATUS");
+	}
 	@Override
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto) {
 		 String result = null; 
@@ -731,7 +755,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		        Object[] parameters = new Object[] {dto.getTransactionId(),dto.getGatePassId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),Integer.parseInt(dto.getGatePassType()),dto.getRoleId()}; 
 
 		        try {
-		            int status = jdbcTemplate.update(WorkmenQueryBank.SAVE_GATEPASS_APPROVAL_STATUS, parameters);
+		        	String query = getSaveGatepassApprovalStatus();
+		            int status = jdbcTemplate.update(query, parameters);
 		            if (status > 0) {
 		                log.info("GatePass approved/rejected successfully for GatePassId: " + dto.getTransactionId());
 		                result="GatePass approved/rejected successfully";
@@ -747,12 +772,16 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		    return result;
 	}
 
+	public String getWorkflowTYpeByBT() {
+		return QueryFileWatcher.getQuery("GET_WORKFLOW_TYPE_BY_BT");
+	}
 	@Override
 	public int getWorkFlowTypeForApprovers(String businessType) {
 		log.info("Entering into getWorkFlowTYpe dao method ");
 		int workflowTypeId = 0;
-		log.info("Query to getWorkFlowTYpe "+WorkmenQueryBank.GET_WORKFLOW_TYPE_BY_BT);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_WORKFLOW_TYPE_BY_BT,businessType);
+		String query = getWorkflowTYpeByBT();
+		log.info("Query to getWorkFlowTYpe "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,businessType);
 		if(rs.next()) {
 			workflowTypeId = rs.getInt("WorkflowType");
 		}
@@ -760,22 +789,30 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return workflowTypeId;
 	}
 
+	public String getUpdateGatepassMainStatus() {
+		return QueryFileWatcher.getQuery("UPDATE_GATEPASSMAIN_STATUS");
+	}
 	@Override
 	public synchronized boolean updateGatePassMainStatus(String gatePassId, String status) {
 		boolean res=false;
 		Object[] object=new Object[]{status,gatePassId};
-		int i = jdbcTemplate.update(WorkmenQueryBank.UPDATE_GATEPASSMAIN_STATUS,object);
+		String query= getUpdateGatepassMainStatus();
+		int i = jdbcTemplate.update(query,object);
 		if(i>0){
 			res=true;
 		}
 		return res;
 	}
 	
+	public String getUpdateGatepassMainStatusType() {
+		return QueryFileWatcher.getQuery("UPDATE_GATEPASSMAIN_STATUS_TYPE");
+	}
 	@Override
 	public synchronized boolean updateGatePassMainStatusAndType(String gatePassId, String status,String gatePassType) {
 		boolean res=false;
 		Object[] object=new Object[]{status,gatePassType,gatePassId};
-		int i = jdbcTemplate.update(WorkmenQueryBank.UPDATE_GATEPASSMAIN_STATUS_TYPE,object);
+		String query = getUpdateGatepassMainStatusType();
+		int i = jdbcTemplate.update(query,object);
 		if(i>0){
 			res=true;
 		}
@@ -794,6 +831,10 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("exit from isLastApprover method = "+status);
 		return status; 
 	}
+	
+	public String getUpdateGatepassAction() {
+		return QueryFileWatcher.getQuery("UPDATE_GATE_PASS_ACTION");
+	}
 
 	@Override
 	public String gatePassAction(GatePassActionDto dto) {
@@ -803,7 +844,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        Object[] parameters = new Object[] {dto.getGatePassType(),dto.getGatePassStatus(),dto.getCreatedBy(),dto.getComments(),dto.getGatePassId()}; 
  
 	        try {
-	            int status = jdbcTemplate.update(WorkmenQueryBank.UPDATE_GATE_PASS_ACTION, parameters);
+	        	String query = getUpdateGatepassAction();
+	            int status = jdbcTemplate.update(query, parameters);
 	            if (status > 0) {
 	                log.info("GatePass action created successfully for GatePassId: " + dto.getGatePassId());
 	                result="GatePass action created successfully";
@@ -819,6 +861,9 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	    return result;
 	}
 
+	public String getSaveGatePassStatusLog() {
+		return QueryFileWatcher.getQuery("SAVE_GATEPASS_STATUSLOG");
+	}
 	@Override
 	public void saveGatePassStatusLog(GatePassStatusLogDto dto) {
 		log.info("Entered into saveGatePassStatusLog for gatePassId: "+dto.getGatePassId() );
@@ -826,7 +871,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
         Object[] parameters = new Object[] {dto.getTransactionId(),dto.getGatePassId(),dto.getGatePassType(),dto.getStatus(),dto.getComments(),dto.getUpdatedBy()};
 
         try {
-            int result = jdbcTemplate.update(WorkmenQueryBank.SAVE_GATEPASS_STATUSLOG,parameters );
+        	String query = getSaveGatePassStatusLog();
+            int result = jdbcTemplate.update(query,parameters );
             if (result > 0) {
                 log.info("GatePass status log saved successfully for GatePassId: " + dto.getGatePassId());
             } else {
@@ -890,7 +936,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return listDto;
 	}
 	
-	@Override
+	@Override//not required anymore
 	public List<MasterUser> getApproversForGatePassAction(String createdBy,String gatepassAction) {
 		log.info("Entering into getApproversForGatePass dao method ");
 		List<MasterUser> approverList= new ArrayList<MasterUser>();
@@ -907,12 +953,16 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return approverList;
 	}
 	
+	public String getGatepassById() {
+		return QueryFileWatcher.getQuery("GET_GATE_PASS_BY_ID");
+	}
 	@Override
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId) {
 		log.info("Entering into getWorkmenDetailBasedOnId dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
-		log.info("Query to getWorkmenDetailBasedOnId "+WorkmenQueryBank.GET_GATE_PASS_BY_ID);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_GATE_PASS_BY_ID,gatePassId);
+		String query = getGatepassById();
+		log.info("Query to getWorkmenDetailBasedOnId "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -972,10 +1022,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("Exiting from getDOTTYpe dao method "+principalEmployer);
 		return workflowTypeId;
 	}
+	public String getValidityOfWoWc() {
+		return QueryFileWatcher.getQuery("GET_VALIDITY_OF_WO_WC");
+	}
 	@Override
 	 public Map<String, LocalDate> getValidityDates(String workOrderId, String wcId) {
 		 Map<String, LocalDate> validityDates = new HashMap<>();
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_VALIDITY_OF_WO_WC,workOrderId,wcId);
+		 String query = getValidityOfWoWc();
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(query,workOrderId,wcId);
 		 while(rs.next()) {
 			 LocalDate validTill = rs.getDate("validTill").toLocalDate();
              String source = rs.getString("source");
@@ -1094,7 +1148,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			if(status) {
 				Object[] parameters = prepareGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
 		    	 try {
-			            int result = jdbcTemplate.update(WorkmenQueryBank.UPDATE_CONTRACT_WORKMEN, parameters);
+		    		 String query = this.getUpdateContractWorkmen();
+			            int result = jdbcTemplate.update(query, parameters);
 			            if (result > 0) {
 			            	transId=gatePassMain.getTransactionId();
 			                log.info("GatePass saved successfully for transId: " + transId);
@@ -1110,7 +1165,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 				 Object[] parameters = prepareGatePassDraftParameters(transId, gatePassMain); 
 
 			        try {
-			            int result = jdbcTemplate.update(WorkmenQueryBank.SAVE_CONTRACT_WORKMEN, parameters);
+			        	String query = this.getSaveContractWorkmen();
+			            int result = jdbcTemplate.update(query, parameters);
 			            if (result > 0) {
 			                log.info("GatePass drafted successfully for transId: " + transId);
 			            } else {
@@ -1130,11 +1186,15 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	    return transId;
 	}
 	
+	public String getMaxTransactionId() {
+		return QueryFileWatcher.getQuery("GET_MAX_TRANSACTION_ID");
+	}
 	@Override
 	public String generateTransationId() {
 	    String transactionId = null;
 	    try {
-	        SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_MAX_TRANSACTION_ID);
+	    	String query = getMaxTransactionId();
+	        SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	        if (rs.next()) {
 	        	transactionId = rs.getString("newTransactionId");
 	        }
@@ -1209,14 +1269,17 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getUserId()
 	    };
 	}
-
+public String getContractWorkmenDraftDetails() {
+	return QueryFileWatcher.getQuery("GET_CONTRACT_WORKMEN_DRAFT_DETAILS");
+}
 
 @Override
 public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionId) {
 	log.info("Entering into getIndividualContractWorkmenDraftDetails dao method ");
 	GatePassMain dto = null;
-	log.info("Query to getIndividualContractWorkmenDraftDetails "+WorkmenQueryBank.GET_CONTRACT_WORKMEN_DRAFT_DETAILS);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_CONTRACT_WORKMEN_DRAFT_DETAILS,transactionId);
+	String query = getContractWorkmenDraftDetails();
+	log.info("Query to getIndividualContractWorkmenDraftDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
 	if(rs.next()) {
 		dto = new GatePassMain();
 		dto.setTransactionId(rs.getString("TransactionId"));
@@ -1421,12 +1484,16 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
     };
 }
 
+public String getUpdateGatepassid() {
+	return QueryFileWatcher.getQuery("UPDATE_GATEPASSID");
+}
 @Override
 public synchronized String updateGatePassIdByTransactionId(String transactionId) {
 	String gatePassId = this.generateGatePassId();
 	if(null !=gatePassId) {
 		Object[] object=new Object[]{gatePassId,transactionId};
-		int i = jdbcTemplate.update(WorkmenQueryBank.UPDATE_GATEPASSID,object);
+		String query = getUpdateGatepassid();
+		int i = jdbcTemplate.update(query,object);
 		if(i>0){
 			return gatePassId;
 		}
@@ -1434,12 +1501,16 @@ public synchronized String updateGatePassIdByTransactionId(String transactionId)
 	}
 	return null;
 }
+public String getContractWorkmenDetailsByTransId() {
+	return QueryFileWatcher.getQuery("GET_CONTRACT_WORKMEN_DETAILS_BY_TRANSID");
+}
 @Override
 public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transactionId) {
 	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
 	GatePassMain dto = null;
-	log.info("Query to getIndividualContractWorkmenDetails "+WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS_BY_TRANSID);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS_BY_TRANSID,transactionId);
+	String query = getContractWorkmenDetailsByTransId();
+	log.info("Query to getIndividualContractWorkmenDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
 	if(rs.next()) {
 		dto = new GatePassMain();
 		dto.setTransactionId(rs.getString("TransactionId"));
@@ -1573,7 +1644,8 @@ public String renewGatePass(GatePassMain gatePassMain) {
     	
     	Object[] parameters = prepareGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
     	 try {
-	            int result = jdbcTemplate.update(WorkmenQueryBank.UPDATE_CONTRACT_WORKMEN, parameters);
+    		 String query = this.getUpdateContractWorkmen();
+	            int result = jdbcTemplate.update(query, parameters);
 	            if (result > 0) {
 	            	transId=gatePassMain.getTransactionId();
 	                log.info("GatePass saved successfully for transId: " + transId);
@@ -1588,12 +1660,16 @@ public String renewGatePass(GatePassMain gatePassMain) {
     return transId;
 }
 
+public String getContractWorkmenDetailsByGpId() {
+	return QueryFileWatcher.getQuery("GET_CONTRACT_WORKMEN_DETAILS_BY_GPID");
+}
 @Override
 public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatePassId) {
 	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
 	GatePassMain dto = null;
-	log.info("Query to getIndividualContractWorkmenDetails "+WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS_BY_GPID);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(WorkmenQueryBank.GET_CONTRACT_WORKMEN_DETAILS_BY_GPID,gatePassId);
+	String query = getContractWorkmenDetailsByGpId();
+	log.info("Query to getIndividualContractWorkmenDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
 	if(rs.next()) {
 		dto = new GatePassMain();
 		dto.setTransactionId(rs.getString("TransactionId"));
@@ -1724,43 +1800,30 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 	return listDto;
 }
 
+public String getWorkflowTypeByTransactionIdQuery() {
+	return QueryFileWatcher.getQuery("GET_WORKFLOW_TYPE_BY_TRANSACTION_ID");
+}
 @Override
-public int getWorkFlowTYpeByTransactionId(String transactionId) {
+public int getWorkFlowTYpeByTransactionId(String transactionId,String actionId) {
 	log.info("Entering into getWorkFlowTYpe dao method ");
 	int workflowTypeId = 0;
-	String query = "select distinct gpwft.WorkflowType "
-			+ " from GATEPASSMAIN gpm  "
-			+ " join CMSPRINCIPALEMPLOYER CPE on cpe.UNITID=gpm.UnitId "
-			+ " join GATEPASSWORKFLOWTYPE gpwft on gpwft.BusinessTypeId = cpe.BUSINESSTYPE "
-			+ " WHERE gpm.TransactionId=? and gpwft.WorkflowType in ('1','2','3')";
+	String query =getWorkflowTypeByTransactionIdQuery();
 	log.info("Query to getWorkFlowTYpe "+query);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId,actionId);
 	if(rs.next()) {
 		workflowTypeId = rs.getInt("WorkflowType");
 	}
 	log.info("Exiting from getWorkFlowTYpe dao method "+transactionId);
 	return workflowTypeId;
 }
+public String getIsLastApproverForParallel() {
+	return QueryFileWatcher.getQuery("IS_LAST_APPROVER_FOR_PARALLEL");
+}
 @Override
 public boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId) {
     boolean status = false;
 
-    String query = "WITH RequiredApprovers AS (  "
-            + "    SELECT ROLE_ID   "
-            + "    FROM GATEPASSAPPROVERHIERARCHY   "
-            + "    WHERE ACTION_ID = ? AND [INDEX] != 0  "
-            + "),  "
-            + "ApprovedRoles AS (  "
-            + "    SELECT DISTINCT RoleId   "
-            + "    FROM GATEPASSAPPROVALSTATUS   "
-            + "    WHERE TransactionId = ? and GatePassTypeId=? "
-            + ")  "
-            + "SELECT CASE   "
-            + "         WHEN (SELECT COUNT(*) FROM ApprovedRoles) = (SELECT COUNT(*) FROM RequiredApprovers)  "
-            + "         AND EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?)  "
-            + "         THEN 'YES'   "
-            + "         ELSE 'NO'   "
-            + "       END AS IsLastApprover";
+    String query = getIsLastApproverForParallel();
 
     try {
         // Ensure proper data type conversion
@@ -1782,26 +1845,14 @@ public boolean isLastApproverForParallel(String gatePassTypeId, String transacti
     return status;
 }
 
+public String getIsLastApproverForParallelGatePassAction() {
+	return QueryFileWatcher.getQuery("IS_LAST_APPROVER_FOR_GATEPASS_ACTION");
+}
 @Override
 public boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId) {
     boolean status = false;
 
-    String query = "WITH RequiredApprovers AS (  "
-            + "    SELECT ROLE_ID   "
-            + "    FROM GATEPASSAPPROVERHIERARCHY   "
-            + "    WHERE ACTION_ID = ? AND [INDEX] != 0  "
-            + "),  "
-            + "ApprovedRoles AS (  "
-            + "    SELECT DISTINCT RoleId   "
-            + "    FROM GATEPASSAPPROVALSTATUS   "
-            + "    WHERE GatePassId = ?  and GatePassTypeId=?"
-            + ")  "
-            + "SELECT CASE   "
-            + "         WHEN (SELECT COUNT(*) FROM ApprovedRoles) = (SELECT COUNT(*) FROM RequiredApprovers)  "
-            + "         AND EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?)  "
-            + "         THEN 'YES'   "
-            + "         ELSE 'NO'   "
-            + "       END AS IsLastApprover";
+    String query = getIsLastApproverForParallelGatePassAction();
 
     try {
         // Ensure proper data type conversion
@@ -1823,6 +1874,19 @@ public boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, St
     return status;
 }
 
+@Override
+public int getWorkFlowTYpeNew(String principalEmployer,String gatePassAction) {
+	log.info("Entering into getWorkFlowTYpeNew dao method ");
+	int workflowTypeId = 0;
+	String query = getWorkflowTypeNew();
+	log.info("Query to getWorkFlowTYpeNew "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,principalEmployer,gatePassAction);
+	if(rs.next()) {
+		workflowTypeId = rs.getInt("WorkflowType");
+	}
+	log.info("Exiting from getWorkFlowTYpeNew dao method "+principalEmployer);
+	return workflowTypeId;
+}
 
 
 }
