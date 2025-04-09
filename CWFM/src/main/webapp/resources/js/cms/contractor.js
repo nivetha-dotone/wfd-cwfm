@@ -1,5 +1,7 @@
 /*Contractor*/
  
+
+
   function loadContractorList(contextPath) {
       //  var contextPath = '<%= request.getContextPath() %>'; // This will be evaluated on the server side
 
@@ -51,19 +53,7 @@
 			    });
 			}
  
-function redirectToContrAdd() {
 
-    // Fetch the content of add.jsp using AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Update the mainContent element with the fetched content
-            document.getElementById("mainContent").innerHTML = xhr.responseText;
-        }
-    };
-    xhr.open("GET", "/CWFM/contractor/add", true);
-    xhr.send();
-}
 
 function redirectToContrEdit() {
     var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
@@ -153,48 +143,7 @@ function redirectToContrView() {
         }
     });// This will navigate back to the previous page in the browser history
 }
-function saveRegistrationDetails(){
-	
-	const data = {
-		contractorregId:$("#registrationid").val().trim(),
-		principalEmployer:$("#principalEmployerId").val(),
-		vendorCode:$("#vendorCode").val().trim(),
-		managerName:$("#managername").val().trim(),
-		locofWork:$("#locofwork").val().trim(),
-		totalStrength:$("#totalStrength").val().trim(),
-		rcMaxEmp:$("#rcmaxemployees").val().trim(),
-		pfNum:$("#pfnumber").val().trim(),
-		natureOfWork:$("#natureOfWork").val().trim(),
-		contractFrom:$("#contractFrom").val(),
-		contractTo:$("#contractTo").val(),
-		contractType:$("#contractType").val(),
-		rcVerified:$("#isRcVerified").val().trim(),
-		
-		
-	};
-	
-		  const xhr = new XMLHttpRequest();
-   xhr.open("POST", "/CWFM/contractor/saveReg", true); // Replace with your actual controller URL
-   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-   xhr.onload = function() {
-       if (xhr.status === 200) {
-           // Handle successful response
-           console.log("Data saved successfully:", xhr.responseText);
-		  
-         loadCommonList('/contractor/contRegList', 'Contractor Registration');
-       } else {
-           // Handle error response
-           console.error("Error saving data:", xhr.statusText);
-       }
-   };
-   
-   xhr.onerror = function() {
-       console.error("Request failed");
-   };
-   
-   // Send the data object as a JSON string
-   xhr.send(JSON.stringify(data));
-	}//eofunc
+
 	
 	function getContractor(unitId, userId) {
     if (!unitId) {
@@ -363,6 +312,7 @@ function exportCSVFormat() {
         
  function saveRoleDetails(){
 	
+	
 	const data = {
 		firstName:$("#firstname").val().trim,
 		lastName:$("#lastname").val().trim,
@@ -394,24 +344,25 @@ function exportCSVFormat() {
    
    // Send the data object as a JSON string
    xhr.send(JSON.stringify(data));
+   
 	}
 function validateFormData() {
     let isValid = true;
-    const principalemployer = $("#principalemployer").val();
+    const principalemployer = $("#principalEmployerId").val();
     if (principalemployer === "") {
         $("#error-principalemployer").show();
         isValid = false;
     }else{
 		$("#error-principalemployer").hide();
 	}
-    const vendorCode = $("#vendorCode").val().trim();
+    const vendorCode = $("#vendorCodeId").val().trim();
     if (vendorCode === "") {
         $("error-vendorCode").show();
         isValid = false;
     }else{
 		 $("error-vendorCode").hide();
 	}
-    const managername = $("#managername").val().trim();
+    const managername = $("#managerNameId").val().trim();
     const nameRegex = /^[A-Za-z\s]+$/;
     if (!nameRegex.test(managername)) {
                  $("#error-managername").show();
@@ -419,7 +370,7 @@ function validateFormData() {
      }else{
 		 $("#error-managername").hide();
 	 }
-    const locofwork = $("#locofwork").val();
+    const locofwork = $("#locofWorkId").val();
      const locofworkRegex = /^[A-Za-z\s]+$/;
      if (!locofworkRegex.test(locofwork)) {
                  $("#error-locofwork").show();
@@ -427,7 +378,7 @@ function validateFormData() {
      }else{
 		 $("#error-locofwork").hide();
 	 }
-    const totalStrength = $("#totalStrength").val().trim();
+    const totalStrength = $("#totalStrengthId").val().trim();
     const totalStrengthRegex = /^[0-9]+$/;
     if (!totalStrengthRegex.test(totalStrength)) {
                  $("#error-totalStrength").show();
@@ -435,7 +386,7 @@ function validateFormData() {
      }else{
 		 $("#error-totalStrength").hide();
 	 }
-	const rcmaxemployees = $("#rcmaxemployees").val().trim();
+	const rcmaxemployees = $("#rcMaxEmpId").val().trim();
     const rcmaxemployRegex = /^[0-9]+$/;
     if (!rcmaxemployRegex.test(rcmaxemployees)) {
                  $("#error-rcmaxemployees").show();
@@ -444,7 +395,7 @@ function validateFormData() {
 		 $("#error-rcmaxemployees").hide();
 	 }
 	
-	const pfInput = $("#pfnumber").val().trim();
+	const pfInput = $("#pfNumId").val().trim();
 	const pfNumberRegex = /^[A-Z]{2}[0-9]{5}[A-Z]{1}[0-9]{4}$/; 
 	if (!pfNumberRegex.test(pfInput)) {
                  $("#error-pfnumber").show();
@@ -452,35 +403,35 @@ function validateFormData() {
      }else{
 		 $("#error-pfnumber").hide();
 	 }
-	const natureOfWork = $("#natureOfWork").val();
+	const natureOfWork = $("#natureOfWorkId").val();
 	 if (natureOfWork === "") {
         $("#error-natureOfWork").show();
         isValid = false;
     }else{
 		$("#error-natureOfWork").hide();
 	}
-	const contractFrom = $("#contractFrom").val();
+	const contractFrom = $("#contractFromId").val();
 	 if (contractFrom === "") {
         $("#error-contractFrom").show();
         isValid = false;
     }else{
 		$("#error-contractFrom").hide();
 	}
-	const contractTo = $("#contractTo").val();
+	const contractTo = $("#contractToId").val();
 	 if (contractTo === "") {
         $("#error-contractTo").show();
         isValid = false;
     }else{
 		$("#error-contractTo").hide();
 	}
-	const contractType = $("#contractType").val();
+	const contractType = $("#contractTypeId").val();
 	 if (contractType === "") {
         $("#error-contractType").show();
         isValid = false;
     }else{
 		$("#error-contractType").hide();
 	}
-	const isRcVerified = $("#isRcVerified").val();
+	const isRcVerified = $("#rcVerifiedId").val();
 	 if (isRcVerified === "") {
         $("#error-isRcVerified").show();
         isValid = false;
@@ -669,14 +620,299 @@ function validateRenewFormData() {
 }
 function toggleMainContractorRow() {
         // Get the selected value of contractor type
-        var contractorType = document.getElementById("contractType").value;
+        var contractorType = document.getElementById("contractTypeId").value;
         var mainContractorRow = document.getElementById("mainContractorRow");
 
         // Show or hide Main Contractor row based on the selected type
         if (contractorType === "Sub Contractor") {
             mainContractorRow.style.display = "table-row"; // Show the row
+			var principalEmployerSelect = document.getElementById("principalEmployerId");
+			var unitId = principalEmployerSelect.value;
+			
+			var xhr = new XMLHttpRequest();
+			    var url = contextPath + "/contractor/getAllContractors?unitId=" + unitId ;
+			    xhr.open("GET", url, true);
+
+			    xhr.onload = function() {
+			        if (xhr.status === 200) {
+			            // Parse the response as a JSON array of contractor objects
+			            var contractors = JSON.parse(xhr.responseText);
+			            console.log("Response:", contractors);
+			            var contractorSelect = document.getElementById("mainContractorId");
+			            contractorSelect.innerHTML = '<option value="">Please select Main Contractor</option>';
+			            contractors.forEach(function(contractor) {
+			                var option = document.createElement("option");
+			                option.value = contractor.contractorId;
+			                option.text =contractor.contractorCode+" | "+ contractor.contractorName;
+			                contractorSelect.appendChild(option);
+			            });
+			        } else {
+			            console.error("Error:", xhr.statusText);
+			        }
+			    };
+
+			    xhr.onerror = function() {
+			        console.error("Request failed");
+			    };
+
+			    xhr.send();
+				
         } else {
             mainContractorRow.style.display = "none"; // Hide the row
-            document.getElementById("mainContractor").value = ""; // Clear the input
+            //document.getElementById("mainContractor").value = ""; // Clear the input
         }
     }
+	
+	
+	function getAllContractorsForReg(unitId) {
+	    var xhr = new XMLHttpRequest();
+	    var url = contextPath + "/contractor/getAllContractors?unitId=" + unitId ;
+	    //alert("URL: " + url);
+	    xhr.open("GET", url, true);
+
+	    xhr.onload = function() {
+	        if (xhr.status === 200) {
+	            // Parse the response as a JSON array of contractor objects
+	            var contractors = JSON.parse(xhr.responseText);
+	            console.log("Response:", contractors);
+	            
+	            // Find the contractor select element
+	            var contractorSelect = document.getElementById("vendorCodeId");
+	            
+	            // Clear existing options
+	            contractorSelect.innerHTML = '<option value="">Please select Vendor Code</option>';
+	            
+	            // Populate the dropdown with the new list of contractors
+	            contractors.forEach(function(contractor) {
+	                var option = document.createElement("option");
+	                option.value = contractor.contractorId;
+	                option.text =contractor.contractorCode+" | "+ contractor.contractorName;
+					option.setAttribute("data-code", contractor.contractorCode);
+					option.setAttribute("data-name", contractor.contractorName);
+	                contractorSelect.appendChild(option);
+	            });
+	        } else {
+	            console.error("Error:", xhr.statusText);
+	        }
+	    };
+
+	    xhr.onerror = function() {
+	        console.error("Request failed");
+	    };
+
+	    xhr.send();
+	}
+	
+	function setValueIfPresent(elementId, value) {
+	    var input = document.getElementById(elementId);
+	    input.value = value || "";
+	}
+	
+	function getAllContractorDetailForReg(contractorId) {
+		var principalEmployerSelect = document.getElementById("principalEmployerId");
+		   var unitId = principalEmployerSelect.value;
+		    var xhr = new XMLHttpRequest();
+		    var url = contextPath + "/contractor/getAllContractorDetail?unitId=" + unitId + "&contractorId=" + contractorId;
+		    //alert("URL: " + url);
+		    xhr.open("GET", url, true);
+
+		    xhr.onload = function() {
+		        if (xhr.status === 200) {
+		            // Parse the response as a JSON array of contractor objects
+		            var contractors = JSON.parse(xhr.responseText);
+		            console.log("Response:", contractors);
+					
+					setValueIfPresent("managerNameId", contractors.managerName);
+					setValueIfPresent("locofWorkId", contractors.locationOfWork);
+					setValueIfPresent("totalStrengthId", contractors.totalStrength);
+					setValueIfPresent("rcMaxEmpId", contractors.maxNoEmp);
+					setValueIfPresent("pfNumId", contractors.pfNum);
+					setValueIfPresent("natureOfWorkId", contractors.natureOfWork);
+					setValueIfPresent("contractFromId", contractors.validFrom);
+					setValueIfPresent("contractToId", contractors.validTo);
+				
+		        } else {
+		            console.error("Error:", xhr.statusText);
+		        }
+		    };
+
+		    xhr.onerror = function() {
+		        console.error("Request failed");
+		    };
+
+		    xhr.send();
+		}
+		
+		function redirectToContractorReg() {
+		   
+		    var xhr = new XMLHttpRequest();
+		    xhr.onreadystatechange = function() {
+		        if (xhr.readyState == 4 && xhr.status == 200) {
+		            document.getElementById("mainContent").innerHTML = xhr.responseText;
+		        }
+		    };
+		    xhr.open("GET", "/CWFM/contractor/contReg" , true);
+		    xhr.send();
+		}
+		
+		function redirectToContractorRegView() {
+		    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+		    if (selectedCheckboxes.length !== 1) {
+		        alert("Please select exactly one row to view.");
+		        return;
+		    }
+		    
+		    var selectedRow = selectedCheckboxes[0].closest('tr');
+		    var contractorregId = selectedRow.querySelector('[name="selectedWOs"]').value;
+
+		    var xhr = new XMLHttpRequest();
+		    xhr.onreadystatechange = function() {
+		        if (xhr.readyState == 4 && xhr.status == 200) {
+		            document.getElementById("mainContent").innerHTML = xhr.responseText;
+		        }
+		    };
+		    xhr.open("GET", "/CWFM/contractor/contractorview/" + contractorregId, true);
+		    xhr.send();
+		}
+
+		
+		function saveRegistrationDetails() {
+		    let basicValid = validateFormData();
+		    if (!basicValid) return;
+
+		    const data = new FormData();
+
+		    const selectedOption = $("#vendorCodeId option:selected");
+
+		    // Build the JSON object
+		    const jsonData = {
+		        contractorregId: $("#contractorregId").val().trim(),
+		        principalEmployer: $("#principalEmployerId").val(),
+		        contractorId: selectedOption.val(),
+		        vendorCode: selectedOption.data("code"),
+		        contractorName: selectedOption.data("name"),
+		        managerName: $("#managerNameId").val().trim(),
+		        locofWork: $("#locofWorkId").val().trim(),
+		        totalStrength: $("#totalStrengthId").val().trim(),
+		        rcMaxEmp: $("#rcMaxEmpId").val().trim(),
+		        pfNum: $("#pfNumId").val().trim(),
+		        natureOfWork: $("#natureOfWorkId").val().trim(),
+		        contractFrom: $("#contractFromId").val(),
+		        contractTo: $("#contractToId").val(),
+		        contractType: $("#contractTypeId").val(),
+		        rcVerified: $("#rcVerifiedId").is(":checked") ? "Yes" : "No",
+		        mainContractor: $("#mainContractorId").val().trim(),
+		        status: "1",
+		        requestType: "Create",
+		        regPolicy: []
+		    };
+
+		    // Loop through each work order/policy row
+		    $("#workOrderBody tr").each(function (index) {
+		        const row = $(this);
+
+		        const policy = {
+		            woNumber: row.find(".woNumber").val(),
+		            natureOfJob: row.find(".natureOfJob").val(),
+		            documentType: row.find(".documentType").val(),
+		            documentNumber: row.find(".documentNumber").val(),
+		            coverage: row.find(".coverage").val(),
+		            validFrom: row.find(".validFrom").val(),
+		            validTo: row.find(".validTo").val()
+		        };
+
+		        jsonData.regPolicy.push(policy);
+
+		        // Handle the file for this row
+		        const fileInput = row.find(".attachment")[0];
+		        if (fileInput && fileInput.files.length > 0) {
+		            data.append("policyAttachments", fileInput.files[0]);
+		        } else {
+		            // Add empty file as placeholder
+		            data.append("policyAttachments", new Blob([]));
+		        }
+		    });
+
+		    // Append the JSON data as a single field
+		    data.append("jsonData", JSON.stringify(jsonData));
+
+		    // Debug: Print form content
+		    for (const [key, value] of data.entries()) {
+		        console.log(key, value instanceof File ? value.name || "Empty file" : value);
+		    }
+
+		    // Submit via AJAX
+		    const xhr = new XMLHttpRequest();
+		    xhr.open("POST", "/CWFM/contractor/saveReg", true);
+
+		    xhr.onload = function () {
+		        if (xhr.status === 200) {
+		            alert("Contractor saved successfully!");
+		            loadCommonList('/contractor/contRegList', 'Contractor Registration');
+		        } else {
+		            alert("Failed to save contractor.");
+		            console.error("Error:", xhr.status, xhr.responseText);
+		        }
+		    };
+
+		    xhr.onerror = function () {
+		        alert("Error occurred while saving contractor.");
+		    };
+
+		    xhr.send(data);
+		}
+
+
+		
+
+		document.addEventListener('click', function (e) {
+		    if (e.target.classList.contains('addRow')) {
+		        addRowCont();
+		    } else if (e.target.classList.contains('removeRow')) {
+		        deleteRowCont(e.target);
+		    }
+		});
+
+		function addRowCont() {
+		    const tbody = document.getElementById("workOrderBody");
+		    const today = new Date().toISOString().split('T')[0];
+
+		    const row = document.createElement("tr");
+		    row.innerHTML = `
+		        <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
+		        <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
+		        <td>
+		            <select class="form-control woNumber"  name="workOrderNumber">
+		                <option value="">Select</option>
+		                <option value="WO1">WO1</option>
+		                <option value="WO2">WO2</option>
+		            </select>
+		        </td>
+		        <td><input type="text" class="form-control natureOfJob" name="natureOfJob" /></td>
+		        <td>
+		            <select class="form-control documentType" name="documentType">
+		                <option value="">Select</option>
+		                <option value="PO">PO</option>
+		                <option value="LOI">LOI</option>
+		            </select>
+		        </td>
+		        <td><input type="text" class="form-control documentNumber" name="documentNumber" /></td>
+		        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
+		        <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
+		        <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
+		        <td><input type="file"  class="form-control attachment" name="attachment" /></td>
+		    `;
+		    tbody.appendChild(row);
+		}
+
+		function deleteRowCont(buttonElement) {
+		    const row = buttonElement.closest('tr');
+		    const tbody = document.getElementById("workOrderBody");
+
+		    if (tbody.rows.length > 1) {
+		        row.remove();
+		    } else {
+		        alert("At least one row must be present.");
+		    }
+		}
+

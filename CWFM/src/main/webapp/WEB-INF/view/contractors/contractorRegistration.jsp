@@ -1,5 +1,6 @@
 <%@ page import="com.wfd.dot1.cwfm.pojo.MasterUser" %>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -12,10 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/cms/contractor.js"></script>
-    <script src="resources/js/cms/workorder.js"></script>
-    <script src="resources/js/cms/workmen.js"></script>
-    <script src="resources/js/cms/report.js"></script>
+   
+   
     <script src="resources/js/jquery.min.js"></script>
     <style>
   body {
@@ -297,128 +296,25 @@ label {
 }
         
     </style>
-     <%
-    	MasterUser user = (MasterUser) session.getAttribute("loginuser");
-        String userId = user != null ? user.getUserId() : "";
-		%>
+   
+		 <%
+    MasterUser user = (MasterUser) session.getAttribute("loginuser");
+    String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
+%>
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <script>
- // Function to validate fields in the current active tab
-    function validateCurrentTab() {
-        // Example of validation logic; customize based on your tab's fields
-        let isValid = true;
-
-        // Example: Validate fields in the current active tab
-        const activeTabId = document.querySelector('.tab-content.active').id;
-
-        // Validate specific fields based on the active tab
-        if (activeTabId === 'tab1') {
-            const aadharNumber = document.getElementById("aadharNumber").value.trim();
-            if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
-                document.getElementById("error-aadhar").textContent = "Please enter a valid 12-digit Aadhar number.";
-                isValid = false;
-            } else {
-                document.getElementById("error-aadhar").textContent = ""; // Clear previous error
-            }
-
-            // Add more validation logic for other fields in tab1
-        } 
-        // Repeat similar validation checks for other tabs if necessary
-
-        return isValid;
-    }
-
-    // Function to show the selected tab
-    function showTab(tabId) {
-        // Check if current tab fields are valid before switching tabs
-        if (!validateCurrentTab()) {
-            return; // Prevent tab switch if validation fails
-        }
-
-        // Hide all tab contents
-        var tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(function(content) {
-            content.classList.remove('active');
-        });
-
-        // Remove active class from all tabs
-        var tabs = document.querySelectorAll('.tabs button');
-        tabs.forEach(function(tab) {
-            tab.classList.remove('active');
-        });
-
-        // Show the selected tab content and add active class to the clicked tab
-        document.getElementById(tabId).classList.add('active');
-        document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
-    }
-
    
-
-
-
-    /* function showTab(tabId) {
-        // Hide all tab contents
-        var tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(function(content) {
-            content.classList.remove('active');
-        });
-
-        // Remove active class from all tabs
-        var tabs = document.querySelectorAll('.tabs button');
-        tabs.forEach(function(tab) {
-            tab.classList.remove('active');
-        });
-
-        // Show the selected tab content and add active class to the clicked tab
-        document.getElementById(tabId).classList.add('active');
-        document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
-    } */
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // Set the default tab
-        showTab('tab1');
-        
-    });
-       
-    function validateTab() {
-        let isValid = true;
-
-        // Call a validation function for the single tab
-        isValid = validateFormData();
-
-        return isValid;
-    }
-    
-  
-  
-
-    </script>
-    <!-- <script>
-        function displayContractorRegId() {
-            const contractorRegId = document.getElementById("registrationid").value;
-            console.log("Generated Contractor Registration ID: " + contractorRegId);
-        }
-
-        window.onload = displayContractorRegId;
-    </script> -->
 </head>
 <body>
-        <!-- <div >
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass()">Save</button>
-             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Cancel</button>
-        </div>  -->
+       
        
     <div id="principalEmployerContent">
         <div class="tabs-container">
         <div class="tabs">
             <button  data-target="tab1" onclick="showTab('tab1')">Basic Data</button>
-           <!--  <button data-target="tab2" onclick="showTab('tab2')">Employment Information</button>
-            <button data-target="tab3" onclick="showTab('tab3')">Other Information</button>
-            <button data-target="tab4" onclick="showTab('tab4')">Wages</button>
-            <button data-target="tab5" onclick="showTab('tab5')">Documents</button> -->
+           
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRegistrationDetails('${sessionScope.loginuser.userId}')">Save</button>
@@ -428,29 +324,20 @@ label {
         </div> 
     </div> 
 
-        <%-- <f:form id="addAadharOBForm" action="/CWFM/contractworkmen/addAadharOB" modelAttribute="workmenbyAadhar" method="post">
-            <div id="errorContainer">
-                <c:if test="${not empty errors}">
-                    <p><span class="required-field">*</span> Indicates Required fields.</p>
-                    <div class="error-message">
-                        <f:errors path="*" cssClass="error" element="div" />
-                    </div> 
-                </c:if>
-            </div>
-            </f:form> --%>
+       
 <div id="tab1" class="tab-content active ">
     <table cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorRegistrationId"/> </label></th>
                 <td>
-                	<input id="registrationid" name="registrationid" value="${contractorregId}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly>
+                	<input id="contractorregId" name="contractorregId" value="${contractorregId}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly>
                 	<label id="error-registrationid" style="color: red;display: none;">Registration ID is required</label>
                 </td>
            </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
-				 <td><select class="custom-select" id="principalEmployerId" name="principalEmployer" style="width: 100%;height: 25px; ">
+				 <td><select class="custom-select" id="principalEmployerId" name="principalEmployer" onchange="getAllContractorsForReg(this.value)" style="width: 100%;height: 25px; ">
                                 <option value="">Please select Principal Employer</option>
                                 <c:forEach var="pe" items="${PrincipalEmployer}">
                 					<option value="${pe.unitId}">${pe.name}</option>
@@ -459,7 +346,10 @@ label {
                     </td>
           <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
                 <td>
-                	<input id="vendorCode" name="vendorCode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<!-- <input id="vendorCodeId" name="vendorCode"  onchange="getAllContractorDetailForReg(this.value) style="width: 100%;height: 20px;" type="text" size="30" maxlength="30"> -->
+                	 <select class="custom-select" id="vendorCodeId" name="vendorCode"  onchange="getAllContractorDetailForReg(this.value)">
+            						<option value="">Please select Vendor Code</option>
+            		</select>
                 	 <label id="error-vendorCode" style="color: red;display: none;">Vendor Code is required</label>
                 </td>
                
@@ -467,12 +357,12 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                 <td>
-                	<input id="managername" name="managername" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
                 	<label id="error-managername" style="color: red;display: none;">Manager name is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.locationOfWork"/></label></th>
                 <td>
-                	<input id="locofwork" name="locofwork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="locofWorkId" name="locofWork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
                 	<label id="error-locofwork"style="color: red;display: none;">Location Of Work is required</label>
                 </td>
                 
@@ -480,12 +370,12 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.totalStrength"/></label></th>
                 <td>
-                	<input id="totalStrength" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="totalStrengthId" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
                 	<label id="error-totalStrength" style="color: red;display: none;">Total Strength is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.rcMaxEmployees"/></label></th>
                 <td>
-                	<input id="rcmaxemployees" name="rcmaxemployees" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="rcMaxEmpId" name="rcMaxEmp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
                 	<label id="error-rcmaxemployees" style="color: red;display: none;">RC Max Employees is required</label>
                 </td>
                
@@ -493,12 +383,12 @@ label {
            <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                 <td>
-                	<input id="pfnumber" name="pfnumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="pfNumId" name="pfNum" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
                 	<label id="error-pfnumber" style="color: red;display: none;">PF Number is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
                 <td>
-                	<input id="natureOfWork" name="natureOfWork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
                 	<label id="error-natureOfWork" style="color: red;display: none;">Nature Of Work is required</label>
                 </td>
                
@@ -506,12 +396,12 @@ label {
             <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractFrom"/></label></th>
                 <td>
-                	<input id="contractFrom" name="contractFrom" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                	<input id="contractFromId" name="contractFrom" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
                 	<label id="error-contractFrom" style="color: red;display: none;">Contract From is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractTo"/></label></th>
                 <td>
-                	<input id="contractTo" name="contractTo" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                	<input id="contractToId" name="contractTo" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
                 	<label id="error-contractTo" style="color: red;display: none;">Contract To is required</label>
                 </td>
                
@@ -520,7 +410,7 @@ label {
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractType"/></label></th>
            <td>
     <!-- Dropdown for contractor type -->
-              <select id="contractType" name="contractType" style="width: 100%; height: 25px;color: black;" onchange="toggleMainContractorRow()">
+              <select id="contractTypeId" name="contractType" style="width: 100%; height: 25px;color: black;" onchange="toggleMainContractorRow()">
                 <option value="">Select Contractor Type</option>
                 <option value="Main Contractor">Main Contractor</option>
                 <option value="Sub Contractor">Sub Contractor</option>
@@ -529,7 +419,7 @@ label {
          </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isRcVerified"/></label></th>
                 <td>
-                	<input id="isRcVerified" name="isRcVerified" style="width: 100%;height: 20px;color: black;" type="checkbox" size="30" maxlength="30">
+                	<input id="rcVerifiedId" name="rcVerified" style="height: 20px;color: black;" type="checkbox" size="30" maxlength="30">
                 	<label id="error-isRcVerified" style="color: red;display: none;">Is RC Verified is required</label>
                 </td>
                
@@ -537,7 +427,10 @@ label {
            <!-- Main Contractor row -->
       <tr id="mainContractorRow" style="display: none;"><th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mainContractor"/></label></th>
     <td>
-        <input id="mainContractor" name="mainContractor" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30">
+       <!--  <input id="mainContractor" name="mainContractor" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"> -->
+        <select class="custom-select" id="mainContractorId" name="mainContractor"  >
+            						<option value="">Please select Main Contractor</option>
+            		</select>
         <label id="error-mainContractor" style="color: red; display: none;">Main Contractor is required</label>
     </td>
    </tr>
@@ -547,7 +440,6 @@ label {
 
 <div class="action-buttons z" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
-           <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Cancel</button> -->
  </div>
  <div  class="tab-content "><spring:message code="label.additionalDocumets"/></div>
             <div id="tab2" class="tab-content active ">
@@ -569,35 +461,39 @@ label {
 				
             </tr>
         </thead>
-        <tbody>
-            <%-- <c:forEach var="approver" items="${approvers}" varStatus="status"> --%>
-                <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
-                   <td ><button class="btn btn-success" onclick="addTaskRow()">+</button></td>
-                   <td ><button class="btn btn-danger" onclick="deleteRow(this)">-</button></td>
-                   <td style="color:black">
-                       <select id="documentDropId" name="value()" onchange="setDataChanged()">
-                          <option value="-1">Select Document Type</option>
-                          <option value="ESIC" >ESIC</option>
-                          <option value="LL" >LL</option>
-                          <option value="RC">RC</option>
-                          <option value="WC" >WC</option>
-                    </select>
-                </td>
-                 <td style= "color:black"> <input type="text"  value=" " id="documentnumber" style="width:100px;"/></td> 
-				<td style="color:black"> <input type="text"  value=" " id="coverage" style="width:100px;"/> </td>
-				<td style="color:black"><input type="date" value=" " id="validf"   " placeholder = "DD/MM/YYYY"  /></td>
-				<td style="color:black"><input type="date" value=" "  id="validto"  " placeholder = "DD/MM/YYYY" /></td>
-				<td style= "color:black"><input type="file" value="No file selected" id="attachments" style="width:100px;"/></td>
-	            <td style= "color:black"><input type="checkbox" value=" " id="panindia"/></td>
-	            <td style= "color:black"><input type="checkbox" value=" " id="subcontractor"/></td>
-             </tr>
-            <%-- </c:forEach> --%>
-        </tbody>
+      <tbody id="workOrderBody">
+    <tr>
+        <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
+        <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
+        <td>
+            <select class="form-control woNumber" name="workOrderNumber">
+                <option value="">Select</option>
+                <option value="WO1">WO1</option>
+                <option value="WO2">WO2</option>
+            </select>
+        </td>
+        <td><input type="text" class="form-control natureOfJob" name="natureOfJob" /></td>
+        <td>
+            <select class="form-control documentType" name="documentType">
+                <option value="">Select</option>
+                <option value="PO">PO</option>
+                <option value="LOI">LOI</option>
+            </select>
+        </td>
+        <td><input type="text" class="form-control documentNumber" name="documentNumber" /></td>
+        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
+        <td><input type="date" class="form-control validFrom" name="validFrom" /></td>
+        <td><input type="date" class="form-control validTo" name="validTo" /></td>
+        <td><input type="file" class="form-control attachment" name="attachment" /></td>
+    </tr>
+</tbody>
+      
                 </table>
             </div>
  
         
  
  </div>
+  <script src="resources/js/cms/contractor.js" defer></script>
 </body>
 </html>

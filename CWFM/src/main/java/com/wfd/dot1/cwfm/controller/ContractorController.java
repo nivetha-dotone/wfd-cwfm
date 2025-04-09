@@ -8,19 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
+import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -175,33 +177,115 @@ public class ContractorController {
 	public String getContractorRegistration(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(String.valueOf(user.getUserId()));
+		List<PrincipalEmployer> peList = workmenService.getAllPrincipalEmployer(user.getUserAccount());
 		request.setAttribute("PrincipalEmployer", peList);
-
+		
+		String contractorRegId = contrService.generateContractorRegistrationId();
+		request.setAttribute("contractorregId", contractorRegId);
 		return "contractors/contractorRegistration";
 	}
 
-	@PostMapping("/saveReg")
-	public ResponseEntity<String> saveReg(@RequestBody ContractorRegistration contreg, HttpServletRequest request,
-			HttpServletResponse response) {
-		String result = contrService.saveReg(contreg);
-		return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
-	}
+	 @GetMapping("/getAllContractors")
+		public ResponseEntity<List<Contractor>> getAllContractors(
+	            @RequestParam("unitId") String unitId, 
+	            HttpServletRequest request,HttpServletResponse response) {
+	        try {
+	        	List<Contractor> contractors=new ArrayList<Contractor>();
+	    			
+	    				contractors = contrService.getAllContractorForReg(unitId);
+	    			
+	            if (contractors.isEmpty()) {
+	                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	            }
+	            return new ResponseEntity<>(contractors, HttpStatus.OK);
+	        } catch (Exception e) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+	 
+	 
+	 @GetMapping("/getAllContractorDetail")
+		public ResponseEntity<Contractor> getAllContractorDetail(
+	            @RequestParam("unitId") String unitId, @RequestParam("contractorId") String contractorId, 
+	            HttpServletRequest request,HttpServletResponse response) {
+	        try {
+	        	Contractor contractors=new Contractor();
+	    			
+	    				contractors = contrService.getAllContractorDetailForReg(unitId,contractorId);
+	    			
+	    				if (contractors == null || contractors.getContractorId() == null) {
+	    		            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	    		        }
+	            return new ResponseEntity<>(contractors, HttpStatus.OK);
+	        } catch (Exception e) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+	 
+//	@PostMapping("/saveReg")
+//	public ResponseEntity<String> saveReg(@RequestBody ContractorRegistration contreg, HttpServletRequest request,
+//			HttpServletResponse response) {
+//		try {
+//			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+//			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+//			contreg.setCreatedBy(String.valueOf(user.getUserId()));
+//		String result = contrService.saveReg(contreg);
+//		}catch(Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                                 .body("Error saving data: " + e.getMessage());
+//		}
+//		return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
+//	}
 
-	/*
-	 * public class TransactionIdServlet extends HttpServlet { protected void
-	 * doGet(HttpServletRequest request, HttpServletResponse response) throws
-	 * ServletException, IOException { // Generate a unique contractorID using
-	 * current timestamp (you can modify this logic) long contractorID =
-	 * System.currentTimeMillis(); // Unique ID based on timestamp
-	 * 
-	 * // Set the contractorID attribute in the request
-	 * request.setAttribute("contractorID", contractorID);
-	 * 
-	 * // Forward the request to the JSP page RequestDispatcher dispatcher =
-	 * request.getRequestDispatcher("contractorRegistration.jsp");
-	 * dispatcher.forward(request, response); }
-	 */
+	 @PostMapping("/saveReg")
+	 public ResponseEntity<String> saveReg(
+	     @RequestParam("jsonData") String jsonData,
+	     @RequestParam("policyAttachments") List<MultipartFile> attachments,
+	     HttpServletRequest request
+	 ) {
+	     try {
+	         // Parse the incoming JSON string into your Java object
+	         ObjectMapper mapper = new ObjectMapper();
+	         ContractorRegistration contreg = mapper.readValue(jsonData, ContractorRegistration.class);
+
+	         HttpSession session = request.getSession(false);
+	         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+	         contreg.setCreatedBy(String.valueOf(user.getUserId()));
+
+	         // Save master registration
+	         String regId = contrService.saveReg(contreg); // should return contractorregId
+
+	         if (regId != null) {
+	             List<ContractorRegistrationPolicy> policies = contreg.getRegPolicy();
+
+	             // Set regId and file details in each policy
+	             for (int i = 0; i < policies.size(); i++) {
+	                 ContractorRegistrationPolicy policy = policies.get(i);
+	                 policy.setContractorRegId(regId);
+
+	                 MultipartFile file = attachments.get(i);
+//	                 if (file != null && !file.isEmpty()) {
+//	                     policy.setFileName(file.getOriginalFilename());
+//	                     // Optionally: save file bytes or store to disk
+//	                     policy.setFileData(file.getBytes()); // if you have a fileData BLOB column
+//	                 } else {
+//	                     policy.setFileName(null);
+//	                     policy.setFileData(null);
+//	                 }
+	             }
+
+	             contrService.savePolicies(policies, contreg);
+	         }
+
+	         return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                 .body("Error saving data: " + e.getMessage());
+	     }
+	 }
+
+
 
 	@GetMapping("/contRegList")
 	public String getContractorRegistrationList(HttpServletRequest request, HttpServletResponse response) {
@@ -303,11 +387,6 @@ public class ContractorController {
 		String result = contrService.saveRenew(contrenew);
 		return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
 	}
-	@GetMapping("/generateContractorId")
-    public String generateContractorId(Model model) {
-        String contractorregId = contrService.generateUniqueContractorId();
-        model.addAttribute("contractorregId", contractorregId); // Pass the ID to the view
-        return "contractorRegistration"; // JSP page name
-    }
+	
 
 }

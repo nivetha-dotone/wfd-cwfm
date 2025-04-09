@@ -6,6 +6,7 @@ import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
+import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.Workorder;
@@ -49,6 +50,14 @@ public interface ContractorService {
 	public String saveRenew(ContractorRenewal contrenew);
 
 	public String generateUniqueContractorId();
+
+	public String generateContractorRegistrationId();
+
+	public List<Contractor> getAllContractorForReg(String unitId);
+
+	public Contractor getAllContractorDetailForReg(String unitId, String contractorId);
+
+	public void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg);
 	   
 	}
 

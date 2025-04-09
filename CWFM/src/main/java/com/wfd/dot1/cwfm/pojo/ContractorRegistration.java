@@ -6,9 +6,12 @@ public class ContractorRegistration{
     private String contractorregId;
 	private String principalEmployer;
 	private String vendorCode;
+	private String contractorId;
+	private String contractorName;
 	private String managerName;
 	private String locofWork;
 	private String totalStrength;
+	
 	private String rcMaxEmp;
 	private String pfNum;
 	private String natureOfWork;
@@ -16,66 +19,17 @@ public class ContractorRegistration{
 	private String contractTo;
 	private String contractType;
 	private String mainContractor;
-	private String contractName;
 	private String status;
 	private String requestType;
-	private String workOrderNum;
-	private String natureOfJob;
-	private String documentType;
-	private String documentNum;
-	private String coverage;
-	private String validFrom;
-	private String validTo;
-	private String attachments;
 	private String rcVerified;
+	private String createdBy;
+	private List<ContractorRegistrationPolicy> regPolicy;
 	
-	public String getWorkOrderNum() {
-		return workOrderNum;
+	public List<ContractorRegistrationPolicy> getRegPolicy() {
+		return regPolicy;
 	}
-	public void setWorkOrderNum(String workOrderNum) {
-		this.workOrderNum = workOrderNum;
-	}
-	public String getNatureOfJob() {
-		return natureOfJob;
-	}
-	public void setNatureOfJob(String natureOfJob) {
-		this.natureOfJob = natureOfJob;
-	}
-	public String getDocumentType() {
-		return documentType;
-	}
-	public void setDocumentType(String documentType) {
-		this.documentType = documentType;
-	}
-	public String getDocumentNum() {
-		return documentNum;
-	}
-	public void setDocumentNum(String documentNum) {
-		this.documentNum = documentNum;
-	}
-	public String getCoverage() {
-		return coverage;
-	}
-	public void setCoverage(String coverage) {
-		this.coverage = coverage;
-	}
-	public String getValidFrom() {
-		return validFrom;
-	}
-	public void setValidFrom(String validFrom) {
-		this.validFrom = validFrom;
-	}
-	public String getValidTo() {
-		return validTo;
-	}
-	public void setValidTo(String validTo) {
-		this.validTo = validTo;
-	}
-	public String getAttachments() {
-		return attachments;
-	}
-	public void setAttachments(String attachments) {
-		this.attachments = attachments;
+	public void setRegPolicy(List<ContractorRegistrationPolicy> regPolicy) {
+		this.regPolicy = regPolicy;
 	}
 	public String getRequestType() {
 		return requestType;
@@ -89,11 +43,11 @@ public class ContractorRegistration{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getContractName() {
-		return contractName;
+	public String getContractorName() {
+		return contractorName;
 	}
-	public void setContractName(String contractName) {
-		this.contractName = contractName;
+	public void setContractorName(String contractorName) {
+		this.contractorName = contractorName;
 	}
 
 	public String getContractorregId() {
@@ -181,14 +135,20 @@ public class ContractorRegistration{
 	public void setMainContractor(String mainContractor) {
 		this.mainContractor = mainContractor;
 	}
+	public String getContractorId() {
+		return contractorId;
+	}
+	public void setContractorId(String contractorId) {
+		this.contractorId = contractorId;
+	}
+	public String getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 	
-	/*
-	 * private List<ContractorRegistrationWODetails> woDetails;
-	 * 
-	 * public List<ContractorRegistrationWODetails> getWoDetails() { return
-	 * woDetails; } public void setWoDetails(List<ContractorRegistrationWODetails>
-	 * woDetails) { this.woDetails = woDetails; }
-	 */
+	
 	
 	
 }

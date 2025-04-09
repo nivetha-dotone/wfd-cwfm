@@ -11,6 +11,7 @@ import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
+import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.Workorder;
@@ -120,4 +121,22 @@ public class ContractorServiceImpl implements ContractorService{
         } while (contrDao.checkIfIdExists(contractorregId)); // Ensure uniqueness
         return contractorregId;
     }
+	@Override
+	public String generateContractorRegistrationId() {
+		return contrDao.generateContractorRegistrationId();
+	}
+	@Override
+	public List<Contractor> getAllContractorForReg(String unitId) {
+		return contrDao.getAllContractorForReg(unitId);
+	}
+	@Override
+	public Contractor getAllContractorDetailForReg(String unitId, String contractorId) {
+		
+		return contrDao.getAllContractorDetailForReg(unitId,contractorId);
+	}
+	@Override
+	public void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg) {
+		 contrDao.savePolicies(policies,contreg);
+		
+	}
 }
