@@ -82,7 +82,7 @@ public class ContractorServiceImpl implements ContractorService{
 		return contrDao.getContractorRenewalList(userId);
 	}
 	@Override
-	 public List<ContractorRegistration> viewContractorAddDetails( String contractorregId) {
+	 public List<ContractorRegistrationPolicy> viewContractorAddDetails( String contractorregId) {
 		// TODO Auto-generated method stub
 	        return contrDao.viewContractorAddDetails(contractorregId);
 	    }
@@ -138,5 +138,10 @@ public class ContractorServiceImpl implements ContractorService{
 	public void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg) {
 		 contrDao.savePolicies(policies,contreg);
 		
+	}
+	@Override
+	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId) {
+		// TODO Auto-generated method stub
+		return contrDao.getAllWorkordersBasedOnPEAndContractor(unitId,contractorId);
 	}
 }

@@ -3,6 +3,8 @@ package com.wfd.dot1.cwfm.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
@@ -182,6 +185,25 @@ public class ContractorController {
 		
 		String contractorRegId = contrService.generateContractorRegistrationId();
 		request.setAttribute("contractorregId", contractorRegId);
+		List<CmsGeneralMaster> gmList2 = workmenService.getAllGeneralMaster();
+
+		// Grouping the CmsGeneralMaster objects by gmType
+		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList2.stream()
+		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+		// Define the types and their corresponding request attribute names
+		Map<String, String> attributeMapping = Map.of(
+		        "DOCUMENT TYPE", "DocumentType"
+		        
+		);
+
+		// Iterate over the attribute mappings and set the request attributes dynamically
+		attributeMapping.forEach((type, attributeName) -> {
+		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+		    request.setAttribute(attributeName, gmList1);
+		});
+		
+		
 		return "contractors/contractorRegistration";
 	}
 
@@ -202,7 +224,20 @@ public class ContractorController {
 	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	        }
 	    }
-	 
+	 @GetMapping("/getAllWorkorders")
+		public ResponseEntity<List<Workorder>> getAllWorkorders(
+	            @RequestParam("unitId") String unitId, @RequestParam("contractorId") String contractorId,
+	            HttpServletRequest request,HttpServletResponse response) {
+	        try {
+	        	List<Workorder> workorders = contrService.getAllWorkordersBasedOnPEAndContractor(unitId,contractorId);
+	            if (workorders.isEmpty()) {
+	                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	            }
+	            return new ResponseEntity<>(workorders, HttpStatus.OK);
+	        } catch (Exception e) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
 	 
 	 @GetMapping("/getAllContractorDetail")
 		public ResponseEntity<Contractor> getAllContractorDetail(
@@ -222,20 +257,7 @@ public class ContractorController {
 	        }
 	    }
 	 
-//	@PostMapping("/saveReg")
-//	public ResponseEntity<String> saveReg(@RequestBody ContractorRegistration contreg, HttpServletRequest request,
-//			HttpServletResponse response) {
-//		try {
-//			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
-//			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-//			contreg.setCreatedBy(String.valueOf(user.getUserId()));
-//		String result = contrService.saveReg(contreg);
-//		}catch(Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                                 .body("Error saving data: " + e.getMessage());
-//		}
-//		return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
-//	}
+
 
 	 @PostMapping("/saveReg")
 	 public ResponseEntity<String> saveReg(
@@ -264,14 +286,12 @@ public class ContractorController {
 	                 policy.setContractorRegId(regId);
 
 	                 MultipartFile file = attachments.get(i);
-//	                 if (file != null && !file.isEmpty()) {
-//	                     policy.setFileName(file.getOriginalFilename());
-//	                     // Optionally: save file bytes or store to disk
-//	                     policy.setFileData(file.getBytes()); // if you have a fileData BLOB column
-//	                 } else {
-//	                     policy.setFileName(null);
-//	                     policy.setFileData(null);
-//	                 }
+	                 if (file != null && !file.isEmpty()) {
+	                     policy.setFileName(file.getOriginalFilename());
+	                     // Optionally: save file bytes or store to disk
+	                 } else {
+	                     policy.setFileName(null);
+	                 }
 	             }
 
 	             contrService.savePolicies(policies, contreg);
@@ -321,7 +341,7 @@ public class ContractorController {
 			HttpServletResponse response) {
 		ContractorRegistration contractor = contrService.viewContractorDetails(contractorregId);
 		request.setAttribute("principalEmployer", contractor);
-		List<ContractorRegistration> list = contrService.viewContractorAddDetails(contractorregId);
+		List<ContractorRegistrationPolicy> list = contrService.viewContractorAddDetails(contractorregId);
 		request.setAttribute("additionalDetails", list);
 		return "contractors/contractorView"; // Return the JSP file name
 	}

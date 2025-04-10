@@ -37,7 +37,7 @@ public interface ContractorService {
 
 	public List<ContractorRegistration> getContractorRenewalList(String userId);
 
-	public List<ContractorRegistration> viewContractorAddDetails(String contractorregId);
+	public List<ContractorRegistrationPolicy> viewContractorAddDetails(String contractorregId);
 
 	public ContractorRenewal viewContractorRenewDetails(String contractorRenewId);
 
@@ -58,6 +58,8 @@ public interface ContractorService {
 	public Contractor getAllContractorDetailForReg(String unitId, String contractorId);
 
 	public void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg);
+
+	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId);
 	   
 	}
 

@@ -319,14 +319,22 @@ public class ContractorDaoImpl implements ContractorDao{
 	}
 	
 	@Override
-	public List<ContractorRegistration> viewContractorAddDetails(String userId) {
-	List<ContractorRegistration> conList= new ArrayList<ContractorRegistration>();
+	public List<ContractorRegistrationPolicy> viewContractorAddDetails(String contractorregId) {
+	List<ContractorRegistrationPolicy> conList= new ArrayList<ContractorRegistrationPolicy>();
 	String query = getAllContractorsAdditionalDetails();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorregId);
 	while(rs.next()) {
-		ContractorRegistration pe = new ContractorRegistration();
+		ContractorRegistrationPolicy pe = new ContractorRegistrationPolicy();
 		
-		
+		pe.setContractorRegId(rs.getString("CONTRACTORREGID"));
+		pe.setWoNumber(rs.getString("WONUMBER"));
+		pe.setNatureOfJob(rs.getString("NATUREOFID"));
+		pe.setDocumentType(rs.getString("LICENCETYPE"));
+		pe.setDocumentNumber(rs.getString("WCCODE"));
+		pe.setCoverage(rs.getInt("WCTOTAL"));
+		pe.setValidFrom(rs.getString("WCFROMDTM"));
+		pe.setValidTo(rs.getString("WCTODTM"));
+		pe.setFileName(rs.getString("ATTACHMENTNAME"));
 		conList.add(pe);
 	}
 	return conList;
@@ -572,6 +580,25 @@ public class ContractorDaoImpl implements ContractorDao{
 				return policies.size();
 			}
 		});
+	}
+
+	 public String getAllWoByPeAndCont() {
+		    return QueryFileWatcher.getQuery("GET_WO_FOR_CONTRACTOR_REG");
+		}
+	@Override
+	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId) {
+		List<Workorder> woList= new ArrayList<Workorder>();
+		String query=getAllWoByPeAndCont();
+		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, contractorId,unitId);
+		while(rs.next()) {
+			Workorder wo = new Workorder();
+			wo.setWorkorderId(rs.getString("WORKORDERID"));
+			wo.setName(rs.getString("SAP_WORKORDER_NUM"));
+			woList.add(wo);
+		}
+		log.info("Exiting from getAllWorkordersBasedOnPEAndContractor dao method "+woList.size());
+		return woList;
 	}
 }
 

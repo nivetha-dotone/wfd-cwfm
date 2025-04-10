@@ -26,6 +26,8 @@
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   
+    
+    
     function showSection(type) {
         document.getElementById("sequentialSection").style.display = (type === 'sequential') ? 'block' : 'none';
         document.getElementById("parallelSection").style.display = (type === 'parallel') ? 'block' : 'none';

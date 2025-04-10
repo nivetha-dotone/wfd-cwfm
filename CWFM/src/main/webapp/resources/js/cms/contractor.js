@@ -618,50 +618,7 @@ function validateRenewFormData() {
 	
     return isValid;
 }
-function toggleMainContractorRow() {
-        // Get the selected value of contractor type
-        var contractorType = document.getElementById("contractTypeId").value;
-        var mainContractorRow = document.getElementById("mainContractorRow");
 
-        // Show or hide Main Contractor row based on the selected type
-        if (contractorType === "Sub Contractor") {
-            mainContractorRow.style.display = "table-row"; // Show the row
-			var principalEmployerSelect = document.getElementById("principalEmployerId");
-			var unitId = principalEmployerSelect.value;
-			
-			var xhr = new XMLHttpRequest();
-			    var url = contextPath + "/contractor/getAllContractors?unitId=" + unitId ;
-			    xhr.open("GET", url, true);
-
-			    xhr.onload = function() {
-			        if (xhr.status === 200) {
-			            // Parse the response as a JSON array of contractor objects
-			            var contractors = JSON.parse(xhr.responseText);
-			            console.log("Response:", contractors);
-			            var contractorSelect = document.getElementById("mainContractorId");
-			            contractorSelect.innerHTML = '<option value="">Please select Main Contractor</option>';
-			            contractors.forEach(function(contractor) {
-			                var option = document.createElement("option");
-			                option.value = contractor.contractorId;
-			                option.text =contractor.contractorCode+" | "+ contractor.contractorName;
-			                contractorSelect.appendChild(option);
-			            });
-			        } else {
-			            console.error("Error:", xhr.statusText);
-			        }
-			    };
-
-			    xhr.onerror = function() {
-			        console.error("Request failed");
-			    };
-
-			    xhr.send();
-				
-        } else {
-            mainContractorRow.style.display = "none"; // Hide the row
-            //document.getElementById("mainContractor").value = ""; // Clear the input
-        }
-    }
 	
 	
 	function getAllContractorsForReg(unitId) {
@@ -780,6 +737,8 @@ function toggleMainContractorRow() {
 		    let basicValid = validateFormData();
 		    if (!basicValid) return;
 
+			let otherFileds = validateDocuments();
+			if(!otherFileds) return;
 		    const data = new FormData();
 
 		    const selectedOption = $("#vendorCodeId option:selected");
@@ -873,37 +832,9 @@ function toggleMainContractorRow() {
 		    }
 		});
 
-		function addRowCont() {
-		    const tbody = document.getElementById("workOrderBody");
-		    const today = new Date().toISOString().split('T')[0];
-
-		    const row = document.createElement("tr");
-		    row.innerHTML = `
-		        <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
-		        <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
-		        <td>
-		            <select class="form-control woNumber"  name="workOrderNumber">
-		                <option value="">Select</option>
-		                <option value="WO1">WO1</option>
-		                <option value="WO2">WO2</option>
-		            </select>
-		        </td>
-		        <td><input type="text" class="form-control natureOfJob" name="natureOfJob" /></td>
-		        <td>
-		            <select class="form-control documentType" name="documentType">
-		                <option value="">Select</option>
-		                <option value="PO">PO</option>
-		                <option value="LOI">LOI</option>
-		            </select>
-		        </td>
-		        <td><input type="text" class="form-control documentNumber" name="documentNumber" /></td>
-		        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
-		        <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
-		        <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
-		        <td><input type="file"  class="form-control attachment" name="attachment" /></td>
-		    `;
-		    tbody.appendChild(row);
-		}
+	
+			
+	
 
 		function deleteRowCont(buttonElement) {
 		    const row = buttonElement.closest('tr');
@@ -915,4 +846,277 @@ function toggleMainContractorRow() {
 		        alert("At least one row must be present.");
 		    }
 		}
+		
+		
+		
+		let globalWorkOrders = [];
+		
+		function toggleMainContractorRow() {
+		    const contractorType = document.getElementById("contractTypeId").value;
+		    const mainContractorRow = document.getElementById("mainContractorRow");
+		    const principalEmployerSelect = document.getElementById("principalEmployerId");
+		    const unitId = principalEmployerSelect.value;
 
+		    // Clear existing work orders in the global array
+		    globalWorkOrders = [];
+
+		    // Clear the work order dropdown for all rows
+		    const woSelects = document.querySelectorAll('.woNumber');
+		    woSelects.forEach(select => select.innerHTML = '<option value="">Select</option>');
+
+		    if (contractorType === "Sub Contractor") {
+		        mainContractorRow.style.display = "table-row";
+
+		        const xhr = new XMLHttpRequest();
+		        const url = contextPath + "/contractor/getAllContractors?unitId=" + unitId;
+
+		        xhr.open("GET", url, true);
+		        xhr.onload = function() {
+		            if (xhr.status === 200) {
+		                const contractors = JSON.parse(xhr.responseText);
+		                const contractorSelect = document.getElementById("mainContractorId");
+		                contractorSelect.innerHTML = '<option value="">Please select Main Contractor</option>';
+
+		                contractors.forEach(function(contractor) {
+		                    const option = document.createElement("option");
+		                    option.value = contractor.contractorId;
+		                    option.text = contractor.contractorCode + " | " + contractor.contractorName;
+		                    contractorSelect.appendChild(option);
+		                });
+
+		                // Add an onchange listener for when a main contractor is selected
+		                contractorSelect.onchange = function() {
+		                    const selectedContractorId = contractorSelect.value;
+		                    if (selectedContractorId) {
+		                        // Fetch the work orders for the selected main contractor
+		                        getAllWorkorderForReg(selectedContractorId);
+		                    }
+		                };
+		            } else {
+		                console.error("Error fetching contractors:", xhr.statusText);
+		            }
+		        };
+
+		        xhr.onerror = function() {
+		            console.error("Request failed");
+		        };
+
+		        xhr.send();
+		    } else if (contractorType === "Main Contractor") {
+		        mainContractorRow.style.display = "none";
+
+		        // Fetch and update work orders for the selected Main Contractor
+		        const contractorId = document.getElementById("vendorCodeId").value;
+		        if (contractorId) {
+		            getAllWorkorderForReg(contractorId);
+		        }
+		    }
+		}
+
+
+		function fetchWorkOrders(contractorId) {
+		    const principalEmployerSelect = document.getElementById("principalEmployerId");
+		    const unitId = principalEmployerSelect.value;
+		    const xhr = new XMLHttpRequest();
+		    const url = contextPath + "/contractor/getAllWorkorders?unitId=" + unitId + "&contractorId=" + contractorId;
+
+		    xhr.open("GET", url, true);
+		    xhr.onload = function() {
+		        if (xhr.status === 200) {
+		            // Store the fetched work orders globally
+		            globalWorkOrders = JSON.parse(xhr.responseText);
+		            console.log("Work Orders Updated:", globalWorkOrders);
+					
+		        } else {
+		            console.error("Error fetching work orders:", xhr.statusText);
+		        }
+		    };
+
+		    xhr.onerror = function() {
+		        console.error("Request failed");
+		    };
+
+		    xhr.send();
+		}
+
+
+		function addRowCont() {
+		    const tbody = document.getElementById("workOrderBody");
+		    const today = new Date().toISOString().split('T')[0];
+
+		    // Create a new table row
+		    const row = document.createElement("tr");
+
+		    // Generate the Work Order options from the global array
+		    let workOrderOptions = '<option value="">Select</option>';
+		    globalWorkOrders.forEach(workOrder => {
+		        workOrderOptions += `<option value="${workOrder.workorderId}">${workOrder.name}</option>`;
+		    });
+
+		    row.innerHTML = `
+		        <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
+		        <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
+		        <td>
+		            <select class="form-control woNumber" name="workOrderNumber">
+		                ${workOrderOptions}
+		            </select>
+		        </td>
+		        <td><input type="text" class="form-control natureOfJob" name="natureOfJob" /></td>
+		        <td></td> <!-- placeholder for the cloned documentType select -->
+		        <td><input type="text" class="form-control documentNumber" name="documentNumber" /></td>
+		        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
+		        <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
+		        <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
+		        <td><input type="file" class="form-control attachment" name="attachment" /></td>
+		    `;
+
+			// Clone the documentType dropdown from the first row
+				    const originalDropdown = document.querySelector('#workOrderBody tr:first-child select.documentType');
+				    const clonedDropdown = originalDropdown.cloneNode(true);
+				    clonedDropdown.classList.add("documentType");
+				    clonedDropdown.name = "documentType";
+
+				    // Insert the cloned dropdown into the correct <td>
+				    row.cells[4].appendChild(clonedDropdown);
+					
+		    // Append the row to the tbody
+		    tbody.appendChild(row);
+		}
+		
+		function getAllWorkorderForReg(contractorId) {
+		    const principalEmployerSelect = document.getElementById("principalEmployerId");
+		    const unitId = principalEmployerSelect.value;
+		    const xhr = new XMLHttpRequest();
+		    const url = contextPath + "/contractor/getAllWorkorders?unitId=" + unitId + "&contractorId=" + contractorId;
+
+		    xhr.open("GET", url, true);
+		    xhr.onload = function() {
+		        if (xhr.status === 200) {
+		            // Store the fetched work orders globally
+		            globalWorkOrders = JSON.parse(xhr.responseText);
+		            console.log("Work Orders Updated:", globalWorkOrders);
+
+		            // Clear existing work order dropdowns before populating new ones
+		            const woSelects = document.querySelectorAll('.woNumber');
+		            woSelects.forEach(select => {
+		                select.innerHTML = '<option value="">Select</option>'; // Clear previous options
+		            });
+
+		            // Populate the work order dropdown with new values
+		            globalWorkOrders.forEach(workOrder => {
+		                const option = document.createElement("option");
+		                option.value = workOrder.workorderId;
+		                option.text = workOrder.name;
+
+		                // Append the options to all work order dropdowns
+		                woSelects.forEach(select => {
+		                    select.appendChild(option);
+		                });
+		            });
+		        } else {
+		            console.error("Error fetching work orders:", xhr.statusText);
+		        }
+		    };
+
+		    xhr.onerror = function() {
+		        console.error("Request failed");
+		    };
+
+		    xhr.send();
+		}
+		
+		function validateDocuments() {
+		    const rows = document.querySelectorAll('#workOrderBody tr');
+		    const rcVerified = document.querySelector('#rcVerifiedId')?.checked || false;
+		    const today = new Date();
+		    const workOrderMap = {};
+		    const workOrderDisplayMap = {};
+		    let messages = [];
+
+		    rows.forEach((row, index) => {
+		        const rowNum = index + 1;
+		        const workOrderSelect = row.querySelector('.woNumber');
+		        const workOrderId = workOrderSelect?.value?.trim();
+		        const workOrderName = workOrderSelect?.selectedOptions[0]?.text?.trim();
+				const docType = row.querySelector('.documentType')?.selectedOptions[0]?.text?.trim();
+
+				
+		        const docNumber = row.querySelector('.documentNumber')?.value?.trim();
+		        const validFromVal = row.querySelector('.validFrom')?.value;
+		        const validToVal = row.querySelector('.validTo')?.value;
+		        const validFrom = validFromVal ? new Date(validFromVal) : null;
+		        const validTo = validToVal ? new Date(validToVal) : null;
+		        const fileInput = row.querySelector('.attachment');
+
+		        if (!workOrderId || !docType) return;
+
+		        // Track work order name for message display
+		        workOrderDisplayMap[workOrderId] = workOrderName;
+
+		        // Initialize and validate duplicates
+		        if (!workOrderMap[workOrderId]) workOrderMap[workOrderId] = new Set();
+		        if (workOrderMap[workOrderId].has(docType)) {
+		            messages.push(`Row ${rowNum}: Duplicate document type "${docType}" for work order "${workOrderName}".`);
+		        }
+		        workOrderMap[workOrderId].add(docType);
+
+		        // Valid From - must be a future date
+		        if (!validFrom || validFrom <= today) {
+		            messages.push(`Row ${rowNum}: "Valid From" must be a future date.`);
+		        }
+
+		        // Valid To - must be after Valid From and also a future date
+		        if (!validTo || validTo <= today || validTo <= validFrom) {
+		            messages.push(`Row ${rowNum}: "Valid To" must be after "Valid From" and a future date.`);
+		        }
+
+		        // Document Number check
+		        if (!docNumber) {
+		            messages.push(`Row ${rowNum}: Document number is required.`);
+		        }
+
+		        // File size check ≤ 3 MB
+				// File size and presence check
+				const maxSizeInBytes = 3 * 1024 * 1024;
+				if (!fileInput?.files?.length) {
+				    messages.push(`Row ${rowNum}: File attachment is required.`);
+				} else {
+				    const file = fileInput.files[0];
+				    if (file.size > maxSizeInBytes) {
+				        messages.push(`Row ${rowNum}: File "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(2)} MB. Maximum allowed size is 3 MB.`);
+				    }
+				}
+
+		    });
+
+		    // Check for ESIC or WC per work order
+		    for (const workOrderId in workOrderMap) {
+		        const docSet = workOrderMap[workOrderId];
+		        const displayName = workOrderDisplayMap[workOrderId] || workOrderId;
+		        if (!(docSet.has('ESIC') || docSet.has('WC'))) {
+		            messages.push(`Work order "${displayName}" must include either ESIC or WC.`);
+		        }
+		    }
+
+		    // RC requirement if verified
+		    if (rcVerified) {
+		        const hasRC = Object.values(workOrderMap).some(set => set.has('RC'));
+		        if (!hasRC) {
+		            messages.push(`RC document is required since RC Verified is checked.`);
+		        }
+		    }
+
+		    // Display messages
+		    const messageContainer = document.getElementById("validationMessages");
+		    if (messages.length > 0) {
+		        messageContainer.innerHTML = `
+		            <ul style="list-style: disc; padding-left: 20px; color: red;">
+		                ${messages.map(msg => `<li>${msg}</li>`).join('')}
+		            </ul>
+		        `;
+		        return false;
+		    } else {
+		        messageContainer.innerHTML = ''; // Clear previous messages
+		        return true;
+		    }
+		}

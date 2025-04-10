@@ -250,8 +250,8 @@
 					<!-- Add more table headers for each column -->
 					<th class="header-text" onclick="sortTable(1)"><spring:message code="label.contractorregId"/><span
 						id="sortTransactionid" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text" onclick="sortTable(2)"><spring:message code="label.unitCode"/><span
-						id="sortUnitcode" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<%-- <th class="header-text" onclick="sortTable(2)"><spring:message code="label.unitCode"/><span
+						id="sortUnitcode" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
 					<th class="header-text" onclick="sortTable(3)"><spring:message code="label.vendorCode"/> <span
 						id="sortVendorcode" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text" onclick="sortTable(4)"><spring:message code="label.contractorName"/><span
@@ -268,7 +268,7 @@
 						<td ><input type="checkbox"
 							name="selectedWOs" value="${wo.contractorregId}"></td>
 						<td  >${wo.contractorregId}</td>
-						<td  >${wo.principalEmployer}</td>
+						<%-- <td  >${wo.principalEmployer}</td> --%>
 						<td  >${wo.vendorCode}</td>
 						<td  >${wo.contractorName}</td>
 						<td  >${wo.status}</td>

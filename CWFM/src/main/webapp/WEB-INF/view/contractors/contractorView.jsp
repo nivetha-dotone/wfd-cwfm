@@ -177,13 +177,17 @@ table.ControlLayout td {
 <body>
     
     <div id="principalEmployerContent">
+    <div class="tabs-container">
+   
+              <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" style="float: right;" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
+    		
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">Additional Information</button> 
+           
      </div>
-     <div class="action-buttons" >
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
-    </div>
+    
+    		</div>
      <div id="tab1" class="tab-content active">
         
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
@@ -280,14 +284,14 @@ table.ControlLayout td {
         <tbody>
              <c:forEach var="item" items="${additionalDetails}" varStatus="status"> 
                 <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
-                    <td style="color:black ;text-align:center">${item.workOrderNum }</td>
+                    <td style="color:black ;text-align:center">${item.woNumber }</td>
                     <td style="color:black;text-align:center">${item.natureOfJob }</td >
                     <td style="color:black;text-align:center">${item.documentType }</td>
-                    <td style="color:black;text-align:center">${item.documentNum }</td>
+                    <td style="color:black;text-align:center">${item.documentNumber }</td>
                     <td style="color:black;text-align:center">${item.coverage }</td>
                     <td style="color:black;text-align:center">${item.validFrom }</td >
                     <td style="color:black;text-align:center">${item.validTo}</td>
-                    <td style="color:black;text-align:center">${item.attachments} </td>
+                    <td style="color:black;text-align:center">${item.fileName} </td>
                     
                 </tr>
              </c:forEach> 

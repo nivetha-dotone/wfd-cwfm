@@ -326,6 +326,7 @@ label {
 
        
 <div id="tab1" class="tab-content active ">
+
     <table cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
@@ -410,11 +411,13 @@ label {
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractType"/></label></th>
            <td>
     <!-- Dropdown for contractor type -->
-              <select id="contractTypeId" name="contractType" style="width: 100%; height: 25px;color: black;" onchange="toggleMainContractorRow()">
-                <option value="">Select Contractor Type</option>
-                <option value="Main Contractor">Main Contractor</option>
-                <option value="Sub Contractor">Sub Contractor</option>
-              </select>
+              <select id="contractTypeId" name="contractType" onchange="toggleMainContractorRow()" style="width: 100%; height: 25px; color: black;">
+    <option value="">Select Contractor Type</option>
+    <option value="Main Contractor">Main Contractor</option>
+    <option value="Sub Contractor">Sub Contractor</option>
+</select>
+<label id="error-contractType" style="color: red; display: none;">Contract Type is required</label>
+              
              <label id="error-contractType" style="color: red; display: none;">Contract Type is required</label>
          </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isRcVerified"/></label></th>
@@ -425,24 +428,28 @@ label {
                
         </tr>
            <!-- Main Contractor row -->
-      <tr id="mainContractorRow" style="display: none;"><th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mainContractor"/></label></th>
+       <tr id="mainContractorRow" style="display: none;"><th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mainContractor"/></label></th>
     <td>
-       <!--  <input id="mainContractor" name="mainContractor" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"> -->
         <select class="custom-select" id="mainContractorId" name="mainContractor"  >
             						<option value="">Please select Main Contractor</option>
             		</select>
         <label id="error-mainContractor" style="color: red; display: none;">Main Contractor is required</label>
     </td>
-   </tr>
+   </tr> 
+   
+
+   
    </tbody>
   </table>
  </div>
+
 
 <div class="action-buttons z" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
  </div>
  <div  class="tab-content "><spring:message code="label.additionalDocumets"/></div>
             <div id="tab2" class="tab-content active ">
+            <div id="validationMessages" style="color: red; font-weight: bold; padding: 10px;"></div>
             <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
                    
         <thead>
@@ -466,19 +473,19 @@ label {
         <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
         <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
         <td>
-            <select class="form-control woNumber" name="workOrderNumber">
-                <option value="">Select</option>
-                <option value="WO1">WO1</option>
-                <option value="WO2">WO2</option>
+            <select class="form-control woNumber" name="workOrderNumber" id="workOrderNumberId">
+               
             </select>
         </td>
         <td><input type="text" class="form-control natureOfJob" name="natureOfJob" /></td>
         <td>
-            <select class="form-control documentType" name="documentType">
-                <option value="">Select</option>
-                <option value="PO">PO</option>
-                <option value="LOI">LOI</option>
-            </select>
+            <select class="form-control documentType" name="documentType" id="documentTypeId">
+            
+                 <option value="">Please select Document Type</option>
+                                <c:forEach var="doc" items="${DocumentType}">
+                					<option value="${doc.gmId}">${doc.gmName}</option>
+            					</c:forEach>
+                                </select>
         </td>
         <td><input type="text" class="form-control documentNumber" name="documentNumber" /></td>
         <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>

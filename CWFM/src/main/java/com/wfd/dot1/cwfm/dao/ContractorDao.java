@@ -39,7 +39,7 @@ public interface ContractorDao {
 
 	public List<ContractorRegistration> getContractorRenewalList(String contractorregId);
 
-	public List<ContractorRegistration> viewContractorAddDetails(String contractorregId);
+	public List<ContractorRegistrationPolicy> viewContractorAddDetails(String contractorregId);
 	
 	public ContractorRenewal viewContractorRenewDetails(String contractorRenewId);
 
@@ -60,6 +60,8 @@ public interface ContractorDao {
 	public Contractor getAllContractorDetailForReg(String unitId, String contractorId);
 
 	public void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg);
+
+	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId);
 	   
 	}
 
