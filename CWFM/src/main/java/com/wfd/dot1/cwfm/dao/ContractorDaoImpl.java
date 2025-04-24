@@ -192,7 +192,7 @@ public class ContractorDaoImpl implements ContractorDao{
 			SqlRowSet rs = jdbcTemplate.queryForRowSet(getContrpemmByPeAndCont(),contractorId,principalEmployerId);
 			if (rs.next()) {
 	            contr = new CMSContrPemm();
-	            contr.setRefId(rs.getLong("REFID"));
+	            //contr.setRefId(rs.getLong("REFID"));
 	            contr.setContractorId(rs.getLong("CONTRACTORID"));
 	            contr.setUnitId(rs.getLong("UNITID"));
 	            contr.setManagerNm(rs.getString("MANAGERNM"));

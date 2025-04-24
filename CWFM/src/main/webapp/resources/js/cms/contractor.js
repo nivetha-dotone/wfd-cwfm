@@ -1029,7 +1029,9 @@ function validateRenewFormData() {
 		    const rows = document.querySelectorAll('#workOrderBody tr');
 		    const rcVerified = document.querySelector('#rcVerifiedId')?.checked || false;
 		    const today = new Date();
-		    const workOrderMap = {};
+		    const workOrderMap = {};      // Tracks document types per work order
+		    const docNumberMap = {};      // Tracks doc numbers per work order
+		    const allDocNumbers = new Set(); // Tracks all doc numbers globally
 		    const workOrderDisplayMap = {};
 		    let messages = [];
 
@@ -1038,9 +1040,7 @@ function validateRenewFormData() {
 		        const workOrderSelect = row.querySelector('.woNumber');
 		        const workOrderId = workOrderSelect?.value?.trim();
 		        const workOrderName = workOrderSelect?.selectedOptions[0]?.text?.trim();
-				const docType = row.querySelector('.documentType')?.selectedOptions[0]?.text?.trim();
-
-				
+		        const docType = row.querySelector('.documentType')?.selectedOptions[0]?.text?.trim();
 		        const docNumber = row.querySelector('.documentNumber')?.value?.trim();
 		        const validFromVal = row.querySelector('.validFrom')?.value;
 		        const validToVal = row.querySelector('.validTo')?.value;
@@ -1050,46 +1050,66 @@ function validateRenewFormData() {
 
 		        if (!workOrderId || !docType) return;
 
-		        // Track work order name for message display
+		        const isFilePresent = fileInput?.files?.length > 0;
+		        const isDocNumberPresent = !!docNumber;
+
 		        workOrderDisplayMap[workOrderId] = workOrderName;
 
-		        // Initialize and validate duplicates
-		        if (!workOrderMap[workOrderId]) workOrderMap[workOrderId] = new Set();
-		        if (workOrderMap[workOrderId].has(docType)) {
-		            messages.push(`Row ${rowNum}: Duplicate document type "${docType}" for work order "${workOrderName}".`);
+		        // Validation messages
+		        if (!isDocNumberPresent) {
+		            messages.push(`Row ${rowNum}: Document number is required.`);
 		        }
-		        workOrderMap[workOrderId].add(docType);
 
-		        // Valid From - must be a future date
+		        if (!isFilePresent) {
+		            messages.push(`Row ${rowNum}: File attachment is required.`);
+		        }
+
 		        if (!validFrom || validFrom <= today) {
 		            messages.push(`Row ${rowNum}: "Valid From" must be a future date.`);
 		        }
 
-		        // Valid To - must be after Valid From and also a future date
 		        if (!validTo || validTo <= today || validTo <= validFrom) {
 		            messages.push(`Row ${rowNum}: "Valid To" must be after "Valid From" and a future date.`);
 		        }
 
-		        // Document Number check
-		        if (!docNumber) {
-		            messages.push(`Row ${rowNum}: Document number is required.`);
+		        if (isFilePresent && fileInput.files[0].size > 3 * 1024 * 1024) {
+		            const file = fileInput.files[0];
+		            messages.push(`Row ${rowNum}: File "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(2)} MB. Maximum allowed size is 3 MB.`);
 		        }
 
-		        // File size check ≤ 3 MB
-				// File size and presence check
-				const maxSizeInBytes = 3 * 1024 * 1024;
-				if (!fileInput?.files?.length) {
-				    messages.push(`Row ${rowNum}: File attachment is required.`);
-				} else {
-				    const file = fileInput.files[0];
-				    if (file.size > maxSizeInBytes) {
-				        messages.push(`Row ${rowNum}: File "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(2)} MB. Maximum allowed size is 3 MB.`);
-				    }
-				}
+		        // Only proceed if document number and file are present
+		        if (isDocNumberPresent && isFilePresent) {
+		            if (!workOrderMap[workOrderId]) workOrderMap[workOrderId] = new Set();
+		            if (!docNumberMap[workOrderId]) docNumberMap[workOrderId] = new Set();
 
+		            // Duplicate document type per work order
+		            if (workOrderMap[workOrderId].has(docType)) {
+		                messages.push(`Row ${rowNum}: Duplicate document type "${docType}" for work order "${workOrderName}".`);
+		            } else {
+		                workOrderMap[workOrderId].add(docType);
+		            }
+
+		            // Duplicate document number per work order
+		            if (docNumberMap[workOrderId].has(docNumber)) {
+		                messages.push(`Row ${rowNum}: Duplicate document number "${docNumber}" within work order "${workOrderName}".`);
+		            } else {
+		                docNumberMap[workOrderId].add(docNumber);
+		            }
+
+		            // Global duplicate document number
+		            if (allDocNumbers.has(docNumber)) {
+		                messages.push(`Row ${rowNum}: Document number "${docNumber}" is already used in another work order.`);
+		            } else {
+		                allDocNumbers.add(docNumber);
+		            }
+		        }
 		    });
 
-		    // Check for ESIC or WC per work order
+		    if (Object.keys(workOrderMap).length === 0) {
+		        messages.push("At least one valid work order with complete document details is required.");
+		    }
+
+		    // ESIC or WC check
 		    for (const workOrderId in workOrderMap) {
 		        const docSet = workOrderMap[workOrderId];
 		        const displayName = workOrderDisplayMap[workOrderId] || workOrderId;
@@ -1098,7 +1118,7 @@ function validateRenewFormData() {
 		        }
 		    }
 
-		    // RC requirement if verified
+		    // RC check
 		    if (rcVerified) {
 		        const hasRC = Object.values(workOrderMap).some(set => set.has('RC'));
 		        if (!hasRC) {
@@ -1106,7 +1126,6 @@ function validateRenewFormData() {
 		        }
 		    }
 
-		    // Display messages
 		    const messageContainer = document.getElementById("validationMessages");
 		    if (messages.length > 0) {
 		        messageContainer.innerHTML = `

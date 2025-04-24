@@ -221,7 +221,7 @@ table.ControlLayout td {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="code" value="${principalEmployer.code}" style="height: 20px;"  size="30" maxlength="30" readonly />
+                              <input type="text" name="code" value="${principalEmployer.name}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
                          <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.organization"/></label></th>
                             <td><input type="text" name="organization" value="${principalEmployer.organization}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
@@ -229,18 +229,18 @@ table.ControlLayout td {
      </td> -->
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <input type="text" name="code" value="${contractor.contractorCode}" style="height: 20px;"  size="30" maxlength="30" readonly />
+                              <input type="text" name="code" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" readonly />
                               </div></td>
-                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.state"/></label></th>
-                            <td><input type="text" name="name" value="${contractor.contractorName}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
+                            <td><input type="text" name="name" value="${contractor.contractorAddress}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
-                            <td><input type="text" name="managerNm" value="${contractorPEMM.managerNm}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="managerNm" value="${contractorPEMM.managerName}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerAddress"/></label></th>
                             <td><input type="text" name="pfNum" value="${contractorPEMM.pfNum}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        
@@ -248,16 +248,16 @@ table.ControlLayout td {
                         
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
-                            <td><input type="text" name="managerEmail" value="${contractorPEMM.managerEmail}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="managerEmail" value="ramco@gmail.com" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
-                            <td><input type="text" name="managerMobile" value="${contractorPEMM.managerMobile}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="managerMobile" value="9876543212" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicRegistration"/></label></th>
-                            <td><input type="text" name="esicNum" value="${contractorPEMM.esicNum}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="esicNum" value="${contractorPEMM.esiwc}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                             <th><label class="custom-label"><spring:message code="label.contractValidTill"/></label></th>
-                            <td><input type="text" name="" value="0" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="" value="${contractorPEMM.validTo }" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isRcVerified"/></label></th>

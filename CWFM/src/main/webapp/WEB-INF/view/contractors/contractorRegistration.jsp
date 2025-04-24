@@ -313,7 +313,8 @@ label {
     <div id="principalEmployerContent">
         <div class="tabs-container">
         <div class="tabs">
-            <button  data-target="tab1" onclick="showTab('tab1')">Basic Data</button>
+              <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
+            <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
            
         </div>
          <div class="action-buttons" >
@@ -448,7 +449,7 @@ label {
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
  </div>
  <div  class="tab-content "><spring:message code="label.additionalDocumets"/></div>
-            <div id="tab2" class="tab-content active ">
+            <div id="tab2" class="tab-content  ">
             <div id="validationMessages" style="color: red; font-weight: bold; padding: 10px;"></div>
             <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
                    

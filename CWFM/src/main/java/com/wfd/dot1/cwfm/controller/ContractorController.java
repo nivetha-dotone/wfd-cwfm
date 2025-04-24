@@ -157,7 +157,7 @@ public class ContractorController {
 		PrincipalEmployer principalEmployer = peService.getIndividualPEDetailByUnitId(principalEmployerId);
 		request.setAttribute("principalEmployer", principalEmployer);
 
-		CMSContrPemm contractorPEMM = contrService.getMappingByContractorIdAndUnitId(contractorId, principalEmployerId);
+		Contractor contractorPEMM = contrService.getAllContractorDetailForReg(principalEmployerId,contractorId);
 		request.setAttribute("contractorPEMM", contractorPEMM);
 
 		List<CmsContractorWC> laborLicenses = contrService

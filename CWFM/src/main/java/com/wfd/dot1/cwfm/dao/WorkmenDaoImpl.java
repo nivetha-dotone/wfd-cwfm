@@ -189,7 +189,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		List<Workorder> woList= new ArrayList<Workorder>();
 		String query=getAllWoByPeAndCont();
 		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+query);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId, contractorId,contractorId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId, contractorId);
 		while(rs.next()) {
 			Workorder wo = new Workorder();
 			wo.setWorkorderId(rs.getString("WORKORDERID"));

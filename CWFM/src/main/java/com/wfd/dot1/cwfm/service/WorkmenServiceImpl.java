@@ -234,6 +234,15 @@ public class WorkmenServiceImpl implements WorkmenService{
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId() || dto.getGatePassType().equalsIgnoreCase(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
 				result = workmenDao.gatePassAction(dto);
+				if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()) || dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
+					 workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getGatePassStatus(),GatePassType.CREATE.getStatus());
+				//rollback status and type to create
+				}else {
+					String gatePassId=dto.getGatePassId();
+					
+					
+				 workmenDao.updateGatePassMainStatus(gatePassId,dto.getGatePassStatus());
+				}
 				 if(null!=result) {
 						GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
 						statusLog.setGatePassId(dto.getGatePassId());
