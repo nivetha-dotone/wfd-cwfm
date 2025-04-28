@@ -210,12 +210,69 @@ table.ControlLayout td {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorRegistrationId"/></label></th>
                 <td><input type="text" name="contractorregId" value="${principalEmployer.contractorregId}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
-                 </tr>
-            <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
                 <td><input type="text" name="principalEmployer" value="${principalEmployer.principalEmployer}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                
+                 </tr>
+            <tr>
+            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
+                <td>
+                	<input id="contractorNameId" name="contractorName" value="${principalEmployer.contractorName}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly/>
+                </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
                 <td><input type="text" name="vendorCode" value="${principalEmployer.vendorCode}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+            </tr>
+             <tr>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
+                <td>
+                	<input id="emailId" name="email"  value="${principalEmployer.email}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly  />
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
+                <td>
+                	<input id="mobileId" name="mobile"  value="${principalEmployer.mobile}" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" readonly  />
+                </td>
+                
+            </tr>
+            
+             <tr>
+           	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAadhar"/></label></th>
+                <td>
+                	<input id="aadharId" name="aadhar" value="${principalEmployer.aadhar}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" readonly  />
+                </td>
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharDoc"/></label></th>
+                <td>
+                 <a href="#" onclick="downloadContractorDoc('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.aadharDoc }')">Download Aadhar</a>
+                </td>
+               
+           </tr>
+            <tr>
+           	   
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorPan"/></label></th>
+                <td>
+                	<input id="panId" name="pan" value="${principalEmployer.pan}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly  />
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.panDoc"/></label></th>
+                <td>
+                 <a href="#" onclick="downloadContractorDoc('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.panDoc }')">Download Pan</a>
+               
+                </td>
+           </tr>
+            <tr>
+           	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorGst"/></label></th>
+                <td>
+                	<input id="gstId" name="gst" value="${principalEmployer.gst}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly  />
+                </td>
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAddress"/></label></th>
+                <td>
+                	<input id="addressId" name="address" value="${principalEmployer.address}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly  />
+                </td>
+               
+           </tr>
+            <tr>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
+                <td><input type="text" name="pfNum" value="${principalEmployer.pfNum}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
+                <td><input type="text" name="natureOfWork" value="${principalEmployer.natureOfWork}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
@@ -229,12 +286,7 @@ table.ControlLayout td {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.rcMaxEmployees"/></label></th>
                 <td><input type="text" name="rcMaxEmp" value="${principalEmployer.rcMaxEmp}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
             </tr>
-            <tr>
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
-                <td><input type="text" name="pfNum" value="${principalEmployer.pfNum}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
-                <td><input type="text" name="natureOfWork" value="${principalEmployer.natureOfWork}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-            </tr>
+           
              <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractFrom"/></label></th>
                 <td><input type="text" name="contractFrom" value="${principalEmployer.contractFrom}" style="height: 20px;" size="30" maxlength="30"  readonly /></td>
@@ -260,6 +312,12 @@ table.ControlLayout td {
             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mainContractor"/></label></th>
                 <td><input type="text" name="mainContractor" value="${principalEmployer.mainContractor}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
             </tr>
+            <tr>
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplyDate"/></label></th>
+                <td>
+                	<input id="pfApplyDateId" name="pfApplyDate" value ="${principalEmployer.pfApplyDate}" style="width: 100%;height: 20px; color: black;" type="text" size="30" maxlength="30" readonly />
+                </td>
+</tr>
         </tbody>
     </table>
    
@@ -291,7 +349,10 @@ table.ControlLayout td {
                     <td style="color:black;text-align:center">${item.coverage }</td>
                     <td style="color:black;text-align:center">${item.validFrom }</td >
                     <td style="color:black;text-align:center">${item.validTo}</td>
-                    <td style="color:black;text-align:center">${item.fileName} </td>
+                    <td style="color:black;text-align:center">
+                     <a href="#" onclick="downloadContractorDoc('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${item.fileName }')">${item.fileName}</a>
+               
+                     </td>
                     
                 </tr>
              </c:forEach> 

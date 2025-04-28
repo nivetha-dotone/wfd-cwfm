@@ -336,9 +336,7 @@ label {
                 	<input id="contractorregId" name="contractorregId" value="${contractorregId}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly>
                 	<label id="error-registrationid" style="color: red;display: none;">Registration ID is required</label>
                 </td>
-           </tr>
-            <tr>
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
+                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
 				 <td><select class="custom-select" id="principalEmployerId" name="principalEmployer" onchange="getAllContractorsForReg(this.value)" style="width: 100%;height: 25px; ">
                                 <option value="">Please select Principal Employer</option>
                                 <c:forEach var="pe" items="${PrincipalEmployer}">
@@ -346,17 +344,91 @@ label {
             					</c:forEach>
                                 </select>
                     </td>
+           </tr>
+            <tr>
+              <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
+                <td>
+                	<input id="contractorNameId" name="contractorName" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-contractorname" style="color: red;display: none;">Contractor name is required</label>
+                </td>
+                 
           <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
                 <td>
-                	<!-- <input id="vendorCodeId" name="vendorCode"  onchange="getAllContractorDetailForReg(this.value) style="width: 100%;height: 20px;" type="text" size="30" maxlength="30"> -->
                 	 <select class="custom-select" id="vendorCodeId" name="vendorCode"  onchange="getAllContractorDetailForReg(this.value)">
             						<option value="">Please select Vendor Code</option>
-            		</select>
+            		</select> 
+            		<!-- <input id="vendorCodeId" name="vendorCode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30"> -->
                 	 <label id="error-vendorCode" style="color: red;display: none;">Vendor Code is required</label>
                 </td>
                
             </tr>
+             <tr>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
+                <td>
+                	<input id="emailId" name="email" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-email" style="color: red;display: none;">Email is required</label>
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
+                <td>
+                	<input id="mobileId" name="mobile" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10">
+                	<label id="error-mobile"style="color: red;display: none;">Mobile number is required</label>
+                </td>
+                
+            </tr>
+            
+             <tr>
+           	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAadhar"/></label></th>
+                <td>
+                	<input id="aadharId" name="aadhar" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12">
+                	<label id="error-aadhar" style="color: red;display: none;">Aadhar Number is required</label>
+                </td>
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharDoc"/></label></th>
+                <td>
+                	<input type="file" class="form-control aadhardoc" id="aadharDocId" name="aadharDoc"  accept="application/pdf"/>
+                	<label id="error-aadharDoc" style="color: red;display: none;">Aadhar Document is required</label>
+                </td>
+               
+           </tr>
             <tr>
+           	   
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorPan"/></label></th>
+                <td>
+                	<input id="panId" name="pan" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-pan" style="color: red;display: none;">Pan Number is required</label>
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.panDoc"/></label></th>
+                <td>
+                	<input type="file" class="form-control pandoc" id="panDocId" name="panDoc"  accept="application/pdf"/>
+                	<label id="error-panDoc" style="color: red;display: none;">Pan Document is required</label>
+                </td>
+           </tr>
+            <tr>
+           	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorGst"/></label></th>
+                <td>
+                	<input id="gstId" name="gst" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-gst" style="color: red;display: none;">GST is required</label>
+                </td>
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAddress"/></label></th>
+                <td>
+                	<input id="addressId" name="address" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-address" style="color: red;display: none;">Address is required</label>
+                </td>
+               
+           </tr>
+           <tr>
+           	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
+                <td>
+                	<input id="pfNumId" name="pfNum" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-pfnumber" style="color: red;display: none;">PF Number is required</label>
+                </td>
+               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
+                <td>
+                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<label id="error-natureOfWork" style="color: red;display: none;">Nature Of Work is required</label>
+                </td>
+               
+           </tr>
+           <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                 <td>
                 	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
@@ -382,19 +454,6 @@ label {
                 </td>
                
             </tr>
-           <tr>
-           	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
-                <td>
-                	<input id="pfNumId" name="pfNum" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	<label id="error-pfnumber" style="color: red;display: none;">PF Number is required</label>
-                </td>
-               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
-                <td>
-                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
-                	<label id="error-natureOfWork" style="color: red;display: none;">Nature Of Work is required</label>
-                </td>
-               
-           </tr>
             <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractFrom"/></label></th>
                 <td>
@@ -426,8 +485,10 @@ label {
                 	<input id="rcVerifiedId" name="rcVerified" style="height: 20px;color: black;" type="checkbox" size="30" maxlength="30">
                 	<label id="error-isRcVerified" style="color: red;display: none;">Is RC Verified is required</label>
                 </td>
+                
                
         </tr>
+        
            <!-- Main Contractor row -->
        <tr id="mainContractorRow" style="display: none;"><th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mainContractor"/></label></th>
     <td>
@@ -438,7 +499,13 @@ label {
     </td>
    </tr> 
    
-
+<tr>
+<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplyDate"/></label></th>
+                <td>
+                	<input id="pfApplyDateId" name="pfApplyDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                	<label id="error-contractFrom" style="color: red;display: none;">PF apply date is required</label>
+                </td>
+</tr>
    
    </tbody>
   </table>

@@ -178,7 +178,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		boolean status=false;
 		if(dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
 			if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus())) {
-			status = workmenDao.updateGatePassMainStatus(dto.getGatePassId(),dto.getStatus());
+			status = workmenDao.updateGatePassMainStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
 			}else {
 			//rollback status and type to create
 			status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),GatePassStatus.APPROVED.getStatus(),GatePassType.CREATE.getStatus());

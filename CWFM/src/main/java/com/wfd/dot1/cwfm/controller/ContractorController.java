@@ -1,5 +1,10 @@
 package com.wfd.dot1.cwfm.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +12,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -258,18 +266,57 @@ public class ContractorController {
 	    }
 	 
 
+	 private static final String ROOT_DIRECTORY = "D:/wfd_cwfm/contractor_docs/";
+	 public String uploadDocuments( MultipartFile aadharFile,
+			 String userId,
+			 String contractorRegId) {
 
+		 // Create directory path
+		 String directoryPath =ROOT_DIRECTORY + userId + "/"+contractorRegId+"/";
+
+		 try {
+			 // Ensure the directory exists, if not create it
+			 Path path = Paths.get(directoryPath);
+			 if (!Files.exists(path)) {
+				 Files.createDirectories(path);
+			 }
+
+			 // Save Aadhar PDF
+			 if (!aadharFile.isEmpty()) {
+				 String aadharFilePath = directoryPath +aadharFile.getOriginalFilename();
+				 saveFile(aadharFile, aadharFilePath);
+			 }
+
+			 
+
+			 // Return success message
+			 return "success";
+
+		 } catch (IOException e) {
+			 e.printStackTrace();
+			 return "failed";
+		 }
+	 }
+	 private void saveFile(MultipartFile file, String path) throws IOException {
+	        byte[] bytes = file.getBytes();
+	        Path filePath = Paths.get(path);
+	        Files.write(filePath, bytes);
+	    }
+	  
 	 @PostMapping("/saveReg")
 	 public ResponseEntity<String> saveReg(
 	     @RequestParam("jsonData") String jsonData,
 	     @RequestParam("policyAttachments") List<MultipartFile> attachments,
+	     @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
+         @RequestParam(value = "panFile", required = false) MultipartFile panFile,
 	     HttpServletRequest request
 	 ) {
 	     try {
 	         // Parse the incoming JSON string into your Java object
 	         ObjectMapper mapper = new ObjectMapper();
 	         ContractorRegistration contreg = mapper.readValue(jsonData, ContractorRegistration.class);
-
+	         contreg.setAadharDoc(aadharFile.getOriginalFilename());
+	         contreg.setPanDoc(panFile.getOriginalFilename());
 	         HttpSession session = request.getSession(false);
 	         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 	         contreg.setCreatedBy(String.valueOf(user.getUserId()));
@@ -278,6 +325,8 @@ public class ContractorController {
 	         String regId = contrService.saveReg(contreg); // should return contractorregId
 
 	         if (regId != null) {
+	        	 uploadDocuments(aadharFile,String.valueOf(user.getUserId()),regId);
+	        	 uploadDocuments(panFile,String.valueOf(user.getUserId()),regId);
 	             List<ContractorRegistrationPolicy> policies = contreg.getRegPolicy();
 
 	             // Set regId and file details in each policy
@@ -289,6 +338,7 @@ public class ContractorController {
 	                 if (file != null && !file.isEmpty()) {
 	                     policy.setFileName(file.getOriginalFilename());
 	                     // Optionally: save file bytes or store to disk
+	                     uploadDocuments(file,String.valueOf(user.getUserId()),regId);
 	                 } else {
 	                     policy.setFileName(null);
 	                 }
@@ -408,5 +458,30 @@ public class ContractorController {
 		return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
 	}
 	
+	@GetMapping("/downloadFile/{contregId}/{userId}/{docName}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("contregId") String contregId,@PathVariable("userId") String userId,  @PathVariable("docName") String docName) {
+        try {
+        	String filePath=null;
+        	
+                filePath = ROOT_DIRECTORY+userId+"/" + contregId + "/" + docName;
+        	
+        	
+            File file = new File(filePath);
+            Resource resource = new FileSystemResource(file);
+
+            if (!resource.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

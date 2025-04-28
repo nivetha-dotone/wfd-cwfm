@@ -23,6 +23,72 @@ public class ContractorRegistration{
 	private String requestType;
 	private String rcVerified;
 	private String createdBy;
+	
+	private String email;
+	private String mobile;
+	private String aadhar;
+	private String aadharDoc;
+	private String pan;
+	private String panDoc;
+	private String gst;
+	private String address;
+	private String pfApplyDate;
+	
+	
+	public String getAadhar() {
+		return aadhar;
+	}
+	public void setAadhar(String aadhar) {
+		this.aadhar = aadhar;
+	}
+	public String getAadharDoc() {
+		return aadharDoc;
+	}
+	public void setAadharDoc(String aadharDoc) {
+		this.aadharDoc = aadharDoc;
+	}
+	public String getPan() {
+		return pan;
+	}
+	public void setPan(String pan) {
+		this.pan = pan;
+	}
+	public String getPanDoc() {
+		return panDoc;
+	}
+	public void setPanDoc(String panDoc) {
+		this.panDoc = panDoc;
+	}
+	public String getGst() {
+		return gst;
+	}
+	public void setGst(String gst) {
+		this.gst = gst;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getPfApplyDate() {
+		return pfApplyDate;
+	}
+	public void setPfApplyDate(String pfApplyDate) {
+		this.pfApplyDate = pfApplyDate;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
 	private List<ContractorRegistrationPolicy> regPolicy;
 	
 	public List<ContractorRegistrationPolicy> getRegPolicy() {

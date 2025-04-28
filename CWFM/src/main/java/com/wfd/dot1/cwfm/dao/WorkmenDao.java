@@ -115,4 +115,6 @@ public interface WorkmenDao {
 
 	int getWorkFlowTYpeNew(String principalEmployer, String gatePassAction);
 
+	public boolean updateGatePassMainStatusByTransactionId(String transactionId, String status);
+
 }

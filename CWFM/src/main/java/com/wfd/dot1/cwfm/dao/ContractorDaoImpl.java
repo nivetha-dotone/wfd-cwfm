@@ -216,7 +216,8 @@ public class ContractorDaoImpl implements ContractorDao{
         		contreg.getContractorregId(),contreg.getContractorId(),contreg.getVendorCode(),contreg.getPrincipalEmployer(),contreg.getContractorName(),
         		contreg.getManagerName(),Integer.parseInt(contreg.getTotalStrength()),Integer.parseInt(contreg.getRcMaxEmp()),
         		contreg.getNatureOfWork(),contreg.getLocofWork(),contreg.getPfNum(),contreg.getRcVerified(),contreg.getMainContractor(),
-        		contreg.getContractType(),contreg.getContractFrom(),contreg.getContractTo(),contreg.getRequestType(),contreg.getStatus(),contreg.getCreatedBy()
+        		contreg.getContractType(),contreg.getContractFrom(),contreg.getContractTo(),contreg.getRequestType(),contreg.getStatus(),contreg.getCreatedBy(),
+        		contreg.getAadhar(),contreg.getAadharDoc(),contreg.getPan(),contreg.getPanDoc(),contreg.getPfApplyDate(),contreg.getGst(),contreg.getAddress(),contreg.getEmail(),contreg.getMobile()
 		};
         try {
            status  = jdbcTemplate.update(saveContractorDetails(), parameters);
@@ -298,6 +299,17 @@ public class ContractorDaoImpl implements ContractorDao{
 	            contr.setContractType(rs.getString("CONTTYPE"));
 	            contr.setRcVerified(rs.getString("RCVALIDATED"));
 	            contr.setMainContractor(rs.getString("MAINCONTRACTOR"));
+	            contr.setContractorName(rs.getString("CONTRACTORNAME"));
+	            contr.setEmail(rs.getString("EMAILADDR"));
+	            contr.setMobile(rs.getString("MOBILENO"));
+	            contr.setAadhar(rs.getString("AADHARNUM"));
+	            contr.setAadharDoc(rs.getString("AADHARDOCNAME"));
+	            contr.setPan(rs.getString("PANNUM"));
+	            contr.setPanDoc(rs.getString("PANDOCNAME"));
+	            contr.setPfApplyDate(rs.getString("PFAPPLYDT"));
+	            contr.setAddress(rs.getString("ADDRESS"));
+	            contr.setGst(rs.getString("GST"));
+	            contr.setCreatedBy(rs.getString("CREATEDBY"));
 	        }
 			return contr;
 	}

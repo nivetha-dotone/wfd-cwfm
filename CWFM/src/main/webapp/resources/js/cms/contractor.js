@@ -346,6 +346,35 @@ function exportCSVFormat() {
    xhr.send(JSON.stringify(data));
    
 	}
+	function validateContractorFiles(aadharFile, policeFile) {
+	    let valid = true;
+
+	    // Aadhaar file presence and size check
+	    if (!aadharFile) {
+	        $("#error-aadharDoc").text("Aadhar file is required.").show();
+	        valid = false;
+	    } else if (aadharFile.size > 5 * 1024 * 1024) {
+	        $("#error-aadharDoc").text("Aadhar file must be less than 5 MB.").show();
+	        valid = false;
+	    } else {
+	        $("#error-aadharDoc").hide(); // Clear error if valid
+	    }
+
+	    // Police file presence and size check
+	    if (!policeFile) {
+	        $("#error-panDoc").text("PAN file is required.").show();
+	        valid = false;
+	    } else if (policeFile.size > 5 * 1024 * 1024) {
+	        $("#error-panDoc").text("PAN file must be less than 5 MB.").show();
+	        valid = false;
+	    } else {
+	        $("#error-panDoc").hide(); // Clear error if valid
+	    }
+
+	    return valid;
+	}
+
+	  
 function validateFormData() {
     let isValid = true;
     const principalemployer = $("#principalEmployerId").val();
@@ -357,10 +386,10 @@ function validateFormData() {
 	}
     const vendorCode = $("#vendorCodeId").val().trim();
     if (vendorCode === "") {
-        $("error-vendorCode").show();
+        $("#error-vendorCode").show();
         isValid = false;
     }else{
-		 $("error-vendorCode").hide();
+		 $("#error-vendorCode").hide();
 	}
     const managername = $("#managerNameId").val().trim();
     const nameRegex = /^[A-Za-z\s]+$/;
@@ -370,6 +399,66 @@ function validateFormData() {
      }else{
 		 $("#error-managername").hide();
 	 }
+	 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+	 const email = $("#emailId").val().trim();
+	 if (!emailRegex.test(email)) {
+	                 $("#error-email").show();
+	        			isValid = false;
+	     }else{
+	 	 $("#error-email").hide();
+	  }
+	  const mobileInput = $("#mobileId").val().trim();
+	  	const mobileNumberRegex = /^[6-9]\d{9}$/;
+	  	if (!mobileNumberRegex.test(mobileInput)) {
+	                   $("#error-mobile").show();
+	          			isValid = false;
+	       }else{
+	  		 $("#error-mobile").hide();
+	  	 }
+		 const aadharNumber = $("#aadharId").val().trim();
+		     if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
+		         $("#error-aadhar").show();
+		         isValid = false;
+		     }else{
+		 		  $("#error-aadhar").hide();
+		 	}
+			const aadharDoc = $("#aadharDocId")[0]?.files?.[0] || null;
+			const panDoc = $("#panDocId")[0]?.files?.[0] || null;
+	const isFileValid = validateContractorFiles(aadharDoc, panDoc);
+	console.log("file is:"+isFileValid);
+				
+				   if (!isFileValid) {
+				          isValid = false; // Stop the upload if validation fails
+				      }
+				  const pan = $("#panId").val().trim();
+				     if (pan === "") {
+				         $("#error-pan").show();
+				         isValid = false;
+				     }else{
+				  	 $("#error-pan").hide();
+				  }
+					  const gst = $("#gstId").val().trim();
+				  			     if (gst === "") {
+				  			         $("#error-gst").show();
+				  			         isValid = false;
+				  			     }else{
+				  			  	 $("#error-gst").hide();
+				  			  }
+							  const address = $("#addressId").val().trim();
+							  				  			     if (address === "") {
+							  				  			         $("#error-address").show();
+							  				  			         isValid = false;
+							  				  			     }else{
+							  				  			  	 $("#error-address").hide();
+							  				  			  }		
+														  	  
+	 const contractorName = $("#contractorNameId").val().trim();
+	 if (!nameRegex.test(contractorName)) {
+	                  $("#error-contractorname").show();
+	         			isValid = false;
+	      }else{
+	 		 $("#error-contractorname").hide();
+	 	 }
     const locofwork = $("#locofWorkId").val();
      const locofworkRegex = /^[A-Za-z\s]+$/;
      if (!locofworkRegex.test(locofwork)) {
@@ -740,7 +829,8 @@ function validateRenewFormData() {
 			let otherFileds = validateDocuments();
 			if(!otherFileds) return;
 		    const data = new FormData();
-
+			var aadharFile = $("#aadharDocId").prop("files")[0];
+			    var panFile = $("#panDocId").prop("files")[0];
 		    const selectedOption = $("#vendorCodeId option:selected");
 
 		    // Build the JSON object
@@ -749,7 +839,15 @@ function validateRenewFormData() {
 		        principalEmployer: $("#principalEmployerId").val(),
 		        contractorId: selectedOption.val(),
 		        vendorCode: selectedOption.data("code"),
-		        contractorName: selectedOption.data("name"),
+		       // contractorName: selectedOption.data("name"),
+			   contractorName: $("#contractorNameId").val().trim(),
+			   email: $("#emailId").val().trim(),
+			   mobile: $("#mobileId").val().trim(),
+			   aadhar: $("#aadharId").val().trim(),
+			   pan: $("#panId").val().trim(),
+			   gst: $("#gstId").val().trim(),
+			   address: $("#addressId").val().trim(),
+			   pfApplyDate: $("#pfApplyDateId").val().trim(),
 		        managerName: $("#managerNameId").val().trim(),
 		        locofWork: $("#locofWorkId").val().trim(),
 		        totalStrength: $("#totalStrengthId").val().trim(),
@@ -766,6 +864,8 @@ function validateRenewFormData() {
 		        regPolicy: []
 		    };
 
+			
+				
 		    // Loop through each work order/policy row
 		    $("#workOrderBody tr").each(function (index) {
 		        const row = $(this);
@@ -792,6 +892,12 @@ function validateRenewFormData() {
 		        }
 		    });
 
+			if (aadharFile) {
+						           data.append("aadharFile", aadharFile);
+						       }
+						       if (panFile) {
+						           data.append("panFile", panFile);
+						       }
 		    // Append the JSON data as a single field
 		    data.append("jsonData", JSON.stringify(jsonData));
 
@@ -906,10 +1012,12 @@ function validateRenewFormData() {
 		        mainContractorRow.style.display = "none";
 
 		        // Fetch and update work orders for the selected Main Contractor
-		        const contractorId = document.getElementById("vendorCodeId").value;
-		        if (contractorId) {
-		            getAllWorkorderForReg(contractorId);
-		        }
+		        const contractorId = $("#vendorCodeId").val();
+		        if (contractorId === "") {
+		           // 
+		        }else{
+					getAllWorkorderForReg(contractorId);
+				}
 		    }
 		}
 
@@ -1138,4 +1246,23 @@ function validateRenewFormData() {
 		        messageContainer.innerHTML = ''; // Clear previous messages
 		        return true;
 		    }
+		}
+		
+		function downloadContractorDoc(contregId, userId, docName) {
+		    const baseUrl = '/CWFM/contractor/downloadFile';
+		    
+		    const url = `${baseUrl}/${contregId}/${userId}/${docName}`;
+			//alert("url is"+url);
+		    const a = document.createElement('a');
+		    a.href = url;
+		    a.download = ''; // This attribute tells the browser to download the file
+
+		    // Append to the body to make it work in Firefox
+		    document.body.appendChild(a);
+
+		    // Programmatically click the anchor
+		    a.click();
+
+		    // Remove the anchor from the document
+		    document.body.removeChild(a);
 		}

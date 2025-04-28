@@ -804,6 +804,21 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		return res;
 	}
 	
+	public String getUpdateGatepassMainStatusByTransactionId() {
+		return QueryFileWatcher.getQuery("UPDATE_GATEPASSMAIN_STATUS_BY_TRANSACTION_ID");
+	}
+	@Override
+	public synchronized boolean updateGatePassMainStatusByTransactionId(String transactionId, String status) {
+		boolean res=false;
+		Object[] object=new Object[]{status,transactionId};
+		String query= getUpdateGatepassMainStatusByTransactionId();
+		int i = jdbcTemplate.update(query,object);
+		if(i>0){
+			res=true;
+		}
+		return res;
+	}
+	
 	public String getUpdateGatepassMainStatusType() {
 		return QueryFileWatcher.getQuery("UPDATE_GATEPASSMAIN_STATUS_TYPE");
 	}
@@ -823,7 +838,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	public boolean isLastApprover(String roleName, String  gatePassTypeId) {
 		boolean status=false;
 		
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery(),gatePassTypeId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery(),gatePassTypeId,gatePassTypeId);
 		if(rs.next()){
 			if(roleName.equals(rs.getString("Role_Name")))
 				status = true;
