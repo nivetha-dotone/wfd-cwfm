@@ -61,3 +61,144 @@ function downloadDocTemp(gatePassId, userId, docType) {
     // Remove the anchor from the document
     document.body.removeChild(a);
 }
+
+// Toggle accordion section
+function toggleSection(id) {
+    $(".accordion-content").not("#" + id).slideUp();
+    $("#" + id).slideToggle();
+}
+
+// Add Kronos or Statutory row
+function addReportRow(section) {
+    const containerId = section === 'kronos' ? '#kronosReportsContainer' : '#statutoryReportsContainer';
+    const inputName = section === 'kronos' ? 'kronosReports' : 'statutoryReports';
+
+    const row = `
+        <div class="report-row">
+            <input type="text" name="${inputName}" placeholder="Enter report name" required />
+            <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>
+        </div>
+    `;
+    $(containerId).append(row);
+}
+
+// Add HR Checklist row
+function addChecklistRow() {
+    const index = $('.checklist-row').length;
+    const row = `
+        <div class="checklist-row">
+            <input type="text" name="checklistNames" placeholder="Check Point Name" required />
+            <label><input type="checkbox" name="licenseRequired${index}" /> Licence No. Required</label>
+            <label><input type="checkbox" name="validUptoRequired${index}" /> Valid Upto Required</label>
+            <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>
+        </div>
+    `;
+    $("#checklistConfigContainer").append(row);
+}
+
+function saveReportConfig() {
+    let isValid = true;
+    let errorSections = [];
+    $("#saveStatusMsg").text("").css("color", "green");
+
+    // Reset all borders first
+    $("input").css("border", "");
+
+    const kronosReports = [];
+    const statutoryReports = [];
+    const checklistItems = [];
+
+    const kronosSet = new Set();
+    const statutorySet = new Set();
+    const checklistSet = new Set();
+
+    // ==== Kronos Reports ====
+    $('input[name="kronosReports"]').each(function () {
+        const value = $(this).val().trim();
+        if (value) {
+            if (kronosSet.has(value.toLowerCase())) {
+                $(this).css("border", "2px solid red");
+                isValid = false;
+                if (!errorSections.includes("Kronos Reports")) {
+                    errorSections.push("Kronos Reports");
+                }
+            } else {
+                kronosSet.add(value.toLowerCase());
+                kronosReports.push(value);
+            }
+        }
+    });
+
+    // ==== Statutory Attachments ====
+    $('input[name="statutoryReports"]').each(function () {
+        const value = $(this).val().trim();
+        if (value) {
+            if (statutorySet.has(value.toLowerCase())) {
+                $(this).css("border", "2px solid red");
+                isValid = false;
+                if (!errorSections.includes("Statutory Reports")) {
+                    errorSections.push("Statutory Reports");
+                }
+            } else {
+                statutorySet.add(value.toLowerCase());
+                statutoryReports.push(value);
+            }
+        }
+    });
+
+    // ==== HR Checklist Items ====
+    $('#checklistConfigContainer .checklist-row').each(function () {
+        const checkpointName = $(this).find('input[name="checklistNames"]').val().trim();
+        const licenseRequired = $(this).find('input[type="checkbox"]').eq(0).is(":checked");
+        const validUptoRequired = $(this).find('input[type="checkbox"]').eq(1).is(":checked");
+
+        if (checkpointName) {
+            if (checklistSet.has(checkpointName.toLowerCase())) {
+                $(this).find('input[name="checklistNames"]').css("border", "2px solid red");
+                isValid = false;
+                if (!errorSections.includes("Checklist Items")) {
+                    errorSections.push("Checklist Items");
+                }
+            } else {
+                checklistSet.add(checkpointName.toLowerCase());
+                checklistItems.push({ checkpointName, licenseRequired, validUptoRequired });
+            }
+        }
+    });
+
+    // ==== Final validations ====
+    if (!kronosReports.length && !statutoryReports.length && !checklistItems.length) {
+        $("#saveStatusMsg")
+            .html("Please enter at least one item in any of the sections: <b>Kronos Reports, Statutory Reports, or Checklist Items</b>.")
+            .css("color", "red");
+        return;
+    }
+
+    if (!isValid) {
+        $("#saveStatusMsg")
+            .html("Duplicate entries found in the following section(s): <b>" + errorSections.join(", ") + "</b>. Please fix them.")
+            .css("color", "red");
+        return;
+    }
+
+    // All entries are valid, continue saving
+    const requestData = {
+        kronosReports,
+        statutoryReports,
+        checklistItems
+    };
+
+    $.ajax({
+        url: "/CWFM/billSetup/saveReportConfigAjax",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(requestData),
+        success: function () {
+            alert("Configuration saved successfully!");
+            loadCommonList('/billSetup/list', 'Bill Verification Setup');
+        },
+        error: function () {
+            alert("Error saving configuration.");
+        }
+    });
+}
