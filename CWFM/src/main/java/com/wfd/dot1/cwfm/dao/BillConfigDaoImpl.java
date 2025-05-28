@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.pojo.HrChecklistItem;
+import com.wfd.dot1.cwfm.pojo.KronosReport;
+import com.wfd.dot1.cwfm.pojo.StatutoryAttachment;
 
 @Repository
 public class BillConfigDaoImpl implements BillConfigDao {
@@ -59,14 +61,37 @@ public class BillConfigDaoImpl implements BillConfigDao {
 
     @Override
     public List<HrChecklistItem> fetchChecklistItems() {
-        String sql = "SELECT CHECKPOINTNAME, LICENSEREQUIRED, VALIDUPTOREQUIRED FROM BillConfigHrChecklist";
+        String sql = "SELECT ID,CHECKPOINTNAME, LICENSEREQUIRED, VALIDUPTOREQUIRED FROM BillConfigHrChecklist";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             HrChecklistItem item = new HrChecklistItem();
+            item.setId(rs.getInt("ID"));
             item.setCheckpointName(rs.getString("CHECKPOINTNAME"));
             item.setLicenseRequired(rs.getBoolean("LICENSEREQUIRED"));
             item.setValidUptoRequired(rs.getBoolean("VALIDUPTOREQUIRED"));
             return item;
         });
+    }
+    @Override
+    public List<KronosReport> fetchKronosReportsWithId() {
+        String sql = "SELECT ID,REPORTNAME FROM BillConfigKronos";
+        return jdbcTemplate.query(sql, (rs, rowNum) ->{
+        KronosReport kr = new KronosReport();
+        kr.setReportName( rs.getString("REPORTNAME"));
+        kr.setId(rs.getInt("ID"));
+        return kr;
+        });
+    }
+
+    @Override
+    public List<StatutoryAttachment> fetchStatutoryReportsWithId() {
+        String sql = "SELECT ID,ATTACHMENTNAME FROM BillConfigStatutory";
+        return jdbcTemplate.query(sql, (rs, rowNum) ->
+        {
+        	StatutoryAttachment kr = new StatutoryAttachment();
+            kr.setAttachmentName( rs.getString("ATTACHMENTNAME"));
+            kr.setId(rs.getInt("ID"));
+            return kr;
+            });
     }
 }
 

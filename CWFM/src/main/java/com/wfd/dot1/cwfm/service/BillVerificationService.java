@@ -10,6 +10,7 @@ import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
 import com.wfd.dot1.cwfm.pojo.BillVerification;
@@ -27,5 +28,9 @@ public interface BillVerificationService {
 	public BillVerification viewbillprecomments(String transactionId);
 		
 	public BillVerification viewbilleicDetails(String transactionId);
+
+	String generateWCTransactionId();
+
+	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
 
 }

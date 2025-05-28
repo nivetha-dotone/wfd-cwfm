@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
@@ -75,6 +76,8 @@ public interface WorkmenService {
 
 	List<GatePassListingDto> getGatePassActionListingForApprovers(String unitId, String deptId, MasterUser user,
 			String gatePassTypeId);
+
+	Map<String, Object> verifyOtpWithSurepass(String clientId, String otp);
 
 
 }	

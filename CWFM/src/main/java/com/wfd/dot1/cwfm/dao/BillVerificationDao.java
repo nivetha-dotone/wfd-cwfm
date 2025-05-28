@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 
 public interface BillVerificationDao {
 
@@ -18,5 +19,9 @@ public interface BillVerificationDao {
 	public BillVerification viewbillprecomments(String transactionId);
 
 	public BillVerification viewbilleicDetails(String transactionId);
+
+	String generateWCTransactionId();
+
+	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
 }
 

@@ -10,6 +10,7 @@ import com.wfd.dot1.cwfm.dao.BillVerificationDao;
 import com.wfd.dot1.cwfm.dao.ContractorDao;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 @Service
 public class BillVerificationServiceImpl implements BillVerificationService{
 
@@ -46,4 +47,14 @@ public class BillVerificationServiceImpl implements BillVerificationService{
 		// TODO Auto-generated method stub
 	        return billDao.viewbilleicDetails(transactionId);
 	    }
+	
+	@Override
+    public String generateWCTransactionId() {
+    	return billDao.generateWCTransactionId();
+    }
+	@Override
+	public List<PrincipalEmployer> getPEDetailByUser(String userAccount) {
+		// TODO Auto-generated method stub
+		return billDao.getPEDetailByUser(userAccount);
+	}
 }

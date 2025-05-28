@@ -3,7 +3,14 @@ package com.wfd.dot1.cwfm.pojo;
 
 	
 	public class HrChecklistItem {
-	    private String checkpointName;
+		private int id;
+	    public int getId() {
+			return id;
+		}
+		public void setId(int id) {
+			this.id = id;
+		}
+		private String checkpointName;
 	    private boolean licenseRequired;
 	    private boolean validUptoRequired;
 

@@ -67,7 +67,7 @@ function toggleSection(id) {
     $(".accordion-content").not("#" + id).slideUp();
     $("#" + id).slideToggle();
 }
-
+/////////////////////// Bill Admin Starts//////////////////////////
 // Add Kronos or Statutory row
 function addReportRow(section) {
     const containerId = section === 'kronos' ? '#kronosReportsContainer' : '#statutoryReportsContainer';
@@ -199,6 +199,210 @@ function saveReportConfig() {
         },
         error: function () {
             alert("Error saving configuration.");
+        }
+    });
+}
+///////////////////////////Bill Admin ENds//////////////////////
+function redirectToBillAdd() {
+
+    // Fetch the content of add.jsp using AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Update the mainContent element with the fetched content
+            document.getElementById("mainContent").innerHTML = xhr.responseText;
+        }
+    };
+    xhr.open("GET", "/CWFM/billVerification/createBill", true);
+    xhr.send();
+}
+
+function getContractors(selectElement, userAccount) {
+	
+	const selectedOption = selectElement.options[selectElement.selectedIndex];
+	    const unitCode = selectedOption.getAttribute("data-code");
+	    document.getElementById("unitCodeId").value = unitCode ? unitCode : "";
+		
+		const unitId = selectedOption.value;
+		    const unitName = selectedOption.text;
+		   
+		
+    var xhr = new XMLHttpRequest();
+    var url = contextPath + "/contractworkmen/getAllContractors?unitId=" + unitId + "&userAccount=" + userAccount;
+    //alert("URL: " + url);
+    xhr.open("GET", url, true);
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // Parse the response as a JSON array of contractor objects
+            var contractors = JSON.parse(xhr.responseText);
+            console.log("Response:", contractors);
+            
+            // Find the contractor select element
+            var contractorSelect = document.getElementById("contractor");
+            
+            // Clear existing options
+            contractorSelect.innerHTML = '<option value="">Please select Contractor</option>';
+            
+            // Populate the dropdown with the new list of contractors
+            contractors.forEach(function(contractor) {
+                var option = document.createElement("option");
+                option.value = contractor.contractorId;
+                option.text = contractor.contractorName;
+				option.setAttribute("data-code", contractor.contractorCode); 
+                contractorSelect.appendChild(option);
+            });
+        } else {
+            console.error("Error:", xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error("Request failed");
+    };
+
+    xhr.send();
+}
+function formatDate(dateTimeStr) {
+    if (!dateTimeStr) return "";
+
+    const date = new Date(dateTimeStr);
+    if (isNaN(date)) return "";
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+}
+function getWorkorders(selectElement) {
+		var principalEmployerSelect = document.getElementById("unitId");
+	    var unitId = principalEmployerSelect.value; // Get the selected principal employer value
+		const selectedOption = selectElement.options[selectElement.selectedIndex];
+		const contractorCode = selectedOption.getAttribute("data-code");
+		document.getElementById("contractorCodeId").value = contractorCode ? contractorCode : "";
+				
+				const contractorId = selectedOption.value;
+				const contractorName = selectedOption.text;
+    var xhr = new XMLHttpRequest();
+    var url = contextPath + "/contractworkmen/getAllWorkOrders?unitId=" + unitId + "&contractorId=" + contractorId;
+    //alert("URL: " + url);
+    xhr.open("GET", url, true);
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // Parse the response as a JSON array of workorder objects
+            var workorders = JSON.parse(xhr.responseText);
+            console.log("Response:", workorders);
+            
+            // Find the workorder select element
+            var workorderSelect = document.getElementById("workorder");
+            
+            // Clear existing options
+            workorderSelect.innerHTML = '<option value="">Please select Workorder</option>';
+            
+            // Populate the dropdown with the new list of workorders
+            workorders.forEach(function(workorder) {
+                var option = document.createElement("option");
+                option.value = workorder.workorderId;
+                option.text = workorder.name;
+				const validFromFormatted = formatDate(workorder.validFrom);
+				const validToFormatted = formatDate(workorder.validTo);
+				option.setAttribute("data-fromDate", validFromFormatted); 
+				option.setAttribute("data-toDate", validToFormatted);
+                workorderSelect.appendChild(option);
+            });
+        } else {
+            console.error("Error:", xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error("Request failed");
+    };
+
+    xhr.send();
+}
+
+function setDates(selectElement){
+	const selectedOption = selectElement.options[selectElement.selectedIndex];
+			const validFrom = selectedOption.getAttribute("data-fromDate");
+			document.getElementById("woValidFromId").value = validFrom ? validFrom : "";
+			
+			const validTo = selectedOption.getAttribute("data-toDate");
+						document.getElementById("woValidToId").value = validTo ? validTo : "";
+}
+
+function saveBtn() {
+    const formData = new FormData();
+
+    // ===== Basic Info JSON Data =====
+    const data = {
+        wcTransId: $('#transactionId').val(),
+        unitId: $('#unitId').val(),
+        unitCode: $('#unitCodeId').val(),
+        contractorId: $('#contractor').val(),
+        contractorCode: $('#contractorCodeId').val(),
+        workOrderNumber: $('#workorder').val(),
+        startDate: $('#billStartDateId').val(),
+        endDate: $('#billEndDateId').val(),
+        services: $('#billCategory').val(),
+        woValidFrom: $('#woValidFromId').val(),
+        woValidTo: $('#woValidToId').val(),
+        billType: $('#billType').val()
+    };
+
+    // ✅ Append JSON directly as string
+    formData.append("jsonData", JSON.stringify(data));
+
+    // ===== Kronos Reports Files =====
+    $("input[type='file'][name^='kronosFile_']").each(function () {
+        if (this.files.length > 0) {
+            formData.append($(this).attr("name"), this.files[0]);
+        }
+    });
+
+    // ===== Statutory Attachments Files =====
+    $("input[type='file'][name^='statutoryFile_']").each(function () {
+        if (this.files.length > 0) {
+            formData.append($(this).attr("name"), this.files[0]);
+        }
+    });
+
+    // ===== Check List Values =====
+    const checklist = [];
+
+    $("#tab4 tbody tr").each(function () {
+        const row = $(this);
+        const id = row.find("input[type='hidden']").attr("name").split('_')[1];
+        const statusValue = row.find("select[name='statusValue']").val();
+        const licenseNumber = row.find("input[name^='licenseNumber_']").val() || "";
+        const validUpto = row.find("input[name^='validUpto_']").val() || "";
+
+        checklist.push({
+            id: id,
+            statusValue: statusValue,
+            licenseNumber: licenseNumber,
+            validUpto: validUpto
+        });
+    });
+
+    // ✅ Append checklist JSON directly as string
+    formData.append("checklistJson", JSON.stringify(checklist));
+
+    // ===== Submit AJAX =====
+    $.ajax({
+        url: '/CWFM/billVerification/saveBill',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            alert('Saved successfully!');
+			loadCommonList('/billVerification/list', 'Bill Verification List');
+        },
+        error: function (xhr) {
+            alert('Error: ' + xhr.responseText);
         }
     });
 }

@@ -2418,3 +2418,104 @@ if(isValid){
 	    xhr.open("GET", "/CWFM/contractworkmen/renewview/" + transactionId, true);
 	    xhr.send();
 	}
+	
+	
+
+	function generateOtp() {
+	    const aadhaarNumber = document.getElementById("aadharNumber").value;
+
+	    // Simple validation
+	    if (!aadhaarNumber || aadhaarNumber.length !== 12 || !/^\d{12}$/.test(aadhaarNumber)) {
+	        document.getElementById("otpError").innerText = "Please enter a valid 12-digit Aadhaar number.";
+	        document.getElementById("otpMessage").innerText = "";
+	        return;
+	    }
+
+	    var xhr = new XMLHttpRequest();
+	    var url = "/CWFM/contractworkmen/generateOtp"; // Your mapped Spring Controller URL
+
+	    xhr.open("POST", url, true);
+	    xhr.setRequestHeader("Content-Type", "application/json");
+
+	    xhr.onload = function () {
+	        var response;
+	        try {
+	            response = JSON.parse(xhr.responseText);
+	        } catch (e) {
+	            document.getElementById("otpError").innerText = "Invalid response from server.";
+	            document.getElementById("otpMessage").innerText = "";
+	            return;
+	        }
+
+	        if (xhr.status === 200 || xhr.status === 422) {
+	            if (response.success) {
+	                document.getElementById("otpMessage").innerText = response.message;
+	                document.getElementById("otpError").innerText = "";
+	            } else {
+	                document.getElementById("otpError").innerText = response.message +" "+response.status;
+	                document.getElementById("otpMessage").innerText = "";
+	            }
+	        } else {
+	            document.getElementById("otpError").innerText = "Error: " + (response.message || xhr.statusText);
+	            document.getElementById("otpMessage").innerText = "";
+	        }
+	    };
+
+	    xhr.onerror = function () {
+	        document.getElementById("otpError").innerText = "Request failed.";
+	        document.getElementById("otpMessage").innerText = "";
+	    };
+
+	    var data = JSON.stringify({ aadhaarNumber: aadhaarNumber });
+	    xhr.send(data);
+	}
+	
+	function verifyOtp() {
+	    const otp = document.getElementById("otp").value;
+
+	    if (!otp || otp.length < 6 || !/^\d+$/.test(otp)) {
+	        document.getElementById("otpError").innerText = "Please enter a valid numeric OTP.";
+	        document.getElementById("otpMessage").innerText = "";
+	        return;
+	    }
+
+	    const data = {
+	        otp: otp,
+	        clientId: "aadhaar_v2_vtzQlmkayhLKnPYgkEmy"
+	    };
+
+	    const xhr = new XMLHttpRequest();
+	    xhr.open("POST", "/CWFM/contractworkmen/verifyOtp", true);
+	    xhr.setRequestHeader("Content-Type", "application/json");
+
+	    xhr.onload = function () {
+	        let response;
+	        try {
+	            response = JSON.parse(xhr.responseText);
+	        } catch (e) {
+	            document.getElementById("otpError").innerText = "Invalid server response.";
+	            return;
+	        }
+
+	        if (xhr.status === 200 && response.success) {
+	            document.getElementById("otpMessage").innerText = "OTP Verified Successfully.";
+	            document.getElementById("otpError").innerText = "";
+
+	            // Populate form fields
+	            document.getElementById("firstName").value = response.fullName?.split(" ")[0] || "";
+	            document.getElementById("lastName").value = response.fullName?.split(" ").slice(1).join(" ") || "";
+	            document.getElementById("dateOfBirth").value = response.dob || "";
+	            document.getElementById("gender").value = response.gender || "";
+	            document.getElementById("address").value = response.address || "";
+	        } else {
+	            document.getElementById("otpError").innerText = response.message || "OTP verification failed.";
+	        }
+	    };
+
+	    xhr.onerror = function () {
+	        document.getElementById("otpError").innerText = "Request failed.";
+	    };
+
+	    xhr.send(JSON.stringify(data));
+	}
+

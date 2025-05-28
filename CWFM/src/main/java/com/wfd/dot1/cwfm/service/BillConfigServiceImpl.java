@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.wfd.dot1.cwfm.dao.BillConfigDao;
 import com.wfd.dot1.cwfm.pojo.HrChecklistItem;
+import com.wfd.dot1.cwfm.pojo.KronosReport;
+import com.wfd.dot1.cwfm.pojo.StatutoryAttachment;
 @Service
 public class BillConfigServiceImpl implements BillConfigService{
 
@@ -36,5 +38,16 @@ public class BillConfigServiceImpl implements BillConfigService{
     public List<HrChecklistItem> getAllChecklistItems() {
         return dao.fetchChecklistItems();
     }
+    
+    @Override
+    public List<KronosReport> fetchKronosReportsWithId(){
+    	return dao.fetchKronosReportsWithId();
+    }
+
+    @Override
+    public List<StatutoryAttachment> fetchStatutoryReportsWithId(){
+    	return dao.fetchStatutoryReportsWithId();
+    }
+    	
 
 }

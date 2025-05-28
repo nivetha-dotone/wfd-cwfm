@@ -1,28 +1,101 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill List</title>
-    <script src="resources/js/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
-    <script src="resources/js/cms/workorder.js"></script>
-    <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
+    <title>Bill Verification List</title>
+    <script src="resources/js/cms/bill.js"></script>
+
+
     <style>
- 
- 
+        /* Add your styles here */
+        .success {
+            color: green;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #e0ffe0;
+            border: 1px solid green;
+            margin-bottom: 1rem;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #ffe0e0;
+            border: 1px solid red;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #DDF3FF;
+            color: #005151;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f8f8f8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+         .success {
+        color: green;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #e0ffe0;
+        border: 1px solid green;
+        margin-bottom: 1rem;
+    }
+    .error {
+        color: red;
+        font-weight: bold;
+        padding: 10px;
+        background-color: #ffe0e0;
+        border: 1px solid red;
+        margin-bottom: 1rem;
+    }
+ label {
+    color: black;
+}
     body {
         background-color: #FFFFFF; /* White background for the page */
-         font-family: 'Noto Sans', sans-serif;
+        font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
     }
 
     .action-bar {
         display: flex;
-        /* justify-content: space-between; */
+        justify-content: space-between;
         align-items: center;
         padding: 1rem;
         background-color: #f8f8f8;
@@ -69,28 +142,11 @@
         border-collapse: collapse;
     }
 
-    td {
+    th, td {
         padding: 10px;
         text-align: left;
         border: 1px solid #ddd;
         font-size: 0.875rem; /* Smaller text size matching the side nav bar */
-         font-family: 'Noto Sans', sans-serif;
-         
-    color: #898989;/* Label text color */
-  padding: .2em .6em .3em;
-  font-size: 85%;
-  font-weight: 700;
-  line-height: 1;
-    white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
-    }
-     th {
-        padding: 10px;
-        text-align: left;
-       /*  border: 1px solid #ddd; */
-        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
-          font-weight: bold;
     }
 
     th {
@@ -106,7 +162,8 @@
     .page-header {
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Distribute space between search and buttons */
+        justify-content: flex-start; /* Align elements to the left */
+    gap: 10px;  /* Distribute space between search and buttons */
         padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
         border-bottom: 1px solid #ccc; /* Subtle border for separation */
@@ -124,7 +181,7 @@
         }
 
         #searchForm {
-            width: 100%; /* Full width for small screens */
+            width: 100%; 
             margin-right: 0; /* Remove margin on small screens */
         }
 
@@ -142,12 +199,11 @@
         font-family: 'Noto Sans', Arial, sans-serif; /* Font family similar to grid header */
         font-size: 14px; /* Adjusted font size to match typical grid header size */
         font-weight: 600; /* Bold text for prominence */
-        /* border: 1px solid #ddd; /* Lighter border for a cleaner look */ */
+        border: 1px solid #ddd; /* Lighter border for a cleaner look */
         white-space: nowrap; /* Prevent text from wrapping */
         padding: 8px 10px; /* Adjusted padding for better spacing */
           background-color: #E0E0E0;  /* Light background color to match grid header */
         color: #333; /* Text color for readability */
-          font-weight: bold;
     }
        table th {
         border-top: 0.0625rem solid var(--zed_sys_color_border_lowEmphasis); /* Top border color */
@@ -159,27 +215,26 @@
         line-height: 1.2rem; /* Reduced line height */
         letter-spacing: normal; /* Letter spacing */
         font-family: 'Noto Sans', sans-serif; /* Font family */
-         font-weight: bold;
+        font-weight: 400; /* Font weight */
         text-align: center; /* Center align text */
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
-</style>
+    </style>
 </head>
 <body>
 <div class="page-header">
    <!--  <form id="searchForm"> -->
    <!--  <div> -->
-   <label for="principalEmployerId" style=" color: darkcyan;"   >Request Status</label>
-      <select id="requestType" name="requestType" style="width: 20%; height: 25px;" onchange="toggleMainContractorRow()">
+  <!--  <label for="principalEmployerId" style=" color: darkcyan;"   >Request Status</label> -->
+      <!-- <select id="requestType" name="requestType" style="width: 20%; height: 25px;" onchange="toggleMainContractorRow()">
          <option value="">Select Status</option>
          <option value="Draft">Draft</option>
          <option value="Submitted">Submitted</option>
          <option value="Approved">Approved</option>
          <option value="Rejected">Rejected</option>
          <option value="Withdrawn">Withdrawn</option>
-     </select>
+     </select> -->
 <!-- <label for="contractorId" style=" color: darkcyan;" >Contractor:</label>
         
        
@@ -210,7 +265,7 @@
    <!--  </form> -->
     <div>
       <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  >Search</button>
-       <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> -->
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToBillAdd()">New</button>
         <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToBillView()">View</button>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
@@ -234,9 +289,9 @@
                     <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.billEndDate"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.status"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.billCategory"/><span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.lastApprover"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <%-- <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.lastApprover"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.nextApprover"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                   
+                    --%>
                     <!-- Add more headers as needed -->
                 <!-- <td style="border: 1px solid black;">ISACTIVE</td>
                 <td style="border: 1px solid black;">UPDATEDTM</td>
@@ -258,8 +313,8 @@
 						<td>${wo.billEndDate}</td>
 						<td>${wo.status}</td>
 						<td>${wo.billCategory}</td>
-						<td>${wo.lastApprover}</td>
-						<td>${wo.nextApprover}</td>
+						<%-- <td>${wo.lastApprover}</td>
+						<td>${wo.nextApprover}</td> --%>
 						<%--<td style="border: 1px solid black;">${principalEmployer.NAME}</td>
                     <td style="border: 1px solid black;">${${wo.requestType}}</td> --%>
 					</tr>

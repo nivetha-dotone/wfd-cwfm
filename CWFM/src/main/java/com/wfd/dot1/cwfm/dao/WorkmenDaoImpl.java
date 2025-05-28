@@ -194,6 +194,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			Workorder wo = new Workorder();
 			wo.setWorkorderId(rs.getString("WORKORDERID"));
 			wo.setName(rs.getString("NAME"));
+			wo.setValidFrom(rs.getString("VALIDFROM"));
+			wo.setValidTo(rs.getString("VALIDDT"));
 			woList.add(wo);
 		}
 		log.info("Exiting from getAllWorkordersBasedOnPEAndContractor dao method "+woList.size());

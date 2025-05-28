@@ -3,11 +3,21 @@ package com.wfd.dot1.cwfm.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
@@ -18,7 +28,6 @@ import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
-import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -29,6 +38,7 @@ import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
 import com.wfd.dot1.cwfm.pojo.Workorder;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Service
 public class WorkmenServiceImpl implements WorkmenService{
@@ -487,4 +497,90 @@ public class WorkmenServiceImpl implements WorkmenService{
 		int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(unitId,gatePassTypeId);
 			return workmenDao.getGatePassActionListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
+	
+	public String getSurePassURL() {
+	    return QueryFileWatcher.getQuery("SUREPASS_VERIFY_OTP_URL");
+	}
+    
+    public String getToken() {
+	    return QueryFileWatcher.getQuery("TOKEN");
+	}
+    
+    public String getGenderIdFromCode(String code, List<CmsGeneralMaster> genderList) {
+        for (CmsGeneralMaster gm : genderList) {
+            if (code.equalsIgnoreCase("M") && gm.getGmName().equalsIgnoreCase("MALE")) {
+                return String.valueOf(gm.getGmId());
+            } else if (code.equalsIgnoreCase("F") && gm.getGmName().equalsIgnoreCase("FEMALE")) {
+                return String.valueOf(gm.getGmId());
+            }
+        }
+        return ""; // or null if not found
+    }
+
+    
+	@Override
+	public Map<String, Object> verifyOtpWithSurepass(String clientId, String otp) {
+        String url =getSurePassURL();
+        String bearerToken = getToken();
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", bearerToken);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("client_id", clientId);
+        body.put("otp", otp);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+
+            Map<String, Object> responseBody = response.getBody();
+            Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", true);
+            result.put("fullName", data.get("full_name"));
+            result.put("dob", data.get("dob"));
+            
+        	List<CmsGeneralMaster> gmList = this.getAllGeneralMaster();
+            Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
+                    .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+            List<CmsGeneralMaster> genderList = groupedByGmType.get("GENDER");
+
+            String genderCode = (String) data.get("gender"); // "M" or "F"
+            String genderId = getGenderIdFromCode(genderCode, genderList);
+
+            result.put("gender", genderId); // send this to frontend
+
+            //result.put("gender", data.get("gender"));
+
+            // Construct address string
+            Map<String, Object> addr = (Map<String, Object>) data.get("address");
+            String address = String.join(", ",
+                    Objects.toString(addr.get("house"), ""),
+                    Objects.toString(addr.get("street"), ""),
+                    Objects.toString(addr.get("loc"), ""),
+                    Objects.toString(addr.get("dist"), ""),
+                    Objects.toString(addr.get("state"), ""));
+
+            result.put("address", address);
+            return result;
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "OTP verification failed: " + e.getStatusText());
+            return error;
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Unexpected error: " + e.getMessage());
+            return error;
+        }
+    }
 }

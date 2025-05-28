@@ -447,16 +447,23 @@ label {
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
     
-    <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" ><spring:message code="label.generateotp"/></button></td>
+    <td>
+     <button type="button" onclick="generateOtp()" class="btn btn-default process-footer-button-cancel ng-binding">Generate OTP</button>
+     
+     </td>
     
     <td>
     	<input id="otp" name="otp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" placeholder="Enter otp here">
     </td>
-     <td> <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" >Verify OTP</button></td>
+     <td> <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="verifyOtp()">Verify OTP</button></td>
     <!--  <td rowspan="6" class="image-container">
         <img id="imageId" width="150" height="150" onclick="openFilePicker();">
         <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileSelect(event)">
     </td> -->
+    <!-- Display response message -->
+<div id="otpMessage" style="margin-top:10px; color: green;"></div>
+<div id="otpError" style="margin-top:10px; color: red;"></div>
+    
     </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.firstName"/></label></th>

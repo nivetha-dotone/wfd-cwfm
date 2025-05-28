@@ -17,8 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +43,6 @@ import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
-import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -53,6 +57,7 @@ import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -1521,5 +1526,87 @@ public class WorkmenController {
     		return "contractWorkmen/renewView";
     	
     }
+    public String getSurePassURL() {
+	    return QueryFileWatcher.getQuery("SUREPASS_URL");
+	}
+    
+    public String getToken() {
+	    return QueryFileWatcher.getQuery("TOKEN");
+	}
+    
+    
+    @PostMapping("/generateOtp")
+    @ResponseBody
+    public Map<String, Object> generateOtp(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        String aadhaarNumber = requestBody.get("aadhaarNumber");
+        String surepassUrl = getSurePassURL();
+        String token = getToken();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("id_number", aadhaarNumber);
+
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(payload, headers);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            ResponseEntity<Map> responseEntity = restTemplate.exchange(surepassUrl, HttpMethod.POST, entity, Map.class);
+            Map<String, Object> responseBody = responseEntity.getBody();
+
+            Map<String, Object> dataMap = (Map<String, Object>) responseBody.get("data");
+
+            // Store client_id in session for later use in verify OTP
+            if (dataMap != null && dataMap.containsKey("client_id")) {
+                session.setAttribute("aadhaarClientId", dataMap.get("client_id"));
+            }
+
+            responseMap.put("success", responseBody.get("success"));
+            responseMap.put("message", responseBody.get("message"));
+            responseMap.put("statusCode", responseBody.get("status_code"));
+            responseMap.put("status", dataMap != null ? dataMap.get("status") : null);
+
+        } catch (HttpClientErrorException ex) {
+            try {
+                Map<String, Object> errorBody = new ObjectMapper().readValue(ex.getResponseBodyAsString(), Map.class);
+                Map<String, Object> dataMap = (Map<String, Object>) errorBody.get("data");
+
+                // Store client_id even in error case (if available)
+                if (dataMap != null && dataMap.containsKey("client_id")) {
+                    session.setAttribute("aadhaarClientId", dataMap.get("client_id"));
+                }
+
+                responseMap.put("success", false);
+                responseMap.put("message", errorBody.get("message"));
+                responseMap.put("statusCode", errorBody.get("status_code"));
+                responseMap.put("status", dataMap != null ? dataMap.get("status") : null);
+
+            } catch (Exception e) {
+                responseMap.put("success", false);
+                responseMap.put("message", "Unable to parse error response.");
+                responseMap.put("statusCode", 500);
+            }
+        } catch (Exception e) {
+            responseMap.put("success", false);
+            responseMap.put("message", "Internal server error occurred.");
+            responseMap.put("statusCode", 500);
+        }
+
+        return responseMap;
+    }
+    @PostMapping("/verifyOtp")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> verifyOtp(@RequestBody Map<String, String> requestData, HttpSession session) {
+        String otp = requestData.get("otp");
+        String clientId = (String) session.getAttribute("aadhaarClientId");
+
+        Map<String, Object> result = workmenService.verifyOtpWithSurepass(clientId, otp);
+        return ResponseEntity.ok(result);
+    }
+
 
 }
