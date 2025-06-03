@@ -15,12 +15,123 @@ public class CMSContrPemm {
     private Date pfApplyDt;
     private String esicNum;
     private boolean rcValidated;
+    private Contractor contractor;
+    private String licenseNumber;
+    private Date licenseValidFrom;
+    private Date licenseValidTo;
+    private String coverage;
+    private int totalStrength;
+    private int maxNoEmp;
+    private String natureofWork;
+    private String locationofWork;
+    private String pfCode;
+    private String esiwc;
+    private Date esiValidFrom;
+    private Date esiValidTo;
+    
+    
 
     public Long getRefId() {
         return refId;
     }
 
-    public void setRefId(Long refId) {
+    public String getLicenseNumber() {
+		return licenseNumber;
+	}
+
+	public void setLicenseNumber(String licenseNumber) {
+		this.licenseNumber = licenseNumber;
+	}
+
+	public Date getLicenseValidFrom() {
+		return licenseValidFrom;
+	}
+
+	public void setLicenseValidFrom(Date licenseValidFrom) {
+		this.licenseValidFrom = licenseValidFrom;
+	}
+
+	public Date getLicenseValidTo() {
+		return licenseValidTo;
+	}
+
+	public void setLicenseValidTo(Date licenseValidTo) {
+		this.licenseValidTo = licenseValidTo;
+	}
+
+	public String getCoverage() {
+		return coverage;
+	}
+
+	public void setCoverage(String coverage) {
+		this.coverage = coverage;
+	}
+
+	public int getTotalStrength() {
+		return totalStrength;
+	}
+
+	public void setTotalStrength(int totalStrength) {
+		this.totalStrength = totalStrength;
+	}
+
+	public int getMaxNoEmp() {
+		return maxNoEmp;
+	}
+
+	public void setMaxNoEmp(int maxNoEmp) {
+		this.maxNoEmp = maxNoEmp;
+	}
+
+	public String getNatureofWork() {
+		return natureofWork;
+	}
+
+	public void setNatureofWork(String natureofWork) {
+		this.natureofWork = natureofWork;
+	}
+
+	public String getLocationofWork() {
+		return locationofWork;
+	}
+
+	public void setLocationofWork(String locationofWork) {
+		this.locationofWork = locationofWork;
+	}
+
+	public String getPfCode() {
+		return pfCode;
+	}
+
+	public void setPfCode(String pfCode) {
+		this.pfCode = pfCode;
+	}
+
+	public String getEsiwc() {
+		return esiwc;
+	}
+
+	public void setEsiwc(String esiwc) {
+		this.esiwc = esiwc;
+	}
+
+	public Date getEsiValidFrom() {
+		return esiValidFrom;
+	}
+
+	public void setEsiValidFrom(Date esiValidFrom) {
+		this.esiValidFrom = esiValidFrom;
+	}
+
+	public Date getEsiValidTo() {
+		return esiValidTo;
+	}
+
+	public void setEsiValidTo(Date esiValidTo) {
+		this.esiValidTo = esiValidTo;
+	}
+
+	public void setRefId(Long refId) {
         this.refId = refId;
     }
 
@@ -112,9 +223,6 @@ public class CMSContrPemm {
         this.rcValidated = b;
     }
     
-   
-    private Contractor contractor;
-
 	public Contractor getContractor() {
 		return contractor;
 	}

@@ -329,5 +329,23 @@ public boolean doesUserExist(String userAccount) {
     Integer count = jdbcTemplate.queryForObject(query, Integer.class, userAccount);
     return count != null && count > 0;
 }
-    
+@Override
+public List<MasterUser> getUserWithUserAccount(String userAccount) {
+    String query = "SELECT userid,userAccount, password,EmailId, FirstName, LastName, ContactNumber, Status FROM MASTERUSER WHERE userAccount = ?";
+
+    return jdbcTemplate.query(query, (rs, rowNum) -> {
+        MasterUser user = new MasterUser();
+        // Assuming you have userId and password if needed later
+         user.setUserId(rs.getInt("userId"));
+        user.setUserAccount(rs.getString("userAccount"));
+        user.setPassword(rs.getString("password"));
+        user.setEmailId(rs.getString("EmailId"));
+        user.setFirstName(rs.getString("FirstName"));
+        user.setLastName(rs.getString("LastName"));
+        user.setContactNumber(rs.getString("ContactNumber"));
+        user.setStatus(rs.getString("Status"));
+        return user;
+    }, userAccount); // Pass userAccount as query parameter
+}
+
 }

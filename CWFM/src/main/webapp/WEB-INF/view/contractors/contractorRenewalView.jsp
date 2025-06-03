@@ -125,7 +125,7 @@ table.ControlLayout {
 
 table.ControlLayout th,
 table.ControlLayout td {
-    padding: 10px; /* Add padding inside cells for spacing around content */
+    padding: 4px; /* Add padding inside cells for spacing around content */
     vertical-align: top; /* Align the content to the top of the cell */
 }
         body {
@@ -182,7 +182,7 @@ table.ControlLayout td {
         }
         .tab-content {
             display: none;
-            padding: 20px;
+            padding: 0px;
             background-color: white;
             border: 1px solid #ccc;
         }
@@ -307,6 +307,7 @@ textarea {
 <body>
     
     <div id="principalEmployerContent">
+    <div class="tabs-container">
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">Add New Documents</button> 
@@ -315,7 +316,9 @@ textarea {
      <div class="action-buttons" >
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
     </div>
-        <div id="tab1" class="tab-content active">
+    </div> 
+     
+   <div id="tab1" class="tab-content active">
         
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
@@ -344,7 +347,7 @@ textarea {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.organization"/></label></th>
                 <td><input type="text" name="organization" value="${contractRenew.organisation}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorCode"/></label></th>
-                <td><input type="text" name="contractorcode" value="${contractRenew.contractorCode}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td><input type="text" name="contractorcode" value="${contractRenew.contractorCode}" style="height: 20px;width:170px;" size="30" maxlength="30" readonly  /></td>
            
             </tr>
             <tr>
@@ -353,7 +356,7 @@ textarea {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                 <td><input type="text" name="managername" value="${contractRenew.managerName}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.locationOfWork"/></label></th>
-                <td><input type="text" name="locationofwork" value="${contractRenew.locationOfWork}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td><input type="text" name="locationofwork" value="${contractRenew.locationOfWork}" style="height: 20px;width:170px;" size="30" maxlength="30" readonly  /></td>
            
             </tr>
             <tr>
@@ -362,7 +365,7 @@ textarea {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfCode"/></label></th>
                 <td><input type="text" name="pfcode" value="${contractRenew.pfCode}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
-                <td><input type="text" name="emailaddress" value="${contractRenew.emailAdd}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td><input type="text" name="emailaddress" value="${contractRenew.emailAdd}" style="height: 20px;width:170px;" size="30" maxlength="30" readonly  /></td>
            
             </tr>
             <tr>
@@ -371,7 +374,7 @@ textarea {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicRegistration"/></label></th>
                 <td><input type="text" name="esicregistration" value="${contractRenew.esicReg}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractValidTill"/></label></th>
-                <td><input type="date" name="contractvalidto" value="${contractRenew.contractorValidTo}" style="height: 20px; color:black;" size="30" maxlength="30"  readonly  /></td>
+                <td><input type="date" name="contractvalidto" value="${contractRenew.contractorValidTo}" style="height: 20px; color:black;width:170px;" size="30" maxlength="30"  readonly  /></td>
           
             </tr>
              <tr>

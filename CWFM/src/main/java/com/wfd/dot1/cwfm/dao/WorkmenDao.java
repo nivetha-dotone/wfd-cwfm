@@ -104,6 +104,7 @@ public interface WorkmenDao {
 
 	GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatePassId);
 
+
 	List<GatePassListingDto> getGatePassActionListingForApprovers(String roleId, int workFlowType,
 			String gatePassTypeId, String deptId, String unitId);
 
@@ -115,6 +116,8 @@ public interface WorkmenDao {
 
 	int getWorkFlowTYpeNew(String principalEmployer, String gatePassAction);
 
+
 	public boolean updateGatePassMainStatusByTransactionId(String transactionId, String status);
+
 
 }

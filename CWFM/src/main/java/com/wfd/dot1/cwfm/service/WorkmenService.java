@@ -74,10 +74,15 @@ public interface WorkmenService {
 
 	String renewGatePass(GatePassMain gatePassMain);
 
+
 	List<GatePassListingDto> getGatePassActionListingForApprovers(String unitId, String deptId, MasterUser user,
 			String gatePassTypeId);
 
 	Map<String, Object> verifyOtpWithSurepass(String clientId, String otp);
 
+
+	boolean isAadhaarExists(String aadhaarNumber);
+	
+	boolean isAadharDuplicate(String aadharNumber);
 
 }	

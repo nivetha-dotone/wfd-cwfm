@@ -1905,5 +1905,18 @@ public int getWorkFlowTYpeNew(String principalEmployer,String gatePassAction) {
 	return workflowTypeId;
 }
 
+@Override
+public boolean findByAadhaarNumber(String aadhaarNumber) {
+    
+    String query = "select count(*) from GATEPASSMAIN where AadharNumber=?";
+    Integer count = jdbcTemplate.queryForObject(query, new Object[]{aadhaarNumber}, Integer.class);
+    return count != null && count > 0;
+}
+@Override
+public boolean checkDuplicateAadhar(String aadharNumber) {
+    String sql = "SELECT COUNT(*) FROM GATEPASSMAIN WHERE AadharNumber = ?";
+    Integer count = jdbcTemplate.queryForObject(sql, new Object[]{aadharNumber}, Integer.class);
+    return count != null && count > 0;
+}
 
 }

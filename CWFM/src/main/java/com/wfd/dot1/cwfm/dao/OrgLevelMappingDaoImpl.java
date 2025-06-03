@@ -22,6 +22,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
+import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 @Repository
@@ -422,6 +423,17 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
 		        //String query = "SELECT ORGLEVELENTRYID FROM OLACCTSETMM WHERE ORGACCTSETID = ?";
 		        return new HashSet<>(jdbcTemplate.queryForList(query, Integer.class, orgAcctSetId));
 		    }
+			@Override
+			public List<OrgLevelMapping> getUserWithShortName(String shortName) {
+				 String query = "select ORGACCTSETID,SHORTNM,LONGDSC from ORGACCTSET where SHORTNM=?";
 
-
+				    return jdbcTemplate.query(query, (rs, rowNum) -> {
+				    	OrgLevelMapping user = new OrgLevelMapping();
+				    	 user.setOrgAcctSetId(rs.getLong("ORGACCTSETID"));
+				        user.setShortName(rs.getString("SHORTNM"));
+				        user.setLongDescription(rs.getString("LONGDSC"));
+				        return user;
+				    }, shortName); // Pass userAccount as query parameter
+				}
 }
+			

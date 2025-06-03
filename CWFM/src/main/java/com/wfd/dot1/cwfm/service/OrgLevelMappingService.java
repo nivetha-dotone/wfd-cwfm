@@ -31,4 +31,5 @@ public interface OrgLevelMappingService {
 		void saveOrgLevelMapping(long orgAcctSetId, Integer entryId);
 		void deleteOrgLevelMapping(long orgAcctSetId, Integer entryId);
 		Set<Integer> getExistingMappings(long orgAcctSetId);
+		List<OrgLevelMapping> getUserWithShortName(String shortName);
 }

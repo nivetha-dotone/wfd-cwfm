@@ -232,7 +232,10 @@
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
      </c:if> --%>
      <c:if test="${UserPermission.viewRights eq 1 }">
+
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContractorRegView()">View</button>
+
+
 
      </c:if>
        <c:if test="${UserPermission.exportRights eq 1 }">

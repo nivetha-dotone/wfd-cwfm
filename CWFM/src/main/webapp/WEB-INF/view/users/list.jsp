@@ -7,6 +7,8 @@
 <html>
 <head>
  <title>Users List</title>
+  <script src="resources/js/cms/users.js"></script>
+ 
   <!--   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Role Rights List</title>
@@ -169,14 +171,46 @@
     }
 </style>
 <script>
-
+function searchUserWithUserAccount(){
+	 var userAccount = $('#userAccount').val();
+console.log(userAccount);
+	 $.ajax({
+	     url: '/CWFM/usersController/getUserWithUserAccount',
+	     type: 'POST',
+	     data: {
+	    	 userAccount: userAccount
+	     },
+	     success: function(response) {
+	         var tableBody = $('#UserTable tbody');
+	         tableBody.empty();
+				if (response.length > 0) {
+	             $.each(response, function(index, wo) {
+	                 var row = '<tr  >' +
+		'<td  ><input type="checkbox" name="selectedUserIds" value="' + wo.userId + '"></td>'+
+	                           '<td  >' + wo.userAccount + '</td>' +
+	                           '<td  >' + wo.emailId + '</td>' +
+		  '<td  >'+ wo.firstName + +wo.lastName  '</td>' +	
+		  '<td  >' + wo.contactNumber + '</td>' +	
+		  '<td  >' + wo.status + '</td>' +	
+	                           '</tr>';
+	                 tableBody.append(row);
+	             });
+	         } else {
+	             tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+	         }
+	     },
+	     error: function(xhr, status, error) {
+	         console.error("Error fetching data:", error);
+	     }
+	 });
+	}	
 </script>
 </head>
 <body>
 <div class="page-header">
     <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="userAccount" name="searchQuery" placeholder="Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchUserWithUserAccount()">Search</button>
     </form>
     <div>
     <c:if test="${UserPermission.addRights eq 1 }">
@@ -193,7 +227,7 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="usersExportToCSV()">Export</button>
     	</c:if>
     	<c:if test="${UserPermission.deleteRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Delete</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Deactive</button>
     	</c:if>
     </div>
     <!-- <div>
@@ -207,14 +241,14 @@
 </div>
 <form  >
     <div class="table-container">
-        <table border="1">
+        <table id="UserTable" border="1">
         <thead>
              <tr>
                 <!-- <th>User ID</th> -->
                 <th class="checkbox-cell">
                     <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers()">
                 </th>
-                <th>User Account</th>
+                <th id="userAccount">User Account</th>
                 <th>Email</th>
                 <th>Full Name</th>
                 <th>Contact Number</th>
@@ -222,14 +256,14 @@
                 <!-- <th>Actions</th> -->
             </tr>
         </thead>
-        <tbody>
+        <tbody id="UserTable">
             <c:forEach var="user" items="${users}">
                 <tr>
                  <%--    <td>${user.userId}</td> --%>
                   <td class="checkbox-cell">
                         <input type="checkbox" name="selectedUserIds" value="${user.userId}">
                     </td>
-                    <td>${user.userAccount}</td>
+                    <td id="userAccount">${user.userAccount}</td>
                     <td>${user.emailId}</td>
                     <td>${user.firstName} ${user.lastName}</td>
                     <td>${user.contactNumber}</td>

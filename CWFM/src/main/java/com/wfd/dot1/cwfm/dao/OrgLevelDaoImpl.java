@@ -104,6 +104,10 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
  public String getAllOrgLevelQuery() {
 	    return QueryFileWatcher.getQuery("GET_ALL_ORG_LEVELS");
 	}
+ public String dependencyOrglevelUpdatesSql() {
+	    return QueryFileWatcher.getQuery("DEPENDENCY_ORGLEVEL_UPDATE_SQL");
+	}
+ 
     @Override
     public void saveOrgLevel(OrgLevelDefDTO orgLevel) {
     	 System.out.println("Saving org level: " + orgLevel.getName() + ", " + orgLevel.getShortName() + ", " + orgLevel.getOrgHierarchyLevel());
@@ -344,12 +348,14 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		        List<Long> undeletableIds = new ArrayList<>();
 		        String CheckSql = dependencyOrglevelCheckSql();
 		        String updateSql = dependencyOrglevelUpdateSql();
+		        String updateSql1 = dependencyOrglevelUpdatesSql();
 		        for (Long orgLevelDefIds : orgLevelDefId) {
 		            Integer count = jdbcTemplate.queryForObject(CheckSql, Integer.class, orgLevelDefIds);
 		            if (count != null && count > 0) {
 		                undeletableIds.add(orgLevelDefIds); // Add to list of undeletable IDs if dependencies exist
 		            } else {
 		               jdbcTemplate.update(updateSql, orgLevelDefIds);
+		               jdbcTemplate.update(updateSql1, orgLevelDefIds);
 		                LOGGER.info("Org Level deleted with orgLevelDefId: {}", orgLevelDefIds);
 		            }
 		        }

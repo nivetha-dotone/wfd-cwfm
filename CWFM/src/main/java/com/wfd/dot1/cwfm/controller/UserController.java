@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wfd.dot1.cwfm.dto.ChangePasswordDTO;
+import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.ResetPasswordDTO;
 import com.wfd.dot1.cwfm.dto.UserDTO;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
@@ -39,6 +42,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/usersController")
 public class UserController {
+	private static final Logger log = LoggerFactory.getLogger(UserController.class.getName());
     @Autowired
     private UserService userService;
     @Autowired
@@ -272,4 +276,18 @@ public class UserController {
 	 * roles); } return userRolesMap; }
 	 */
 
+    @GetMapping("/getUserWithUserAccount")
+   	public ResponseEntity<List<MasterUser>> getUserWithUserAccount(
+               @RequestParam String userAccount,HttpServletRequest request,HttpServletResponse response) {
+          
+           	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+               MasterUser loginuser = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+           
+           	  // Sample data (replace with your database queries)
+   	        List<MasterUser> users = userService.getUserWithUserAccount(userAccount);
+   	        
+   	     return ResponseEntity.ok(users);
+
+              
+    }
 }

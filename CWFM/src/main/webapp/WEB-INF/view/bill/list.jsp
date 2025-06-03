@@ -280,7 +280,7 @@
                         <input type="checkbox" id="selectAllWOCheckbox" onchange="toggleSelectAllWOS()">
                     </td> 
                     <!-- Add more table headers for each column -->
-                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.TransactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(2)"><spring:message code="label.unitCode"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(3)"><spring:message code="label.vendorCode"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(4)"><spring:message code="label.contractorName"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>

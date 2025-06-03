@@ -10,7 +10,7 @@ public class Workorder {
 	private String validTo;
 	private String sapWorkorderNumber;
 	private String eicNumber;
-	
+	private String releasedDate;
 	private String typeId;
 	private String depId;
 	private String secId;
@@ -18,6 +18,13 @@ public class Workorder {
 	private String glCode;
 	private String costCenter;
 	
+	
+	public String getReleasedDate() {
+		return releasedDate;
+	}
+	public void setReleasedDate(String releasedDate) {
+		this.releasedDate = releasedDate;
+	}
 	public String getCostCenter() {
 		return costCenter;
 	}

@@ -14,7 +14,43 @@ public class Contractor {
 	
 	private String principalEmployer;
 	
-	   private boolean isBlocked;
+    private boolean isBlocked;
+	   
+    private String city;
+	   
+	private String reference;
+	   
+	private long mobileNumber;
+	   
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getReference() {
+		return reference;
+	}
+
+	public void setReference(String reference) {
+		this.reference = reference;
+	}
+
+	
+
+	public Contractor(String contractorName, String contractorAddress, String contractorCode, boolean isBlocked){
+		// TODO Auto-generated constructor stub
+		this.contractorName = contractorName;
+        this.contractorAddress = contractorAddress;
+        this.contractorCode = contractorCode;
+        this.isBlocked = isBlocked;
+	}
+
+	public Contractor() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public boolean isBlocked() {
 		return isBlocked;
@@ -71,6 +107,7 @@ public class Contractor {
 	public void setUnitId(String unitId) {
 		this.unitId = unitId;
 	}
+
 	
 
 	private String managerName;
@@ -273,4 +310,14 @@ public class Contractor {
 		this.wcValidated = wcValidated;
 	}
 	
+
+
+	public long getMobileNumber() {
+		return mobileNumber;
+	}
+
+	public void setMobileNumber(long mobileNumber) {
+		this.mobileNumber = mobileNumber;
+	}
+
 }

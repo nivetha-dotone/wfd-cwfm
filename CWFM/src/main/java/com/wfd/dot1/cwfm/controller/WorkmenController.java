@@ -1526,6 +1526,7 @@ public class WorkmenController {
     		return "contractWorkmen/renewView";
     	
     }
+
     public String getSurePassURL() {
 	    return QueryFileWatcher.getQuery("SUREPASS_URL");
 	}
@@ -1607,6 +1608,7 @@ public class WorkmenController {
         Map<String, Object> result = workmenService.verifyOtpWithSurepass(clientId, otp);
         return ResponseEntity.ok(result);
     }
+
 
 
 }

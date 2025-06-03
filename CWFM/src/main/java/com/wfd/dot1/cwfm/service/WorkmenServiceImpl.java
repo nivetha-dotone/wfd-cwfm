@@ -497,6 +497,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(unitId,gatePassTypeId);
 			return workmenDao.getGatePassActionListingForApprovers(user.getRoleId(),workFlowTypeId,gatePassTypeId,deptId,unitId);
 	}
+
 	
 	public String getSurePassURL() {
 	    return QueryFileWatcher.getQuery("SUREPASS_VERIFY_OTP_URL");
@@ -583,4 +584,5 @@ public class WorkmenServiceImpl implements WorkmenService{
             return error;
         }
     }
+
 }

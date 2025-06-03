@@ -52,6 +52,38 @@ public class PrincipalEmployer {
 	
 	private String updatedBy;
 	
+	private String updatedTM;
+	
+	
+
+	public PrincipalEmployer( String organization, String code,String name, String address, String managerName, String managerAddrs, String businessType, int maxWorkmen,
+			int maxCntrWorkmen, int bocwApplicability, int isMwApplicability,String licenseNumber, String pfCode,
+			String wcNumber, String factoryLicenseNumber) {
+		
+		this.organization=organization;
+		this.code=code;
+		this.name=name;
+		this.address=address;
+		this.managerName=managerName;
+		this.managerAddrs=managerAddrs;
+		this.businessType=businessType;
+		this.maxWorkmen=maxWorkmen;
+		this.maxCntrWorkmen=maxCntrWorkmen;
+		this.bocwApplicability=bocwApplicability;
+		this.isMwApplicability=isMwApplicability;
+		this.pfCode=pfCode;
+		this.licenseNumber=licenseNumber;
+		this.wcNumber=wcNumber;
+		this.factoryLicenseNumber=factoryLicenseNumber;
+		
+		
+		
+	}
+
+	public PrincipalEmployer() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getUnitId() {
 		return unitId;
 	}
@@ -260,5 +292,5 @@ public class PrincipalEmployer {
 		this.updatedTM = updatedTM;
 	}
 
-	private String updatedTM;
+	
 }

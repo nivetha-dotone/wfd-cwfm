@@ -23,4 +23,6 @@ public interface UserService {
 	void deleteUsers(List<Integer> userIds);
 	List<String> getRolesByUserId(Long userId);
 	boolean doesUserExist(String userAccount);
+	List<MasterUser> getUserWithUserAccount(String userAccount);
+	
 }

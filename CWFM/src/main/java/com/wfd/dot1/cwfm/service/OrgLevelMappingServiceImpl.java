@@ -134,6 +134,10 @@ public class OrgLevelMappingServiceImpl implements OrgLevelMappingService {
 	public Set<Integer> getExistingMappings(long orgAcctSetId) {
 		return orgLevelMappingDao.getExistingMappings(orgAcctSetId);
 	}
-    
+	@Override
+	public List<OrgLevelMapping> getUserWithShortName(String shortName) {
+		return orgLevelMappingDao.getUserWithShortName(shortName);
+	}
+
     
 }

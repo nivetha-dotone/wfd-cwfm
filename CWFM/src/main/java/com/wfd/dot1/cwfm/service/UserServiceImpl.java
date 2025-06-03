@@ -85,4 +85,8 @@ public class UserServiceImpl implements UserService {
 	public boolean doesUserExist(String userAccount) {
 		return userDAO.doesUserExist(userAccount);
 	}
+	 @Override
+	    public List<MasterUser> getUserWithUserAccount(String userAccount) {
+	        return userDAO.getUserWithUserAccount(userAccount);
+	    }
 }

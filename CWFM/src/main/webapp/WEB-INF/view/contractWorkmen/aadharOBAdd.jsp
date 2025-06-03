@@ -243,7 +243,7 @@ function extractIdFromURL() {alert(1)
 </div>
 
 <div class="section">
-    <div class="section-header" onclick="toggleSection('section2')">Other Information:</div>
+    <div class="section-header" onclick="toggleSection('section2')"  >Other Information:</div>
     <div id="section2Content" class="section-content">
        <table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
@@ -384,7 +384,7 @@ function extractIdFromURL() {alert(1)
 </div>
 <!-- Statutory/Regulatory Data: -->
 <div class="section">
-    <div class="section-header" onclick="toggleSection('section3')">Employment Information:</div>
+    <div class="section-header" onclick="toggleSection('section3')" >Employment Information:</div>
     <div id="section3Content" class="section-content">
        <table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>

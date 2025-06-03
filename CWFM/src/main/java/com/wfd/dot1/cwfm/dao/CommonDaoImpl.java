@@ -216,6 +216,9 @@ public class CommonDaoImpl implements CommonDao {
 	 public String deleteRoleRights() {
 		 return QueryFileWatcher.getQuery("DELETE_ROLE_RIGHTS");
 	 }
+	 public String dependencyUpdate() {
+		 return QueryFileWatcher.getQuery("DEPENDENCY_UPDATE");
+	 }
 	
 	@Autowired
 	  private CommonService commonService;
@@ -345,12 +348,14 @@ public class CommonDaoImpl implements CommonDao {
 	        List<Long> undeletableIds = new ArrayList<>();
 	        String dependencyCheckSql = dependencyCheckSql();
 	        String updateSql = dependencyUpdateSql();
+	        String updateSql1 = dependencyUpdate();
 	        for (Long gmTypeId : gmTypeIds) {
 	            Integer count = jdbcTemplate.queryForObject(dependencyCheckSql, Integer.class, gmTypeId);
 	            if (count != null && count > 0) {
 	                undeletableIds.add(gmTypeId); // Add to list of undeletable IDs if dependencies exist
 	            } else {
 	               jdbcTemplate.update(updateSql, gmTypeId);
+	               jdbcTemplate.update(updateSql1, gmTypeId);
 	                LOGGER.info("GM Type deleted with gmTypeId: {}", gmTypeId);
 	            }
 	        }

@@ -19,20 +19,35 @@
        <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
      <script src="resources/js/cms/bill.js"></script>
+
       <script src="resources/js/cms/workflow.js"></script>
+<script src="resources/js/cms/users.js"></script>
+     <script src="resources/js/cms/dataimportexport.js"></script>
+
    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   
-    
-    
+
     function showSection(type) {
         document.getElementById("sequentialSection").style.display = (type === 'sequential') ? 'block' : 'none';
         document.getElementById("parallelSection").style.display = (type === 'parallel') ? 'block' : 'none';
         document.getElementById("autoSection").style.display = (type === 'auto') ? 'block' : 'none';
     }
+
+function fileUploadTemplateSideBar(){
+	$(".openSidebar").click(function (event) {
+        event.preventDefault();
+        $("#sidebar").css("width", "300px");
+    });
+
+    $("#closeSidebar").click(function () {
+        $("#sidebar").css("width", "0");
+    });
+}
+
 function redirectToPEAdd() {
     // Fetch the content of add.jsp using AJAX
     var xhr = new XMLHttpRequest();
@@ -161,6 +176,10 @@ function validateCurrentTab() {
     let isValid = true;
     const activeTabId = document.querySelector('.tab-content.active').id;
     if (activeTabId === 'tab1') {
+    	//let basic = validateBasicData();
+    	//let aadhar =  validateAadharBeforeNextTab();
+        	//isValid = basic && aadhar;
+        	//console.log(isValid+ " "+basic+" "+aadhar);
         isValid = validateBasicData();
     } 
     else if(activeTabId === 'tab2'){
@@ -4452,9 +4471,408 @@ table th {
             }
         });
     } 
+    
+   /*  function fetchTemplateOptions() {
+        var dropdown = document.getElementById("templateType");
+        var selectedTemplate = dropdown.value;
+
+        if (selectedTemplate) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/CWFM/data/getTemplateOptions?selectedTemplate=" + selectedTemplate, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+
+                    document.getElementById("templateOptions").style.display = "block";
+                    document.getElementById("templateMessage").innerText = "What would you like to do with this template?";
+                    document.getElementById("infoTemplate").href = response.infoUrl;
+                    document.getElementById("viewTemplate").href = response.viewUrl;
+                    document.getElementById("downloadTemplate").href = response.downloadUrl;
+                }
+            };
+
+            xhr.send();
+        } else {
+            document.getElementById("templateOptions").style.display = "none";
+        }
+    } */
+    function fetchTemplateOptions() {
+        var selectedTemplate = $("#templateType").val();
+
+        // Hide the message initially
+        $("#templateOptions").hide();
+
+        if (selectedTemplate) {
+            $.ajax({
+                url: "/CWFM/data/getTemplateOptions",
+                type: "GET",
+                data: { selectedTemplate: selectedTemplate },
+                
+                success: function(response) {
+                	console.log(1);
+                    if (response) {
+                        $("#templateMessage").text(response);  // Set response text
+                        $("#templateOptions").fadeIn();  // Show message smoothly
+                    }
+                },
+                error: function() {
+                    console.error("Error fetching template options");
+                }
+            });
+        }
+    }
+    function fetchTemplateInfo() {
+        var selectedTemplate = document.getElementById("templateType").value;
+
+        if (!selectedTemplate) {
+            alert("Please select a template first.");
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/CWFM/data/getTemplateInfo?templateType=" + encodeURIComponent(selectedTemplate), true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+       console.log(2);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                console.log(5);
+                document.getElementById("modalTitle").innerText = response.title;
+                document.getElementById("modalDescription").innerText = response.description;
+
+                var tableHtml = "<table border='1' style='width:100%;'>";
+                tableHtml += "<tr><th>Field Name</th><th>Field Type</th><th>Example</th></tr>";
+
+                response.fields.forEach(function (field) {
+                    tableHtml += "<tr><td>" + field.name + "</td><td>" + field.type + "</td><td>" + field.example + "</td></tr>";
+                });
+
+                tableHtml += "</table>";
+                document.getElementById("modalTable").innerHTML = tableHtml;
+
+                document.getElementById("templateModal").style.display = "block"; // Show modal
+            } else if (xhr.readyState === 4) {
+                alert("Error fetching template details.");
+            }
+        };
+
+        xhr.send();
+    }
+
+    function closeModal() {
+        document.getElementById("templateModal").style.display = "none"; // Hide modal
+    }
+    function viewTemplateInfo() {
+        var selectedTemplate = document.getElementById("templateType").value;
+
+        if (!selectedTemplate) {
+            alert("Please select at least one template.");
+            return; // Stop execution if no template is selected
+        }
+
+        // Hide sidebar
+        document.getElementById("sidebar").style.display = "none";  
+
+        // Hide import/export buttons & arrows
+        document.querySelector(".button-container").style.display = "none";
+        document.querySelector(".arrow-container").style.display = "none";
+
+        // Show the table container
+        var tableContainer = document.getElementById("viewTemplateContainer");
+        tableContainer.style.display = "block";  
+
+        // Get table header and body elements
+        var tableHeaderRow = document.getElementById("tableHeaderRow");
+        var tableBody = document.getElementById("tableBody");
+
+        // Clear previous headers and rows
+        tableHeaderRow.innerHTML = "";
+        tableBody.innerHTML = "";
+
+        // Define headers based on the selected template
+        var headers = [];
+        if (selectedTemplate === "generalMaster") {
+            headers = ["GM Name", "GM Description", "GM TypeID","IS Active","Created Time","Updated Time","Updated By"];
+        }
+        else if (selectedTemplate === "minimumWage") {
+            headers = ["Trade", "Skill", "Basic","Da","Allowance","From Date","Unit Code","Organization"];
+        }
+        else if (selectedTemplate === "workorder") {
+            headers = ["Work Order Number", "Item", "Line","Line Number","Service Code","Short Text","Delivery Complition","Item Changed ON","Vendor Code","Vendor Name","Vendor Address",
+            	"Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code","G/L Code","Cost Center",
+            	"Nature of Job","Rate","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Quantity Completed","Work Order Release Date",
+            	"Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Organisation"];
+        }
+        else if (selectedTemplate === "contractor") {
+            headers = ["Contractor Name", "Contractor Address","City","Plant Code","Contractor Manager Name","License Num","License Valid From","License Valid To",
+            	"License Coverage","Total Strength","Maximum Number of Workmen","Nature of Work","Location of Work","Contractor Validity Start Date","Contractor Validity End Date",
+            	"Contractor Id","PF Code","EC/WC Number","EC/WC Validity Start Date","EC/WC Validity End Date","Coverage","PF Number","PF Apply Date","Reference","Mobile Number",
+            	"ESI Number","ESI Valid From","ESI Valid To","Organisation","Main Contractor Code","Work Order Number"];
+        }
+        else if (selectedTemplate === "principalEmployer") {
+            headers = ["Organization","Plant Code","Name", "Address","Manager Name","Manager Address","Bussiness Type","Max Workmen","Max Contract Workmen","BOCW Applicability",
+            	"Is MW Applicability","License Number","PF Code","ESWC Number","Factory License Number"];
+        }
+
+        // Populate table headers
+        headers.forEach(function(header) {
+            var th = document.createElement("th");
+            th.style.border = "1px solid #ddd";
+            th.style.padding = "8px";
+            th.textContent = header;
+            tableHeaderRow.appendChild(th);
+        });
+
+        // Add empty rows (5 rows as an example)
+        for (var i = 0; i < 5; i++) {  
+            var tr = document.createElement("tr");
+            headers.forEach(function() {
+                var td = document.createElement("td");
+                td.style.border = "1px solid #ddd";
+                td.style.padding = "8px";
+                td.textContent = ""; // Ensuring empty rows
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr); // Append row to tbody
+        }
+    }
+    function openFileSidebar() {
+        document.getElementById("fileUploadSidebar").style.width = "300px"; // Open sidebar
+    }
+
+    function closeFileSidebar() {
+        document.getElementById("fileUploadSidebar").style.width = "0"; // Close sidebar
+    }
+
+   /*  function submitFile() {
+        var fileInput = document.getElementById("fileInput");
+        
+        if (fileInput.files.length === 0) {
+            alert("Please choose a file before uploading.");
+        } else {
+            alert("File uploaded successfully!");
+            closeFileSidebar(); // Close sidebar after upload
+        }
+    } */
+
+    
+    function uploadTemplateFile() {
+        const fileInput = document.getElementById("fileInput");
+        const templateType = document.getElementById("templateType").value;
+
+        if (!fileInput.files[0] || !templateType) {
+            alert("Please select a template and a file.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        formData.append("templateType", templateType);
+
+        fetch("/CWFM/data/uploadTemplate", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log("Server Response:", result);
+
+            // Clear previous error display
+            document.getElementById("errorContainer").innerHTML = "";
+
+            const successData = result.data?.successData ?? [];
+            const errorData = result.data?.errorData ?? [];
+
+            if (result.status === "success") {
+                if (successData.length > 0) {
+                    renderUploadedData(successData, templateType); // display saved data
+                }
+                if (errorData.length > 0) {
+                    renderErrors(errorData); // display row-level field errors
+                }
+            } else {
+                // If errorData is present, show detailed error in UI
+                if (errorData.length > 0) {
+                    renderErrors(errorData);
+                } else {
+                    alert(result.message || "Upload failed.");
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Upload error", err);
+            alert("Something went wrong during file upload.");
+        });
+    }
+
+
+
+  
+
+
+    function renderUploadedData(data, templateType) {
+        const tableBody = document.getElementById("tableBody");
+        const tableHeaderRow = document.getElementById("tableHeaderRow");
+        tableBody.innerHTML = "";
+        tableHeaderRow.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 10;
+            td.textContent = "No data found.";
+            tr.appendChild(td);
+            tableBody.appendChild(tr);
+            return;
+        }
+
+        let headers = [];
+        let fieldMap = [];
+
+        if (templateType === "generalMaster") {
+            headers = ["GM Name", "GM Description", "GM TypeID", "IS Active", "Created Time", "Updated Time", "Updated By"];
+            fieldMap = ["gmName", "gmDescription", "gmTypeId", "isActive", "createdTM", "updatedTM", "updatedBy"];
+        } else if (templateType === "minimumWage") {
+            headers = ["Trade", "Skill", "Basic", "Da", "Allowance", "From Date", "Unit Code", "Organization"];
+            fieldMap = ["trade", "skill", "basic", "da", "allowamce", "fromDate", "unitCode", "organization"];
+        } else if (templateType === "workorder") {
+            headers = ["Work Order Number", "Item", "Short Text", "Delivery Completion", "Item Changed ON", "Work Order Validity From", "Work Order Validity To", "Work Order Type", "G/L Code", "Cost Center", "Nature of Job", "Rate", "Quantity", "PM Order No", "WBS Element", "Quantity Completed", "Work Order Release Date", "Service Entry Created Date", "Service Entry Updated Date"];
+            fieldMap = ["sapWorkorderNumber", "itemNum", "shortName", "deliveryCompletion", "changedon", "validFrom", "validTo", "sapType", "glCode", "costCenter", "job", "rate", "qty", "pmOrderNum", "wbsElement", "qtyCompleted", "releasedDate", "seCreatedOn", "seUpdatedOn"];
+        } else if (templateType === "contractor") {
+            headers = ["CONTRACTOR NAME", "CONTRACTOR ADDRESS", "City", "Contractor MANAGER NAME", "LICENSE NUM", "LICENCSE VALID FROM", "LICENCSE VALID TO", "LICENCSE COVERAGE", "TOTAL STRENGTH", "MAXIMUM NUMBER OF WORKMEN", "NATURE OF WORK", "LOCATION OF WORK", "CONTRACTOR VALIDITY START DATE", "CONTRACTOR VALIDITY END DATE", "CONTRACTOR ID", "PF CODE", "EC/WC number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF NUMBER", "PF APPLY DATE", "Reference", "Mobile Number", "ESI NUMBER", "ESI VALID FROM", "ESI VALID TO", "Main Contractor Code", "Work Order Number"];
+            fieldMap = ["contractorName", "contractorAddress", "city", "managerNm", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "totalStrength", "maxNoEmp", "natureofWork", "locationofWork", "periodStartDt", "periodEndDt", "contractorId", "pfCode", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "pfNum", "pfApplyDt", "reference", "mobileNumber", "esiwc", "esiValidFrom", "esiValidTo", "contractorCode", "workOrderNumber"];
+        } else if (templateType === "principalEmployer") {
+            headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number"];
+            fieldMap = ["organization", "code", "name", "address", "managerName", "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen", "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode", "wcNumber", "factoryLicenseNumber"];
+        }
+
+        headers.forEach(header => {
+            const th = document.createElement("th");
+            th.style.border = "1px solid grey";
+            th.style.padding = "8px";
+            th.textContent = header;
+            tableHeaderRow.appendChild(th);
+        });
+
+        const safe = val => (val !== null && val !== undefined ? val : "");
+
+        data.forEach(row => {
+            const tr = document.createElement("tr");
+            fieldMap.forEach(field => {
+                const td = document.createElement("td");
+                td.style.border = "1px solid grey";
+                td.style.padding = "8px";
+                td.textContent = safe(row[field]);
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function renderErrors(errorData) {
+        const container = document.getElementById("errorContainer");
+        container.innerHTML = "";
+
+        const table = document.createElement("table");
+        table.classList.add("table", "table-bordered");
+        table.style.marginTop = "10px";
+
+        const headerRow = document.createElement("tr");
+        ["Row", "Field", "Error Message"].forEach(text => {
+            const th = document.createElement("th");
+            th.innerText = text;
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        errorData.forEach(error => {
+            if (error.fieldErrors) {
+                for (const [field, message] of Object.entries(error.fieldErrors)) {
+                    const row = document.createElement("tr");
+
+                    const rowCell = document.createElement("td");
+                    rowCell.textContent = error.row;
+
+                    const fieldCell = document.createElement("td");
+                    fieldCell.textContent = field;
+
+                    const messageCell = document.createElement("td");
+                    messageCell.textContent = message;
+
+                    row.appendChild(rowCell);
+                    row.appendChild(fieldCell);
+                    row.appendChild(messageCell);
+
+                    table.appendChild(row);
+                }
+            } else {
+                // If only general error is returned
+                const row = document.createElement("tr");
+
+                const rowCell = document.createElement("td");
+                rowCell.textContent = error.row || "-";
+
+                const fieldCell = document.createElement("td");
+                fieldCell.textContent = "-";
+
+                const messageCell = document.createElement("td");
+                messageCell.textContent = error.error || "Unknown error";
+
+                row.appendChild(rowCell);
+                row.appendChild(fieldCell);
+                row.appendChild(messageCell);
+
+                table.appendChild(row);
+            }
+        });
+
+        container.appendChild(table);
+    }
+
+
+
+    function searchUserByShortName() {
+        var shortName = $('#shortNameSearch').val().trim();
+        console.log("Searching for userAccount:", shortName);
+        if (!shortName) {
+            alert("Please enter a short name to search.");
+            return;
+        }
+
+        $.ajax({
+            url: '/CWFM/org-level-mapping/getUserWithShortName',
+            type: 'GET',
+            data: { shortName: shortName },
+            success: function(response) {
+            	console.log("Response received:", response); // ✅ Debug
+                var tableBody = $('#OrgLevelTable tbody');
+                tableBody.empty();
+
+                if (response.length > 0) {
+                    $.each(response, function(index, user) {
+                        var row = '<tr>' +
+                            '<td><input type="checkbox" name="selectedOrgMap" value="' + user.orgAcctSetId + '"></td>' +
+                            '<td>' + user.shortName + '</td>' +
+                            '<td>' + user.longDescription + '</td>' +
+                            '</tr>';
+                        tableBody.append(row);
+                    });
+                } else {
+                    tableBody.append('<tr><td colspan="3">No data found</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error during search:", error);
+            }
+        });
+    }
+  
 
 
     </script>
+    
 </body>
 
 </html>

@@ -22,10 +22,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.wfd.dot1.cwfm.dao.OrgLevelDao;
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
+import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
 import com.wfd.dot1.cwfm.service.MasterUserService;
 import com.wfd.dot1.cwfm.service.OrgLevelMappingService;
 import com.wfd.dot1.cwfm.service.OrgLevelService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/org-level-mapping")
@@ -259,7 +264,20 @@ public class OrgLevelMappingController {
 //    }
 //   
 
-    
+    @GetMapping("/getUserWithShortName")
+   	public ResponseEntity<List<OrgLevelMapping>> getUserWithShortName(
+               @RequestParam String shortName,HttpServletRequest request,HttpServletResponse response) {
+          
+           	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+               MasterUser loginuser = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+           
+           	  // Sample data (replace with your database queries)
+   	        List<OrgLevelMapping> users = orgLevelMappingService.getUserWithShortName(shortName);
+   	        
+   	     return ResponseEntity.ok(users);
+
+              
+    }
   
 
 }

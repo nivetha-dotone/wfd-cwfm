@@ -172,8 +172,8 @@
 <body>
 <div class="page-header">
     <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="shortNameSearch" name="searchQuery" placeholder="Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchUserByShortName()">Search</button>
     </form>
     <div>
    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapAdd()">New</button>
@@ -186,7 +186,7 @@
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="editMapping()">Edit</button>
 </div> -->
 <div class="table-container">
-    <table border="1">
+    <table id="OrgLevelTable" border="1">
                 <thead>
                     <tr>
                     <td><input type="checkbox" id="selectAllOrgMapCheckbox" onchange="toggleSelectAllOrgMap()"></td>

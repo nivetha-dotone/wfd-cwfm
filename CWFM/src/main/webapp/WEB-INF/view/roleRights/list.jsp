@@ -182,7 +182,7 @@
     <div>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToRRAdd()">Add</button>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" id="editButton" onclick="redirectToRREdit()">Edit</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedRoleRights()">Delete</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedRoleRights()">Deactive</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToRoleCSV()">Export</button>
 <button type="submit" id="saveButton" class="btn btn-default" style="display: none;" onclick="saveUpdatedRoleRights()">Save</button>
 

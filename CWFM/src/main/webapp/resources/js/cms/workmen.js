@@ -251,7 +251,41 @@ function initializeDatePicker() {
         isValid = false;
     }else{
 		  $("#error-aadhar").hide();
+		  
 	}
+	/*// Check if Aadhaar is 12 digits and numeric
+       if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
+        $("#error-aadhar").show();
+        isValid = false;
+      }else{
+            $("#error-aadhar").hide();
+            
+            // Proceed with AJAX call to check for duplicate Aadhaar
+            $.ajax({
+            type: "GET", // Changed from POST to GET for read-only operation
+            url: "/CWFM/contractworkmen/checkAadhaarDuplicate",
+            data: { aadhaarNumber: aadharNumber },
+            dataType: "json", // Ensure the backend returns JSON
+            success: function (response) {
+                if (response.exists === true) {
+                    $("#error-aadhar").text("Aadhaar number already exists!").show();
+                   // $("#aadharNumber").val(""); // Clear field
+                    isValid = false;
+                } else {
+                    $("#error-aadhar").hide();
+                    // Aadhaar is valid, allow tab switch or next step
+                   
+                   
+                }
+            },
+            error: function (xhr) {
+                // Better error handling
+                console.log("AJAX Error:", xhr);
+                $("#error-aadhar").text("Server error occurred while checking Aadhaar.").show();
+            }
+        });
+        
+        }*/
 
     const firstName = $("#firstName").val().trim();
     const firstnameRegex = /^[A-Za-z\s]{2,}$/;
@@ -330,7 +364,7 @@ function initializeDatePicker() {
      }else{
 		 $("#error-address").hide();
 	 }
-
+console.log(isValid);
     return isValid;
 
 }
@@ -2418,6 +2452,7 @@ if(isValid){
 	    xhr.open("GET", "/CWFM/contractworkmen/renewview/" + transactionId, true);
 	    xhr.send();
 	}
+
 	
 	
 
@@ -2518,4 +2553,5 @@ if(isValid){
 
 	    xhr.send(JSON.stringify(data));
 	}
+
 
