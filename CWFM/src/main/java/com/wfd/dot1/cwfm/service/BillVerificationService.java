@@ -12,7 +12,7 @@ import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
-
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 
 public interface BillVerificationService {
@@ -32,5 +32,7 @@ public interface BillVerificationService {
 	String generateWCTransactionId();
 
 	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
+
+	public String save(CMSWageCostDTO workflowData);
 
 }

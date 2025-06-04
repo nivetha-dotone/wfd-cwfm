@@ -600,17 +600,17 @@ label {
 		<tbody>
 		<tr>
 				<th  style="width: 100px;height:20px;"><label class="custom-label"> Action Plan</label></th>
-				 <td><input type="text" name="actionPlan" value="" style="height: 20px;" size="30" maxlength="30"    /></td>
+				 <td><input type="text" id="actionPlanId" name="actionPlan" value="" style="height: 20px;" size="30" maxlength="30"    /></td>
  
 		</tr>
 			
 		
 			<tr>
 				<th><label class="custom-label"> <spring:message code="label.previousComment"/></label></th>
-			<td><input type="text" name="preComments" value=""  style="width: 265px;height: 150px;"  readonly  /></td>
+			<td><input type="text" id="preCommentsId" name="preComments" value=""  style="width: 265px;height: 150px;"  readonly  /></td>
  	
 				<th><label class="custom-label"><spring:message code="label.comment"/></label></th>
-				<td><input type="text" value=" "  name="comments" style="width: 265px;height: 150px;" /></td>
+				<td><input type="text" id="commentsId" value=" "  name="comments" style="width: 265px;height: 150px;" /></td>
 				</tr>
 		</tbody>
  </table> 

@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.List;
 
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -23,5 +24,7 @@ public interface BillVerificationDao {
 	String generateWCTransactionId();
 
 	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
+
+	public String saveBill(CMSWageCostDTO workflowData);
 }
 

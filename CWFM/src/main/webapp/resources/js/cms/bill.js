@@ -335,21 +335,32 @@ function setDates(selectElement){
 
 function saveBtn() {
     const formData = new FormData();
-
+	const unitSelect = document.getElementById("unitId");
+		 const unitId = unitSelect?.value;
+		 const unitName = unitSelect?.options[unitSelect.selectedIndex]?.text;
+		 
+		 const contractorSelect = document.getElementById("contractor");
+		 		 const contractorSelectId = contractorSelect?.value;
+		 		 const contractorSelectName = contractorSelect?.options[contractorSelect.selectedIndex]?.text;
     // ===== Basic Info JSON Data =====
     const data = {
         wcTransId: $('#transactionId').val(),
-        unitId: $('#unitId').val(),
+        unitId: unitId,
         unitCode: $('#unitCodeId').val(),
-        contractorId: $('#contractor').val(),
+		unitName: unitName,
+        contractorId:contractorSelectId,
         contractorCode: $('#contractorCodeId').val(),
+		contractorName:contractorSelectName,
         workOrderNumber: $('#workorder').val(),
         startDate: $('#billStartDateId').val(),
         endDate: $('#billEndDateId').val(),
         services: $('#billCategory').val(),
         woValidFrom: $('#woValidFromId').val(),
         woValidTo: $('#woValidToId').val(),
-        billType: $('#billType').val()
+        billType: $('#billType').val(),
+		actionPlan:$('#actionPlanId').val(),
+		comments:$('#commentsId').val(),
+		preComments:$('#preCommentsId').val()
     };
 
     // ✅ Append JSON directly as string

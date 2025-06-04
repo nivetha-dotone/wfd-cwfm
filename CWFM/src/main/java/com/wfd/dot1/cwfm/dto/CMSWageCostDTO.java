@@ -86,4 +86,64 @@ public class CMSWageCostDTO {
 	public void setServices(String services) {
 		this.services = services;
 	}
+	
+	private int status;
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
+	private String createdBy;
+	private String updateBy;
+	public String getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+	public String getUpdateBy() {
+		return updateBy;
+	}
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+	private String comments;
+	private String actionPlan;
+	private String preComments;
+	public String getComments() {
+		return comments;
+	}
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+	public String getActionPlan() {
+		return actionPlan;
+	}
+	public void setActionPlan(String actionPlan) {
+		this.actionPlan = actionPlan;
+	}
+	public String getPreComments() {
+		return preComments;
+	}
+	public void setPreComments(String preComments) {
+		this.preComments = preComments;
+	}
+	
+	private String unitName;
+	private String contractorName;
+	public String getUnitName() {
+		return unitName;
+	}
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+	public String getContractorName() {
+		return contractorName;
+	}
+	public void setContractorName(String contractorName) {
+		this.contractorName = contractorName;
+	}
+	
 }

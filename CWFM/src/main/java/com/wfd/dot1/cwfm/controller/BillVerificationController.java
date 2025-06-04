@@ -161,18 +161,23 @@ public class BillVerificationController {
     public ResponseEntity<String> saveBill(
         @RequestParam("jsonData") String jsonData,
         @RequestParam("checklistJson") String checklistJson,
-        @RequestParam Map<String, MultipartFile> files
+        @RequestParam Map<String, MultipartFile> files,HttpServletRequest request,HttpServletResponse response
     ) {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
+            HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+            MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+        	
             CMSWageCostDTO workflowData = mapper.readValue(jsonData, CMSWageCostDTO.class);
+            workflowData.setCreatedBy(String.valueOf(user.getUserId()));
+            workflowData.setUpdateBy(String.valueOf(user.getUserId()));
             List<ChecklistItemDTO> checklistItems = Arrays.asList(
                 mapper.readValue(checklistJson, ChecklistItemDTO[].class)
             );
 
             // Save core data
-            //billService.save(workflowData, checklistItems, files);
+          String wcTransId= billService.save(workflowData);
 
             return ResponseEntity.ok("Saved successfully");
         } catch (Exception e) {

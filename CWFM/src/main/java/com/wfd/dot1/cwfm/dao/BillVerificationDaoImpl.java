@@ -14,6 +14,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
@@ -122,5 +123,33 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 			}
 			log.info("Exiting from getAllContractorBasedOnPE dao method "+list.size());
 			return list;
+		}
+		@Override
+		public String saveBill(CMSWageCostDTO dto) {
+			String transId=null;
+			String query = "INSERT INTO CMSWageCostWorkFlow (WCTransID, Status, UnitId, UnitCode, UnitName, ContractorId, ContractorCode, ContractorName, " +
+	                "WorkOrderNumber, StartDate, EndDate, Services, CreatedBy, CreatedDate, UpdatedDate, WOValidFrom, WOValidTo, BillType,UpdatedBy,Comments,PreComments,ActionPlan) " +
+	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?, ?,?,?,?,?)";
+			dto.setStatus(4);
+			 Object[] parameters = new Object[] {
+					 dto.getWcTransId(),dto.getStatus(),dto.getUnitId(),dto.getUnitCode(),dto.getUnitName(),dto.getContractorId(),dto.getContractorCode(),dto.getContractorName(),
+					 dto.getWorkOrderNumber(),dto.getStartDate(),dto.getEndDate(),dto.getServices(),dto.getCreatedBy(),dto.getWoValidFrom(),dto.getWoValidTo(),
+					 dto.getBillType(),dto.getUpdateBy(),dto.getComments(),dto.getPreComments(),dto.getActionPlan()
+			 };
+
+		        try {
+		            int result = jdbcTemplate.update(query,parameters );
+		            if (result > 0) {
+		                log.info("Bill saved successfully for transId: " + dto.getWcTransId());
+		                transId=String.valueOf(dto.getWcTransId());
+		            } else {
+		                log.warn("Failed to save Bill  for transId: " + dto.getWcTransId());
+		            }
+		        } catch (Exception e) {
+		            log.error("Error saving Bill  for transId: " + dto.getWcTransId(), e);
+		        }
+				log.info("Exiting from Bill for transId: "+dto.getWcTransId() );
+
+			return transId;
 		}
 }

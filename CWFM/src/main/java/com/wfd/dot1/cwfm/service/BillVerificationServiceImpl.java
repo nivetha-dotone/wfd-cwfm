@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.wfd.dot1.cwfm.dao.BillVerificationDao;
 import com.wfd.dot1.cwfm.dao.ContractorDao;
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -56,5 +57,10 @@ public class BillVerificationServiceImpl implements BillVerificationService{
 	public List<PrincipalEmployer> getPEDetailByUser(String userAccount) {
 		// TODO Auto-generated method stub
 		return billDao.getPEDetailByUser(userAccount);
+	}
+	@Override
+	public String save(CMSWageCostDTO workflowData) {
+		// TODO Auto-generated method stub
+		return billDao.saveBill(workflowData);
 	}
 }
