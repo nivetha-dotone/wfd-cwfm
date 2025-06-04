@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
@@ -611,6 +612,66 @@ public class ContractorDaoImpl implements ContractorDao{
 		}
 		log.info("Exiting from getAllWorkordersBasedOnPEAndContractor dao method "+woList.size());
 		return woList;
+	}
+
+	 public String getContractorMasterExportQuery() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTOR_MASTER_EXPORT");
+		}
+	 
+	@Override
+	public List<ContractorRegistration> getContractorMasterExportData(String unitId) {
+		List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
+		String query = getContractorMasterExportQuery();
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+		while(rs.next()) {
+			ContractorRegistration pe = new ContractorRegistration();
+			pe.setVendorCode(rs.getString("CODE"));
+			pe.setContractorName(rs.getString("CONTRACTORNAME"));
+			pe.setAddress(rs.getString("ADDRESS"));
+			pe.setMobile(rs.getString("MOBILENO"));
+			pe.setManagerName(rs.getString("MANAGERNM"));
+			pe.setEmail(rs.getString("EMAILADDR"));
+			peList.add(pe);
+		}
+		return peList;
+	}
+
+	 public String getContractorComplianceExportQuery() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTOR_COMPLIANCE_EXPORT");
+		}
+	@Override
+	public List<ContractorComplianceDto> getContractorComplianceExportData(String unitId) {
+		List<ContractorComplianceDto> peList= new ArrayList<ContractorComplianceDto>();
+		String query = getContractorComplianceExportQuery();
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+		while(rs.next()) {
+			ContractorComplianceDto pe = new ContractorComplianceDto();
+			pe.setPeId(rs.getString("PEID"));
+			pe.setContractorCode(rs.getString("CONTRACTORCODE"));
+			pe.setLicenseNumber(rs.getString("LICENSENUMBER"));
+			pe.setLicenseStartDate(rs.getString("LICENSEVALIDITYSTARTDATE"));
+			pe.setLicenseEndDate(rs.getString("LICENSEVALIDITYENDDATE"));
+			pe.setContractorCoverge(rs.getString("CONTRACTORCOVERAGE"));
+			pe.setTotalStrength(rs.getString("TOTALSTRENGTH"));
+			pe.setNatureOfWork(rs.getString("NATUREOFWORK"));
+			pe.setContractStartDate(rs.getString("CONTRACTSTARTDATE"));
+			pe.setContractEndDate(rs.getString("CONTRACTENDDATE"));
+			pe.setEsiNumber(rs.getString("ESINUMBER"));
+			pe.setWcEsiValidFrom(rs.getString("ESIVALIDFROM"));
+			pe.setWcEsiValidTo(rs.getString("ESIVALIDTO"));
+			pe.setWcNo(rs.getString("WCCODE"));
+			pe.setWcValidFrom(rs.getString("WCFROMDTM"));
+			pe.setWcValidTo(rs.getString("WCTODTM"));
+			pe.setPfNumber(rs.getString("PFNUM"));
+			pe.setPfApplyDate(rs.getString("PFAPPLYDT"));
+			pe.setLaborWelfare(rs.getString("LaborWelfarefund"));
+			pe.setProfessionalTax(rs.getString("ProfessionalTax"));
+			pe.setGst(rs.getString("GST"));
+			pe.setIsmwApplicable(rs.getString("ISMWApplicable"));
+			pe.setEffectiveDate(rs.getString("CREATEDDTM"));
+			peList.add(pe);
+		}
+		return peList;
 	}
 }
 

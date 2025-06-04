@@ -617,7 +617,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setPrincipalEmployer(rs.getString("UnitId"));
 			dto.setContractor(rs.getString("ContractorId"));
 			dto.setWorkorder(rs.getString("WorkorderId"));
-			dto.setTrade(rs.getString("TradeId"));
+			dto.setTrade(rs.getString("Trade	Id"));
 			dto.setSkill(rs.getString("SkillId"));
 			dto.setDepartment(rs.getString("DepartmentId"));
 			dto.setSubdepartment(rs.getString("AreaId"));

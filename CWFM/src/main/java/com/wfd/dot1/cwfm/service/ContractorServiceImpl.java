@@ -10,6 +10,7 @@ import com.wfd.dot1.cwfm.dao.ContractorDao;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
@@ -143,5 +144,15 @@ public class ContractorServiceImpl implements ContractorService{
 	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId) {
 		// TODO Auto-generated method stub
 		return contrDao.getAllWorkordersBasedOnPEAndContractor(unitId,contractorId);
+	}
+	@Override
+	public List<ContractorRegistration> getContractorMasterExportData(String unitId) {
+		// TODO Auto-generated method stub
+		return contrDao.getContractorMasterExportData(unitId);
+	}
+	@Override
+	public List<ContractorComplianceDto> getContractorComplianceExportData(String unitId) {
+		// TODO Auto-generated method stub
+		return contrDao.getContractorComplianceExportData(unitId);
 	}
 }

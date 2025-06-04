@@ -5,6 +5,7 @@ import java.util.List;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
@@ -60,6 +61,10 @@ public interface ContractorService {
 	public void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg);
 
 	public List<Workorder> getAllWorkordersBasedOnPEAndContractor(String unitId, String contractorId);
+
+	public List<ContractorRegistration> getContractorMasterExportData(String unitId);
+
+	public List<ContractorComplianceDto> getContractorComplianceExportData(String unitId);
 	   
 	}
 
