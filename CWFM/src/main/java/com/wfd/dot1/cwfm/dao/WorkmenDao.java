@@ -11,6 +11,7 @@ import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
@@ -118,6 +119,8 @@ public interface WorkmenDao {
 
 
 	public boolean updateGatePassMainStatusByTransactionId(String transactionId, String status);
+
+	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId);
 
 
 }

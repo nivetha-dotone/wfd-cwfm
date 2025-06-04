@@ -31,6 +31,7 @@ import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
@@ -584,5 +585,20 @@ public class WorkmenServiceImpl implements WorkmenService{
             return error;
         }
     }
+	@Override
+	public boolean isAadhaarExists(String aadhaarNumber) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean isAadharDuplicate(String aadharNumber) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId) {
+		// TODO Auto-generated method stub
+		return workmenDao.getContractWorkmenExportData(unitId);
+	}
 
 }

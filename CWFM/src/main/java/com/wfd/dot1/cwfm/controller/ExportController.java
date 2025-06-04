@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
@@ -127,6 +128,119 @@ public class ExportController {
                   rows.add(row);
               }
                 break;
+            case "Contract Workmen":
+                List<ContractWorkmenExportDto> workmen = workmenService.getContractWorkmenExportData(unitId);
+                columns = Arrays.asList("Person Number(Employee id.)", "First Name", "Last Name", "Middle Initial/Name", "Short Name", "Badge Number (Punch Card)",
+                		"Hire Date","Birth Date","Phone 1","Phone 2","Phone 3","Email","Address","City","State","Postal Code","Country","Employment Status","Employment Status Effective Date","Reports to Manager",
+                		"Worker Type(Black Listed)","User Account Name","User Account Status","User Password","Company","Location","Plant Location","Department","Section","sub-section (Line)","Contractore Code",
+                		"Home Business Structure Level 8","Home Business Structure Level 9","Category","Supervioser Id","Cost Center","Workorder","Home Labor Category Level 4","Home Labor Category Level 5","Home Labor Category Level 6","Home Job and Labor Category Effective Date",
+                		"Gender","Aadhar Number","Name as Per Aadhar","Father or Husband Name","Permanent Address","Permanent District","Permanent State",
+                		"Permanent Pincode","ID Mark","UAN Number","Marital Status","Technical Qualification","Academic Qualification","Shoe Size","Blood Group",
+                		"Workmen Type","Nature Of Job/Work","ESIC IP Number","PAN Number","PF Number","Bank Account Number.","Bank Name","IFSC Code","Future Use 2","Future Use 3","Future Use 4",
+                		"Future Use 5","Future Use 6","Future Use 7","Future Use 8","Future Use Date 1","Future Use Date 2","Future Use Date 3","Future Use Date 4","Future Use Date 5",
+                		"Skill","Proficiency Level","Skill and Proficiency Level Effective Date","Certification 1","Certification 1 Start date","Certification 1 End date","Certification 2","Certification 2 Start date",
+                		"Certification 2 End date","Certification 3","Certification 3 Start date","Certification 3 End date","Certification 4","Certification 4 Start date","Certification 4 End date"  	);
+                
+                
+                for (ContractWorkmenExportDto c : workmen) {
+                    Map<String, String> row = new LinkedHashMap<>();
+                    row.put("Person Number(Employee id.)", c.getPersonNumber());
+                    row.put("First Name", c.getFirstName());
+                    row.put("Last Name", c.getLastName());
+                    row.put("Middle Initial/Name", c.getMiddleName());
+                    row.put("Short Name", c.getShortName());
+                    row.put("Badge Number (Punch Card)", c.getBadgeNumber());
+                    row.put("Hire Date", c.getHireDate());
+                    row.put("Birth Date", c.getBirthDate());
+                    row.put("Phone 1", c.getPhone1());
+                    row.put("Phone 2", c.getPhone2());
+                    row.put("Phone 3", c.getPhone3());
+                    row.put("Email", c.getEmail());
+                    row.put("Address", c.getAddress());
+                    row.put("City", c.getCity());
+                    row.put("State", c.getState());
+                    row.put("Postal Code", c.getPostalCode());
+                    row.put("Country", c.getCountry());
+                    row.put("Employment Status", c.getEmploymentStatus());
+                    row.put("Employment Status Effective Date", c.getEmploymentStatusEffectiveDate());
+                    row.put("Reports to Manager", c.getReportsToManager());
+                    row.put("Worker Type(Black Listed)", c.getWorkerType());
+                    row.put("User Account Name", c.getUserAccountName());
+                    row.put("User Account Status", c.getUserAccountStatus());
+                    row.put("User Password", c.getUserPassword());
+                    row.put("Company", c.getCompany());
+                    row.put("Location", c.getLocation());
+                    row.put("Plant Location", c.getPlantLocation());
+                    row.put("Department", c.getDepartment());
+                    row.put("Section", c.getSection());
+                    row.put("sub-section (Line)", c.getSubSection());
+                    row.put("Contractore Code", c.getContractorCOde());
+                    row.put("Home Business Structure Level 8", c.getHome8());
+                    row.put("Home Business Structure Level 9", c.getHome9());
+                    row.put("Category", c.getCategory());
+                    row.put("Supervioser Id", c.getSupervisorId());
+                    row.put("Cost Center", c.getCostCenter());
+                    row.put("Workorder", c.getWorkorder());
+                    row.put("Home Labor Category Level 4", c.getHome4());
+                    row.put("Home Labor Category Level 5", c.getHome5());
+                    row.put("Home Labor Category Level 6", c.getHome6());
+                    row.put("Home Job and Labor Category Effective Date", c.getCategoryEffectiveDate());
+                    row.put("Gender", c.getGender());
+                    row.put("Aadhar Number", c.getAadhar());
+                    row.put("Name as Per Aadhar", c.getNameAsAadhar());
+                    row.put("Father or Husband Name", c.getRelativeName());
+                    row.put("Permanent Address", c.getPermanentAddress());
+                    row.put("Permanent District", c.getPermanentDistrict());
+                    row.put("Permanent State", c.getPermanentState());
+                    row.put("Permanent Pincode", c.getPermanentpincode());
+                    row.put("ID Mark", c.getIdMark());
+                    row.put("UAN Number", c.getUanNumber());
+                    row.put("Marital Status", c.getMaritalStatus());
+                    row.put("Technical Qualification", c.getTechnical());
+                    row.put("Academic Qualification", c.getAcademic());
+                    row.put("Shoe Size", c.getShoeSize());
+                    row.put("Blood Group", c.getBloodGroup());
+                    row.put("Workmen Type", c.getWorkmenType());
+                    row.put("Nature Of Job/Work", c.getNatureOfJob());
+                    row.put("ESIC IP Number", c.getEsicNo());
+                    row.put("PAN Number", c.getPanNumber());
+                    row.put("PF Number", c.getPfNumber());
+                    row.put("Bank Account Number.", c.getBankAccountNumber());
+                    row.put("Bank Name", c.getBankName());
+                    row.put("IFSC Code", c.getIfscCode());
+                    row.put("Future Use 2", c.getFutureUse2());
+                    row.put("Future Use 3", c.getFutureUse3());
+                    row.put("Future Use 4", c.getFutureUse4());
+                    row.put("Future Use 5", c.getFutureUse5());
+                    row.put("Future Use 6", c.getFutureUse6());
+                    row.put("Future Use 7", c.getFutureUse7());
+                    row.put("Future Use 8", c.getFutureUse8());
+                    row.put("Future Use Date 1", c.getFutureDate1());
+                    row.put("Future Use Date 2", c.getFutureDate2());
+                    row.put("Future Use Date 3", c.getFutureDate3());
+                    row.put("Future Use Date 4", c.getFutureDate4());
+                    row.put("Future Use Date 5", c.getFutureDate5());
+                    row.put("Skill", c.getSkill());
+                    row.put("Proficiency Level", c.getProLevel());
+                    row.put("Skill and Proficiency Level Effective Date", c.getSkillDate());
+                    row.put("Certification 1", c.getCert1());
+                    row.put("Certification 1 Start date", c.getCert1StartDate());
+                    row.put("Certification 1 End date", c.getCert1EndDate());
+                    row.put("Certification 2", c.getCert2());
+                    row.put("Certification 2 Start date", c.getCert2StartDate());
+                    row.put("Certification 2 End date", c.getCert2EndDate());
+                    row.put("Certification 3", c.getCert3());
+                    row.put("Certification 3 Start date", c.getCert3StartDate());
+                    row.put("Certification 3 End date", c.getCert3EndDate());
+                    row.put("Certification 4", c.getCert4());
+                    row.put("Certification 4 Start date", c.getCert4StartDate());
+                    row.put("Certification 4 End date", c.getCert4EndDate());
+
+                   
+                    rows.add(row);
+                }
+                break;   
+                
         }
 
         response.put("columns", columns);

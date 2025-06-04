@@ -32,6 +32,7 @@ import com.wfd.dot1.cwfm.pojo.ApprovalStatus;
 import com.wfd.dot1.cwfm.pojo.ApproverInfo;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
@@ -1905,18 +1906,117 @@ public int getWorkFlowTYpeNew(String principalEmployer,String gatePassAction) {
 	return workflowTypeId;
 }
 
-@Override
-public boolean findByAadhaarNumber(String aadhaarNumber) {
-    
-    String query = "select count(*) from GATEPASSMAIN where AadharNumber=?";
-    Integer count = jdbcTemplate.queryForObject(query, new Object[]{aadhaarNumber}, Integer.class);
-    return count != null && count > 0;
+
+public String getContractWorkmenExportQuery() {
+	return QueryFileWatcher.getQuery("WORKMEN_EXPORT");
 }
 @Override
-public boolean checkDuplicateAadhar(String aadharNumber) {
-    String sql = "SELECT COUNT(*) FROM GATEPASSMAIN WHERE AadharNumber = ?";
-    Integer count = jdbcTemplate.queryForObject(sql, new Object[]{aadharNumber}, Integer.class);
-    return count != null && count > 0;
+public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId) {
+	List<ContractWorkmenExportDto> dto = new ArrayList<ContractWorkmenExportDto>();
+	String query = getContractWorkmenExportQuery();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,unitId);
+	while(rs.next()) {
+		ContractWorkmenExportDto obj = new ContractWorkmenExportDto();
+		obj.setPersonNumber(rs.getString("GatePassId"));
+		obj.setFirstName(rs.getString("FirstName"));
+		obj.setLastName(rs.getString("LastName"));
+		obj.setMiddleName(rs.getString("middleName"));
+		obj.setShortName(rs.getString("shortName"));
+		obj.setBadgeNumber(rs.getString("badgeNumber"));
+		obj.setHireDate(rs.getString("hireDate"));
+		obj.setBirthDate(rs.getString("birthDate"));
+		obj.setPhone1(rs.getString("phone1"));
+		obj.setPhone2(rs.getString("phone2"));
+		obj.setPhone3(rs.getString("phone3"));
+		obj.setEmail(rs.getString("email"));
+		obj.setAddress(rs.getString("Address"));
+		obj.setCity(rs.getString("city"));
+		obj.setState(rs.getString("State"));
+		obj.setCountry(rs.getString("postalCode"));
+		obj.setPostalCode(rs.getString("country"));
+		obj.setEmploymentStatus(rs.getString("employmentStatus"));
+		
+		obj.setEmploymentStatusEffectiveDate(rs.getString("employmentStatusEffectiveDate"));
+		obj.setReportsToManager(rs.getString("ReportingManager"));
+		obj.setWorkerType(rs.getString("workType"));
+		obj.setUserAccountName(rs.getString("userAccountName"));
+		obj.setUserAccountStatus(rs.getString("userAccountStatus"));
+		obj.setUserPassword(rs.getString("userPassword"));
+		obj.setCompany(rs.getString("company"));
+		obj.setLocation(rs.getString("location"));
+		obj.setPlantLocation(rs.getString("plantLocation"));
+		obj.setDepartment(rs.getString("department"));
+		obj.setSection(rs.getString("section"));
+		obj.setSubSection(rs.getString("subSection"));
+		obj.setContractorCOde(rs.getString("contractorCode"));
+		obj.setHome8(rs.getString("home8"));
+		obj.setHome9(rs.getString("home9"));
+		obj.setCategory(rs.getString("category"));
+		obj.setSupervisorId(rs.getString("supervisorId"));
+		obj.setCostCenter(rs.getString("costCenter"));
+		obj.setWorkorder(rs.getString("workorder"));
+		obj.setHome4(rs.getString("home4"));
+		obj.setHome5(rs.getString("home5"));
+		obj.setHome6(rs.getString("home6"));
+		obj.setCategoryEffectiveDate(rs.getString("categoryEffectiveDate"));
+		obj.setGender(rs.getString("gender"));
+		obj.setAadhar(rs.getString("AadharNumber"));
+		obj.setNameAsAadhar(rs.getString("aadharName"));
+		obj.setRelativeName(rs.getString("RelativeName"));
+		obj.setPermanentAddress(rs.getString("Address"));
+		obj.setPermanentDistrict(rs.getString("permanentDistrict"));
+		obj.setPermanentState(rs.getString("permanentState"));
+		obj.setPermanentpincode(rs.getString("permanentPincode"));
+		obj.setIdMark(rs.getString("IdMark"));
+		obj.setUanNumber(rs.getString("UanNumber"));
+		obj.setMaritalStatus(rs.getString("MaritalStatus"));
+		obj.setTechnical(rs.getString("Technical"));
+		obj.setAcademic(rs.getString("academic"));
+		obj.setShoeSize(rs.getString("shoesize"));
+		obj.setBloodGroup(rs.getString("bloodGroup"));
+		obj.setWorkmenType(rs.getString("workmenType"));
+		obj.setNatureOfJob(rs.getString("NatureOfJob"));
+		obj.setEsicNo(rs.getString("WcEsicNo"));
+		obj.setPanNumber(rs.getString("panNumber"));
+		obj.setPfNumber(rs.getString("pfNumber"));
+		obj.setBankAccountNumber(rs.getString("AccountNumber"));
+		obj.setBankName(rs.getString("bankName"));
+		obj.setIfscCode(rs.getString("IfscCode"));
+		obj.setFutureUse2(rs.getString("future2"));
+		obj.setFutureUse3(rs.getString("future3"));
+		obj.setFutureUse4(rs.getString("future4"));
+		obj.setFutureUse5(rs.getString("future5"));
+		obj.setFutureUse6(rs.getString("future6"));
+		obj.setFutureUse7(rs.getString("future7"));
+		obj.setFutureUse8(rs.getString("future8"));
+		obj.setFutureDate1(rs.getString("futureDate1"));
+		obj.setFutureDate2(rs.getString("futureDate2"));
+		obj.setFutureDate3(rs.getString("futureDate3"));
+		obj.setFutureDate4(rs.getString("futureDate4"));
+		obj.setFutureDate5(rs.getString("futureDate5"));
+		obj.setSkill(rs.getString("skill"));
+		obj.setProLevel(rs.getString("proLevel"));
+		obj.setSkillDate(rs.getString("skillDate"));
+		obj.setCert1(rs.getString("cert1"));
+		obj.setCert1StartDate(rs.getString("cert1StartDate"));
+		obj.setCert1EndDate(rs.getString("cert1EndDate"));
+		
+		obj.setCert2(rs.getString("cert2"));
+		obj.setCert2StartDate(rs.getString("cert2StartDate"));
+		obj.setCert2EndDate(rs.getString("cert2EndDate"));
+		
+		obj.setCert3(rs.getString("cert3"));
+		obj.setCert3StartDate(rs.getString("cert3StartDate"));
+		obj.setCert3EndDate(rs.getString("cert3EndDate"));
+		
+		obj.setCert4(rs.getString("cert4"));
+		obj.setCert4StartDate(rs.getString("cert4StartDate"));
+		obj.setCert4EndDate(rs.getString("cert4EndDate"));
+		dto.add(obj);
+	}
+	return dto;
 }
+
+
 
 }

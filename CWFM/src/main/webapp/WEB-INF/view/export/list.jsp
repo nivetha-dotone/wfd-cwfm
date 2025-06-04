@@ -261,7 +261,7 @@
     
    
        <button type="button" id="exportBtn"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportModuleCSV()">Export</button> 
-         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Cancel</button>
+         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick=" loadCommonList('/export/list', 'Export');">Cancel</button>
           <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
 
