@@ -16,6 +16,7 @@
     <script src="resources/js/cms/workorder.js"></script>
     <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
+    <script src="resources/js/cms/bill.js"></script>
     <style>
   body {
     margin: 0;
@@ -409,7 +410,7 @@ label {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
                 <td>
                 
-                <select class="custom-select" id="unitId" name="unitId" onchange="getContractors(this, '${sessionScope.loginuser.userAccount}')">
+                <select class="custom-select" id="unitId" name="unitId" onchange="getContractorsForBill(this, '${sessionScope.loginuser.userAccount}')">
                                 <option value="">Please select Unit Name</option>
                                 
 								<c:forEach var="pe" items="${peList}">
@@ -430,7 +431,7 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
                 <td>
-                <select class="custom-select" id="contractor" name="contractorId" onchange="getWorkorders(this)">
+                <select class="custom-select" id="contractor" name="contractorId" onchange="getWorkordersForBill(this)">
             						<option value="">Please select Contractor</option>
 									<c:forEach var="contr" items="${Contractors}">
 										
@@ -534,9 +535,10 @@ label {
         <tbody>
              <c:forEach var="report" items="${kronosReports}">
             <tr><td><label>${report.reportName}</label></td>
-            <td><input type="file" name="kronosFile_${report.id}" /></td></tr>
+            <td><input type="file" name="kronosFile_${report.id}" id="kronosFile_${report.id}" onchange="showFileNameBill(this, '${report.id}')"/>
+        	<span id="fileName_${report.id}" style="margin-left:10px;color: black;"></span></td></tr>
         </c:forEach>
-              
+            
 			
            
 			</tbody>
@@ -548,7 +550,8 @@ label {
             <tbody>
             	<c:forEach var="stat" items="${statutoryReports}">
            <tr><td> <label>${stat.attachmentName}</label></td>
-            <td><input type="file" name="statutoryFile_${stat.id}" /></td>
+            <td><input type="file" name="statutoryFile_${stat.id}" id="statutoryFile_${stat.id}" onchange="showFileNameBill0(this, '${stat.id}')"/>
+        	<span id="statfileName_${stat.id}" style="margin-left:10px;color: black;"></span></td></tr>
         </c:forEach>
 			</tbody>
                 </table>
@@ -597,7 +600,7 @@ label {
 		<tbody>
 		<tr>
 				<th  style="width: 100px;height:20px;"><label class="custom-label"> Action Plan</label></th>
-				 <td><input type="text" name="actionPlan" value="" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
+				 <td><input type="text" name="actionPlan" value="" style="height: 20px;" size="30" maxlength="30"    /></td>
  
 		</tr>
 			

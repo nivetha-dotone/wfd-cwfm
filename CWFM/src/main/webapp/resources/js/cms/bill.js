@@ -217,7 +217,7 @@ function redirectToBillAdd() {
     xhr.send();
 }
 
-function getContractors(selectElement, userAccount) {
+function getContractorsForBill(selectElement, userAccount) {
 	
 	const selectedOption = selectElement.options[selectElement.selectedIndex];
 	    const unitCode = selectedOption.getAttribute("data-code");
@@ -275,7 +275,7 @@ function formatDate(dateTimeStr) {
 
     return `${day}-${month}-${year}`;
 }
-function getWorkorders(selectElement) {
+function getWorkordersForBill(selectElement) {
 		var principalEmployerSelect = document.getElementById("unitId");
 	    var unitId = principalEmployerSelect.value; // Get the selected principal employer value
 		const selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -406,3 +406,14 @@ function saveBtn() {
         }
     });
 }
+
+function showFileNameBill(input, id) {
+        const fileName = input.files[0]?.name || "No file chosen";
+        document.getElementById('fileName_' + id).textContent = fileName;
+    }
+    
+    function showFileNameBill0(input, id) {
+        const fileName = input.files[0]?.name || "No file chosen";
+        document.getElementById('statfileName_' + id).textContent = fileName;
+    }
+     
