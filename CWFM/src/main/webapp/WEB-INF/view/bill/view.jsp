@@ -1,23 +1,24 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-    <%@ page isELIgnored="false" %>
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-    <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ page import="com.wfd.dot1.cwfm.pojo.MasterUser" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page isELIgnored="false" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
-      <!--  <script src="resources/js/commonjs.js"></script> -->
     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/cms/contractor.js"></script>
     <script src="resources/js/cms/workorder.js"></script>
-       <script src="resources/js/cms/workmen.js"></script>
+    <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
+    <script src="resources/js/cms/bill.js"></script>
     <style>
- body {
+  body {
     margin: 0;
     overflow-x: hidden;
     font-family: 'Noto Sans', sans-serif;
@@ -273,36 +274,113 @@ label {
     color: #495057; /* Set the text color to a dark shade */
     font-family: Arial, sans-serif;
 }
-textarea {
-            color: gray; /* Set text color to gray */
-            width: 300px; /* Optional width */
-            height: 150px; /* Optional height */
+
+/* #preview {
+            width: 200px;
+            height: 200px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        } */
+        #preview img {
+            max-width: 100%;
+            max-height: 100%;
         }
+       
         
     </style>
+     <%
+    MasterUser user = (MasterUser) session.getAttribute("loginuser");
+    String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
+%>
+
+	
     <script>
-        function showTab(tabId) {
-            // Hide all tab contents
-            var tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(function(content) {
-                content.classList.remove('active');
-            });
+ // Function to validate fields in the current active tab
+    function validateCurrentTab() {
+        // Example of validation logic; customize based on your tab's fields
+        let isValid = true;
 
-            // Remove active class from all tabs
-            var tabs = document.querySelectorAll('.tabs button');
-            tabs.forEach(function(tab) {
-                tab.classList.remove('active');
-            });
+        // Example: Validate fields in the current active tab
+        const activeTabId = document.querySelector('.tab-content.active').id;
 
-            // Show the selected tab content and add active class to the clicked tab
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
+        // Validate specific fields based on the active tab
+        if (activeTabId === 'tab1') {
+            const aadharNumber = document.getElementById("aadharNumber").value.trim();
+            if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
+                document.getElementById("error-aadhar").textContent = "Please enter a valid 12-digit Aadhar number.";
+                isValid = false;
+            } else {
+                document.getElementById("error-aadhar").textContent = ""; // Clear previous error
+            }
+
+            // Add more validation logic for other fields in tab1
+        } 
+        // Repeat similar validation checks for other tabs if necessary
+
+        return isValid;
+    }
+
+    // Function to show the selected tab
+    function showTab(tabId) {
+        // Check if current tab fields are valid before switching tabs
+        if (!validateCurrentTab()) {
+            return; // Prevent tab switch if validation fails
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // Set the default tab
-            showTab('tab1');
+        // Hide all tab contents
+        var tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(function(content) {
+            content.classList.remove('active');
         });
+
+        // Remove active class from all tabs
+        var tabs = document.querySelectorAll('.tabs button');
+        tabs.forEach(function(tab) {
+            tab.classList.remove('active');
+        });
+
+        // Show the selected tab content and add active class to the clicked tab
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
+    }
+
+   
+
+
+
+    /* function showTab(tabId) {
+        // Hide all tab contents
+        var tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(function(content) {
+            content.classList.remove('active');
+        });
+
+        // Remove active class from all tabs
+        var tabs = document.querySelectorAll('.tabs button');
+        tabs.forEach(function(tab) {
+            tab.classList.remove('active');
+        });
+
+        // Show the selected tab content and add active class to the clicked tab
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector('button[data-target="' + tabId + '"]').classList.add('active');
+    } */
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Set the default tab
+        showTab('tab1');
+        initializeDatePicker();
+    });
+       
+
+    
+  
+  
+
     </script>
 </head>
 <body>
@@ -316,9 +394,9 @@ textarea {
              <button data-target="tab5" onclick="showTabOther('tab5')">Comments</button> 
             
     </div>
-     <div class="action-buttons" >
+     <!-- <div class="action-buttons" >
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
-    </div>
+    </div> -->
         <div id="tab1" class="tab-content active">
         
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
@@ -326,43 +404,64 @@ textarea {
            <tbody>
 			<tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.transactioId"/></label></th>
-                <td><input type="text" name="transactionId" value="${billverification.transactionId}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <td><input type="text" id="transactionId" name="transactionId" value="${bvr.wcTransId}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
                  </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
-                <td><input type="text" name="unitCode" value="${billverification.unitCode}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
-                <td><input type="text" name="unitName" value="${billverification.unitName}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
-            </tr>
+                <td>
+                
+	<input type="text" value="${bvr.unitName}" style="height: 20px;width: 100%;" readonly />                           
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
+                <td><input type="text" id="unitCodeId" name="unitCode"  style="height: 20px;width: 100%;" value="${bvr.unitCode}"  readonly  /></td>
+             </tr>
             <tr>
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
-                <td><input type="text" name="vendorCode" value="${billverification.vendorCode}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
-                <td><input type="text" name="contractorName" value="${billverification.contractorName}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td>
+                <input type="text" value="${bvr.contractorName}" style="height: 20px;width: 100%;" readonly />      
+                 </td>
+                
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
+                <td><input type="text" id="contractorCodeId" name="contractorCode" style="height: 20px;width: 100%;" value="${bvr.contractorCode}" readonly  /></td>
+                
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billStartDate"/></label></th>
-                <td><input type="text" name="billStartDate" value="${billverification.billStartDate}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td>
+                <input id="billStartDateId" name="billStartDate" style="width: 100%;height: 20px; color: black;" type="text"  value="${bvr.startDate}"  readonly >
+                	
+                </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billEndDate"/></label></th>
-                <td><input type="text" name="billEndDate" value="${billverification.billEndDate}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td>
+                <input id="billEndDateId" name="billEndDate" style="width: 100%;height: 20px; color: black;" type="text"  value="${bvr.endDate}"  readonly>
+                	<label id="error-billEndDate" style="color: red;display: none;">Bill end date is required</label>
+               
+                </td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workorderCode"/></label></th>
-                <td><input type="text" name="workOrderCode" value="${billverification.workOrderCode}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td>
+                 <input type="text" value="${bvr.workOrderNumber}" style="height: 20px;width: 100%;" readonly /> 
+                </td>
+                            
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billType"/></label></th>
-                <td><input type="text" name="billType" value="${billverification.billType}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
+                <td>
+                <input type="text" value="${bvr.billType}" style="height: 20px;width: 100%;" readonly /> 
+                </td>
             </tr>
              <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workorderValidFrom"/></label></th>
-                <td><input type="text" name="workOrderValidFrom" value="${billverification.workOrderValidFrom}" style="height: 20px;" size="30" maxlength="30"  readonly /></td>
+                <td><input type="text" id="woValidFromId" name="woValidFrom" value="${bvr.woValidFrom}" style="height: 20px;width: 100%;" size="30" maxlength="30"  readonly /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workorderValidTo"/></label></th>
-                <td><input type="text" name="workOrderValidTo" value="${billverification.workOrderValidTo}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
+                <td><input type="text" id="woValidToId" name="woValidTo" value="${bvr.woValidTo}" style="height: 20px;width: 100%;" size="30" maxlength="30"  readonly  /></td>
             </tr>
 			<tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billCategory"/></label></th>
-                <td><input type="text" name="billCategory" value="${billverification.billCategory}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <td>
+                	<input type="text" value="${bvr.services}" style="height: 20px;width: 100%;" readonly /> 
+                	 </td>
                  </tr>
-			<tr>
+			<%-- <tr>
 			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.engineeringInCharge"/></label></th>
 				<td>
 					<select id="value(engincharge)" name="value(engincharge)" style="width: 256px;height: 150px;"></select>
@@ -377,312 +476,100 @@ textarea {
 				</td>
 				<td ><select id="ListBox2" name="ListBox22"    style="width: 265px;height: 150px;">
 				 </select></td>
-			</tr>
+			</tr> --%>
 			</tbody>
     </table>
    
 
         </div>
     <div id="tab2" class="tab-content">
-            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;">
                    
         <tbody>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.standardMusterRollReport"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('standardMusterRollReport','${billreports.billStartDate }','musterroll')">Download standardMusterRollReport</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.billVerificationAbstractReport"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('billVerificationAbstractReport','${billreports.billStartDate }','billverification')">Download billVerificationAbstractReport</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.wageCostReport"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('wageCostReport','${billreports.billStartDate }','wagecost')">Download wageCostReport</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.bonusReport"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('bonusReport','${billreports.billStartDate }','bonusreport')">Download bonusReport</a>
-                </td>
-              </tr>
-             <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.extraHoursReport"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('extraHoursReport','${billreports.billStartDate }','extrahours')">Download extraHoursReport</a>
-                </td>
-              
-              </tr>
+            <c:forEach var="file" items="${kronosFiles}">
+    <tr>
+        <td style="color:black;">${file.reportName}
+       <a href="#" onclick="downloadBill('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
+    </tr>
+</c:forEach>
+            
+            
 			
            
 			</tbody>
                 </table>
             </div>
             <div id="tab3" class="tab-content">
-            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;">
                    
             <tbody>
-            <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.formA"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('forma','${billreports.billStartDate }','forma')">Download formA</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.formB"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('formb','${billreports.billStartDate }','formb')">Download formB</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.formC"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('formc','${billreports.billStartDate }','formc')">Download formC</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.formD"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('formd','${billreports.billStartDate }','formd')">Download formD</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.ecrpf"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('ecrpf','${billreports.billStartDate }','ecrpf')">Download ecrpf</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.challanandCopyofRemittancePF"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('challanpf','${billreports.billStartDate }','challanpf')">Download challanandCopyofRemittancePF</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.esicpf"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('ecresic','${billreports.billStartDate }','ecresic')">Download esicpf</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.challanandCopyofRemittanceesic"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('challanesic','${billreports.billStartDate }','challanesic')">Download challanandCopyofRemittanceesic</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.bankStatement"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('bankstatement','${billreports.billStartDate }','bankstatement')">Download bankStatement</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.annualReturn"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('annualreturn','${billreports.billStartDate }','annualreturn')">Download annualReturn</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.bonusRegister"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('bonusregister','${billreports.billStartDate }','bonusregister')">Download bonusRegister</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.lwfChallanandRemittance"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('lwfchallan','${billreports.billStartDate }','lwfchallan')">Download lwfChallanandRemittance</a>
-                </td>
-              </tr>
-              <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.challanandCopyofRemittancePT"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('challanpt','${billreports.billStartDate }','challanpt')">Download challanandCopyofRemittancePT</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.userAttachment1"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('userattachment1','${billreports.billStartDate }','userattachment1')">Download userAttachment1</a>
-                </td>
-              </tr>
-		   <tr>
-                		<td style="color:black"><label class="custom-label"><spring:message code="label.userAttachment2"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('userattachment2','${billreports.billStartDate }','userattachment2')">Download userAttachment2</a>
-                </td>
-               <td style="color:black"><label class="custom-label"><spring:message code="label.userAttachment3"/></label></td>
-                <td>
-                   <a href="#" onclick="downloadDoc('userattachment3','${billreports.billStartDate }','userattachment3')">Download userAttachment3</a>
-                </td>
-              </tr>
-		</tbody>
+            	<c:forEach var="file" items="${statutoryFiles}">
+    <tr>
+        <td style="color:black;">${file.reportName} : 
+        
+        
+        <a href="#" onclick="downloadBill('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
+    </tr>
+</c:forEach>
+            	
+			</tbody>
                 </table>
+                
             </div>
         <div id="tab4" class="tab-content">
-            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
-                   
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;color:black;">
+               <thead>
+               <tr>
+               
+               	<td>Check points </td>
+               	<td>Status Y/N </td>
+               	<td>License No./Policy No./Code No. </td>
+               	<td>Date of Compliance/Valid Upto </td>
+               </tr>
+               </thead>    
             <tbody>
-		<tr>
-    <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><label class="custom-label"><b><spring:message code="label.s.no"/></b></label></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid;width:40%;"><label class="custom-label"><b><spring:message code="label.checkPoints"/></b></label></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid;width:30%;"><label class="custom-label"><b><spring:message code="label.statusy/n"/></b></label></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid; text-align: left;width:24%;"><label class="custom-label"><b><spring:message code="label.licenseNoPolicyCodeNo"/></b></label></td>
-    <td style=" border-top: thin solid; border-bottom: thin solid;width:30%;"><label class="custom-label"><b><spring:message code="label.dateofCompilanceValidUpto"/> </b></label></td>
-   </tr>
-   <tr>
-	 <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">1</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Licence copy obtained by Vendor under Contract Labour Act 1970.</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.llStatus}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-	<td><input type="text" name="workOrderValidTo" value="${billhrclearance.llCopy}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.llValidTo}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-          		
-  </tr> 
- <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">2</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Employee Register ( Form  A ) Rule 2(I)</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.empReg}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-  </tr>
- <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">3</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Wages Register (Form B, Under Central Rule)</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.wageReg}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">4</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Register of Loan/ Recovery ( Form  C, Under  Central Rule)</label></td>
-   <td><input type="text" name="workOrderValidTo" value="${billhrclearance.loanRecovery}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">5</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Attendance Register  (Form D  Under Central Rule)</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.attenReg}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-     <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">6</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Unified Annual Return under Contract Labour Act Rules 1971( In the month of December every year)</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.annualReturnCL}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">7</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Challan & Remittance Confirmation Slip of PF</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pfSlip}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pfSlipDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-          
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">8</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">ECR copy of PF</label></td>
-   <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pfEcr}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pfECRDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-          
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">9</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Challan & Remittance Confirmation Slip of ESIC</label></td>
-   <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pfSlipDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.esicSlipDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-          
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">10</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">ECR copy of ESIC</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.esicSlip}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.esicECRDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-          
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">11</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Bank Statement of wages paid to workmen submitted</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.bankStmntStatus}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;">-</td>
-  </tr>
-  <tr>
-    <td style="border-left: thin solid; border-bottom: thin solid;text-align: center;" ><label class="custom-label">12</label></td>
-    <td  style="text-align: left;border-bottom: thin solid;" ><label class="custom-label">Challan Copy of Professional Tax</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pTaxChallan}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border-bottom: thin solid;color: black;" >-</td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.pTaxDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-          
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">13</label></td>
-    <td  style="text-align: left;border: thin solid;" ><label class="custom-label">Accident Policy under Workmen Compensation Act ,in case of workers drawing salary more than Rs 21,000/= Gross Per Month</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.accidentPolicy}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border: thin solid;color: black;">- </td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">14</label></td>
-    <td  style="text-align: left;border: thin solid;" ><label class="custom-label">Labour Welfare Fund Act (Only in the Month of June & December every year)</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.laborWelfare}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.labWelFundActDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">15</label></td>
-    <td  style="text-align: left;border: thin solid;" ><label class="custom-label">Bonus Register Form C  Rule 4(c ) ( Under Bonus Act 1965)</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.bonusRegFormC}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border: thin solid;color: black;">-</td>
-    <td style="text-align: center;border: thin solid;color: black;">-</td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">16</label></td>
-    <td  style="text-align: left;border: thin solid;" ><label class="custom-label">Leave with Wages</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.leaveWihtWages}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border: thin solid;color: black;">-</td>
-    <td style="text-align: center;border: thin solid;color: black;">-</td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;color: black;" ><label class="custom-label">17</label></td>
-    <td  style="text-align: left;border: thin solid;color: black;" ><label class="custom-label">Previous Month Wages paid on</label></td>
-    <td><input type="text" name="workOrderValidTo" value="${billhrclearance.preMonWage}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-     <td><input type="text" name="workOrderValidTo" value="${billhrclearance.preMonWageDate}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">18</label></td>
-    <td  style="text-align: left;border: thin solid;width: auto;color: black;" ><input type="text"  onchange="setDataChanged();" size="80" maxlength="200" style="width:100% " /></td>
-     <td style="text-align: center;border: thin solid;color: black;">-</td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">19</label></td>
-    <td  style="text-align: left;border: thin solid;width: auto;color: black;" ><input type="text"   onchange="setDataChanged();" size="80" maxlength="200" style="width:100% "/></td>
-     <td style="text-align: center;border: thin solid;color: black;">-</td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-    <td style="text-align: center;border: thin solid;color: black;" >-</td>
-  </tr>
-  <tr>
-    <td style="border: thin solid;text-align: center;" ><label class="custom-label">20</label></td>
-    <td  style="border: thin solid;width: auto;color: black;" ><input type="text"   onchange="setDataChanged();" size="80" maxlength="200" style="width:100% " /></td>
-     <td style="border: thin solid;color: black;">-</td>
-    <td style="border: thin solid;color: black;" >-</td>
-    <td style="border: thin solid;color: black;" >-</td>
-  </tr>
+				<c:forEach var="item" items="${checklistItems}">
+            <tr><td> <input type="hidden" name="id_${item.id}">${item.checkpointName}</td>
+            	<td> <select class="custom-select" id="statusValue" name="statusValue"  >
+                                <option value="">Please select status</option>
+								<c:forEach var="status" items="${ChecklistStatus}">
+								
+                					<option value="${status.gmId}">${status.gmName}</option>
+            					</c:forEach>
+                                </select> </td>
+            	<td> <c:if test="${item.licenseRequired}">
+                <input type="text" name="licenseNumber_${item.id}" placeholder="Enter License Number" />
+            </c:if> </td>
+            	<td> <c:if test="${item.validUptoRequired}">
+                <input type="date"  name="validUpto_${item.id}"  />
+            </c:if> </td>
+            </tr>
+        </c:forEach>
+   
       </tbody>
      </table>
     </div> 
   <div id="tab5" class="tab-content">
             <div class="Panel">
+             <div class="action-buttons" >
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveBtn();"
+            id="saveBtn">Save</button>
+    </div>
 	<table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
 		<tr>
 				<th  style="width: 100px;height:20px;"><label class="custom-label"> Action Plan</label></th>
-				 <td><input type="text" name="workOrderValidTo" value="${billhrclearance.actionPlan}" style="height: 20px;" size="30" maxlength="30"  readonly  /></td>
+				 <td><input type="text" id="actionPlanId" name="actionPlan" value="${bvr.actionPlan}" style="height: 20px;" size="30" maxlength="30"    readonly/></td>
  
 		</tr>
 			
 		
 			<tr>
 				<th><label class="custom-label"> <spring:message code="label.previousComment"/></label></th>
-			<td><input type="text" name="workOrderValidTo" value="${billprecomments.precomments}"  style="width: 265px;height: 150px;"  readonly  /></td>
+			<td><input type="text" id="preCommentsId" name="preComments" value=""  style="width: 265px;height: 150px;"  readonly  /></td>
  	
 				<th><label class="custom-label"><spring:message code="label.comment"/></label></th>
-				<td><input type="text" value=" "   onchange="setDataChanged();" style="width: 265px;height: 150px;" /></td>
+				<td><input type="text" id="commentsId" value="${bvr.comments}"  name="comments" style="width: 265px;height: 150px;" readonly/></td>
 				</tr>
 		</tbody>
  </table> 

@@ -13,11 +13,13 @@ import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
+import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
+import com.wfd.dot1.cwfm.pojo.BillReportFile;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
 
 public interface BillVerificationService {
 
-	public List<BillVerification> getBillVerificationList(String userId) ;
+	public List<CMSWageCostDTO> getBillVerificationList(String userId, String deptId, String unitId) ;
 
 	public BillVerification viewbillDetails(String transactionId);
 
@@ -34,5 +36,16 @@ public interface BillVerificationService {
 	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
 
 	public String save(CMSWageCostDTO workflowData);
+
+	public List<CMSWageCostDTO> getBillVerificationListForApprovers(String principalEmployerId, String deptId,
+			MasterUser user);
+
+	public CMSWageCostDTO getIndividualBillDetails(String transactionId);
+
+	public void saveFile(BillReportFile b);
+
+	public List<BillReportFile> findByTransactionIdAndType(String transactionId, String type);
+
+	public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId);
 
 }

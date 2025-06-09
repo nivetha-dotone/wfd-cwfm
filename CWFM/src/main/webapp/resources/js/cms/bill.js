@@ -30,7 +30,7 @@ function exportCSVFormat() {
     }
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
-    var unitId = selectedRow.querySelector('[name="selectedWOs"]').value;
+    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
 
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -38,7 +38,7 @@ function exportCSVFormat() {
             document.getElementById("mainContent").innerHTML = xhr.responseText;
         }
     };
-    xhr.open("GET", "/CWFM/billVerification/billview/" + unitId , true);
+    xhr.open("GET", "/CWFM/billVerification/view/" + transactionId , true);
     xhr.send();
 }   
 function downloadDocTemp(gatePassId, userId, docType) {
@@ -410,7 +410,7 @@ function saveBtn() {
         contentType: false,
         success: function (response) {
             alert('Saved successfully!');
-			loadCommonList('/billVerification/list', 'Bill Verification List');
+			loadCommonList('/billVerification/listingFilter', 'Bill Verification List');
         },
         error: function (xhr) {
             alert('Error: ' + xhr.responseText);
@@ -427,4 +427,66 @@ function showFileNameBill(input, id) {
         const fileName = input.files[0]?.name || "No file chosen";
         document.getElementById('statfileName_' + id).textContent = fileName;
     }
-     
+	function searchBillBasedOnPE() {
+					    var principalEmployerId = $('#principalEmployerId').val();
+					    
+						var deptId=$("#deptId").val();
+					    $.ajax({
+					        url: '/CWFM/billVerification/list',
+					        type: 'POST',
+					        data: {
+					            principalEmployerId: principalEmployerId,
+								deptId:deptId
+					        },
+					        success: function(response) {
+					            var tableBody = $('#workmenTable tbody');
+					            tableBody.empty();
+					            if (response.length > 0) {
+					                $.each(response, function(index, wo) {
+					                    var row = '<tr  >' +
+												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.wcTransId + '"></td>'+
+												'<td  >' + wo.wcTransId + '</td>' +
+												 '<td  >' + wo.unitCode + '</td>' +
+					                              '<td  >' + wo.contractorCode + '</td>' +
+												  '<td  >' + wo.contractorName + '</td>' +	
+												  
+												  '<td  >' + wo.workOrderNumber + '</td>' +
+												  '<td  >' + wo.startDate + '</td>' +
+												  '<td  >' + wo.endDate + '</td>' +	
+												  '<td  >' + wo.status + '</td>' +	
+												  '<td  >' +wo.services + '</td>' +	
+												 			                             
+					                              '</tr>';
+					                    tableBody.append(row);
+					                });
+					            } else {
+					                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+					            }
+					        },
+					        error: function(xhr, status, error) {
+					            console.error("Error fetching data:", error);
+					        }
+					    });
+					}  
+					
+
+						function downloadBill(reportType, transactionId, fileName) {
+					    const baseUrl = '/CWFM/billVerification/downloadFile';
+					    
+					    // Construct the URL based on gatePassId, userId, and docType
+					    const url = `${baseUrl}/${reportType}/${transactionId}/${fileName}`;
+						//alert("url is"+url);
+					    // Create a temporary anchor element
+					    const a = document.createElement('a');
+					    a.href = url;
+					    a.download = ''; // This attribute tells the browser to download the file
+
+					    // Append to the body to make it work in Firefox
+					    document.body.appendChild(a);
+
+					    // Programmatically click the anchor
+					    a.click();
+
+					    // Remove the anchor from the document
+					    document.body.removeChild(a);
+					} 

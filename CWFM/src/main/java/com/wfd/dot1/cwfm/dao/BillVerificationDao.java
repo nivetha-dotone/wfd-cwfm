@@ -3,13 +3,15 @@ package com.wfd.dot1.cwfm.dao;
 import java.util.List;
 
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
+import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
+import com.wfd.dot1.cwfm.pojo.BillReportFile;
+import com.wfd.dot1.cwfm.pojo.BillStatusLogDto;
 import com.wfd.dot1.cwfm.pojo.BillVerification;
-import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 
 public interface BillVerificationDao {
 
-	public List<BillVerification> getBillVerificationList(String contractorregId);
+	public List<CMSWageCostDTO> getBillVerificationList(String userId, String deptId, String unitId);
 	
 	public BillVerification viewbillDetails(String transactionId);
 
@@ -26,5 +28,21 @@ public interface BillVerificationDao {
 	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
 
 	public String saveBill(CMSWageCostDTO workflowData);
+
+	public List<CMSWageCostDTO> getBillVerificationListForApprovers(String roleId, int workFlowType, String deptId,
+			String principalEmployerId);
+	
+	public int getWorkflowType(String module,String unitId);
+	public void saveBillStatusLog(BillStatusLogDto dto);
+
+	String getActionIdForBill();
+
+	CMSWageCostDTO getIndividualBVRDetails(String transactionId);
+
+	public void saveFile(BillReportFile b);
+
+	List<BillReportFile> findByTransactionIdAndType(Long transactionId, String reportType);
+
+	public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId);
 }
 

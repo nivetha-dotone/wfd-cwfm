@@ -145,5 +145,12 @@ public class CMSWageCostDTO {
 	public void setContractorName(String contractorName) {
 		this.contractorName = contractorName;
 	}
+	private String actionId;
+	public String getActionId() {
+		return actionId;
+	}
+	public void setActionId(String actionId) {
+		this.actionId = actionId;
+	}
 	
 }

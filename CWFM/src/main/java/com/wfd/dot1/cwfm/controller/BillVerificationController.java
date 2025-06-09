@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,10 +25,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
-import com.wfd.dot1.cwfm.pojo.BillVerification;
+import com.wfd.dot1.cwfm.enums.UserRole;
+import com.wfd.dot1.cwfm.pojo.BillReportFile;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.KronosReport;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.StatutoryAttachment;
 import com.wfd.dot1.cwfm.service.BillConfigService;
 import com.wfd.dot1.cwfm.service.BillVerificationService;
 import com.wfd.dot1.cwfm.service.CommonService;
@@ -66,28 +72,72 @@ public class BillVerificationController {
     	 
     	return "bill/billverification";
 	 }
-    @GetMapping("/List")
+    @GetMapping("/listingFilter")
     public String getbillList(HttpServletRequest request, HttpServletResponse response) {
 
-    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
-    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-    		List<BillVerification> listDto = billService.getBillVerificationList(String.valueOf(user.getUserId()));
-    		request.setAttribute("billlist", listDto);
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> contractors = groupedByLevelDef.getOrDefault("Contractor", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/billVerification/listingFilter");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	  request.setAttribute("Contr", contractors);
     		return "bill/list";
 
     	
     }
-    @GetMapping("/billview/{transactionId}")
-	public String viewbillDetails(@PathVariable String transactionId, HttpServletRequest request,
-			HttpServletResponse response) {
-    	BillVerification bill = billService.viewbillDetails(transactionId);
-		request.setAttribute("billverification", bill);
-		BillVerification reports = billService.viewbillReportsDetails(transactionId);
-		request.setAttribute("billreports", reports);
-		BillVerification hrclearance = billService.viewbillhrclearanceDetails(transactionId);
-		request.setAttribute("billhrclearance", hrclearance);
-		BillVerification precomments = billService.viewbillprecomments(transactionId);
-		request.setAttribute("billprecomments", precomments);
+    @PostMapping("/list")
+    public ResponseEntity<List<CMSWageCostDTO>> gatePassListingDetails(
+    		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
+    		@RequestParam(value = "deptId", required = false) String deptId,//deptId is contractorId not department
+    		HttpServletRequest request,HttpServletResponse response) {
+    	
+    	try {
+			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			List<CMSWageCostDTO> listDto = new ArrayList<CMSWageCostDTO>();
+			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    		listDto=billService.getBillVerificationList(String.valueOf(user.getUserId()),deptId,principalEmployerId);
+			}else {	
+			
+				listDto=billService.getBillVerificationListForApprovers(principalEmployerId,deptId,user);
+    		}	
+				if (listDto.isEmpty()) {
+					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				}
+			
+			return new ResponseEntity<>(listDto, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+    }
+    
+    
+    @GetMapping("/view/{transactionId}")
+    public String viewIndividualBillDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    	CMSWageCostDTO obj =null;
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	try {
+    		CMSWageCostDTO  dto= billService.getIndividualBillDetails(transactionId);
+    		request.setAttribute("bvr", dto);
+    		List<BillReportFile>  kronosReport= billService.findByTransactionIdAndType(transactionId, "Kronos");
+    		request.setAttribute("kronosFiles", kronosReport);
+    		List<BillReportFile>  statReport= billService.findByTransactionIdAndType(transactionId, "Statutory");
+    		request.setAttribute("statutoryFiles", statReport);
+    	}catch(Exception e) {
+    		
+    	}
 		return "bill/view"; // Return the JSP file name
 	}
     @GetMapping("/downloadFile/{docType}")
@@ -178,11 +228,105 @@ public class BillVerificationController {
 
             // Save core data
           String wcTransId= billService.save(workflowData);
+          if (wcTransId != null) {
+        	  //save reports to drive and checklist to db
+        	  
+        	  String kronosBasePath = "D:/wfd_cwfm/Bill/KronosReports/" + wcTransId + "/";
+        	  String statutoryBasePath = "D:/wfd_cwfm/Bill/StatutoryReports/" + wcTransId + "/";
 
-            return ResponseEntity.ok("Saved successfully");
+        	  // Create directories if they don't exist
+        	  new File(kronosBasePath).mkdirs();
+        	  new File(statutoryBasePath).mkdirs();
+        	  
+        	 
+        	  List<KronosReport> kronosReportName=billConfigService.fetchKronosReportsWithId();
+
+        		List<StatutoryAttachment> statReportName=billConfigService.fetchStatutoryReportsWithId();
+        		Map<Integer, String> reportMap = kronosReportName.stream()
+        			    .collect(Collectors.toMap(KronosReport::getId, KronosReport::getReportName));
+        		
+        		Map<Integer, String> reportMap1 = statReportName.stream()
+        			    .collect(Collectors.toMap(StatutoryAttachment::getId, StatutoryAttachment::getAttachmentName));
+
+        	  for (Map.Entry<String, MultipartFile> entry : files.entrySet()) {
+        	      String key = entry.getKey();
+        	      int repotrId ; 
+        	      String reportName = null;
+        	      MultipartFile file = entry.getValue();
+
+        	      if (file != null && !file.isEmpty()) {
+        	          String originalFilename = file.getOriginalFilename();
+        	          String targetDir;
+        	          BillReportFile b = new BillReportFile();
+    	              b.setTransactionId(workflowData.getWcTransId());
+    	             
+        	          if (key.startsWith("kronosFile")) {
+        	        	  b.setReportType("Kronos");
+        	              targetDir = kronosBasePath;
+        	               repotrId =Integer.parseInt( key.replaceAll("\\D+", "")); 
+                	       reportName = reportMap.get(repotrId);
+        	          } else if (key.startsWith("statutoryFile")) {
+        	              targetDir = statutoryBasePath;
+        	              b.setReportType("Statutory");
+        	              repotrId =Integer.parseInt( key.replaceAll("\\D+", "")); 
+               	       reportName = reportMap1.get(repotrId);
+        	          } else {
+        	              // Skip unknown file types
+        	              continue;
+        	          }
+        	          b.setReportName(reportName);
+        	          try {
+        	              File destination = new File(targetDir + originalFilename);
+        	              file.transferTo(destination);
+        	              System.out.println("Saved: " + destination.getAbsolutePath());
+        	              b.setFileName(originalFilename);
+        	              billService.saveFile(b);
+        	          } catch (IOException e) {
+        	              e.printStackTrace();
+        	              // Optionally log or handle failure
+        	          }
+        	      }
+        	  }
+
+        	  //save checklist
+        	  //billService.saveChecklist(checklistItems,wcTransId);
+        	  
+        	   return new ResponseEntity<>("billVerification/list", HttpStatus.OK);
+          }
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Save failed");
+        }
+    }
+    
+    @GetMapping("/downloadFile/{reportType}/{transactionId}/{fileName}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("reportType") String reportType,@PathVariable("transactionId") String transactionId,  @PathVariable("fileName") String fileName) {
+        try {
+        	String filePath=null;
+        	if(reportType.equals("Kronos")) {
+        		filePath= "D:/wfd_cwfm/Bill/KronosReports/" + transactionId + "/" + fileName;
+        	}else {
+        		filePath= "D:/wfd_cwfm/Bill/StatutoryReports/" + transactionId + "/" + fileName;
+        	}
+        	
+        	
+        	
+            File file = new File(filePath);
+            Resource resource = new FileSystemResource(file);
+
+            if (!resource.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

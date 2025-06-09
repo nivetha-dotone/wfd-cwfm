@@ -224,55 +224,56 @@
 </head>
 <body>
 <div class="page-header">
-   <!--  <form id="searchForm"> -->
-   <!--  <div> -->
-  <!--  <label for="principalEmployerId" style=" color: darkcyan;"   >Request Status</label> -->
-      <!-- <select id="requestType" name="requestType" style="width: 20%; height: 25px;" onchange="toggleMainContractorRow()">
-         <option value="">Select Status</option>
-         <option value="Draft">Draft</option>
-         <option value="Submitted">Submitted</option>
-         <option value="Approved">Approved</option>
-         <option value="Rejected">Rejected</option>
-         <option value="Withdrawn">Withdrawn</option>
-     </select> -->
-<!-- <label for="contractorId" style=" color: darkcyan;" >Contractor:</label>
-        
-       
-<select class="custom-select" id="contractorId" name="contractorId"  style="color:gray;padding:3px;">
-            						<option value="">Please select Contractor</option>
-        						</select> -->
-        <tr>
-           	   <th><label class="custom-label" style=" color: darkcyan;" ><span class="required-field"></span><spring:message code="label.workOrderNumber"/></label></th>
-                <td>
-                	<input id="workOrderNumber" name="workOrderNumber" style="width: 20%;height: 20px; color: black;" type="text" size="30" maxlength="30">
-                	<!-- <label id="error-workOrderNumber" style="color: red;display: none;">Contract From is required</label> -->
-                </td>
-               <th><label class="custom-label" style=" color: darkcyan;" ><span class="required-field"></span><spring:message code="label.From"/></label></th>
-                <td>
-                	<input id="From" name="From" style="width: 20%;height: 20px; color: black;" type="date" size="30" maxlength="30">
-                	<!-- <label id="error-From" style="color: red;display: none;">Contract To is required</label> -->
-                </td>
-                 <th><label class="custom-label" style=" color: darkcyan;" ><span class="required-field"></span><spring:message code="label.To"/></label></th>
-               <td>
-                	<input id="To" name="To" style="width: 20%;height: 20px; color: black;" type="date" size="30" maxlength="30">
-                	<!-- <label id="error-To" style="color: red;display: none;">Contract To is required</label> -->
-                </td>
-        </tr>
+   <!--  <form id="searchForm">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
+    </form> -->
+        <div>
+   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
+         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
+         <option value="">Select Principal Employer</option>
+    <c:forEach items="${principalEmployers}" var="pe">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${pe.id}">${pe.description}</option>
+    </c:forEach>
+</select>
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
-<input type="hidden" id="contractorId" name="contractorId">
-      
-  <!-- </div> -->
-   <!--  </form> -->
+
+<label for="departmentId" style=" color: darkcyan;"   >Contractor:</label>
+         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
+         <option value="">Select Contractor</option>
+    <c:forEach items="${Contr}" var="c">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${c.id}">${c.description}</option>
+    </c:forEach>
+</select>
+<input type="hidden" id="deptId" name="deptId">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchBillBasedOnPE()">Search</button>
+  </div>
     <div>
-      <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  >Search</button>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToBillAdd()">New</button>
-        <%-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> --%>
+    
+    <c:if test="${UserPermission.addRights eq 1 }">
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToBillAdd()">Add</button>
+    </c:if>
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToBillEdit()">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToBillView()">View</button>
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+    	</c:if>
+
     </div>
 </div>
  
- <div class="table-container">
+<%--  <div class="table-container">
    <table border="1"  id="workorderTable" >
         <thead>
             <tr>
@@ -289,40 +290,36 @@
                     <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.billEndDate"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.status"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.billCategory"/><span id="sortIndicatorIsmApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <%-- <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.lastApprover"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.nextApprover"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    --%>
-                    <!-- Add more headers as needed -->
-                <!-- <td style="border: 1px solid black;">ISACTIVE</td>
-                <td style="border: 1px solid black;">UPDATEDTM</td>
-                <td style="border: 1px solid black;">UPDATEDBY</td> -->
-            </tr>
+
+ --%>
+
+   <div class="table-container">
+                        
+    <table id="workmenTable"  cellspacing="0" cellpadding="0" >
+        <thead>
+<tr >
+                    <td >
+                        <input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()" >
+                    </td> 
+                    <!-- Add more table headers for each column -->
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.unitCode"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.vendorCode"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.contractorName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.workOrderNumber"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.billStartDate"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.billEndDate"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.status"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.billCategory"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                      </tr>
         </thead>
-        
-           <tbody>
-				<c:forEach items="${billlist}" var="wo">
-					<tr>
-						<td ><input type="checkbox"
-							name="selectedWOs" value="${wo.transactionId}"></td>
-						<td>${wo.transactionId}</td>
-						<td>${wo.unitCode}</td>
-						<td>${wo.vendorCode}</td>
-						<td>${wo.contractorName}</td>
-						<td>${wo.workOrderNumber}</td>
-						<td>${wo.billStartDate}</td>
-						<td>${wo.billEndDate}</td>
-						<td>${wo.status}</td>
-						<td>${wo.billCategory}</td>
-						<%-- <td>${wo.lastApprover}</td>
-						<td>${wo.nextApprover}</td> --%>
-						<%--<td style="border: 1px solid black;">${principalEmployer.NAME}</td>
-                    <td style="border: 1px solid black;">${${wo.requestType}}</td> --%>
-					</tr>
-				</c:forEach>
-			</tbody> 
-        
+        <tbody>
+            
+        </tbody>
     </table>
     
+                        </form>
+                         </div>
 </body>
-</div>
 </html>
+

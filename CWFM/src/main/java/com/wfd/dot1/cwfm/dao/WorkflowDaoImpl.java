@@ -149,6 +149,8 @@ public class WorkflowDaoImpl implements WorkflowDao{
             String actionId = actionStatusMap.get(request.getActionName());
             if (actionId != null) {
                 approver.setActionId(actionId);
+            }else {
+            	approver.setActionId(request.getActionId());
             }
         	approver.setActionName(request.getActionName());
         	approver.setRoleId("0");
@@ -162,6 +164,8 @@ public class WorkflowDaoImpl implements WorkflowDao{
             String actionId = actionStatusMap.get(approver.getActionName());
             if (actionId != null) {
                 approver.setActionId(actionId);
+            }else {
+            	approver.setActionId(request.getActionId());
             }
             jdbcTemplate.update(insertApprover, workflowTypeId, approver.getActionId(),approver.getActionName() ,
             		approver.getRoleId(), approver.getRoleName(),approver.getHierarchy());
