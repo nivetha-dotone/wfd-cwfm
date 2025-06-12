@@ -553,8 +553,8 @@ label {
                 <td>
                 	<select class="custom-select" name="maritalStatus" id="maritalStatus">
                         <option value="">Please select Marital Status</option>
-                        	<option value="Single" ${GatePassObj.maritalStatus eq 'Single' ? 'selected="selected"' : ''}>Single</option>
-    						<option value="Married" ${GatePassObj.maritalStatus eq 'Married' ? 'selected="selected"' : ''}>Married</option>
+                        	<option value="Single" ${GatePassObj.maritalStatus eq 'UNMARRIED' ? 'selected="selected"' : ''}>UNMARRIED</option>
+    						<option value="Married" ${GatePassObj.maritalStatus eq 'MARRIED' ? 'selected="selected"' : ''}>MARRIED</option>
                     </select>
                 	<label id="error-maritalStatus"style="color: red;display: none;">Marital Status is required</label>
                 </td>
