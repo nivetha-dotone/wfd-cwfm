@@ -563,10 +563,14 @@ label {
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td>
                 <c:if test="${empty GatePassObj.address }">
-                	<input id="address" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" >
+                	<!-- <input id="address" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" > -->
+                	<textarea id="address" name="address" style="width: 100%; height: 60px; text-transform: capitalize;"></textarea>
+                	
                 </c:if>
                 <c:if test="${not empty GatePassObj.address }">
-                	<input id="address" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" value="${GatePassObj.address  }">
+                	<%-- <input id="address" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" value="${GatePassObj.address  }"> --%>
+                	<textarea id="address" name="address" style="width: 100%; height: 60px; text-transform: capitalize;">${GatePassObj.address}</textarea>
+                	
                 </c:if>
                 	<label id="error-address" style="color: red;display: none;">Please enter a valid Address</label>
                 </td>
