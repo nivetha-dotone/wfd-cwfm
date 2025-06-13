@@ -232,12 +232,20 @@
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
          <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
          <option value="">Select Principal Employer</option>
-    <c:forEach items="${principalEmployers}" var="pe">
-       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+    <%-- <c:forEach items="${principalEmployers}" var="pe">
+        <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
             ${principalEmployer.name}
-        </option> --%>
+        </option>
         <option value="${pe.id}">${pe.description}</option>
+    </c:forEach> --%>
+    
+    <c:forEach items="${principalEmployers}" var="pe" varStatus="status">
+        <option value="${pe.id}" 
+            <c:if test="${principalEmployers.size() == 1}">selected</c:if>>
+            ${pe.description}
+        </option>
     </c:forEach>
+    
 </select>
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
 
@@ -248,11 +256,13 @@
        <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
             ${principalEmployer.name}
         </option> --%>
-        <option value="${dept.id}">${dept.description}</option>
+        <option value="${dept.id}"  <c:if test="${Dept.size() == 1}">selected</c:if>>${dept.description}</option>
     </c:forEach>
 </select>
 <input type="hidden" id="deptId" name="deptId">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE()">Search</button>
+ <!-- Inline script placed immediately after dropdowns -->
+
   </div>
     <div>
     

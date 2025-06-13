@@ -236,7 +236,7 @@
        <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
             ${principalEmployer.name}
         </option> --%>
-        <option value="${pe.id}">${pe.description}</option>
+        <option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
     </c:forEach>
 </select>
 <input type="hidden" id="principalEmployerId" name="principalEmployerId">
@@ -248,7 +248,7 @@
        <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
             ${principalEmployer.name}
         </option> --%>
-        <option value="${dept.id}">${dept.description}</option>
+        <option value="${dept.id}" <c:if test="${Dept.size() == 1}">selected</c:if>>${dept.description}</option>
     </c:forEach>
 </select>
 <input type="hidden" id="deptId" name="deptId">

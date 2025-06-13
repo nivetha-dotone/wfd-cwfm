@@ -44,29 +44,99 @@ function toggleExportSelectAll() {
            });
        }
 
-function exportModuleCSV() {
-    let csv = '';
-    let headers = [];
-    $('#dynamicTable thead th').each(function (index) {
-        if (index === 0) return;
-        headers.push($(this).text());
-    });
-    csv += headers.join(',') + '\n';
+	   function exportModuleCSV() {
+	       let moduleName = $('#module option:selected').text().trim();
 
-    $('#dynamicTable tbody tr').each(function () {
-        if ($(this).find('.rowCheckbox').is(':checked')) {
-            let row = [];
-            $(this).find('td:not(:first-child)').each(function () {
-                row.push($(this).text());
-            });
-            csv += row.join(',') + '\n';
-        }
-    });
+	       // ✅ Only split CSV if module is "Contract Workmen"
+	       if (moduleName === "Contract Workmen") {
+	           let headers = [];
+	           let employmentStatusIndex = -1;
 
-    let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    let link = document.createElement("a");
-	let moduleName = $('#module option:selected').text();
-    link.href = URL.createObjectURL(blob);
-    link.download = moduleName.trim() + ".csv";
-    link.click();
-}
+	           // Collect headers and find the index of "Employment Status"
+	           $('#dynamicTable thead th').each(function (index) {
+	               if (index === 0) return; // Skip checkbox column
+	               let headerText = $(this).text().trim();
+	               headers.push(headerText);
+	               if (headerText === "Employment Status") {
+	                   employmentStatusIndex = index - 1;
+	               }
+	           });
+
+	           if (employmentStatusIndex === -1) {
+	               alert("Employment Status column not found.");
+	               return;
+	           }
+
+	           let activeRows = [];
+	           let terminatedRows = [];
+
+	           $('#dynamicTable tbody tr').each(function () {
+	               if ($(this).find('.rowCheckbox').is(':checked')) {
+	                   let row = [];
+	                   $(this).find('td:not(:first-child)').each(function () {
+	                       row.push($(this).text().trim());
+	                   });
+
+	                   let status = row[employmentStatusIndex];
+	                   if (status === "Active") {
+	                       activeRows.push(row);
+	                   } else if (status === "Terminated") {
+	                       terminatedRows.push(row);
+	                   }
+	               }
+	           });
+
+	           if (activeRows.length > 0) {
+	               downloadCSV(headers, activeRows, moduleName + "_Active.csv");
+	           }
+
+	           if (terminatedRows.length > 0) {
+	               downloadCSV(headers, terminatedRows, moduleName + "_Terminated.csv");
+	           }
+
+	           if (activeRows.length === 0 && terminatedRows.length === 0) {
+	               alert("No selected rows with Employment Status 'Active' or 'Terminated'.");
+	           }
+	       } else {
+	           // ✅ Default single CSV export for all other modules
+	           let headers = [];
+	           $('#dynamicTable thead th').each(function (index) {
+	               if (index === 0) return;
+	               headers.push($(this).text().trim());
+	           });
+
+	           let rows = [];
+	           $('#dynamicTable tbody tr').each(function () {
+	               if ($(this).find('.rowCheckbox').is(':checked')) {
+	                   let row = [];
+	                   $(this).find('td:not(:first-child)').each(function () {
+	                       row.push($(this).text().trim());
+	                   });
+	                   rows.push(row);
+	               }
+	           });
+
+	           if (rows.length > 0) {
+	               downloadCSV(headers, rows, moduleName + ".csv");
+	           } else {
+	               alert("No rows selected.");
+	           }
+	       }
+	   }
+
+	   function downloadCSV(headers, rows, fileName) {
+	       let csv = headers.join(',') + '\n';
+	       rows.forEach(row => {
+	           csv += row.map(value => `'${value}'`).join(',') + '\n';
+	       });
+
+	       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+	       const link = document.createElement("a");
+	       link.href = URL.createObjectURL(blob);
+	       link.download = fileName;
+	       link.style.display = "none";
+	       document.body.appendChild(link);
+	       link.click();
+	       document.body.removeChild(link);
+	   }
+

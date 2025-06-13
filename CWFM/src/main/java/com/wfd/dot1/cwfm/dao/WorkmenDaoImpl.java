@@ -1914,7 +1914,7 @@ public String getContractWorkmenExportQuery() {
 public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId) {
 	List<ContractWorkmenExportDto> dto = new ArrayList<ContractWorkmenExportDto>();
 	String query = getContractWorkmenExportQuery();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,unitId);
 	while(rs.next()) {
 		ContractWorkmenExportDto obj = new ContractWorkmenExportDto();
 		obj.setPersonNumber(rs.getString("GatePassId"));
