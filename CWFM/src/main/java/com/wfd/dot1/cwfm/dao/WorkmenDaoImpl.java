@@ -1057,9 +1057,9 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 }
 
 	@Override
-	public List<ApproverStatusDTO> getApprovalDetails(String transactionId) {
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId) {
 		 // Fetch approvers from GATEPASSAPPROVERINFO
-        List<ApproverInfo> approverList = this.getApproversByGatePassId(GatePassType.CREATE.getStatus());
+        List<ApproverInfo> approverList = this.getApproversByGatePassId(GatePassType.CREATE.getStatus(),unitId);
 
         // Fetch approval statuses from GATEPASSAPPROVALSTATUS
         List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(transactionId);
@@ -1092,8 +1092,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
         return approverStatusList;
 	}
 
-	private List<ApproverInfo> getApproversByGatePassId(String gatePassTypeId) {
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(getApproverHierarchy(),gatePassTypeId);
+	private List<ApproverInfo> getApproversByGatePassId(String gatePassTypeId,String unitId) {
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(getApproverHierarchy(),gatePassTypeId,unitId);
 		 List<ApproverInfo> list = new ArrayList<ApproverInfo>();
 		 while(rs.next()) {
 			 ApproverInfo info=new ApproverInfo();
@@ -2015,6 +2015,18 @@ public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId
 		dto.add(obj);
 	}
 	return dto;
+}
+
+
+public String getAadharExistsQuery() {
+	return QueryFileWatcher.getQuery("AADHAR_EXISTS");
+}
+
+@Override
+public boolean isAadharExists(String aadharNumber,String transactionId) {
+	String sql = getAadharExistsQuery();
+    Integer count = jdbcTemplate.queryForObject(sql, new Object[]{aadharNumber,transactionId}, Integer.class);
+    return count != null && count > 0;
 }
 
 

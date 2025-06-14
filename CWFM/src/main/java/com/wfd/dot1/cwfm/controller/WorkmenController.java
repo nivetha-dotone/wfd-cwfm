@@ -284,6 +284,7 @@ public class WorkmenController {
     }
     
     @PostMapping("/saveGatePass")
+    @ResponseBody
     public ResponseEntity<String> saveGatePass(
             @RequestParam("jsonData") String jsonData,
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
@@ -459,7 +460,7 @@ public class WorkmenController {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
     	    }
     		}
-    		List<ApproverStatusDTO> approvers = workmenService.getApprovalDetails(transactionId);
+    		List<ApproverStatusDTO> approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId());
     		 request.setAttribute("approvers", approvers);
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1609,6 +1610,14 @@ public class WorkmenController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/checkAadharExists")
+    @ResponseBody
+    public Map<String, Boolean> checkAadharExists(@RequestParam("aadharNumber") String aadharNumber,@RequestParam("transactionId")String transactionId) {
+        boolean exists = workmenService.isAadharExists(aadharNumber,transactionId);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return response;
+    }
 
 
 }

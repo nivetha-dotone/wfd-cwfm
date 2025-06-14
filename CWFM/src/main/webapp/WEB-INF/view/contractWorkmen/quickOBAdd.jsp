@@ -542,10 +542,10 @@ label {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
                 <td>
                 	<c:if test="${empty GatePassObj.mobileNumber }">
-                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" autocomplete="off">
                 	</c:if>
                 	<c:if test="${not empty GatePassObj.mobileNumber }">
-                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" value="${GatePassObj.mobileNumber }" autocomplete="off">
+                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" value="${GatePassObj.mobileNumber }" autocomplete="off">
                 	</c:if>
                 	<label id="error-mobileNumber" style="color: red;display: none;">Please enter a valid Mobile Number</label>
                 </td>
@@ -595,7 +595,7 @@ label {
 								<c:forEach var="pe" items="${PrincipalEmployer}">
 								
                 					<option value="${pe.id}"
-									 <c:if test="${PrincipalEmployer.size() == 1}">selected</c:if>>
+									>
 									${pe.description}</option>
             					</c:forEach>
 							
@@ -663,7 +663,7 @@ label {
                                 <option value="">Please select Department</option>
 								
                                  <c:forEach var="dept" items="${Dept}">
-                						<option value="${dept.id}" <c:if test="${Dept.size() == 1}">selected</c:if>>
+                						<option value="${dept.id}" >
 										${dept.description}</option>
             						</c:forEach>
 								
@@ -1004,8 +1004,10 @@ label {
     </div>
     <div style="display: flex; justify-content: start;">
             <input type="file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event,'imageFile','imageFileName')" style="overflow: hidden;">
+    	
      </div>
-     <span id="imageFileName" style="margin-left: 10px;color:black;"></span> 
+     <span id="imageFileName" style="margin-left: 10px;color:black;"></span>
+     <div id="profilePcError"></div>  
 </td>
                   
                    
@@ -1047,6 +1049,7 @@ label {
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
 				 --><th><label class="custom-label"><spring:message code="label.comment"/></label></th>
 				<td><textarea id="comments"  name="comments" placeholder="Type here..." style="width: 501px; height: 70px;text-transform: capitalize;"></textarea>
+				<label id="error-comments" style="color: red;display: none;">Enter comments</label>
 				</td>
 			</tr>
 		<tr>
@@ -1055,7 +1058,8 @@ label {
 				<td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;"><b>
 				<input type="checkbox" name="acceptCheck" id="acceptCheck"  /> 
 				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
-				</b></td>
+				</b>
+				<label id="acceptError" style="color: red;display: none;">You must accept the declaration</label></td>
 			</tr>
 				<!-- <tr >
 				<td colspan="4"><input type="checkbox" name="acceptCheck" id="acceptCheck"  />

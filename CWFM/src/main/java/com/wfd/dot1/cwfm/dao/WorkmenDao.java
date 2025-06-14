@@ -84,7 +84,7 @@ public interface WorkmenDao {
 
 	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId);
 
-	public List<ApproverStatusDTO> getApprovalDetails(String transactionId);
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId);
 
 	public List<Contractor> getAllContractorForAdmin(String unitId);
 
@@ -121,6 +121,8 @@ public interface WorkmenDao {
 	public boolean updateGatePassMainStatusByTransactionId(String transactionId, String status);
 
 	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId);
+
+	public boolean isAadharExists(String aadharNumber,String transactionId);
 
 
 }

@@ -245,48 +245,38 @@ function initializeDatePicker() {
 	} 
     function validateBasicData() {
     let isValid = true;
+	let aadharCheckPassed = false;
     const aadharNumber = $("#aadharNumber").val().trim();
+	const transactionId=$("#transactionId").val().trim();
     if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
         $("#error-aadhar").show();
         isValid = false;
     }else{
-		  $("#error-aadhar").hide();
+		 // $("#error-aadhar").hide();
 		  
-	}
-	/*// Check if Aadhaar is 12 digits and numeric
-       if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
-        $("#error-aadhar").show();
-        isValid = false;
-      }else{
-            $("#error-aadhar").hide();
-            
-            // Proceed with AJAX call to check for duplicate Aadhaar
-            $.ajax({
-            type: "GET", // Changed from POST to GET for read-only operation
-            url: "/CWFM/contractworkmen/checkAadhaarDuplicate",
-            data: { aadhaarNumber: aadharNumber },
-            dataType: "json", // Ensure the backend returns JSON
-            success: function (response) {
-                if (response.exists === true) {
-                    $("#error-aadhar").text("Aadhaar number already exists!").show();
-                   // $("#aadharNumber").val(""); // Clear field
-                    isValid = false;
-                } else {
-                    $("#error-aadhar").hide();
-                    // Aadhaar is valid, allow tab switch or next step
-                   
-                   
-                }
-            },
-            error: function (xhr) {
-                // Better error handling
-                console.log("AJAX Error:", xhr);
-                $("#error-aadhar").text("Server error occurred while checking Aadhaar.").show();
-            }
-        });
-        
-        }*/
+		         // Check in backend if Aadhar exists
+		         $.ajax({
+		             url: "/CWFM/contractworkmen/checkAadharExists",
+		             type: "GET",
+		             data: { aadharNumber: aadharNumber,transactionId : transactionId },
+		             async: false, // NOTE: synchronous to block form submission
+		             success: function (response) {
+		                 if (response.exists) {
+		                     $("#error-aadhar").text("Aadhar number already exists").show();
+		                     isValid = false;
+		                 } else {
+		                     $("#error-aadhar").hide();
+		                     aadharCheckPassed = true;
+		                 }
+		             },
+		             error: function () {
+		                 $("#error-aadhar").text("Error checking Aadhar").show();
+		                 isValid = false;
+		             }
+		         });
+		     }
 
+	
     const firstName = $("#firstName").val().trim();
     const firstnameRegex = /^[A-Za-z\s]{2,}$/;
     if (!firstnameRegex.test(firstName)) {
@@ -365,7 +355,7 @@ function initializeDatePicker() {
 		 $("#error-address").hide();
 	 }
 console.log(isValid);
-    return isValid;
+    return isValid && aadharCheckPassed;
 
 }
 
@@ -569,7 +559,7 @@ function validateWages(){
     }else{
 		$("#error-zone").hide();
 	}
-	const allowanceRegex = /^[0-9]{1,3}(\.[0-9]{1,2})?$/;
+	const allowanceRegex = /^[0-9]{1,6}(\.[0-9]{1,2})?$/;
 	const basic = $("#basic").val().trim();
 	const da = $("#da").val().trim();
 	const hra = $("#hra").val().trim();
@@ -658,33 +648,59 @@ function fileUpload(){
         });
    return isValid;
 }
-    function validateFiles(aadharFile, policeFile,profilePc) {
-        let valid = true;
-        
-        // Example validation for file size and type
-        if (aadharFile && aadharFile.size > 5 * 1024 * 1024) { // Check if file size is more than 5MB
-            $("#aadharError").text("Aadhar file must be less than 5MB").css("color", "red");
-            valid = false;
-        } else {
-            $("#aadharError").text(""); // Clear error if valid
-        }
+function validateFiles(aadharFile, policeFile, profilePc) {
+    let valid = true;
 
-        if (policeFile && policeFile.size > 5 * 1024 * 1024) { // Check if file size is more than 5MB
-            $("#policeError").text("Police file must be less than 5MB").css("color", "red");
-            valid = false;
-        } else {
-            $("#policeError").text(""); // Clear error if valid
-        }
-		
-		if (profilePc && profilePc.size > 5 * 1024 * 1024) { // Check if file size is more than 5MB
-		           $("#profilePcError").text("Photo/Image must be less than 5MB").css("color", "red");
-		           valid = false;
-		       } else {
-		           $("#profilePcError").text(""); // Clear error if valid
-		       }
-
-        return valid; // Return the validation result
+    // Aadhar File - Mandatory & Size check
+    if (!aadharFile) {
+        $("#aadharError").text("Aadhar file is required").css("color", "red");
+        valid = false;
+    } else if (aadharFile.size > 5 * 1024 * 1024) {
+        $("#aadharError").text("Aadhar file must be less than 5MB").css("color", "red");
+        valid = false;
+    } else {
+        $("#aadharError").text("");
     }
+
+    // Police Verification File - Mandatory & Size check
+    if (!policeFile) {
+        $("#policeError").text("Police verification file is required").css("color", "red");
+        valid = false;
+    } else if (policeFile.size > 5 * 1024 * 1024) {
+        $("#policeError").text("Police file must be less than 5MB").css("color", "red");
+        valid = false;
+    } else {
+        $("#policeError").text("");
+    }
+
+    // Profile Photo - Mandatory & Size check
+    if (!profilePc) {
+        $("#profilePcError").text("Profile photo is required").css("color", "red");
+        valid = false;
+    } else if (profilePc.size > 5 * 1024 * 1024) {
+        $("#profilePcError").text("Photo/Image must be less than 5MB").css("color", "red");
+        valid = false;
+    } else {
+        $("#profilePcError").text("");
+    }
+
+	const comments = $("#comments").val().trim();
+		    if (comments === "") {
+		        $("#error-comments").show();
+		        valid = false;
+		    }else{
+				 $("#error-comments").hide();
+			}
+			// Accept Checkbox validation
+			    if (!$("#acceptCheck").is(":checked")) {
+			        $("#acceptError").show();
+			        valid = false;
+			    } else {
+			        $("#acceptError").hide();
+			    }		
+    return valid;
+}
+
     
   
 	
@@ -778,6 +794,8 @@ function fileUpload(){
     var policeFile = $("#policeFile").prop("files")[0];
 	var profilePic = $("#imageFile").prop("files")[0];
 	
+	
+	
     // Validate the files (optional)
     if (!validateFiles(aadharFile, policeFile,profilePic)) {
         documentValid = false; // Stop the upload if validation fails
@@ -799,6 +817,7 @@ function fileUpload(){
         wagesValid = false;
     }
 
+	
     console.log("basicValid: " + basicValid);
     console.log("employmentValid: " + employmentValid);
     console.log("otherValid: " + otherValid);

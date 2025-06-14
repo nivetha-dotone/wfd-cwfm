@@ -399,9 +399,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return dot;
 	}
 	@Override
-	public List<ApproverStatusDTO> getApprovalDetails(String transactionId) {
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId) {
 		// TODO Auto-generated method stub
-		return workmenDao.getApprovalDetails( transactionId);
+		return workmenDao.getApprovalDetails( transactionId,unitId);
 	}
 	
 	@Override
@@ -599,6 +599,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId) {
 		// TODO Auto-generated method stub
 		return workmenDao.getContractWorkmenExportData(unitId);
+	}
+	@Override
+	public boolean isAadharExists(String aadharNumber,String transactionId) {
+		// TODO Auto-generated method stub
+		return workmenDao.isAadharExists(aadharNumber,transactionId);
 	}
 
 }

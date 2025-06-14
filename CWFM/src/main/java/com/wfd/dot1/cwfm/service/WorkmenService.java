@@ -58,7 +58,7 @@ public interface WorkmenService {
 
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId);
 
-	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId);
+	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId,String unitId);
 
 	public List<Contractor> getAllContractorForAdmin(String principalEmployerId);
 
@@ -87,5 +87,7 @@ public interface WorkmenService {
 	boolean isAadharDuplicate(String aadharNumber);
 
 	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId);
+
+	public boolean isAadharExists(String aadharNumber,String transactionId);
 
 }	
