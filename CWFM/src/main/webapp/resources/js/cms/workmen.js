@@ -540,22 +540,22 @@ function validateWages(){
 	let isValid = true;
     const wage = $("#wageCategory").val();
      if (wage === "") {
-        $("#error-wageCategory").show();
-        isValid = false;
+       // $("#error-wageCategory").show();
+       // isValid = false;
     }else{
 		$("#error-wageCategory").hide();
 	}
 	const bonus = $("#bonusPayout").val();
      if (bonus === "") {
-        $("#error-bonusPayout").show();
-        isValid = false;
+        //$("#error-bonusPayout").show();
+        //isValid = false;
     }else{
 		$("#error-bonusPayout").hide();
 	}
 	const zone = $("#zone").val();
      if (zone === "") {
-        $("#error-zone").show();
-        isValid = false;
+       // $("#error-zone").show();
+        //isValid = false;
     }else{
 		$("#error-zone").hide();
 	}
@@ -566,38 +566,51 @@ function validateWages(){
 	const washing = $("#washingAllowance").val().trim();
 	const other = $("#otherAllowance").val().trim();
 	const uniform = $("#uniformAllowance").val().trim();
-	
-	if ( !allowanceRegex.test(basic) ) {
+	if(basic == ""){
+		$("#basic").val("0.00"); 
+	//not mandatory	
+	}else 	if ( !allowanceRegex.test(basic) ) {
              $("#error-basic").show();
-       		 isValid = false;    
+       		 isValid = false; 
+			  
       }else{
 		 $("#error-basic").hide();
 	  }
-	  if ( !allowanceRegex.test(da) ) {
+	  if(da == ""){
+		$("#da").val("0.00"); 
+	  }else	  if ( !allowanceRegex.test(da) ) {
              $("#error-da").show();
        		 isValid = false;    
       }else{
 		 $("#error-da").hide();
 	  }
-	  if ( !allowanceRegex.test(hra) ) {
+	  if(hra == ""){
+		$("#hra").val("0.00"); 
+	  }else	  if ( !allowanceRegex.test(hra) ) {
              $("#error-hra").show();
        		 isValid = false;    
       }else{
 		 $("#error-hra").hide();
 	  }
-	  if ( !allowanceRegex.test(washing) ) {
+	  if(washing == ""){
+		$("#washing").val("0.00"); 
+	  }else	  if ( !allowanceRegex.test(washing) ) {
              $("#error-washingAllowance").show();
        		 isValid = false;    
       }else{
 		 $("#error-washingAllowance").hide();
 	  }
-	  if ( !allowanceRegex.test(other) ) {
+	  if(other == ""){
+		$("#other").val("0.00"); 
+		  	  }else	  if ( !allowanceRegex.test(other) ) {
              $("#error-otherAllowance").show();
        		 isValid = false;    
       }else{
 		 $("#error-otherAllowance").hide();
 	  }
-	  if ( !allowanceRegex.test(uniform) ) {
+	  if(uniform == ""){
+		$("#uniform").val("0.00"); 
+	  }else	  if ( !allowanceRegex.test(uniform) ) {
              $("#error-uniformAllowance").show();
        		 isValid = false;    
       }else{
@@ -2572,5 +2585,14 @@ if(isValid){
 
 	    xhr.send(JSON.stringify(data));
 	}
+
+function formatToTwoDecimalPlaces(input) {
+  let value = parseFloat(input.value);
+  if (isNaN(value)) {
+    input.value = '0.00';
+  } else {
+    input.value = value.toFixed(2);
+  }
+}
 
 

@@ -245,7 +245,7 @@
         <select class="custom-select" id="principalEmployer" name="principalEmployerId" required>
                                 <option value="">Please select Principal Employer</option>
 								<c:forEach var="pe" items="${PrincipalEmployer}">
-                					<option value="${pe.id}">${pe.description}</option>
+                					<option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
             					</c:forEach>
                                 </select>
         

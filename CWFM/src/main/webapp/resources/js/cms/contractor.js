@@ -166,8 +166,8 @@ function redirectToContrView() {
                <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><select class="form-control"><option>ESIC</option><option>LL</option><option>WC</option></select></td>
                <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="text" class="form-control" /></td>
                <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="text" class="form-control" /></td>
-               <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="date" class="form-control datetimepickerformat" onclick="initializeDatePicker()" /></td>
-               <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="date" class="form-control datetimepickerformat" onclick="initializeDatePicker()"/></td>
+               <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="date" class="form-control datetimepickerformat1" onclick="initializeDatePicker()" /></td>
+               <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="date" class="form-control datetimepickerformat1" onclick="initializeDatePicker()"/></td>
                <td style=" border-left: thin solid;border-bottom: thin solid;border-top: thin solid;width:2%; "><input type="file" class="form-control" /></td>
            </tr>
            `);

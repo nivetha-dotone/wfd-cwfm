@@ -13,7 +13,12 @@
     
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
       <!--  <script src="resources/js/commonjs.js"></script> -->
-    <script src="resources/js/cms/principalEmployer.js"></script>
+   
+
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/cms/contractor.js"></script>
     <script src="resources/js/cms/workorder.js"></script>
        <script src="resources/js/cms/workmen.js"></script>
@@ -27,14 +32,42 @@
 
 
       <script src="resources/js/cms/export.js"></script>
-
-   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
+    const minDate = new Date(currentYear - 70, 0, 1);
+       $(".datetimepickerformat").datepicker({//dob
+       	dateFormat: 'yy-mm-dd',
+           changeMonth: true,
+           changeYear: true,
+           yearRange: `${currentYear - 70}:${currentYear - 18}`, // only show valid years
+           minDate: minDate,
+           maxDate: maxDate
+       });
+       $('.datetimepickerformat1').datepicker({//date of joiing
+           dateFormat: 'yy-mm-dd', // Set the date format
+           changeMonth: true,      // Allow changing month via dropdown
+           changeYear: true,       // Allow changing year via dropdown
+           yearRange: "0:+100", 
+           minDate: 0              // Prevent selecting future dates
+       });
+       const sixMonthsAgo = new Date();
+       sixMonthsAgo.setMonth(today.getMonth() - 6);
 
+       $(".datetimepickerformat2").datepicker({//health check date
+           dateFormat: 'yy-mm-dd',
+           changeMonth: true,
+           changeYear: true,
+           minDate: sixMonthsAgo,
+           maxDate: today,
+           yearRange: `${sixMonthsAgo.getFullYear()}:${today.getFullYear()}`
+       });
+       
+    
+  
     function showSection(type) {
         document.getElementById("sequentialSection").style.display = (type === 'sequential') ? 'block' : 'none';
         document.getElementById("parallelSection").style.display = (type === 'parallel') ? 'block' : 'none';
@@ -73,22 +106,37 @@ function loadCommonList(path,heading) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
+        	const today = new Date();
+        	const currentYear = today.getFullYear();
+        	const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
+        	const minDate = new Date(currentYear - 70, 0, 1);
             document.getElementById("mainContent").innerHTML = this.responseText;
-            $(".datetimepickerformat").datepicker({
-            	  dateFormat: 'yy-mm-dd', // Set the date format
-                  changeMonth: true,      // Allow changing month via dropdown
-                  changeYear: true,       // Allow changing year via dropdown
-                  yearRange: "-100:+0",   // Set the year range from 100 years ago to the current year
-                  maxDate: 0
+            $(".datetimepickerformat").datepicker({//dob
+            	dateFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: `${currentYear - 70}:${currentYear - 18}`, // only show valid years
+                minDate: minDate,
+                maxDate: maxDate
             });
-            $('.datetimepickerformat1').datepicker({
+            $('.datetimepickerformat1').datepicker({//date of joiing
     	        dateFormat: 'yy-mm-dd', // Set the date format
     	        changeMonth: true,      // Allow changing month via dropdown
     	        changeYear: true,       // Allow changing year via dropdown
     	        yearRange: "0:+100", 
     	        minDate: 0              // Prevent selecting future dates
     	    });
-            
+            const sixMonthsAgo = new Date();
+            sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+            $(".datetimepickerformat2").datepicker({//health check date
+                dateFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true,
+                minDate: sixMonthsAgo,
+                maxDate: today,
+                yearRange: `${sixMonthsAgo.getFullYear()}:${today.getFullYear()}`
+            });
             
             
             const successMessage = sessionStorage.getItem("successMessage");
@@ -1542,6 +1590,8 @@ window.onload = function() {
         console.warn("No role selected. Sidebar will remain empty.");
         document.getElementById('dynamic-menu').innerHTML = ""; // Clear sidebar
     }
+    
+    
 };
 
 function changeRole(selectedRoleId, selectedRoleName) {
