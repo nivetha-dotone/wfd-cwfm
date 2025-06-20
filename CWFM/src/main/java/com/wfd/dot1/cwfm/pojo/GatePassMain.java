@@ -466,5 +466,12 @@ public class GatePassMain {
 		this.transactionId = transactionId;
 	}
 	
+	private String onboardingType;
+	public String getOnboardingType() {
+		return onboardingType;
+	}
+	public void setOnboardingType(String onboardingType) {
+		this.onboardingType = onboardingType;
+	}
 	
 }

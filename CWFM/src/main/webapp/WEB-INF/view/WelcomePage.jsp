@@ -111,32 +111,6 @@ function loadCommonList(path,heading) {
         	const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
         	const minDate = new Date(currentYear - 70, 0, 1);
             document.getElementById("mainContent").innerHTML = this.responseText;
-            $(".datetimepickerformat").datepicker({//dob
-            	dateFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: `${currentYear - 70}:${currentYear - 18}`, // only show valid years
-                minDate: minDate,
-                maxDate: maxDate
-            });
-            $('.datetimepickerformat1').datepicker({//date of joiing
-    	        dateFormat: 'yy-mm-dd', // Set the date format
-    	        changeMonth: true,      // Allow changing month via dropdown
-    	        changeYear: true,       // Allow changing year via dropdown
-    	        yearRange: "0:+100", 
-    	        minDate: 0              // Prevent selecting future dates
-    	    });
-            const sixMonthsAgo = new Date();
-            sixMonthsAgo.setMonth(today.getMonth() - 6);
-
-            $(".datetimepickerformat2").datepicker({//health check date
-                dateFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                minDate: sixMonthsAgo,
-                maxDate: today,
-                yearRange: `${sixMonthsAgo.getFullYear()}:${today.getFullYear()}`
-            });
             
             
             const successMessage = sessionStorage.getItem("successMessage");
@@ -163,11 +137,13 @@ function loadCommonList(path,heading) {
                 }, 5000);
             }
               resetSessionTimer();
+              //setDateRange();
         }
     };
     xhttp.open("GET", url, true);
     xhttp.send();
 }
+
 function loadQobAdd(path,heading,userId) {
 	//alert("loadQobAdd"+userId);
 	 updateHeading(heading);
@@ -2985,7 +2961,7 @@ table th {
         
     </style>
 </head>
-<body>
+<body >
 <% 
     String initials = (String) session.getAttribute("userInitials");
     MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -3491,6 +3467,7 @@ table th {
     } */
 
     document.addEventListener('DOMContentLoaded', () => {
+    	
         let submenuVisible = false;
         let submenuSelected = false;
 

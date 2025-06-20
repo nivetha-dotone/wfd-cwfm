@@ -260,17 +260,16 @@
     </c:forEach>
 </select>
 <input type="hidden" id="deptId" name="deptId">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE('regular')">Search</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE('quick')">Search</button>
  <!-- Inline script placed immediately after dropdowns -->
 
   </div>
     <div>
     <c:if test="${UserPermission.addRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenAdd()">Add</button> 
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenQuickAdd()">Add</button> 
      </c:if>
-    <c:if test="${UserPermission.editRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenEdit()">Edit</button> 
-     </c:if>
+    
+  
      <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
 

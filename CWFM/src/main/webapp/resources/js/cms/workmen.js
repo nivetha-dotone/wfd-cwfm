@@ -566,7 +566,7 @@ function validateWages(){
 	const washing = $("#washingAllowance").val().trim();
 	const other = $("#otherAllowance").val().trim();
 	const uniform = $("#uniformAllowance").val().trim();
-	if(basic == ""){
+	if(basic === ""){
 		$("#basic").val("0.00"); 
 	//not mandatory	
 	}else 	if ( !allowanceRegex.test(basic) ) {
@@ -576,7 +576,7 @@ function validateWages(){
       }else{
 		 $("#error-basic").hide();
 	  }
-	  if(da == ""){
+	  if(da === ""){
 		$("#da").val("0.00"); 
 	  }else	  if ( !allowanceRegex.test(da) ) {
              $("#error-da").show();
@@ -584,7 +584,7 @@ function validateWages(){
       }else{
 		 $("#error-da").hide();
 	  }
-	  if(hra == ""){
+	  if(hra === ""){
 		$("#hra").val("0.00"); 
 	  }else	  if ( !allowanceRegex.test(hra) ) {
              $("#error-hra").show();
@@ -592,24 +592,24 @@ function validateWages(){
       }else{
 		 $("#error-hra").hide();
 	  }
-	  if(washing == ""){
-		$("#washing").val("0.00"); 
+	  if(washing === ""){
+		$("#washingAllowance").val("0.00"); 
 	  }else	  if ( !allowanceRegex.test(washing) ) {
              $("#error-washingAllowance").show();
        		 isValid = false;    
       }else{
 		 $("#error-washingAllowance").hide();
 	  }
-	  if(other == ""){
-		$("#other").val("0.00"); 
+	  if(other === ""){
+		$("#otherAllowance").val("0.00"); 
 		  	  }else	  if ( !allowanceRegex.test(other) ) {
              $("#error-otherAllowance").show();
        		 isValid = false;    
       }else{
 		 $("#error-otherAllowance").hide();
 	  }
-	  if(uniform == ""){
-		$("#uniform").val("0.00"); 
+	  if(uniform === ""){
+		$("#uniformAllowance").val("0.00"); 
 	  }else	  if ( !allowanceRegex.test(uniform) ) {
              $("#error-uniformAllowance").show();
        		 isValid = false;    
@@ -792,11 +792,11 @@ function validateFiles(aadharFile, policeFile, profilePc) {
 		
 		
 		
-		
+	
 
     
 
-	function submitGatePass(userId) {
+	function submitGatePass(userId,type) {
     let basicValid = true;
     let employmentValid = true;
     let otherValid = true;
@@ -822,6 +822,7 @@ function validateFiles(aadharFile, policeFile, profilePc) {
         employmentValid = false;
     }
 
+	if(type=== "regular"){
     if (!validateOtherInformation()) {
         otherValid = false;
     }
@@ -829,7 +830,16 @@ function validateFiles(aadharFile, policeFile, profilePc) {
     if (!validateWages()) {
         wagesValid = false;
     }
-
+}else{
+	otherValid = true;
+	wagesValid = true;
+	$("#uniformAllowance").val("0.00"); 
+	$("#washingAllowance").val("0.00");  	
+	$("#hra").val("0.00");  	
+	$("#da").val("0.00"); 
+	$("#basic").val("0.00"); 
+	$("#otherAllowance").val("0.00"); 
+}
 	
     console.log("basicValid: " + basicValid);
     console.log("employmentValid: " + employmentValid);
@@ -887,6 +897,7 @@ function validateFiles(aadharFile, policeFile, profilePc) {
             comments: $("#comments").val().trim(),
 			address:$("#address").val().trim(),
 			doj:$("#doj").val(),
+			onboardingType:type,
         };
 
         // Serialize the JSON object to a string
@@ -1731,7 +1742,7 @@ function previewImage(event,inputId,displayId) {
             document.body.appendChild(link);
             link.click();
         }
-		function searchGatePassBasedOnPE() {
+		function searchGatePassBasedOnPE(type) {
 					    var principalEmployerId = $('#principalEmployerId').val();
 					    
 						var deptId=$("#deptId").val();
@@ -1740,7 +1751,8 @@ function previewImage(event,inputId,displayId) {
 					        type: 'POST',
 					        data: {
 					            principalEmployerId: principalEmployerId,
-								deptId:deptId
+								deptId:deptId,
+								type:type
 					        },
 					        success: function(response) {
 					            var tableBody = $('#workmenTable tbody');
@@ -2189,6 +2201,7 @@ function previewImage(event,inputId,displayId) {
 											    xhr.onreadystatechange = function() {
 											        if (xhr.readyState == 4 && xhr.status == 200) {
 											            document.getElementById("mainContent").innerHTML = xhr.responseText;
+														setDateRange();
 											        }
 											    };
 											    xhr.open("GET", "/CWFM/contractworkmen/getDraftDetails/" + transactionId, true);
@@ -2594,5 +2607,64 @@ function formatToTwoDecimalPlaces(input) {
     input.value = value.toFixed(2);
   }
 }
+function redirectToWorkmenQuickAdd() {
 
+    // Fetch the content of add.jsp using AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Update the mainContent element with the fetched content
+            document.getElementById("mainContent").innerHTML = xhr.responseText;
+			setDateRange();
+        }
+    };
+    xhr.open("GET", "/CWFM/contractworkmen/quickOnboardingCreation", true);
+    xhr.send();
+}
+function redirectToWorkmenAdd(){
+	// Fetch the content of add.jsp using AJAX
+	    var xhr = new XMLHttpRequest();
+	    xhr.onreadystatechange = function() {
+	        if (xhr.readyState == 4 && xhr.status == 200) {
+	            // Update the mainContent element with the fetched content
+	            document.getElementById("mainContent").innerHTML = xhr.responseText;
+				setDateRange();
+	        }
+	    };
+	    xhr.open("GET", "/CWFM/contractworkmen/addQuickOB", true);
+	    xhr.send();
+}
+function setDateRange() {
+	const today = new Date();
+	const currentYear = today.getFullYear();
+	const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
+	const minDate = new Date(currentYear - 70, 0, 1);
+
+    $(".datetimepickerformat").datepicker({//dob
+    	dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: `${currentYear - 70}:${currentYear - 18}`, // only show valid years
+        minDate: minDate,
+        maxDate: maxDate
+    });
+    $('.datetimepickerformat1').datepicker({//date of joiing
+        dateFormat: 'yy-mm-dd', // Set the date format
+        changeMonth: true,      // Allow changing month via dropdown
+        changeYear: true,       // Allow changing year via dropdown
+        yearRange: "0:+100", 
+        minDate: 0              // Prevent selecting future dates
+    });
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+    $(".datetimepickerformat2").datepicker({//health check date
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        minDate: sixMonthsAgo,
+        maxDate: today,
+        yearRange: `${sixMonthsAgo.getFullYear()}:${today.getFullYear()}`
+    });
+}
 

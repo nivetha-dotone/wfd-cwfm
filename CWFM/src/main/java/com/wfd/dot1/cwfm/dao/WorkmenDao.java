@@ -44,9 +44,9 @@ public interface WorkmenDao {
 
 	public String saveGatePass(GatePassMain gatePassMain);
 
-	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId, String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String type);
 
-	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId,String deptId,String unitId);
+	public List<GatePassListingDto> getGatePassListingForApprovers(String userId,int workFlowType,String gatePassTypeId,String deptId,String unitId,String type);
 
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId);
 

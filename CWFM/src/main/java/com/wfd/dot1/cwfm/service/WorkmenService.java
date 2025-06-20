@@ -42,9 +42,9 @@ public interface WorkmenService {
 
 	public String saveGatePass(GatePassMain gatePassMain);
 
-	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String type);
 
-	public List<GatePassListingDto> getGatePassListingForApprovers(String unitId,String deptId,MasterUser user, String gatePassTypeId);
+	public List<GatePassListingDto> getGatePassListingForApprovers(String unitId,String deptId,MasterUser user, String gatePassTypeId,String type);
 
 	public GatePassMain getIndividualContractWorkmenDetails(String gatePassId);
 

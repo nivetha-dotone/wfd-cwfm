@@ -379,6 +379,7 @@ public class WorkmenController {
     public ResponseEntity<List<GatePassListingDto>> gatePassListingDetails(
     		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
     		@RequestParam(value = "deptId", required = false) String deptId,
+    		@RequestParam(value = "type", required = false) String type,
     		HttpServletRequest request,HttpServletResponse response) {
     	
     	try {
@@ -386,9 +387,9 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus());
+    			listDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
     		}else {	
-			listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus());
+			listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -466,7 +467,10 @@ public class WorkmenController {
     		log.error("Error getting workmen details ", e);
     	}
     	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
+    	if(gatePassMainObj.getOnboardingType().equals("regular"))
     		return "contractWorkmen/view";
+    	else
+    		return "contractWorkmen/quickOnboardingView";
     }
     @PostMapping("/approveRejectGatePass")
     public ResponseEntity<String> approveRejectGatePass(@RequestBody ApproveRejectGatePassDto dto,HttpServletRequest request,HttpServletResponse response) {
@@ -1619,5 +1623,78 @@ public class WorkmenController {
         return response;
     }
 
+    //quickOnboardingList
+    @GetMapping("/quickOnboardingList")
+    public String quickOnboardingList(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/quickOnboardingList");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	  request.setAttribute("Dept", departments);
+    	  
+		return "contractWorkmen/quickOnboardingList";
+	}
+    
+
+    @GetMapping("/quickOnboardingCreation")
+    public String quickOnboardingCreation(HttpServletRequest request,HttpServletResponse response) {
+	
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	log.info("Entered into addQuickOBForm"+user.getUserId());
+    	
+    	String transactionId= workmenService.generateTransactionId();
+    	request.setAttribute("transactionId", transactionId);
+    	
+    	List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	request.setAttribute("PrincipalEmployer", peList);
+    	  request.setAttribute("Dept", departments);
+          request.setAttribute("Subdept", subdepartments);
+          
+        //Skills
+		List<Skill> skillList = workmenService.getAllSkill();
+		request.setAttribute("Skills", skillList);
+		
+		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
+
+		// Grouping the CmsGeneralMaster objects by gmType
+		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
+		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+		// Define the types and their corresponding request attribute names
+		Map<String, String> attributeMapping = Map.of(
+		        "GENDER", "GenderOptions",
+		        "BLOODGROUP", "BloodGroup",
+		        "ACCESSAREA", "AccessArea",
+		        "ACADEMICS", "Academics",
+		        "WAGECATEGORY", "WageCategory",
+		        "BONUSPAYOUT", "BonusPayout",
+		        "ZONE", "Zone"
+		);
+
+		// Iterate over the attribute mappings and set the request attributes dynamically
+		attributeMapping.forEach((type, attributeName) -> {
+		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+		    request.setAttribute(attributeName, gmList1);
+		});
+        return "contractWorkmen/quickOnboardingCreate";
+    }
 
 }

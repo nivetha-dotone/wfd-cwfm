@@ -471,17 +471,18 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
 	        				gatePassMain.getDoj(),gatePassMain.getDot(),
-	        gatePassMain.getUserId()
-	    };
+	        gatePassMain.getUserId(),
+	        gatePassMain.getOnboardingType()
+	        };
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId) {
+	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String type) {
 		log.info("Entering into getGatePassListingDetails dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		String query =getAllGatePassForContractor();
 		log.info("Query to getGatePassListingDetails "+query);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,deptId,unitId,userId,gatePassTypeId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,deptId,unitId,type,userId,gatePassTypeId,type);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -528,7 +529,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassListingForApprovers(String roleId,int workFlowType,String gatePassTypeId,String deptId,String unitId) {
+	public List<GatePassListingDto> getGatePassListingForApprovers(String roleId,int workFlowType,String gatePassTypeId,String deptId,String unitId,String type) {
 		log.info("Entering into getGatePassListingForApprovers dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		SqlRowSet rs =null;
@@ -662,6 +663,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setAddress(rs.getString("Address"));
 			dto.setDoj(rs.getString("DOJ"));
 			dto.setDot(rs.getString("DOT"));
+			dto.setOnboardingType(rs.getString("OnboardingType"));
 		}
 		log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 		return dto;

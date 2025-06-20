@@ -299,6 +299,8 @@ label {
 	
     <script>
  // Function to validate fields in the current active tab
+ 
+
     function validateCurrentTab() {
         // Example of validation logic; customize based on your tab's fields
         let isValid = true;
@@ -375,44 +377,13 @@ label {
         initializeDatePicker();
     });
        
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
-    const minDate = new Date(currentYear - 70, 0, 1);
-       $(".datetimepickerformat").datepicker({//dob
-       	dateFormat: 'yy-mm-dd',
-           changeMonth: true,
-           changeYear: true,
-           yearRange: `${currentYear - 70}:${currentYear - 18}`, // only show valid years
-           minDate: minDate,
-           maxDate: maxDate
-       });
-       $('.datetimepickerformat1').datepicker({//date of joiing
-           dateFormat: 'yy-mm-dd', // Set the date format
-           changeMonth: true,      // Allow changing month via dropdown
-           changeYear: true,       // Allow changing year via dropdown
-           yearRange: "0:+100", 
-           minDate: 0              // Prevent selecting future dates
-       });
-       const sixMonthsAgo = new Date();
-       sixMonthsAgo.setMonth(today.getMonth() - 6);
-
-       $(".datetimepickerformat2").datepicker({//health check date
-           dateFormat: 'yy-mm-dd',
-           changeMonth: true,
-           changeYear: true,
-           minDate: sixMonthsAgo,
-           maxDate: today,
-           yearRange: `${sixMonthsAgo.getFullYear()}:${today.getFullYear()}`
-       });
-       
-    
+   
   
   
 
     </script>
 </head>
-<body>
+<body >
         <!-- <div >
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass()">Save</button>
              <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Cancel</button>
@@ -423,13 +394,13 @@ label {
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTab('tab1')">Basic Data</button>
             <button data-target="tab2" onclick="showTab('tab2')">Employment Information</button>
-            <button data-target="tab3" onclick="showTab('tab3')">Other Information</button>
-            <button data-target="tab4" onclick="showTab('tab4')">Wages</button>
+            <!-- <button data-target="tab3" onclick="showTab('tab3')">Other Information</button>
+            <button data-target="tab4" onclick="showTab('tab4')">Wages</button> -->
             <button data-target="tab5" onclick="showTab('tab5')">Documents</button>
         </div>
          <div class="action-buttons" >
-            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','regular')">Save</button>
-            <button   type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="draftGatePass('${sessionScope.loginuser.userId}')">Draft</button>
+            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','quick')">Save</button>
+           <%--  <button   type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="draftGatePass('${sessionScope.loginuser.userId}')">Draft</button> --%>
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Cancel</button>
         </div> 
     </div>
@@ -527,10 +498,8 @@ label {
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
-               <td>
-               	<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30" autocomplete="off" 
-               	value="${not empty GatePassObj.dateOfBirth ? GatePassObj.dateOfBirth : ''}"
-               	>   
+               <td>    	<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30" autocomplete="off"  >
+					
 					  <label id="error-dateOfBirth" style="color: red;display: none;">Please enter a valid Date Of Birth</label>
 			</td>
                
