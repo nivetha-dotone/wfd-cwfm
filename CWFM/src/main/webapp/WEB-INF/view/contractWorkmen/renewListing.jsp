@@ -292,5 +292,12 @@
     
                         </form>
                          </div>
+                         <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+    <script>
+        setTimeout(function () {
+            searchRenew();
+        }, 10); // Delay ensures DOM is rendered after innerHTML
+    </script>
+    </c:if>
 </body>
 </html>

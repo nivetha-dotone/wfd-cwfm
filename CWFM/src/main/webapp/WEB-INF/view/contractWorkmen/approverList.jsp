@@ -319,7 +319,6 @@
                           <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
     <script>
         setTimeout(function () {
-        	console.log("entered here...");
             searchGatePassBasedOnPE('regular');
         }, 10); // Delay ensures DOM is rendered after innerHTML
     </script>
