@@ -97,7 +97,7 @@ function redirectToPEAdd() {
     xhr.open("GET", "/CWFM/principalEmployer/add", true);
     xhr.send();
 }
-function loadCommonList(path,heading) {
+/* function loadCommonList(path,heading) {
 	 updateHeading(heading);
 	    var url = contextPath + path;
     // Construct the URL using the contextPath variable SystemAdmin
@@ -106,11 +106,7 @@ function loadCommonList(path,heading) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-        	const today = new Date();
-        	const currentYear = today.getFullYear();
-        	const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
-        	const minDate = new Date(currentYear - 70, 0, 1);
-            document.getElementById("mainContent").innerHTML = this.responseText;
+        	 document.getElementById("mainContent").innerHTML = this.responseText;
             
             
             const successMessage = sessionStorage.getItem("successMessage");
@@ -138,6 +134,60 @@ function loadCommonList(path,heading) {
             }
               resetSessionTimer();
               //setDateRange();
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+} */
+
+function loadCommonList(path, heading) {
+    updateHeading(heading);
+    var url = contextPath + path;
+    console.log("Constructed URL:", url);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const mainContent = document.getElementById("mainContent");
+            mainContent.innerHTML = this.responseText;
+
+            // ✅ Run all inline scripts manually
+            const scripts = mainContent.querySelectorAll("script");
+            scripts.forEach(script => {
+                const newScript = document.createElement("script");
+                if (script.src) {
+                    newScript.src = script.src;
+                    newScript.async = false;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript);
+                // Optional: remove afterward to keep DOM clean
+                script.remove();
+            });
+
+            // ✅ Show messages if any
+            const successMessage = sessionStorage.getItem("successMessage");
+            const errorMessage = sessionStorage.getItem("errorMessage");
+            const messageDiv = document.getElementById("messageDiv");
+
+            if (messageDiv) {
+                if (successMessage) {
+                    messageDiv.innerHTML = successMessage;
+                    messageDiv.style.color = "green";
+                } else if (errorMessage) {
+                    messageDiv.innerHTML = errorMessage;
+                    messageDiv.style.color = "red";
+                }
+                sessionStorage.removeItem("successMessage");
+                sessionStorage.removeItem("errorMessage");
+
+                setTimeout(() => {
+                    messageDiv.style.display = "none";
+                }, 5000);
+            }
+
+            resetSessionTimer();
         }
     };
     xhttp.open("GET", url, true);

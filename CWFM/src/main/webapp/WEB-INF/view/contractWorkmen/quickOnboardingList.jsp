@@ -232,12 +232,7 @@
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
          <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
          <option value="">Select Principal Employer</option>
-    <%-- <c:forEach items="${principalEmployers}" var="pe">
-        <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.name}
-        </option>
-        <option value="${pe.id}">${pe.description}</option>
-    </c:forEach> --%>
+   
     
     <c:forEach items="${principalEmployers}" var="pe" varStatus="status">
         <option value="${pe.id}" 
@@ -253,15 +248,14 @@
          <select id="deptId" name="deptId" style="color:gray;padding:3px;">
          <option value="">Select Department</option>
     <c:forEach items="${Dept}" var="dept">
-       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.name}
-        </option> --%>
+      
         <option value="${dept.id}"  <c:if test="${Dept.size() == 1}">selected</c:if>>${dept.description}</option>
     </c:forEach>
 </select>
+
+
 <input type="hidden" id="deptId" name="deptId">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE('quick')">Search</button>
- <!-- Inline script placed immediately after dropdowns -->
 
   </div>
     <div>
@@ -315,5 +309,15 @@
     
                         </form>
                          </div>
+                         <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+    <script>
+        setTimeout(function () {
+        	console.log("entered here...");
+            searchGatePassBasedOnPE('quick');
+        }, 10); // Delay ensures DOM is rendered after innerHTML
+    </script>
+    
+</c:if>
+                         
 </body>
 </html>

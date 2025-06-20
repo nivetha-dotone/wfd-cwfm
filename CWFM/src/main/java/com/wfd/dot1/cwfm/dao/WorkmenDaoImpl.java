@@ -538,11 +538,11 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			query=this.getAllGatePassForSquential();
 			log.info("Query to getGatePassListingForApprovers "+query);
 			
-			 rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,roleId,gatePassTypeId);
+			 rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,roleId,gatePassTypeId,type);
 		}else {
 			query=this.getAllGatePassForParallel();
 			log.info("Query to getGatePassListingForApprovers "+query);
-			 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
+			 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId,type);
 		}
 		
 		while(rs.next()) {

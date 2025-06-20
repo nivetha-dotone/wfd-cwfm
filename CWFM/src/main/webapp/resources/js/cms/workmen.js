@@ -1,5 +1,5 @@
 var divIndex=0;
-let selectedDocumentTypes = new Set();
+//let selectedDocumentTypes = new Set();
 function searchWithPEContractorInWorkmenAadharList(contextPath) {
 	 var principalEmployerId = document.getElementById("principalEmployerId").value;
 	 var contractorId = document.getElementById("contractorId").value;
