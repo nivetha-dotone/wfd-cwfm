@@ -83,21 +83,32 @@ public class FileUploadDaoImpl implements FileUploadDao {
     }
     
     @Override
-    public void savePrincipalEmployer(PrincipalEmployer pe) {
-    	//java.sql.Date sqlDate = null;
-
-       // if (pe.getUpdatedTM() != null && !pe.getUpdatedTM().trim().equalsIgnoreCase("NULL") && !pe.getUpdatedTM().trim().isEmpty()) {
-       //     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-       //     LocalDate localDate = LocalDate.parse(pe.getUpdatedTM().trim(), formatter);
-       //     sqlDate = java.sql.Date.valueOf(localDate); // Convert LocalDate to java.sql.Date
-        //}
-		/*
-		 * DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		 * LocalDate date = LocalDate.parse(pe.getUpdatedTM(), formatter);
-		 */	
+    public Long savePrincipalEmployer(PrincipalEmployer p) {
+    	 KeyHolder keyHolder = new GeneratedKeyHolder();
+    	 
         String sql = "INSERT INTO CMSPRINCIPALEMPLOYER (ORGANIZATION,CODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAXCNTRWORKMEN,BOCWAPPLICABILITY,ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,WCNUMBER,FACTORYLICENCENUMBER) VALUES (?,?, ?, ?, ?,?,?, ?, ?, ?,?,?, ?, ?, ?)";
-        jdbcTemplate.update(sql,pe.getOrganization(),pe.getCode(), pe.getName(), pe.getAddress(), pe.getManagerName(),pe.getManagerAddrs(),pe.getBusinessType(),pe.getMaxWorkmen(),pe.getMaxCntrWorkmen(),pe.getBocwApplicability(),pe.getIsMwApplicability(),pe.getLicenseNumber(),pe.getPfCode(),pe.getWcNumber(),pe.getFactoryLicenseNumber());
-    }
+        jdbcTemplate.update(connection -> {
+	        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+	        ps.setString(1, p.getOrganization());
+	        ps.setString(2, p.getCode());
+	        ps.setString(3, p.getName());
+	        ps.setString(4, p.getAddress());
+	        ps.setString(5, p.getManagerName());
+	        ps.setString(6, p.getManagerAddrs());
+	        ps.setString(7, p.getBusinessType());
+	        ps.setInt(8, p.getMaxWorkmen());
+	        ps.setInt(9, p.getMaxCntrWorkmen());
+	        ps.setInt(10, p.getBocwApplicability());
+	        ps.setLong(11, p.getIsMwApplicability());
+	        ps.setString(12,p.getLicenseNumber());
+	        ps.setString(13, p.getPfCode());
+	        ps.setString(14, p.getWcNumber());
+	        ps.setString(15,p.getFactoryLicenseNumber());
+	        return ps;
+	    }, keyHolder);
+
+	    return keyHolder.getKey().longValue();  // This is your auto-generated unitId
+	}
 
 
 
@@ -127,43 +138,48 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    return keyHolder.getKey().longValue();  // This is your auto-generated contractorId
 	}
 
-	/*
-	 * public String getUnitIdByCode(String code) { String sql =
-	 * "SELECT UNITID FROM CMSPRINCIPALEMPLOYER WHERE CODE = ?"; return
-	 * jdbcTemplate.queryForObject(sql, new Object[]{code}, String.class); }
-	 */
+	@Override
+	public Long getUnitIdByPlantCodeAndOrg(String plantCode, String organization) {
+	    String sql = "select unitid from CMSPRINCIPALEMPLOYER where code = ? and ORGANIZATION =? ";
+	    try {
+	        return jdbcTemplate.queryForObject(sql, new Object[]{plantCode, organization}, Long.class);
+	    } catch (EmptyResultDataAccessException e) {
+	        return null;
+	    }
+	}
+
 	
 	@Override
-	public Long savePemm(CMSContrPemm pemm) {
+	public void savePemm(CMSContrPemm pemm) {
 	    String sql = "INSERT INTO CMSCONTRPEMM (CONTRACTORID, UNITID, MANAGERNM, LICENSENUM, VALIDFROMDT, VALIDTODT, COVERAGE, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PERIODSTARTDT, PERIODENDDT, PFCODE, PFNUM, PFAPPLYDT, ESIWC, ESIVALIDFROM, ESIVALIDTO) " +
-	                 "VALUES (?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	    jdbcTemplate.update(connection -> {
 	        PreparedStatement ps = connection.prepareStatement(sql);
 	        ps.setLong(1, pemm.getContractorId());
-	        ps.setString(2, pemm.getManagerNm());
-	        ps.setString(3, pemm.getLicenseNumber());
-	        ps.setDate(4, new java.sql.Date(pemm.getLicenseValidFrom().getTime()));
-	        ps.setDate(5, new java.sql.Date(pemm.getLicenseValidTo().getTime()));
-	        ps.setString(6, pemm.getCoverage());
-	        ps.setInt(7, pemm.getTotalStrength());
-	        ps.setInt(8, pemm.getMaxNoEmp());
-	        ps.setString(9, pemm.getNatureofWork());
-	        ps.setString(10, pemm.getLocationofWork());
-	        ps.setDate(11, new java.sql.Date(pemm.getPeriodStartDt().getTime()));
-	        ps.setDate(12, new java.sql.Date(pemm.getPeriodEndDt().getTime()));
-	        ps.setString(13, pemm.getPfCode());
-	        ps.setString(14, pemm.getPfNum());
-	        ps.setDate(15, new java.sql.Date(pemm.getPfApplyDt().getTime()));
-	        ps.setString(16, pemm.getEsiwc());
-	        ps.setDate(17, new java.sql.Date(pemm.getEsiValidFrom().getTime()));
-	        ps.setDate(18, new java.sql.Date(pemm.getEsiValidTo().getTime()));
+	        ps.setLong(2, pemm.getUnitId());
+	        ps.setString(3, pemm.getManagerNm());
+	        ps.setString(4, pemm.getLicenseNumber());
+	        ps.setDate(5, new java.sql.Date(pemm.getLicenseValidFrom().getTime()));
+	        ps.setDate(6, new java.sql.Date(pemm.getLicenseValidTo().getTime()));
+	        ps.setString(7, pemm.getCoverage());
+	        ps.setInt(8, pemm.getTotalStrength());
+	        ps.setInt(9, pemm.getMaxNoEmp());
+	        ps.setString(10, pemm.getNatureofWork());
+	        ps.setString(11, pemm.getLocationofWork());
+	        ps.setDate(12, new java.sql.Date(pemm.getPeriodStartDt().getTime()));
+	        ps.setDate(13, new java.sql.Date(pemm.getPeriodEndDt().getTime()));
+	        ps.setString(14, pemm.getPfCode());
+	        ps.setString(15, pemm.getPfNum());
+	        ps.setDate(16, new java.sql.Date(pemm.getPfApplyDt().getTime()));
+	        ps.setString(17, pemm.getEsiwc());
+	        ps.setDate(18, new java.sql.Date(pemm.getEsiValidFrom().getTime()));
+	        ps.setDate(19, new java.sql.Date(pemm.getEsiValidTo().getTime()));
 	        return ps;
 	    });
 
-	    return 1L; // explicitly returning 0 as unitId since it's hardcoded in the insert
+	   // explicitly returning 0 as unitId since it's hardcoded in the insert
 	}
-
 
 
 	
@@ -176,17 +192,26 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	        wc.getWcCode(),
 	        wc.getWcFromDtm(),
 	        wc.getWcToDtm(),
-	        wc.getWcTotal()	
-	       // wc.getLicenceType() // if this should be NULL, pass `null` here
+	        wc.getWcTotal()
+	        //wc.getLicenceType() // if this should be NULL, pass `null` here
 	    );
 	}
 
     @Override
     public void savecsc(CMSSubContractor csc) {
-        String sql = "insert into CMSSUBCONTRACTOR(CONTRACTOR_ID,WORKORDER_NO)values(?,?)";
-        jdbcTemplate.update(sql,csc.getContractorId(),csc.getWorkOrderNumber());
+        String sql = "insert into CMSSUBCONTRACTOR(CONTRACTOR_ID,WORKORDER_NO,UNITID)values(?,?,?)";
+        jdbcTemplate.update(sql,csc.getContractorId(),csc.getWorkOrderNumber(),csc.getUnitId());
     }
 
+    @Override
+	public Long getContractorIdbyUnitId(Long unitId ) {
+	    String sql = "select unitid from CMSPRINCIPALEMPLOYER where code = ? and ORGANIZATION =? ";
+	    try {
+	        return jdbcTemplate.queryForObject(sql, new Object[]{unitId}, Long.class);
+	    } catch (EmptyResultDataAccessException e) {
+	        return null;
+	    }
+	}
 
 
 	@Override
@@ -256,6 +281,59 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	        return null;
 	    }
 	}
+	
+	@Override
+    public String getCSVHeaders(String templateType) {
+        switch (templateType.toLowerCase()) {
+            case "generalmaster":
+                return "GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY\n";
 
+            case "principalemployer":
+                return "ORGANISATION,PLANTCODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAX CONTRACT WORKMEN,BOCWAPPLICABILITY,"
+                		+ "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State\n";
+
+            case "contractor":
+                return "CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,LICENCSE COVERAGE,"
+                		+ "TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
+                		+ "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,"
+                		+ "Mobile Number,ESI NUMBER,ESI VALID FROM,ESI VALID TO,Organisation,Main Contractor Code,Work Order Number\n";
+            case "workorder":
+            	return "Work Order Number,Item,Short Text,Delivery Complition,Item Changed ON,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
+            			+ "G/L Code,Plant code,Cost Center,Nature of Job,Rate,Quantity,PM Order No,WBS Element,Quantity Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Organisation\n";
+            default:
+                // fallback/default template
+                return "Template is Not Found to Download";
+        }
+    }
+	
+	@Override
+	public boolean isPrincipalEmployerCodeExists(String code) {
+	    String sql = "SELECT COUNT(*) FROM CMSPRINCIPALEMPLOYER WHERE code = ?";
+	    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, code);
+	    return count != null && count > 0;
+	}
+
+	@Override
+	public boolean isContractorCodeExists(String contractorCode) {
+		 String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR WHERE code = ?";
+		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, contractorCode);
+		    return count != null && count > 0;
+	}
+
+	 @Override
+	    public Long getStateIdByName(String stateName) {
+	        String sql = "select STATEID from CMSSTATE WHERE STATENM = ?";
+	        try {
+	            return jdbcTemplate.queryForObject(sql, Long.class, stateName);
+	        } catch (EmptyResultDataAccessException e) {
+	            return null; // State not found
+	        }
+	    }
+
+	 @Override
+	    public void savePEState(Long unitId, Long stateId) {
+	        String sql = "INSERT INTO CMSPESTATE (UNITID,STATEID ) VALUES (?, ?)";
+	        jdbcTemplate.update(sql, unitId, stateId);
+	    }
 }
 

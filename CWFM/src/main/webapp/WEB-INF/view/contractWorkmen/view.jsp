@@ -457,7 +457,7 @@ textarea {
             
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.lastName"/></label></th>
                 <td>
-                	<input id="lastName" name="lastName" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.lastName}">
+                	<input id="lastName" name="lastName" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.lastName}" readonly>
                 </td>
           
             </tr>
@@ -559,6 +559,16 @@ textarea {
                             <th><label class="custom-label"><spring:message code="label.healthCheckUpDate"/></label></th>
                             <td>
                             	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.healthCheckDate }" readonly>
+                            	</td>
+                        </tr>
+                        <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <td>
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.pfNumber }" readonly>
+                            </td>
+                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <td>
+                            	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
                             	</td>
                         </tr>
                         <tr>
@@ -705,6 +715,11 @@ textarea {
                 <td>
                     <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','police')">Download Police Verification Document</a>
                 </td>
+                <th><label class="custom-label"><spring:message code="label.policeVerificationDate"/></label></th>
+                        	<td>
+    				<input id="policeVerificationDate" name="policeVerificationDate" class="datetimepickerformat3" style="width: 100%; height: 20px;" type="text" 
+            value="${GatePassObj.policeVerificationDate }" readonly>
+			</td>
             		</tr>
             		<c:if test="${not empty GatePassObj.bankDocName}">
             		<tr>

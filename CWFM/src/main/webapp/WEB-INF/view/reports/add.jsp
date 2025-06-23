@@ -23,13 +23,13 @@
     </div>
     <f:form id="addReportForm" action="/CWFM/reportSetup/addReport" method="post">
         <label for="reportName">Report Name:</label>
-        <input type="text" id="reportName" name="reportName">
+        <input type="text" id="reportName" name="reportName" autocomplete="off">
         <br>
         <label for="rdlName">RDL Name:</label>
-        <input type="text" id="rdlName" name="rdlName">
+        <input type="text" id="rdlName" name="rdlName" autocomplete="off">
         <br>
         <label for="reportDescription">Report Description:</label>
-        <input type="text" id="reportDescription" name="reportDescription">
+        <input type="text" id="reportDescription" name="reportDescription" autocomplete="off">
         <br>
         <label for="selectedGmTypes">Select GM Type:</label><br>
         <select id="availableOptions" multiple style="width: 200px;">

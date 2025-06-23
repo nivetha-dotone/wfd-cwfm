@@ -282,7 +282,7 @@ background-color: #DDF3FF; /* Light green for the table header */
         <select id="templateType" name="templateType" onchange="fetchTemplateOptions()" style="width: 100%; height: 45px;color:gray;" >
                 <option value=""style="color:gray;">Template</option>
                 <option value="generalMaster"style="color:gray;">Data-General Master</option>
-               <option value="minimumWage"style="color:gray;">Data-Minimum Wage</option>
+              <!--  <option value="minimumWage"style="color:gray;">Data-Minimum Wage</option> -->
                 <option value="principalEmployer"style="color:gray;">Data-Principal Employer</option>
                 <option value="contractor"style="color:gray;">Data-Contractor</option>
                  <option value="workorder"style="color:gray;">Data-Workorder</option> 

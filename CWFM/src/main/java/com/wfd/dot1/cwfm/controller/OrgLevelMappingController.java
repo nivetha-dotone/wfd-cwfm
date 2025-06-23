@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.wfd.dot1.cwfm.dao.OrgLevelDao;
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
 import com.wfd.dot1.cwfm.service.MasterUserService;
@@ -279,6 +281,32 @@ public class OrgLevelMappingController {
               
     }
   
+    @GetMapping("/orglevelmappingview")
+	public String viewUserDetails(@RequestParam("id") Long id, Model model) {
+     	
+    	 OrgLevelMapping basicInfo = orgLevelMappingService.findBasicInfo(id);
+         System.out.println("Basic Info: " + basicInfo);
+         List<OrgLevelMapping> orgLevelMapping = orgLevelMappingService.getOrgLevelMappingById(id);
+         model.addAttribute("orgLevelMapping", orgLevelMapping);
 
+         // Fetch all active Org Levels
+         List<OrgLevelDefDTO> orgLevels = orgLevelService.getActiveOrgLevels();
+
+         for (OrgLevelDefDTO orgLevel : orgLevels) {
+             // Fetch Available Entries
+             List<OrgLevelEntryDTO> availableEntries = orgLevelMappingService.getAvailableEntries(id,orgLevel.getOrgLevelDefId());
+             orgLevel.setAvailableEntries(availableEntries);
+
+             // Fetch Selected Entries based on OrgLevelMapping ID and OrgLevelDefId
+             List<OrgLevelEntryDTO> selectedEntries = orgLevelMappingService.getSelectedEntries(id, orgLevel.getOrgLevelDefId());
+             orgLevel.setSelectedEntries(selectedEntries);
+         }
+
+         model.addAttribute("orgLevels", orgLevels);
+         model.addAttribute("basicInfo", basicInfo);
+         
+		return "orgLevelMapping/view"; // Return the JSP file name
+	}
+    
 }
 

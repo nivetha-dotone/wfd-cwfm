@@ -35,7 +35,7 @@
          <button type="button" onclick="woListExportToCSV()" class="btn btn-sm btn-success">Export</button>
         </div>
         <form id="searchForm">
-            <input type="text" id="searchInput" name="searchQuery" placeholder="Search...">
+            <input type="text" id="searchInput" name="searchQuery" placeholder="Search..." autocomplete="off">
              <button type="button" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')" class="btn btn-sm btn-success">Search</button> 
         </form>
       

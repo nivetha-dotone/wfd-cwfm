@@ -23,10 +23,10 @@
     <c:if test="${not empty reportParameters}">
         <form id="addReportForm" action="/CWFM/reportSetup/execute" method="post">
             <label for="reportName">Report Name:</label>
-            <input type="text" id="reportName" name="reportName"  value="${reportParameters[0][0]}">>
+            <input type="text" id="reportName" name="reportName"  autocomplete="off" value="${reportParameters[0][0]}">>
             <br>
             <label for="reportDescription">Report Description:</label>
-            <input type="text" id="reportDescription" name="reportDescription" value="${reportParameters[0][1]}">
+            <input type="text" id="reportDescription" name="reportDescription" autocomplete="off" value="${reportParameters[0][1]}">
             <br>
             <%-- Assuming the parameter 1 and parameter 2 values are the next two elements in the list --%>
            <label for="parameter1">Parameter 1:</label><br>

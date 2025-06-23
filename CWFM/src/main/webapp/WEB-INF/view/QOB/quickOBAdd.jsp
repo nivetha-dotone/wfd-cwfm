@@ -61,13 +61,13 @@
                             <label for="transactionId" class="form-label">Transaction Id</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="transactionId" name="transactionId" required>
+                            <input type="text" class="form-control form-control-rounded" id="transactionId" name="transactionId" required autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="aadhaarNumber" class="form-label">Aadhaar Number</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="aadhaarNumber" name="aadhaarNumber" required>
+                            <input type="text" class="form-control form-control-rounded" id="aadhaarNumber" name="aadhaarNumber" required autocomplete="off">
                         </div>
                     </div>
 
@@ -77,13 +77,13 @@
                             <label for="firstName" class="form-label">First Name</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="firstName" name="firstName" required>
+                            <input type="text" class="form-control form-control-rounded" id="firstName" name="firstName" required autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="lastName" class="form-label">Last Name</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="lastName" name="lastName" required>
+                            <input type="text" class="form-control form-control-rounded" id="lastName" name="lastName" required autocomplete="off">
                         </div>
                     </div>
 
@@ -93,7 +93,7 @@
                             <label for="dob" class="form-label">Date of Birth</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="dob" name="dob" required>
+                            <input type="text" class="form-control form-control-rounded" id="dob" name="dob" required autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="gender" class="form-label">Gender</label>
@@ -114,13 +114,13 @@
                             <label for="fatherHusbandName" class="form-label">Father/Husband Name</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="fatherHusbandName" name="fatherHusbandName" required>
+                            <input type="text" class="form-control form-control-rounded" id="fatherHusbandName" name="fatherHusbandName" required autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="mobileNumber" class="form-label">Mobile Number</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="mobileNumber" name="mobileNumber" required>
+                            <input type="text" class="form-control form-control-rounded" id="mobileNumber" name="mobileNumber" required autocomplete="off">
                         </div>
                     </div>
 
@@ -130,7 +130,7 @@
                             <label for="contractorEmployeeCode" class="form-label">Contractor Employee Code</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="contractorEmployeeCode" name="contractorEmployeeCode" required>
+                            <input type="text" class="form-control form-control-rounded" id="contractorEmployeeCode" name="contractorEmployeeCode" required autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="maritalStatus" class="form-label">Marital Status</label>
@@ -157,7 +157,7 @@
                             <label for="dateOfJoining" class="form-label">Date of Joining</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="dateOfJoining" name="dateOfJoining" required>
+                            <input type="text" class="form-control form-control-rounded" id="dateOfJoining" name="dateOfJoining" required autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="department" class="form-label">Department</label>
@@ -305,13 +305,13 @@
                             <label for="pfNumber" class="form-label">PF Number</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="pfNumber" name="pfNumber">
+                            <input type="text" class="form-control form-control-rounded" id="pfNumber" name="pfNumber" autocomplete="off">
                         </div>
                         <div class="col-md-2">
                             <label for="uanNumber" class="form-label">UAN Number</label>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-rounded" id="uanNumber" name="uanNumber">
+                            <input type="text" class="form-control form-control-rounded" id="uanNumber" name="uanNumber" autocomplete="off">
                         </div>
                     </div>
 

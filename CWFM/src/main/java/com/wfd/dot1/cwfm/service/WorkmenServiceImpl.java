@@ -38,6 +38,7 @@ import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
+import com.wfd.dot1.cwfm.pojo.WageDetailsDto;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
@@ -595,6 +596,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	@Override
 	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId) {
 		// TODO Auto-generated method stub
@@ -606,4 +608,14 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.isAadharExists(aadharNumber,transactionId);
 	}
 
+	/*
+	 * @Override public boolean checkAadharDuplicate(String aadhaarNumber) { return
+	 * workmenDao.isAadharExists(aadhaarNumber); }
+	 */
+	
+	@Override
+	public List<WageDetailsDto> getWageMasterExportData(String unitId) {
+		// TODO Auto-generated method stub
+		return workmenDao.getWageMasterExportData(unitId);
+	}
 }

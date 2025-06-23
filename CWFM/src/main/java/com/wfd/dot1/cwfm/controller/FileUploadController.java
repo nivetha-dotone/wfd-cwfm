@@ -6,6 +6,7 @@ import com.wfd.dot1.cwfm.service.FileUploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -248,7 +249,7 @@ public class FileUploadController {
         try {
             Map<String, Object> result = fileUploadService.processTemplateFile(file, templateType);
             Map<String, Object> data = (Map<String, Object>) result.get("data");
-
+           System.out.println(data);
             List<Map<String, Object>> successData = (List<Map<String, Object>>) data.get("successData");
             List<Map<String, Object>> errorData = (List<Map<String, Object>>) data.get("errorData");
 
@@ -282,7 +283,15 @@ public class FileUploadController {
         }
     }
 
+    @GetMapping("/downloadTemplate")
+    public void downloadTemplate(@RequestParam("templateType") String templateType,
+                                 HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=" + templateType + "_template.csv");
 
+        String csvContent = fileUploadService.getTemplateCSV(templateType);
+        response.getWriter().write(csvContent);
+    }
     }
 
     

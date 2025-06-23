@@ -132,19 +132,19 @@ th label {
 
 </div>
 
-<form id="resetPasswordForm">
+<form id="resetPasswordForm" autocomplete="off">
     <table class="ControlLayout">
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
             <td>
-                <input type="text" id="resetUserAccount" name="userAccount" placeholder="Enter User Account" style="height: 20px;" size="30" maxlength="30" />
+                <input type="text" id="resetUserAccount" name="userAccount" placeholder="Enter User Account" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
             </td>
         </tr>
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>New Password:</label></th>
            <!--  <td><input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" /></td> -->
          <td>
-                <input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" onkeyup="validateResetPassword()" />
+                <input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" onkeyup="validateResetPassword()" autocomplete="off"/>
                 <span id="resetPasswordMessage" style="color: red;"></span> 
                 
             </td>

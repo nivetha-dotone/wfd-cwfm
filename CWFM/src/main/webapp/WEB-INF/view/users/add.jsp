@@ -140,6 +140,9 @@ table.ControlLayout td {
     background-color: #ffcccc; /* Light red background */
 }
     </style>
+
+
+    
 </head>
 
 <body>
@@ -151,41 +154,41 @@ table.ControlLayout td {
  
 </div>
 <div id="tab1" class="tab-content active">
-   <form id="userFormID">
+   <form id="userFormID" >
     <table class="ControlLayout">
         <!-- Form fields -->
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>First Name:</label></th>
-            <td><input type="text" name="firstName" style="height: 20px;" size="30" maxlength="30" />
+            <td><input type="text" name="firstName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off"/>
              <span id="firstNameError" class="error-message"></span>
              </td>
            
             <th><label class="custom-label"><span class="required-field">*</span>Last Name:</label></th>
-            <td><input type="text" name="lastName" style="height: 20px;" size="30" maxlength="30" />
+            <td><input type="text" name="lastName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" />
             <span id="lastNameError" class="error-message"></span>
             </td>
             
         </tr>
         <tr>
              <th><label class="custom-label"><span class="required-field">*</span>Email:</label></th>
-        <td style="color: black;"><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" />
+        <td style="color: black;"><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
         <span id="emailIdError" class="error-message"></span>
         </td>
         
             <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
-            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" />
+            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
             <span id="contactNumberError" class="error-message"></span>
             </td>
              
         </tr>
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>Password:</label></th>
-            <td style="color: black;"><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" autocomplete="new-password" />
+            <td style="color: black;"><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" autocomplete="new-password" autocomplete="off"/>
             <span id="passwordError" class="error-message"></span>
             </td>
             
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
-            <td><input type="text" name="userAccount" style="height: 20px;" size="30" maxlength="30" autocomplete="new-userAccount"/>
+            <td><input type="text" name="userAccount" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="new-userAccount"/>
             <span id="userAccountError" class="error-message"></span>
             </td>
         

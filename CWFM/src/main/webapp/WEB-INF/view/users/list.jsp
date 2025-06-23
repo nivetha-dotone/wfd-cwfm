@@ -209,7 +209,7 @@ console.log(userAccount);
 <body>
 <div class="page-header">
     <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="userAccount" name="searchQuery" placeholder="Search...">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="userAccount" name="searchQuery"  autocomplete="off" placeholder="Search...">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchUserWithUserAccount()">Search</button>
     </form>
     <div>
@@ -263,9 +263,9 @@ console.log(userAccount);
                   <td class="checkbox-cell">
                         <input type="checkbox" name="selectedUserIds" value="${user.userId}">
                     </td>
-                    <td id="userAccount">${user.userAccount}</td>
+                    <td id="userAccount" style="text-transform: capitalize;">${user.userAccount}</td>
                     <td>${user.emailId}</td>
-                    <td>${user.firstName} ${user.lastName}</td>
+                    <td style="text-transform: capitalize;">${user.firstName} ${user.lastName}</td>
                     <td>${user.contactNumber}</td>
                     <td>${user.status}</td>
                     <%-- <td>

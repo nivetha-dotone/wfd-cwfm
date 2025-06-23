@@ -131,20 +131,20 @@ th label {
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="changePassword()">Save</button>
 </div>
 
-<form id="userFormID">
+<form id="userFormID" autocomplete="off">
     <table class="ControlLayout">
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
-            <td><input type="text" name="userAccount" id="userAccount" value="${userAccount}" readonly style="background-color: #e9ecef; height: 20px;" size="30" maxlength="30" /></td>
+            <td><input type="text" name="userAccount" id="userAccount" value="${userAccount}" readonly style="background-color: #e9ecef; height: 20px;" size="30" maxlength="30" autocomplete="off"/></td>
         </tr>
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>Old Password:</label></th>
-            <td><input type="password" name="oldPassword" id="oldPassword" style="height: 20px;" size="30" maxlength="30" autocomplete="new-password" /></td>
+            <td><input type="password" name="oldPassword" id="oldPassword" style="height: 20px;" size="30" maxlength="30" autocomplete="new-password" autocomplete="off"/></td>
 
             <th><label class="custom-label"><span class="required-field">*</span>New Password:</label></th>
            <!--  <td><input type="password" name="newPassword" style="height: 20px;" size="30" maxlength="30" /></td> -->
              <td>
-                <input type="password" id="newPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" onkeyup="validatePassword()" />
+                <input type="password" id="newPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" onkeyup="validatePassword()" autocomplete="off"/>
                 <span id="passwordMessage" style="color: red;"></span>
             </td>
         </tr>

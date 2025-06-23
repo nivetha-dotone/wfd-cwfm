@@ -20,11 +20,11 @@ public interface FileUploadDao {
 
     void saveGeneralMaster(CmsGeneralMaster gm);
     void saveMinimumWage(MimumWageMasterTemplate mw);
-    void savePrincipalEmployer(PrincipalEmployer pe);
+    Long savePrincipalEmployer(PrincipalEmployer p);
     Long insertIntoWageTable(MinimumWageDTO dto);
     void insertIntoMinimumWageTable(LocalDate fromDate, Long wageId);
     Long saveContractor(Contractor contractor);
-    Long savePemm(CMSContrPemm pemm);
+    void savePemm(CMSContrPemm pemm);
    // int savepe(String code);
 	void savewc(CmsContractorWC wc);
 	void savecsc(CMSSubContractor csc);
@@ -35,5 +35,20 @@ public interface FileUploadDao {
 
 	void saveWorkorderTyp(ContractorWorkorderTYP wotyp);
 
-	//Long getWorkorderIdBySapNumber(String sapWorkorderNumber);
+	Long getUnitIdByPlantCodeAndOrg(String plantCode, String organization);
+
+	Long getContractorIdbyUnitId(Long unitId);
+
+	//Long getWorkorderIdBySapNumber(String sapWorkorderNumber);	
+	
+	String getCSVHeaders(String templateType);
+	
+	boolean isPrincipalEmployerCodeExists(String code);
+	
+	boolean isContractorCodeExists(String contractorCode);
+	
+	Long getStateIdByName(String stateName);
+	
+	void savePEState(Long unitId, Long stateId);
+
 }

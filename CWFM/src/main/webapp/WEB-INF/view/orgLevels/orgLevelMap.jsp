@@ -150,10 +150,10 @@
     <input type="hidden" name="orgLevelDefId" id="orgLevelDefId" value="${param.orgLevelDefId}">
 
     <label for="entryName">Entry Name:</label>
-    <input type="text" name="entryName" id="entryName" required>
+    <input type="text" name="entryName" id="entryName" style="text-transform: capitalize;" required autocomplete="off">
 
     <label for="description">Description:</label>
-    <input type="text" name="description" id="description">
+    <input type="text" name="description" id="description" style="text-transform: capitalize;" autocomplete="off">
 
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgEntries()">Save</button>
 </div>

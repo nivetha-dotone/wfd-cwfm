@@ -234,7 +234,7 @@
 <div class="page-header">
   <label for="gmTypeName"style=" color: darkcyan;">GM Type Name:</label>
   
-        <input type="text" id="gmTypeName" name="gmTypeName" required  oninput="convertToUppercase(this)">
+        <input type="text" id="gmTypeName" name="gmTypeName" required  oninput="convertToUppercase(this)" autocomplete="off"> 
       <%--  <c:if test="${userRights[0].addRights == 0}"> --%>
         <button type="submit"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGMTYPE()">Save</button>
    <%-- </c:if>

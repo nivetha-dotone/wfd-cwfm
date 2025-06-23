@@ -21,6 +21,7 @@ import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
+import com.wfd.dot1.cwfm.pojo.WageDetailsDto;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.ContractorService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
@@ -240,7 +241,30 @@ public class ExportController {
                     rows.add(row);
                 }
                 break;   
-                
+            case "Wage":
+                List<WageDetailsDto> wage = workmenService.getWageMasterExportData(unitId);
+                columns = Arrays.asList("PE Code", "Contractor Code", "Workmen ID", "Aadhar Number", "Basic", "DA","HRA","Conveyance Allowance","Special Allowance","Skill Allowance","Washing Allowance","Uniform Allowance","Hardship Allowance","Effective Date");
+                for (WageDetailsDto w : wage) {
+                    Map<String, String> row = new LinkedHashMap<>();
+                    row.put("PE Code", w.getPeId() );
+                    row.put("Contractor Code", w.getContractorCode());
+                    row.put("Workmen ID", w.getWorkmenId());
+                    row.put("Aadhar Number", w.getAadhar());
+                    row.put("Basic", w.getBasic());
+                    row.put("DA", w.getDa());
+                    row.put("HRA", w.getHra());
+                    row.put("Conveyance Allowance", w.getConveyenceAllow());
+                    row.put("Special Allowance", w.getSpecialAllow());
+                    row.put("Skill Allowance", w.getSkillAllow());
+                    row.put("Washing Allowance", w.getWashingAllow());                    
+                    row.put("Uniform Allowance", w.getUniformAllow());
+                    row.put("Hardship Allowance", w.getHardshipAllow());
+                    row.put("Effective Date", w.getEffectiveDate());
+                    
+                    rows.add(row);
+                }
+                break;
+
         }
 
         response.put("columns", columns);

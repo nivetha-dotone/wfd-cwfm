@@ -465,6 +465,9 @@ public class GatePassMain {
 	public void setTransactionId(String transactionId) {
 		this.transactionId = transactionId;
 	}
+	private String pfNumber;
+	
+	private String esicNumber;
 	
 	private String onboardingType;
 	public String getOnboardingType() {
@@ -474,4 +477,28 @@ public class GatePassMain {
 		this.onboardingType = onboardingType;
 	}
 	
-}
+	public String getEsicNumber() {
+		return esicNumber;
+	}
+	public void setEsicNumber(String esicNumber) {
+		this.esicNumber = esicNumber;
+	}
+	public String getPfNumber() {
+		return pfNumber;
+	}
+	public void setPfNumber(String pfNumber) {
+		this.pfNumber = pfNumber;
+	}
+	public String policeVerificationDate;
+	
+	public String getPoliceVerificationDate() {
+		return policeVerificationDate;
+	}
+	public void setPoliceVerificationDate(String policeVerificationDate) {
+		this.policeVerificationDate = policeVerificationDate;
+	}
+	
+	}
+	
+	
+

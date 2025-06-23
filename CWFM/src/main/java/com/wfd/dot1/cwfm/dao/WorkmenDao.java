@@ -18,6 +18,7 @@ import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
+import com.wfd.dot1.cwfm.pojo.WageDetailsDto;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
 public interface WorkmenDao {
@@ -122,7 +123,10 @@ public interface WorkmenDao {
 
 	public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId);
 
+
 	public boolean isAadharExists(String aadharNumber,String transactionId);
 
 
+
+	public List<WageDetailsDto> getWageMasterExportData(String unitId);
 }

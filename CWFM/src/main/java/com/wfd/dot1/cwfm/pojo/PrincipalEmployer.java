@@ -54,7 +54,15 @@ public class PrincipalEmployer {
 	
 	private String updatedTM;
 	
-	
+	private String stateNM;
+
+	public String getStateNM() {
+		return stateNM;
+	}
+
+	public void setStateNM(String stateNM) {
+		this.stateNM = stateNM;
+	}
 
 	public PrincipalEmployer( String organization, String code,String name, String address, String managerName, String managerAddrs, String businessType, int maxWorkmen,
 			int maxCntrWorkmen, int bocwApplicability, int isMwApplicability,String licenseNumber, String pfCode,
@@ -75,7 +83,7 @@ public class PrincipalEmployer {
 		this.licenseNumber=licenseNumber;
 		this.wcNumber=wcNumber;
 		this.factoryLicenseNumber=factoryLicenseNumber;
-		
+		//this.stateNM=stateNM;
 		
 		
 	}

@@ -34,11 +34,13 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
+import com.wfd.dot1.cwfm.pojo.WageDetailsDto;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.queries.WorkmenQueryBank;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
@@ -146,6 +148,10 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 
 	 public String getAllGatePassActionForParallel() {
 		    return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_ACTION_FOR_PARALLEL_APPROVER");
+		}
+	 
+	 public String getWageMasterExportData() {
+		    return QueryFileWatcher.getQuery("GET_WAGE_DETAILS_EXPORT_DATA");
 		}
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
@@ -446,6 +452,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        gatePassMain.getAccessArea(),
 	        gatePassMain.getUanNumber(),
 	        gatePassMain.getHealthCheckDate(),
+	        gatePassMain.getPfNumber(),
+	        gatePassMain.getEsicNumber(),
 	        gatePassMain.getBloodGroup(),
 	        gatePassMain.getAccommodation(),
 	        gatePassMain.getAcademic(),
@@ -470,10 +478,11 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        gatePassMain.getWorkFlowType(),
 	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
-	        				gatePassMain.getDoj(),gatePassMain.getDot(),
+	        				gatePassMain.getDoj(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
 	        gatePassMain.getUserId(),
 	        gatePassMain.getOnboardingType()
 	        };
+
 	}
 
 	@Override
@@ -630,6 +639,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setAccessArea(rs.getString("AccessAreaId"));
 			dto.setUanNumber(rs.getString("UanNumber"));
 			dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+			dto.setPfNumber(rs.getString("pfnumber"));
+			dto.setEsicNumber(rs.getString("esicNumber"));
 			dto.setBloodGroup(rs.getString("BloodGroupId"));
 			dto.setAccommodation(rs.getString("Accommodation"));
 			dto.setAcademic(rs.getString("AcademicId"));
@@ -662,6 +673,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setComments(rs.getString("Comments"));
 			dto.setAddress(rs.getString("Address"));
 			dto.setDoj(rs.getString("DOJ"));
+			dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 			dto.setDot(rs.getString("DOT"));
 			dto.setOnboardingType(rs.getString("OnboardingType"));
 		}
@@ -1253,6 +1265,8 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getAccessArea()!=null? gatePassMain.getAccessArea():" ",
 	        gatePassMain.getUanNumber()!=null?gatePassMain.getUanNumber():" ",
 	        gatePassMain.getHealthCheckDate()!=null?gatePassMain.getHealthCheckDate():" ",
+	       gatePassMain.getPfNumber()!=null?gatePassMain.getPfNumber():" ",
+	       gatePassMain.getEsicNumber()!=null?gatePassMain.getEsicNumber():" ",
 	        gatePassMain.getBloodGroup()!=null?gatePassMain.getBloodGroup():" ",
 	        gatePassMain.getAccommodation()!=null? gatePassMain.getAccommodation():" ",
 	        gatePassMain.getAcademic()!=null?gatePassMain.getAcademic():" ",
@@ -1285,8 +1299,10 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
 	        gatePassMain.getDoj()!=null?gatePassMain.getDoj():" ",
+	        gatePassMain.getPoliceVerificationDate()!=null?gatePassMain.getPoliceVerificationDate():" ",
 	        gatePassMain.getDot()!=null?gatePassMain.getDot():" ",
-	        gatePassMain.getUserId()
+	        gatePassMain.getUserId(),
+	        "regular"
 	    };
 	}
 public String getContractWorkmenDraftDetails() {
@@ -1330,6 +1346,8 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 		dto.setAccessArea(rs.getString("AccessAreaId"));
 		dto.setUanNumber(rs.getString("UanNumber"));
 		dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+		dto.setPfNumber(rs.getString("pfnumber"));
+		dto.setEsicNumber(rs.getString("esicNumber"));
 		dto.setBloodGroup(rs.getString("BloodGroupId"));
 		dto.setAccommodation(rs.getString("Accommodation"));
 		dto.setAcademic(rs.getString("AcademicId"));
@@ -1440,6 +1458,7 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 		dto.setComments(rs.getString("Comments"));
 		dto.setAddress(rs.getString("Address"));
 		dto.setDoj(rs.getString("DOJ"));
+		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDraftDetails dao method "+transactionId);
@@ -1475,6 +1494,8 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
         gatePassMain.getAccessArea(),
         gatePassMain.getUanNumber(),
         gatePassMain.getHealthCheckDate(),
+        gatePassMain.getPfNumber(),
+        gatePassMain.getEsicNumber(),
         gatePassMain.getBloodGroup(),
         gatePassMain.getAccommodation(),
         gatePassMain.getAcademic(),
@@ -1499,7 +1520,7 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
        0,
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
-        				gatePassMain.getDoj(),gatePassMain.getDot(),
+        				gatePassMain.getDoj(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
         gatePassMain.getUserId(),transId
     };
 }
@@ -1561,6 +1582,8 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setAccessArea(rs.getString("AccessAreaId"));
 		dto.setUanNumber(rs.getString("UanNumber"));
 		dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+		dto.setPfNumber(rs.getString("pfnumber"));
+		dto.setEsicNumber(rs.getString("esicNumber"));
 		dto.setBloodGroup(rs.getString("BloodGroupId"));
 		dto.setAccommodation(rs.getString("Accommodation"));
 		dto.setAcademic(rs.getString("AcademicId"));
@@ -1593,6 +1616,7 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setComments(rs.getString("Comments"));
 		dto.setAddress(rs.getString("Address"));
 		dto.setDoj(rs.getString("DOJ"));
+		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
@@ -1720,6 +1744,8 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setAccessArea(rs.getString("AccessAreaId"));
 		dto.setUanNumber(rs.getString("UanNumber"));
 		dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+		dto.setPfNumber(rs.getString("pfnumber"));
+		dto.setEsicNumber(rs.getString("esicNumber"));
 		dto.setBloodGroup(rs.getString("BloodGroupId"));
 		dto.setAccommodation(rs.getString("Accommodation"));
 		dto.setAcademic(rs.getString("AcademicId"));
@@ -1752,6 +1778,7 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setComments(rs.getString("Comments"));
 		dto.setAddress(rs.getString("Address"));
 		dto.setDoj(rs.getString("DOJ"));
+		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
@@ -1909,6 +1936,7 @@ public int getWorkFlowTYpeNew(String principalEmployer,String gatePassAction) {
 }
 
 
+
 public String getContractWorkmenExportQuery() {
 	return QueryFileWatcher.getQuery("WORKMEN_EXPORT");
 }
@@ -2020,6 +2048,8 @@ public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId
 }
 
 
+
+
 public String getAadharExistsQuery() {
 	return QueryFileWatcher.getQuery("AADHAR_EXISTS");
 }
@@ -2031,6 +2061,34 @@ public boolean isAadharExists(String aadharNumber,String transactionId) {
     return count != null && count > 0;
 }
 
+
+
+@Override
+public List<WageDetailsDto> getWageMasterExportData(String unitId) {
+	List<WageDetailsDto> peList= new ArrayList<WageDetailsDto>();
+	String query = getWageMasterExportData();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+	while(rs.next()) {
+		WageDetailsDto pe = new WageDetailsDto();
+		pe.setPeId(rs.getString("PECODE"));
+		pe.setContractorCode(rs.getString("CONTRACTORCODE"));
+		pe.setWorkmenId(rs.getString("WORKMENID"));
+		pe.setAadhar(rs.getString("AADHARNUMBER"));
+		pe.setBasic(rs.getString("BASIC"));
+		pe.setDa(rs.getString("DA"));
+		pe.setHra(rs.getString("HRA"));
+		pe.setConveyenceAllow(rs.getString("CONVEYANCEALLOWANCE"));
+		pe.setSpecialAllow(rs.getString("SPECIALALLOWANCE"));
+		pe.setSkillAllow(rs.getString("SKILLALLOWANCE"));
+		pe.setWashingAllow(rs.getString("WASHINGALLOWANCE"));
+		pe.setUniformAllow(rs.getString("UNIFORMALLOWANCE"));
+		pe.setHardshipAllow(rs.getString("HARDSHIPALLOWANCE"));
+		pe.setEffectiveDate(rs.getString("EFFECTIVEDATE"));
+		
+		peList.add(pe);
+	}
+	return peList;
+}
 
 
 }

@@ -251,7 +251,7 @@
 						id="contractorCheckbox" onchange="toggleSelectAllAadharWorkmen()">
 					</td>
 					<!-- Add more table headers for each column -->
-					<th class="header-text" onclick="sortTable(1)"><spring:message code="label.contractorregId"/><span
+					<th class="header-text" onclick="sortTable(1)"><spring:message code="label.contractorRegistrationId"/><span
 						id="sortTransactionid" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<%-- <th class="header-text" onclick="sortTable(2)"><spring:message code="label.unitCode"/><span
 						id="sortUnitcode" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>

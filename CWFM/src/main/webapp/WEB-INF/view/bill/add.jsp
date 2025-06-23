@@ -426,7 +426,7 @@ label {
                            
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
-                <td><input type="text" id="unitCodeId" name="unitCode"  style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+                <td><input type="text" id="unitCodeId" name="unitCode"  style="height: 20px;" size="30" maxlength="30" readonly   /></td>
              </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
@@ -451,12 +451,12 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billStartDate"/></label></th>
                 <td>
-                <input id="billStartDateId" name="billStartDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                <input id="billStartDateId" name="billStartDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off" >
                 	<label id="error-billStartDate" style="color: red;display: none;">Bill start date is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billEndDate"/></label></th>
                 <td>
-                <input id="billEndDateId" name="billEndDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                <input id="billEndDateId" name="billEndDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off" >
                 	<label id="error-billEndDate" style="color: red;display: none;">Bill end date is required</label>
                
                 </td>
@@ -600,7 +600,7 @@ label {
 		<tbody>
 		<tr>
 				<th  style="width: 100px;height:20px;"><label class="custom-label"> Action Plan</label></th>
-				 <td><input type="text" id="actionPlanId" name="actionPlan" value="" style="height: 20px;" size="30" maxlength="30"    /></td>
+				 <td><input type="text" id="actionPlanId" name="actionPlan" value="" style="height: 20px;" size="30" maxlength="30"  autocomplete="off"   /></td>
  
 		</tr>
 			
@@ -610,7 +610,7 @@ label {
 			<td><input type="text" id="preCommentsId" name="preComments" value=""  style="width: 265px;height: 150px;"  readonly  /></td>
  	
 				<th><label class="custom-label"><spring:message code="label.comment"/></label></th>
-				<td><input type="text" id="commentsId" value=" "  name="comments" style="width: 265px;height: 150px;" /></td>
+				<td><input type="text" id="commentsId" value=" "  name="comments" style="width: 265px;height: 150px;" autocomplete="off" /></td>
 				</tr>
 		</tbody>
  </table> 

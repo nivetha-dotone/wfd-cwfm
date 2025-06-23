@@ -134,21 +134,21 @@ th label {
        <input type="hidden" name="userId" id="userId" value="${user.userId}" />
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>First Name:</label></th>
-            <td><input type="text" name="firstName" style="height: 20px;" size="30" maxlength="30" value="${user.firstName}" /></td>
+            <td><input type="text" name="firstName" style="height: 20px;" size="30" maxlength="30" value="${user.firstName}" autocomplete="off"/></td>
             <th><label class="custom-label"><span class="required-field">*</span>Last Name:</label></th>
-            <td><input type="text" name="lastName" style="height: 20px;" size="30" maxlength="30" value="${user.lastName}" /></td>
+            <td><input type="text" name="lastName" style="height: 20px;" size="30" maxlength="30" value="${user.lastName}" autocomplete="off"/></td>
         </tr>
         <tr>
              <th><label class="custom-label"><span class="required-field">*</span>Email:</label></th>
-        <td><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" value="${user.emailId}" /></td>
+        <td><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" value="${user.emailId}" autocomplete="off"/></td>
             <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
-            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" value="${user.contactNumber}" /></td>
+            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" value="${user.contactNumber}" autocomplete="off"/></td>
         </tr>
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>Password:</label></th>
-            <td><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" value="${user.password}" /></td>
+            <td><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" value="${user.password}" autocomplete="off" readonly/></td>
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
-            <td><input type="text" name="userAccount" style="height: 20px;" size="30" maxlength="30" value="${user.userAccount}" /></td>
+            <td><input type="text" name="userAccount" style="height: 20px;" size="30" maxlength="30" value="${user.userAccount}" autocomplete="off" readonly/></td>
         </tr>
        <tr> 
     <th><label class="custom-label"><span class="required-field">*</span>Roles:</label></th>

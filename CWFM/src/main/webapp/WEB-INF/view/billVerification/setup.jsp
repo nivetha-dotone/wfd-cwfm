@@ -56,7 +56,7 @@
                 <div id="kronosReportsContainer">
                     <c:forEach var="report" items="${kronosReports}">
                         <div class="report-row">
-                            <input type="text" name="kronosReports" value="${report}" placeholder="Enter report name" />
+                            <input type="text" name="kronosReports" value="${report}" placeholder="Enter report name" autocomplete="off" />
                             <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>
                         </div>
                     </c:forEach>
@@ -70,7 +70,7 @@
                 <div id="statutoryReportsContainer">
                     <c:forEach var="report" items="${statutoryReports}">
                         <div class="report-row">
-                            <input type="text" name="statutoryReports" value="${report}" placeholder="Enter report name" />
+                            <input type="text" name="statutoryReports" value="${report}" placeholder="Enter report name" autocomplete="off" />
                             <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>
                         </div>
                     </c:forEach>
@@ -84,7 +84,7 @@
                 <div id="checklistConfigContainer">
                     <c:forEach var="item" items="${checklistItems}" varStatus="loop">
                         <div class="checklist-row">
-                            <input type="text" name="checklistNames" value="${item.checkpointName}" placeholder="Check Point Name" required />
+                            <input type="text" name="checklistNames" value="${item.checkpointName}" placeholder="Check Point Name" required autocomplete="off" />
                             <label><input type="checkbox" name="licenseRequired${loop.index}" ${item.licenseRequired ? "checked" : ""}/> Licence No. Required</label>
                             <label><input type="checkbox" name="validUptoRequired${loop.index}" ${item.validUptoRequired ? "checked" : ""}/> Valid Upto Required</label>
                             <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>

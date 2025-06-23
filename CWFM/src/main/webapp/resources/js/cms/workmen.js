@@ -247,13 +247,16 @@ function initializeDatePicker() {
     let isValid = true;
 	let aadharCheckPassed = false;
     const aadharNumber = $("#aadharNumber").val().trim();
+
 	const transactionId=$("#transactionId").val().trim();
     if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
+
         $("#error-aadhar").show();
         isValid = false;
     }else{
 		 // $("#error-aadhar").hide();
 		  
+
 		         // Check in backend if Aadhar exists
 		         $.ajax({
 		             url: "/CWFM/contractworkmen/checkAadharExists",
@@ -275,6 +278,7 @@ function initializeDatePicker() {
 		             }
 		         });
 		     }
+
 
 	
     const firstName = $("#firstName").val().trim();
@@ -460,6 +464,20 @@ function validateEmploymentInformation(){
         isValid = false;
     }else{
 		 $("#error-healthCheckDate").hide();
+	}
+	const pfNumber = $("#pfNumber").val().trim();
+    if (pfNumber === "") {
+        $("#error-pfNumber").show();
+        isValid = false;
+    }else{
+		 $("#error-pfNumber").hide();
+	}
+	const esicNumber = $("#esicNumber").val().trim();
+    if (esicNumber === "") {
+        $("#error-esicNumber").show();
+        isValid = false;
+    }else{
+		 $("#error-esicNumber").hide();
 	}
 	const doj = $("#doj").val().trim();
     if (doj === "") {
@@ -846,18 +864,36 @@ function validateFiles(aadharFile, policeFile, profilePc) {
     console.log("otherValid: " + otherValid);
     console.log("wagesValid: " + wagesValid);
     console.log("documentValid: " + documentValid);
+    
+    // ✅ Utility function for Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+    // ✅ Capital case transformation
+    const firstName = toCapitalCase($("#firstName").val().trim());
+    const lastName = toCapitalCase($("#lastName").val().trim());
+    const relationName = toCapitalCase($("#relationName").val().trim());
+    const natureOfJob = toCapitalCase($("#natureOfJob").val().trim());
+    const emergencyName = toCapitalCase($("#emergencyName").val().trim());
+    const address = toCapitalCase($("#address").val().trim());
+    const idMark = toCapitalCase($("#idMark").val().trim());
 
     if (basicValid && employmentValid && otherValid && wagesValid && documentValid) {
         const data = new FormData();
         const jsonData = {
 			transactionId:$("#transactionId").val().trim(),
             aadhaarNumber: $("#aadharNumber").val().trim(),
-            firstName: $("#firstName").val().trim(),
-            lastName: $("#lastName").val().trim(),
+            firstName: firstName,
+            lastName: lastName,
             dateOfBirth: $("#dateOfBirth").val().trim(),
             gender: $("#gender").val(),
-            relationName: $("#relationName").val().trim(),
-            idMark: $("#idMark").val().trim(),
+            relationName: relationName,
+            idMark: idMark,
             mobileNumber: $("#mobileNumber").val().trim(),
             maritalStatus: $("#maritalStatus").val(),
             principalEmployer: $("#principalEmployer").val(),
@@ -868,19 +904,21 @@ function validateFiles(aadharFile, policeFile, profilePc) {
             department: $("#department").val(),
             subdepartment: $("#subdepartment").val(),
             eic: $("#eic").val(),
-            natureOfJob: $("#natureOfJob").val().trim(),
+            natureOfJob: natureOfJob,
             wcEsicNo: $("#wc").val(),
             hazardousArea: $("#hazardousArea").val(),
             accessArea: $("#accessArea").val(),
             uanNumber: $("#uanNumber").val().trim(),
             healthCheckDate: $("#healthCheckDate").val().trim(),
+            pfNumber:$("#pfNumber").val(),
+			esicNumber:$("#esicNumber").val(),
             bloodGroup: $("#bloodGroup").val(),
             accommodation: $("#accommodation").val(),
             academic: $("#academic").val(),
             technical: $("#technical").val(),
             ifscCode: $("#ifscCode").val().trim(),
             accountNumber: $("#accountNumber").val().trim(),
-            emergencyName: $("#emergencyName").val().trim(),
+            emergencyName: emergencyName,
             emergencyNumber: $("#emergencyNumber").val().trim(),
             wageCategory: $("#wageCategory").val(),
             bonusPayout: $("#bonusPayout").val(),
@@ -895,9 +933,12 @@ function validateFiles(aadharFile, policeFile, profilePc) {
             userId: userId,
             gatePassAction: "save",
             comments: $("#comments").val().trim(),
-			address:$("#address").val().trim(),
+			address: address,
 			doj:$("#doj").val(),
+            policeVerificationDate: $("#policeVerificationDate").val().trim(),
+
 			onboardingType:type,
+
         };
 
         // Serialize the JSON object to a string
@@ -2666,5 +2707,16 @@ function setDateRange() {
         maxDate: today,
         yearRange: `${sixMonthsAgo.getFullYear()}:${today.getFullYear()}`
     });
+   
+const oneYearAgo = new Date();
+oneYearAgo.setFullYear(today.getFullYear() - 1);
+   $(".datetimepickerformat3").datepicker({
+    dateFormat: 'yy-mm-dd',
+    changeMonth: true,
+    changeYear: true,
+    minDate: oneYearAgo,
+    maxDate: today,
+    yearRange: `${today.getFullYear() - 1}:${today.getFullYear()}`
+});
 }
 

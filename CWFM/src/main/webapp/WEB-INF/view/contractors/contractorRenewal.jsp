@@ -434,90 +434,90 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorRenewalId"/></label></th>
                 <td>
-                	<input id="renewalid" name="renewalid" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="renewalid" name="renewalid" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-renewalid" style="color: red;display: none;">Renewal ID is required</label>
                 </td>
            </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
                 <td>
-                	<input id="unitcode" name="unitcode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="unitcode" name="unitcode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	 <label id="error-unitcode" style="color: red;display: none;">Unit Code is required</label>
                 </td>
           
             
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.organization"/></label></th>
                 <td>
-                	<input id="organization" name="organization" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" >
+                	<input id="organization" name="organization" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	 <label id="error-organization" style="color: red;display: none;">Organization is required</label>
                 </td>
                
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorCode"/></label></th>
                 <td>
-                	<input id="contractorcode" name="contractorcode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="contractorcode" name="contractorcode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	 <label id="error-contractorcode" style="color: red;display: none;">Contractor Code is required</label>
                 </td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
                 <td>
-                	<input id="contractorname" name="contractorname" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="contractorname" name="contractorname" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-contractorname" style="color: red;display: none;">Contractor name is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                 <td>
-                	<input id="managername" name="managername" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="managername" name="managername" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-managername"style="color: red;display: none;">Manger Name is required</label>
                 </td>
                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.locationOfWork"/></label></th>
                 <td>
-                	<input id="locationofwork" name="locationofwork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="locationofwork" name="locationofwork" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-locationofwork"style="color: red;display: none;">Location Of Work is required</label>
                 </td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.supervisorName"/></label></th>
                 <td>
-                	<input id="supervisorname" name="supervisorname" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="supervisorname" name="supervisorname" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-supervisorname" style="color: red;display: none;">Supervisor Name is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfCode"/></label></th>
                 <td>
-                	<input id="pfcode" name="pfcode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="pfcode" name="pfcode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-pfcode" style="color: red;display: none;">PF Code is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
                 <td>
-                	<input id="emailaddress" name="emailaddress" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="emailaddress" name="emailaddress" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-emailaddress" style="color: red;display: none;">Email Address is required</label>
                 </td>
             </tr>
            <tr>
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
                 <td>
-                	<input id="mobilenumber" name="mobilenumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="mobilenumber" name="mobilenumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-mobilenumber" style="color: red;display: none;">Mobile Number is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicRegistration"/></label></th>
                 <td>
-                	<input id="esicregistration" name="esicregistration" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="esicregistration" name="esicregistration" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-esicregistration" style="color: red;display: none;">ESIC Registration is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractValidTill"/></label></th>
                 <td>
-                	<input id="contractvalidtill" name="contractvalidtill" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30">
+                	<input id="contractvalidtill" name="contractvalidtill" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-contractvalidtill" style="color: red;display: none;">Contract Valid Till is required</label>
                 </td>
            </tr>
            <tr>
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorClassification"/></label></th>
                 <td>
-                	<input id="contractorclass" name="contractorclass" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="contractorclass" name="contractorclass" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-contractorclass" style="color: red;display: none;">Contractor Classification is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractType"/></label></th>
                 <td>
-                	<input id="contractortype" name="contractortype" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30">
+                	<input id="contractortype" name="contractortype" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<label id="error-contractortype" style="color: red;display: none;">Contractor Type is required</label>
                 </td>
            </tr>
@@ -563,10 +563,10 @@ label {
                           <option value="WC" >WC</option>
                     </select>
                 </td>
-                 <td style= "color:black"> <input type="text"  value=" " id="documentnumber" style="width:100px;"/></td> 
-				<td style="color:black"> <input type="text"  value=" " id="coverage" style="width:100px;"/> </td>
-				<td style="color:black"><input type="date" value=" " id="validfrom"   " placeholder = "DD/MM/YYYY"  /></td>
-				<td style="color:black"><input type="date" value=" "  id="validto"  " placeholder = "DD/MM/YYYY" /></td>
+                 <td style= "color:black"> <input type="text"  value=" " id="documentnumber" style="width:100px;" autocomplete="off"/></td> 
+				<td style="color:black"> <input type="text"  value=" " id="coverage" style="width:100px;" autocomplete="off"/> </td>
+				<td style="color:black"><input type="date" value=" " id="validfrom"   " placeholder = "DD/MM/YYYY" autocomplete="off" /></td>
+				<td style="color:black"><input type="date" value=" "  id="validto"  " placeholder = "DD/MM/YYYY" autocomplete="off"/></td>
 				<td style= "color:black"><input type="file" value="No file selected" id="attachments" style="width:100px;"/></td>
 	            <td style= "color:black"><input type="checkbox" value=" " id="panindia"/></td>
 	            <td style= "color:black"><input type="checkbox" value=" " id="subcontractor"/></td>

@@ -123,7 +123,7 @@ function extractIdFromURL() {alert(1)
                          <th><label class="custom-label"><span class="required-field">*</span>Unit Name</label></th>
 <td>
     <div>
-        <f:input type="text" id="unitName" path="NAME" style="height: 20px;" size="30" maxlength="30"/>
+        <f:input type="text" id="unitName" path="NAME" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
        <%--  <f:errors path="NAME" cssClass="error-message"/> --%>
     </div>
 </td>
@@ -139,17 +139,17 @@ function extractIdFromURL() {alert(1)
                             <th><label class="custom-label"><span class="required-field">*</span>Unit Code</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <f:input type="text" id="unitCode" path="CODE"  style="height: 20px;"  size="30" maxlength="30" />
+                              <f:input type="text" id="unitCode" path="CODE"  style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/>
                               </div></td>
                          <th><label class="custom-label"><span class="required-field">*</span>Organization</label></th>
-                            <td><f:input type="text" path="ORGANIZATION"  style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="ORGANIZATION"  style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                        
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Address</label></th>
                             <td>
                               <div style="padding-right: 15px;">
-                              <f:input type="text" id="address" path="ADDRESS"  style="height: 20px;"  size="30" maxlength="30" />
+                              <f:input type="text" id="address" path="ADDRESS"  style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/>
                               </div></td>
                          <th><label class="custom-label"><span class="required-field">*</span>State</label></th>
                             <%-- <td>
@@ -171,24 +171,24 @@ function extractIdFromURL() {alert(1)
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Manager Name</label></th>
-                            <td><f:input type="text" path="MANAGERNAME" value="${principalEmployer.MANAGERNAME}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="MANAGERNAME" value="${principalEmployer.MANAGERNAME}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         <th><label class="custom-label"><span class="required-field">*</span>Manager Address</label></th>
-                            <td><f:input type="text" path="MANAGERADDRS" value="${principalEmployer.MANAGERADDRS}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="MANAGERADDRS" value="${principalEmployer.MANAGERADDRS}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                        
                         </tr>
                         
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Type of Business</label></th>
-                            <td><f:input type="text" path="BUSINESSTYPE" value="${principalEmployer.BUSINESSTYPE}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="BUSINESSTYPE" value="${principalEmployer.BUSINESSTYPE}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         <th><label class="custom-label"><span class="required-field">*</span>Maximum Number of Workmen</label></th>
-                            <td><f:input type="text" path="MAXWORKMEN" value="${principalEmployer.MAXWORKMEN}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="MAXWORKMEN" value="${principalEmployer.MAXWORKMEN}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Maximun Number of Contract Workmen</label></th>
-                            <td><f:input type="text" path="MAXCNTRWORKMEN" value="${principalEmployer.MAXCNTRWORKMEN}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="MAXCNTRWORKMEN" value="${principalEmployer.MAXCNTRWORKMEN}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                             <th><label class="custom-label">Current count of Contract Workmen</label></th>
-                            <td><input type="text"  value="0" style="height: 20px;"  size="30" maxlength="30" disabled="true" /></td>
+                            <td><input type="text"  value="0" style="height: 20px;"  size="30" maxlength="30" disabled="true" autocomplete="off"/></td>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>BOCWAct Applicability</label></th>
@@ -209,31 +209,31 @@ function extractIdFromURL() {alert(1)
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>License Number</label></th>
-                            <td><f:input type="text" path="LICENSENUMBER" value="${principalEmployer.LICENSENUMBER}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="LICENSENUMBER" value="${principalEmployer.LICENSENUMBER}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         <th><label class="custom-label"><span class="required-field">*</span>PF Code</label></th>
-                            <td><f:input type="text" path="PFCODE" value="${principalEmployer.PFCODE}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="PFCODE" value="${principalEmployer.PFCODE}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         
                         </tr>
                         <tr>
                          <th><label class="custom-label"><span class="required-field">*</span>WC Number</label></th>
-                            <td><f:input type="text" path="WCNUMBER" value="${principalEmployer.WCNUMBER}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="WCNUMBER" value="${principalEmployer.WCNUMBER}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         
                             <th><label class="custom-label"><span class="required-field">*</span>ESIC Number</label></th>
-                            <td><f:input type="text" path="ESICNUMBER" value="${principalEmployer.ESICNUMBER}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="ESICNUMBER" value="${principalEmployer.ESICNUMBER}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         </tr>
                         
                          <tr>
                          <th><label class="custom-label"><span class="required-field">*</span>PT Registration No.</label></th>
-                            <td><f:input type="text" path="PTREGNO" value="${principalEmployer.PTREGNO}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="PTREGNO" value="${principalEmployer.PTREGNO}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         
                             <th><label class="custom-label"><span class="required-field">*</span>LWF Registration No.</label></th>
-                            <td><f:input type="text" path="LWFREGNO" value="${principalEmployer.LWFREGNO}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="LWFREGNO" value="${principalEmployer.LWFREGNO}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                         </tr>
                         
                          <tr>
                          
                             <th><label class="custom-label"><span class="required-field">*</span>Factory Licence No</label></th>
-                            <td><f:input type="text" path="FACTORYLICENCENUMBER" value="${principalEmployer.FACTORYLICENCENUMBER}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="FACTORYLICENCENUMBER" value="${principalEmployer.FACTORYLICENCENUMBER}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                        <th><label class="custom-label"><span class="required-field">*</span>IS RC Applicable ?</label></th>
                       <td>
                        <input type="checkbox" id="ISRCAPPLICABLE" name="ISRCAPPLICABLE" ${principalEmployer.ISRCAPPLICABLE ? 'checked' : ''}/>
@@ -256,7 +256,7 @@ function extractIdFromURL() {alert(1)
                          <tr>
                          
                             <th><label class="custom-label"><span class="required-field">*</span>RC Number</label></th>
-                            <td><f:input type="text" path="RCNUMBER" value="${principalEmployer.RCNUMBER}" style="height: 20px;"  size="30" maxlength="30" /></td>
+                            <td><f:input type="text" path="RCNUMBER" value="${principalEmployer.RCNUMBER}" style="height: 20px;"  size="30" maxlength="30" autocomplete="off"/></td>
                          
                             <th><label class="custom-label"><span class="required-field">*</span>Attachment Name</label></th>
                             <%-- <td><f:input type="text" path="ATTACHMENTNM" value="${principalEmployer.ATTACHMENTNM}" style="height: 20px;"  size="30" maxlength="30" /></td> --%>

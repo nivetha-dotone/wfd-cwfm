@@ -319,7 +319,7 @@
                     </select>
                 </td>
                 <td class="hierarchy-col">
-                    <input type="number" name="hierarchyIndex" required>
+                    <input type="number" name="hierarchyIndex" required autocomplete="off">
                 </td>
             </tr>
         </tbody>

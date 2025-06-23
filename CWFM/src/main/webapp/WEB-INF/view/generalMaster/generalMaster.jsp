@@ -209,10 +209,10 @@ function editRow(gmId) {
     
     
         <label for="masterName" style="color: darkcyan;">Master Name:</label>
-        <input type="text" id="masterName" name="masterName" style="color:gray;" required>
+        <input type="text" id="masterName" name="masterName" style="color:gray; text-transform: capitalize;" required autocomplete="off">
 
         <label for="masterValue" style="color: darkcyan;">Master Value:</label>
-        <input type="text" id="masterValue" name="masterValue" style="color:gray;" required>
+        <input type="text" id="masterValue" name="masterValue" style="color:gray; text-transform: capitalize;" required autocomplete="off">
 
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveGMMaster()">Save</button>
         <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">Cancel</button> -->

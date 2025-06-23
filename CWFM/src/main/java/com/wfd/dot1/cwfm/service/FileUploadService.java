@@ -15,9 +15,10 @@ public interface FileUploadService {
    
     Map<String, Object> processTemplateFile(MultipartFile file, String templateType) throws Exception;
     static void saveMinimumWageTemplate(MinimumWageDTO dto) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
+
+	String getTemplateCSV(String templateType);
     
     
     }

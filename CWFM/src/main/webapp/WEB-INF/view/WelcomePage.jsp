@@ -186,8 +186,9 @@ function loadCommonList(path, heading) {
                     messageDiv.style.display = "none";
                 }, 5000);
             }
-
+			setDateRange();
             resetSessionTimer();
+            
         }
     };
     xhttp.open("GET", url, true);
@@ -539,15 +540,24 @@ function deleteSelectedOrgLevel() {
 	    let shortNameSet = new Set();  // Track unique Short Names
 	    let hierarchySet = new Set();  // Track unique Hierarchy Levels
 
+	 // ✅ Utility function to convert to Capital Case
+	    function toCapitalCase(str) {
+	        return str
+	            .toLowerCase()
+	            .split(' ')
+	            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+	            .join(' ');
+	    }
+
 	    orgLevelRows.forEach((row, index) => {
 	        const orgLevelDefIdElem = row.querySelector('input[name="orgLevelDefId[]"]');
-	        const orgLevelNameElem = row.querySelector('input[name="orgLevelName[]"]');
-	        const shortNameElem = row.querySelector('input[name="shortName[]"]');
+	        let orgLevelNameElem = row.querySelector('input[name="orgLevelName[]"]');
+	        let shortNameElem = row.querySelector('input[name="shortName[]"]');
 	        const hierarchyElem = row.querySelector('input[name="hierarchy[]"]');
 
 	        const orgLevelDefId = orgLevelDefIdElem ? orgLevelDefIdElem.value.trim() : null;
-	        const orgLevelName = orgLevelNameElem ? orgLevelNameElem.value.trim() : '';
-	        const shortName = shortNameElem ? shortNameElem.value.trim() : '';
+	        let orgLevelName = orgLevelNameElem ? orgLevelNameElem.value.trim() : '';
+	        let shortName = shortNameElem ? shortNameElem.value.trim() : '';
 	        const hierarchy = hierarchyElem ? hierarchyElem.value.trim() : '';
 
 	        console.log(`Processing Row ${index + 1}:`);
@@ -565,6 +575,10 @@ function deleteSelectedOrgLevel() {
 	        } else {
 	            row.style.backgroundColor = ''; // Reset color if valid
 	        }
+
+	     // ✅ Capitalize fields
+	        orgLevelName = toCapitalCase(orgLevelName);
+	        shortName = toCapitalCase(shortName);
 
 	        // **Duplicate Check**
 	        const duplicateName = nameSet.has(orgLevelName);
@@ -741,8 +755,8 @@ function navigateToOrgLevel() {
 function saveOrgEntries() {
     const orgLevelEntryId = document.getElementById('orgLevelEntryId').value;
     const orgLevelDefId = document.getElementById('orgLevelDefId').value;
-    const entryName = document.getElementById('entryName').value.trim();
-    const description = document.getElementById('description').value.trim();
+    let entryName = document.getElementById('entryName').value.trim();
+    let description = document.getElementById('description').value.trim();
 
     const errorBox = document.getElementById("formErrorMessage");
 
@@ -753,6 +767,17 @@ function saveOrgEntries() {
 
     errorBox.style.display = "none"; // Hide previous errors
     errorBox.innerText = ''; // Clear previous messages
+ // ✅ Utility function to convert to Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+    // ✅ Capitalize fields
+    entryName = toCapitalCase(entryName);
+    description = toCapitalCase(description);
 
     let errorMessages = []; // Array to store all error messages
 
@@ -1061,8 +1086,8 @@ function saveGMMaster() {
     console.log("🚀 saveGMMaster() function called!"); // Check if function runs
 
     const gmTypeId = document.getElementById('gmTypeId').value;
-    const masterName = document.getElementById('masterName').value.trim();
-    const masterValue = document.getElementById('masterValue').value.trim();
+    let masterName = document.getElementById('masterName').value.trim();
+    let masterValue = document.getElementById('masterValue').value.trim();
     const errorBox = document.getElementById("formErrorMessage");
 
     errorBox.style.display = "none"; // Hide previous errors
@@ -1078,7 +1103,18 @@ function saveGMMaster() {
         errorBox.style.display = "block";
         return;
     }
+ // ✅ Convert to Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
 
+    masterName = toCapitalCase(masterName);
+    masterValue = toCapitalCase(masterValue);
+    
     console.log("📌 Valid Input:", { gmTypeId, masterName, masterValue }); // Log data
 
     // **Duplicate Check in Existing Table**
@@ -1420,14 +1456,25 @@ function saveUser() {
         console.error("Error: Form not found!");
         return;
     }
-
+    // Reusable function to convert to Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
     // Fetch input values
-    const firstName = form.elements['firstName'] ? form.elements['firstName'].value.trim() : "";
-    const lastName = form.elements['lastName'] ? form.elements['lastName'].value.trim() : "";
+    let firstName = form.elements['firstName'] ? form.elements['firstName'].value.trim() : "";
+    let lastName = form.elements['lastName'] ? form.elements['lastName'].value.trim() : "";
     const emailId = form.elements['emailId'] ? form.elements['emailId'].value.trim() : "";
     const contactNumber = form.elements['contactNumber'] ? form.elements['contactNumber'].value.trim() : "";
     const password = form.elements['password'] ? form.elements['password'].value.trim() : "";
-    const userAccount = form.elements['userAccount'] ? form.elements['userAccount'].value.trim() : "";
+    let userAccount = form.elements['userAccount'] ? form.elements['userAccount'].value.trim() : "";
+    // 👉 Apply Capital Case here before validation and saving
+    firstName = toCapitalCase(firstName);
+    lastName = toCapitalCase(lastName);
+    userAccount = toCapitalCase(userAccount); // Optional: If you want account name capitalized
 
     let isValid = true;
     document.querySelectorAll(".error-message").forEach(e => e.innerText = "");
@@ -2095,6 +2142,21 @@ function saveOrgLevelMapping() {
     let name = document.getElementById('name').value.trim();
     let description = document.getElementById('description').value.trim();
     
+ // ✅ Utility function to convert to Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+    // ✅ Capitalize fields
+    name = toCapitalCase(name);
+    description = toCapitalCase(description);
+    
+    // ✅ Set capitalized values back to input fields (optional if you want user to see it too)
+    document.getElementById('name').value = name;
+    document.getElementById('description').value = description;
     if (name === "") {
         showError("name", "Name cannot be empty");
         return;
@@ -4762,24 +4824,27 @@ table th {
 
             // Clear previous error display
             document.getElementById("errorContainer").innerHTML = "";
-
+            const templateType = document.getElementById("templateType").value;
             const successData = result.data?.successData ?? [];
             const errorData = result.data?.errorData ?? [];
 
-            if (result.status === "success") {
-                if (successData.length > 0) {
-                    renderUploadedData(successData, templateType); // display saved data
-                }
-                if (errorData.length > 0) {
-                    renderErrors(errorData); // display row-level field errors
-                }
-            } else {
-                // If errorData is present, show detailed error in UI
-                if (errorData.length > 0) {
-                    renderErrors(errorData);
-                } else {
-                    alert(result.message || "Upload failed.");
-                }
+            let anyDataProcessed = false;
+
+            // ✅ Render saved data (non-duplicates)
+            if (successData.length > 0) {
+                renderUploadedData(successData, templateType);
+                anyDataProcessed = true;
+            }
+
+            // ❌ Render duplicate errors
+            if (errorData.length > 0) {
+                renderErrors(errorData);
+                anyDataProcessed = true;
+            }
+
+            // ❌ Only show this if truly no records were returned
+            if (!anyDataProcessed) {
+                alert("No records processed.");
             }
         })
         .catch(err => {
@@ -4856,61 +4921,55 @@ table th {
         const container = document.getElementById("errorContainer");
         container.innerHTML = "";
 
+        if (!errorData || errorData.length === 0) {
+            container.textContent = "No errors found.";
+            return;
+        }
+
         const table = document.createElement("table");
         table.classList.add("table", "table-bordered");
         table.style.marginTop = "10px";
+        table.style.borderCollapse = "collapse";
+        table.style.width = "100%";
 
         const headerRow = document.createElement("tr");
         ["Row", "Field", "Error Message"].forEach(text => {
             const th = document.createElement("th");
             th.innerText = text;
+            th.style.border = "1px solid #999";
+            th.style.padding = "6px";
             headerRow.appendChild(th);
         });
         table.appendChild(headerRow);
 
         errorData.forEach(error => {
-            if (error.fieldErrors) {
-                for (const [field, message] of Object.entries(error.fieldErrors)) {
-                    const row = document.createElement("tr");
+            const row = document.createElement("tr");
 
-                    const rowCell = document.createElement("td");
-                    rowCell.textContent = error.row;
+            const rowCell = document.createElement("td");
+            rowCell.textContent = error.row || "-";
+            rowCell.style.border = "1px solid #999";
+            rowCell.style.padding = "6px";
 
-                    const fieldCell = document.createElement("td");
-                    fieldCell.textContent = field;
+            const fieldCell = document.createElement("td");
+            fieldCell.textContent = "-"; // No field info in your structure
+            fieldCell.style.border = "1px solid #999";
+            fieldCell.style.padding = "6px";
 
-                    const messageCell = document.createElement("td");
-                    messageCell.textContent = message;
+            const messageCell = document.createElement("td");
+            messageCell.textContent = error.error || "Unknown error";
+            messageCell.style.border = "1px solid #999";
+            messageCell.style.padding = "6px";
 
-                    row.appendChild(rowCell);
-                    row.appendChild(fieldCell);
-                    row.appendChild(messageCell);
+            row.appendChild(rowCell);
+            row.appendChild(fieldCell);
+            row.appendChild(messageCell);
 
-                    table.appendChild(row);
-                }
-            } else {
-                // If only general error is returned
-                const row = document.createElement("tr");
-
-                const rowCell = document.createElement("td");
-                rowCell.textContent = error.row || "-";
-
-                const fieldCell = document.createElement("td");
-                fieldCell.textContent = "-";
-
-                const messageCell = document.createElement("td");
-                messageCell.textContent = error.error || "Unknown error";
-
-                row.appendChild(rowCell);
-                row.appendChild(fieldCell);
-                row.appendChild(messageCell);
-
-                table.appendChild(row);
-            }
+            table.appendChild(row);
         });
 
         container.appendChild(table);
     }
+
 
 
 
@@ -4950,7 +5009,38 @@ table th {
         });
     }
   
+    function redirectToOrgLevelMappingView() {
+    	 var selectedCheckbox = document.querySelector('input[name="selectedOrgMap"]:checked');
 
+    	    if (!selectedCheckbox) {
+    	        alert("Please select a record to view.");
+    	        return;
+    	    }
+
+    	    var selectedId = selectedCheckbox.value;
+    	    var xhr = new XMLHttpRequest();
+    	    xhr.onreadystatechange = function () {
+    	        if (xhr.readyState === 4 && xhr.status === 200) {
+    	            document.getElementById("mainContent").innerHTML = xhr.responseText;
+    	            initializeOrgMapping(selectedId); // Initialize with selected ID
+    	        }
+    	    };
+    	    xhr.open("GET", "/CWFM/org-level-mapping/orglevelmappingview?id=" + selectedId, true);
+    	    xhr.send();
+       
+    } 
+    function downloadTemplateInfo() {
+    	 const templateType = document.getElementById("templateType").value;
+
+        if (!templateType) {
+            alert("Please select a template to download.");
+            return;
+        }
+
+        // Trigger the CSV file download from server
+        const downloadUrl = "/CWFM/data/downloadTemplate?templateType=" + encodeURIComponent(templateType);
+        window.location.href = downloadUrl;
+    }
 
     </script>
     

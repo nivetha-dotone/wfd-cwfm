@@ -127,15 +127,15 @@ th label {
 
 <body>
      <label for="apiUrl">API URL:</label>
-    <input type="text" id="apiUrl" placeholder="Enter API URL" />
+    <input type="text" id="apiUrl" placeholder="Enter API URL" autocomplete="off"/>
     <br />
 
     <label for="accessToken">Access Token:</label>
-    <input type="text" id="accessToken" placeholder="Enter Access Token" />
+    <input type="text" id="accessToken" placeholder="Enter Access Token" autocomplete="off"/>
     <br />
 
     <label for="csvFileName">CSV File Name:</label>
-    <input type="text" id="csvFileName" placeholder="Enter CSV file name" />
+    <input type="text" id="csvFileName" placeholder="Enter CSV file name" autocomplete="off"/>
     <br />
 
     <button onclick="fetchIntData()">Fetch Data</button>

@@ -305,7 +305,7 @@
                             <th><label class="custom-label"><span class="required-field">*</span>Contractor Registration ID</label></th>
                             <td>
                                 <div>
-                                    <input type="text" id="unitName" style="height: 20px;" size="30" maxlength="30"/>
+                                    <input type="text" id="unitName" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
                                 </div>
                             </td>
                         </tr>
@@ -327,35 +327,35 @@
                             <th><label class="custom-label"><span class="required-field">*</span>Manager Name</label></th>
                             <td>
                                 <div style="padding-right: 15px;">
-                                    <input type="text" id="address" style="height: 20px;" size="30" maxlength="30" />
+                                    <input type="text" id="address" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off"/>
                                 </div>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span>Location of Work</label></th>
                             <td>
                                 <div style="padding-right: 15px;">
-                                    <input type="text" id="address" style="height: 20px;" size="30" maxlength="30" />
+                                    <input type="text" id="address" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off"/>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Total Strength</label></th>
-                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" /></td>
+                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/></td>
                             <th><label class="custom-label"><span class="required-field">*</span>RC Max Employees</label></th>
-                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" /></td>
+                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/></td>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>PF Number</label></th>
-                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" /></td>
+                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/></td>
                             <th><label class="custom-label"><span class="required-field">*</span>Nature of Work</label></th>
-                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" /></td>
+                            <td><input type="text" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off"/></td>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>Contract From</label></th>
-                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" /></td>
+                            <td><input type="text" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/></td>
                             <th><label class="custom-label">Contract To</label></th>
                             <td>
                                 <div style="padding-right: 15px;">
-                                    <input type="text" id="address" style="height: 20px;" size="30" maxlength="30" />
+                                    <input type="text" id="address" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
                                 </div>
                             </td>
                         </tr>
@@ -422,23 +422,23 @@
             </td>
             <td>
                 <!-- Input for WC Code -->
-                <input type="text" name="wcCode" />
+                <input type="text" name="wcCode" autocomplete="off"/>
             </td>
             <td>
                 <!-- Input for WC Total -->
-                <input type="text" name="wcTotal" />
+                <input type="text" name="wcTotal" autocomplete="off"/>
             </td>
             <td>
                 <!-- Input for WC From -->
-                <input type="text" name="wcFrom" placeholder="DD/MM/YYYY" />
+                <input type="text" name="wcFrom" placeholder="DD/MM/YYYY" autocomplete="off"/>
             </td>
             <td>
                 <!-- Input for WC To -->
-                <input type="text" name="wcTo" placeholder="DD/MM/YYYY" />
+                <input type="text" name="wcTo" placeholder="DD/MM/YYYY" autocomplete="off"/>
             </td>
             <td>
                 <!-- Input for Attachment -->
-                <input type="file" name="attachment" />
+                <input type="file" name="attachment" autocomplete="off"/>
             </td>
           <!--   <td><button type="button" class="removeRow">-</button></td> -->
         </tr>

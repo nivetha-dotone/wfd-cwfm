@@ -134,13 +134,13 @@
      <!-- Form to enter Name and Description -->
      <div class="form-group">
         <label for="name" style=" color: darkcyan;">Name:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" style="text-transform: capitalize;" required autocomplete="off">
         <span id="nameError" class="error-message"></span>
     </div>
 
     <div class="form-group">
         <label for="description" style=" color: darkcyan;">Description:</label>
-        <input type="text" id="description" name="description" required>
+        <input type="text" id="description" name="description" style="text-transform: capitalize;"  required autocomplete="off">
         <span id="descriptionError" class="error-message"></span>
     </div>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgLevelMapping()">Save</button>

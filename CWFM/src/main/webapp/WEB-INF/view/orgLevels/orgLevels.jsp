@@ -193,7 +193,7 @@
     </div>
 </div>
        <div class="table-container">
-        <form method="post" action="/save">
+        <form method="post" action="/save" autocomplete="off">
     <table id="orgLevelTable">
          <thead>
                 <tr>
@@ -213,9 +213,9 @@
                         <input type="hidden" name="orgLevelDefId[]" value="${orgLevel.orgLevelDefId}">
                             <input type="checkbox" name="selectedOrgLevels" value="${orgLevel.orgLevelDefId}" data-row-id="${orgLevel.orgLevelDefId}">
                         </td>
-                        <td><input type="text" name="orgLevelName[]" value="${orgLevel.name}" required style="color:gray;"></td>
-                        <td><input type="text" name="shortName[]" value="${orgLevel.shortName}" required style="color:gray;"></td>
-                        <td><input type="number" name="hierarchy[]" value="${orgLevel.orgHierarchyLevel}" required style="color:gray;"></td>
+                        <td><input type="text" name="orgLevelName[]" value="${orgLevel.name}" required style="color:gray; text-transform: capitalize;" autocomplete="off"></td>
+                        <td><input type="text" name="shortName[]" value="${orgLevel.shortName}" required style="color:gray; text-transform: capitalize;" autocomplete="off"></td>
+                        <td><input type="number" name="hierarchy[]" value="${orgLevel.orgHierarchyLevel}" required style="color:gray;" autocomplete="off"></td>
                         
                     </tr>
                 </c:forEach> 
@@ -226,9 +226,9 @@
                         <td class="checkbox-cell">
                             <input type="checkbox" name="selectedOrgLevels">
                         </td>
-                        <td><input type="text" name="orgLevelName[]" placeholder="Org Level Name" required></td>
-                        <td><input type="text" name="shortName[]" placeholder="Short Name" required></td>
-                        <td><input type="number" name="hierarchy[]" placeholder="Hierarchy" required></td>
+                        <td><input type="text" name="orgLevelName[]" placeholder="Org Level Name" required autocomplete="off"></td>
+                        <td><input type="text" name="shortName[]" placeholder="Short Name" required autocomplete="off"></td>
+                        <td><input type="number" name="hierarchy[]" placeholder="Hierarchy" required autocomplete="off"></td>
                     </tr>
                 </c:if>
             </tbody>

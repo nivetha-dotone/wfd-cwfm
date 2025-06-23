@@ -149,14 +149,14 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>Enter Aadhar</label></th>
         <td>
             <div>
-                <input id="aadharNumber" name="aadharNumber"  style="height: 20px;"  type="text" value="" size="18" maxlength="12">
+                <input id="aadharNumber" name="aadharNumber"  style="height: 20px;"  type="text" value="" size="18" maxlength="12" autocomplete="off">
                 <button id="sendOTPButton">Send OTP</button>
             </div>
         </td>
           <th><label class="custom-label"><span class="required-field">*</span>OTP</label></th>
 <td>
     <div>
-        <input id="otp"  style="height: 20px;"  type="text" value="" size="10" maxlength="10">
+        <input id="otp"  style="height: 20px;"  type="text" value="" size="10" maxlength="10" autocomplete="off">
         <button id="sendOTPButton">Validate</button>
     </div>
 </td>
@@ -179,7 +179,7 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>First Name</label></th>
         <td>
             <div style="padding-right: 15px;">
-                <input id="firstName" name="firstName" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30">
+                <input id="firstName" name="firstName" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30" autocomplete="off">
             </div>
         </td>
     </tr>
@@ -187,7 +187,7 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>Last Name</label></th>
         <td>
          <div style="padding-right: 15px;">
-            <input id="lastName" name="lastName" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30">
+            <input id="lastName" name="lastName" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30" autocomplete="off">
         </div>
         </td>
     </tr>
@@ -195,7 +195,7 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>Date of Birth</label></th>
         <td>
             <div style="padding-right: 15px;">
-                <input id="dateOfBirth" name="dateOfBirth" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30">
+                <input id="dateOfBirth" name="dateOfBirth" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30" autocomplete="off">
             </div>
         </td>
     </tr>
@@ -203,7 +203,7 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>Date of Joining</label></th>
         <td>
          <div style="padding-right: 15px;">
-            <input id="dateOfJoining" name="dateOfJoining" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30">
+            <input id="dateOfJoining" name="dateOfJoining" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30" autocomplete="off">
          </div>
         </td>
     </tr>
@@ -223,7 +223,7 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>Father/Husband Name</label></th>
         <td>
          <div style="padding-right: 15px;">
-            <input id="relationName" name="relationName" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30">
+            <input id="relationName" name="relationName" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30" autocomplete="off">
         </div>
         </td>
     </tr>
@@ -231,7 +231,7 @@ function extractIdFromURL() {alert(1)
         <th><label class="custom-label"><span class="required-field">*</span>ID Mark</label></th>
         <td>
          <div style="padding-right: 15px;">
-            <input id="idMark" name="idMark" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30">
+            <input id="idMark" name="idMark" style="width: 100%;height: 20px;"  type="text" value="" size="30" maxlength="30" autocomplete="off">
        
        </div> </td>
     </tr>
@@ -254,13 +254,13 @@ function extractIdFromURL() {alert(1)
                         <th><label class="custom-label"><span class="required-field"></span>Nearest Police Station</label></th>
                             <td>
                              <div style="padding-right: 15px;">
-                             <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                             <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                              </div></td>
                        
                        <th><label class="custom-label"><span class="required-field"></span>PF Number</label></th>
                             <td>
                              <div style="padding-right: 15px;">
-                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div>
                             </td>
                        
@@ -273,14 +273,14 @@ function extractIdFromURL() {alert(1)
                             <%-- <td><f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" /></td>
                         --%>
                        <th><label class="custom-label"><span class="required-field"></span>Referred By</label></th>
-                            <td><div style="padding-right: 15px;"><f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <td><div style="padding-right: 15px;"><f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr>
                         <tr>
                         <th><label class="custom-label"><span class="required-field"></span>Academics</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="academics" value="${workmenbyAadhar.academics}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="academics" value="${workmenbyAadhar.academics}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field">*</span>Technical</label></th>
@@ -293,24 +293,24 @@ function extractIdFromURL() {alert(1)
                          <tr>
                         <th><label class="custom-label"><span class="required-field"></span>Is Police verification done ?</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field"></span>Police Verification Date</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr>
                          <tr>
                         <th><label class="custom-label"><span class="required-field"></span>Vaccination Date</label></th>
                             <td> <div style="padding-right: 15px;"> 
-                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field"></span>PersonalID</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr> 
@@ -322,43 +322,43 @@ function extractIdFromURL() {alert(1)
                            <%--  <td><f:input type="text" path="accomodation" value="${workmenbyAadhar.accomodation}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" /></td>
                         --%>
                        <th><label class="custom-label"><span class="required-field"></span>Mobile Number</label></th>
-                            <td> <div style="padding-right: 15px;"><f:input type="text" path="mobileNumber" value="${workmenbyAadhar.mobileNumber}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <td> <div style="padding-right: 15px;"><f:input type="text" path="mobileNumber" value="${workmenbyAadhar.mobileNumber}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr>
                         <tr>
                         <th><label class="custom-label"><span class="required-field"></span>Account Number</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="accountNo" value="${workmenbyAadhar.accountNo}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="accountNo" value="${workmenbyAadhar.accountNo}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field"></span>Bank IFSC Code</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="bankBranch" value="${workmenbyAadhar.bankBranch}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="bankBranch" value="${workmenbyAadhar.bankBranch}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr>
                          <tr>
                         <th><label class="custom-label"><span class="required-field"></span>Prior Experience</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field"></span>Previous EP Number</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr> 
                          <tr>
                         <th><label class="custom-label"><span class="required-field">*</span>Emergency Name</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="relationName" value="${workmenbyAadhar.emergencyName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="relationName" value="${workmenbyAadhar.emergencyName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field">*</span>Emergency Number</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="idMark" value="${workmenbyAadhar.emergencyNumber}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="idMark" value="${workmenbyAadhar.emergencyNumber}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr>
@@ -374,7 +374,7 @@ function extractIdFromURL() {alert(1)
 </td>
                         <th><label class="custom-label"><span class="required-field">*</span>Date of Termination</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="dateOfTermination" value="${workmenbyAadhar.dateOfTermination}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="dateOfTermination" value="${workmenbyAadhar.dateOfTermination}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                         
                         </tr>
@@ -452,7 +452,7 @@ function extractIdFromURL() {alert(1)
                          <tr>
                         <th><label class="custom-label"><span class="required-field">*</span>Nature of Job</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="relationName" value="${workmenbyAadhar.relationName}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field">*</span>WC Policy/ESIC Reg Number</label></th>
@@ -479,12 +479,12 @@ function extractIdFromURL() {alert(1)
                          <tr>
                         <th><label class="custom-label"><span class="required-field"></span>UAN Number</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="uanNumber" value="${workmenbyAadhar.uanNumber}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="uanNumber" value="${workmenbyAadhar.uanNumber}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                        <th><label class="custom-label"><span class="required-field"></span>Health Check Up Date</label></th>
                             <td> <div style="padding-right: 15px;">
-                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" />
+                            <f:input type="text" path="idMark" value="${workmenbyAadhar.idMark}"  style="width: 100%;height: 20px;"   size="30" maxlength="30" autocomplete="off"/>
                             </div></td>
                        
                         </tr>

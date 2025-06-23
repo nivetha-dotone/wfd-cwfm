@@ -28,6 +28,7 @@ import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
 @Service
@@ -72,17 +73,17 @@ public class FileUploadServiceImpl implements FileUploadService {
                 // savedData = processGeneralMaster(reader);
                 break;
             case "contractor":
-                if (!headerLine.equalsIgnoreCase("CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,"
+                if (!headerLine.equalsIgnoreCase("CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,"
                         + "LICENCSE COVERAGE,TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
                         + "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,Mobile Number,ESI NUMBER,"
-                        + "ESI VALID FROM,ESI VALID TO,Main Contractor Code,Work Order Number")) {
+                        + "ESI VALID FROM,ESI VALID TO,Organisation,Main Contractor Code,Work Order Number")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                  savedData = processContractor(reader);
                 break;
             case "workorder":
                 if (!headerLine.equalsIgnoreCase("Work Order Number,Item,Short Text,Delivery Complition,Item Changed ON,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
-                        + "G/L Code,Cost Center,Nature of Job,Rate,Quantity,PM Order No,WBS Element,Quantity Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date")) {
+                        + "G/L Code,Plant code,Cost Center,Nature of Job,Rate,Quantity,PM Order No,WBS Element,Quantity Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Organisation")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processWorkorder(reader);
@@ -95,7 +96,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 break;
             case "principalemployer":
                 if (!headerLine.equalsIgnoreCase("ORGANISATION,PLANTCODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAX CONTRACT WORKMEN,BOCWAPPLICABILITY,"
-                        + "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER")) {
+                        + "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                  savedData = processPrincipalEmployer(reader);
@@ -191,14 +192,18 @@ public class FileUploadServiceImpl implements FileUploadService {
         String line;
         int rowNum = 0;
 
+        String[] fieldNames = {
+            "organization", "code", "name", "address", "managerName",
+            "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen",
+            "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode",
+            "wcNumber", "factoryLicenseNumber", "stateNM"
+        };
+
         while ((line = reader.readLine()) != null) {
             rowNum++;
+            line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
 
-            line = line.replaceAll("[\\x00-\\x1F\\x7F]", ""); // Clean control chars
-
-            if (line.trim().isEmpty()) {
-                continue; // Skip blank lines
-            }
+            if (line.trim().isEmpty()) continue;
 
             String[] rawFields = line.split(",", -1);
             String[] fields = new String[rawFields.length];
@@ -208,100 +213,86 @@ public class FileUploadServiceImpl implements FileUploadService {
 
             Map<String, String> fieldErrors = new LinkedHashMap<>();
 
-            if (fields.length < 15) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "error", "Insufficient columns. Expected at least 15."
-                ));
+            if (fields.length < 16) {
+                errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
+                continue;
+            }
+
+            for (int i = 0; i < fieldNames.length; i++) {
+                if (fields[i].isBlank()) {
+                    fieldErrors.put(fieldNames[i], "is Mandatory");
+                }
+            }
+
+            if (!fieldErrors.isEmpty()) {
+                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
             }
 
             try {
-                // Read individual fields
-                String organization = fields[0];
                 String code = fields[1];
-                String name = fields[2];
-                String address = fields[3];
-                String managerName = fields[4];
-                String managerAddrs = fields[5];
-                String businessType = fields[6];
-                String maxWorkmenStr = fields[7];
-                String maxCntrWorkmenStr = fields[8];
-                String bocwApplicabilityStr = fields[9];
-                String isMwApplicabilityStr = fields[10];
-                String licenseNumber = fields[11];
-                String pfCode = fields[12];
-                String wcNumber = fields[13];
-                String factoryLicenseNumber = fields[14];
+                String stateName = fields[15];
 
-                // Validate required fields
-                if (organization.isEmpty()) fieldErrors.put("organization", "is required");
-                if (code.isEmpty()) fieldErrors.put("code", "is required");
-                if (name.isEmpty()) fieldErrors.put("name", "is required");
-                if (address.isEmpty()) fieldErrors.put("address", "is required");
-                if (managerName.isEmpty()) fieldErrors.put("managerName", "is required");
-                if (managerAddrs.isEmpty()) fieldErrors.put("manager Address", "is required");
-                if (maxWorkmenStr.isEmpty()) fieldErrors.put("maxWorkmen", "is required");
-                if (isMwApplicabilityStr.isEmpty()) fieldErrors.put("isMwApplicability", "is required");
-                if (maxCntrWorkmenStr.isEmpty()) fieldErrors.put("maxContractWorkmen", "is required");
-                if (bocwApplicabilityStr.isEmpty()) fieldErrors.put("bocwApplicability", "is required");
-                if (licenseNumber.isEmpty()) fieldErrors.put("licenseNumber", "is required");
-                if (pfCode.isEmpty()) fieldErrors.put("pfCode", "is required");
-                if (wcNumber.isEmpty()) fieldErrors.put("wcNumber", "is required");
-                if (factoryLicenseNumber.isEmpty()) fieldErrors.put("factoryLicenseNumber", "is required");
-               
-                int maxWorkmen = 0, maxCntrWorkmen = 0, bocwApplicability = 0, isMwApplicability = 0;
-
-               // try {
-                //    maxWorkmen = Integer.parseInt(maxWorkmenStr);
-                //    maxCntrWorkmen = Integer.parseInt(maxCntrWorkmenStr);
-                //    bocwApplicability = Integer.parseInt(bocwApplicabilityStr);
-                //    isMwApplicability = Integer.parseInt(isMwApplicabilityStr);
-               // } catch (NumberFormatException e) {
-               //     fieldErrors.put("numberParse", "Invalid number format in one of the numeric fields");
-               // }
-
-                if (!fieldErrors.isEmpty()) {
-                    errorData.add(Map.of(
-                        "row", rowNum,
-                        "fieldErrors", fieldErrors
-                    ));
+                // Duplicate plantCode check
+                if (fileUploadDao.isPrincipalEmployerCodeExists(code)) {
+                    errorData.add(Map.of("row", rowNum, "error", "Duplicate plantCode: " + code + " already exists"));
                     continue;
                 }
 
-                // Save entity
-                PrincipalEmployer pe = new PrincipalEmployer(
-                    organization, code, name, address, managerName, managerAddrs,
-                    businessType, maxWorkmen, maxCntrWorkmen, bocwApplicability, isMwApplicability,
-                    licenseNumber, pfCode, wcNumber, factoryLicenseNumber
-                );
-                fileUploadDao.savePrincipalEmployer(pe);
+                // Check if state exists in CMSSTATE table
+                Long stateId = fileUploadDao.getStateIdByName(stateName);
+                if (stateId == null) {
+                    errorData.add(Map.of("row", rowNum, "error", "State not found: " + stateName));
+                    continue;
+                }
 
-                // Prepare success record
+                // Save PrincipalEmployer
+                PrincipalEmployer p = new PrincipalEmployer();
+                p.setOrganization(fields[0]);
+                p.setCode(code);
+                p.setName(fields[2]);
+                p.setAddress(fields[3]);
+                p.setManagerName(fields[4]);
+                p.setManagerAddrs(fields[5]);
+                p.setBusinessType(fields[6]);
+                p.setMaxWorkmen(Integer.parseInt(fields[7]));
+                p.setMaxCntrWorkmen(Integer.parseInt(fields[8]));
+                p.setBocwApplicability(Integer.parseInt(fields[9]));
+                p.setIsMwApplicability(Integer.parseInt(fields[10]));
+                p.setLicenseNumber(fields[11]);
+                p.setPfCode(fields[12]);
+                p.setWcNumber(fields[13]);
+                p.setFactoryLicenseNumber(fields[14]);
+                p.setStateNM(stateName);  // Save for display/reference
+
+                Long unitId = fileUploadDao.savePrincipalEmployer(p);  // Save and get unitId
+
+                // Save to CMSPrincipalEmployerState with unitId and stateId
+                fileUploadDao.savePEState(unitId, stateId);
+
+                // Prepare and add to success list
                 Map<String, Object> success = new LinkedHashMap<>();
-                success.put("organization", organization);
-                success.put("code", code);
-                success.put("name", name);
-                success.put("address", address);
-                success.put("managerName", managerName);
-                success.put("managerAddrs", managerAddrs);
-                success.put("businessType", businessType);
-                success.put("maxWorkmen", maxWorkmen);
-                success.put("maxCntrWorkmen", maxCntrWorkmen);
-                success.put("bocwApplicability", bocwApplicability);
-                success.put("isMwApplicability", isMwApplicability);
-                success.put("licenseNumber", licenseNumber);
-                success.put("pfCode", pfCode);
-                success.put("wcNumber", wcNumber);
-                success.put("factoryLicenseNumber", factoryLicenseNumber);
+                success.put("organization", p.getOrganization());
+                success.put("code", p.getCode());
+                success.put("name", p.getName());
+                success.put("address", p.getAddress());
+                success.put("managerName", p.getManagerName());
+                success.put("managerAddrs", p.getManagerAddrs());
+                success.put("businessType", p.getBusinessType());
+                success.put("maxWorkmen", p.getMaxWorkmen());
+                success.put("maxCntrWorkmen", p.getMaxCntrWorkmen());
+                success.put("bocwApplicability", p.getBocwApplicability());
+                success.put("isMwApplicability", p.getIsMwApplicability());
+                success.put("licenseNumber", p.getLicenseNumber());
+                success.put("pfCode", p.getPfCode());
+                success.put("wcNumber", p.getWcNumber());
+                success.put("factoryLicenseNumber", p.getFactoryLicenseNumber());
+                success.put("stateNM", stateName);
 
                 successData.add(success);
 
             } catch (Exception e) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "error", "Unexpected error: " + e.getMessage()
-                ));
+                errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
             }
         }
 
@@ -312,6 +303,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
 
+
    
     private Map<String, Object> processContractor(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
@@ -319,7 +311,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         String line;
         int rowNum = 0;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        // Map column index to field name
+
         String[] fieldNames = {
             "contractorName",        // 0
             "contractorAddress",     // 1
@@ -349,18 +341,18 @@ public class FileUploadServiceImpl implements FileUploadService {
             "esiValidFrom",          // 25
             "esiValidTo",            // 26
             "contractorCode",        // 27
-            "workOrderNumber"        // 28
+            "workOrderNumber",       // 28
+            "plantCode",             // 29
+            "organization"           // 30
         };
+
         while ((line = reader.readLine()) != null) {
             rowNum++;
-
             line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
 
-            if (line.trim().isEmpty()) {
-                continue;
-            }
+            if (line.trim().isEmpty()) continue;
 
-            String[] rawFields = line.split(",", -1); // Keep empty trailing fields
+            String[] rawFields = line.split(",", -1);
             String[] fields = new String[rawFields.length];
             for (int i = 0; i < rawFields.length; i++) {
                 fields[i] = rawFields[i].trim().replaceAll("\"", "");
@@ -368,78 +360,93 @@ public class FileUploadServiceImpl implements FileUploadService {
 
             Map<String, String> fieldErrors = new LinkedHashMap<>();
 
-            // Validate field count
-            if (fields.length < 29) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "error", "Insufficient number of fields"
-                ));
+            if (fields.length < 31) {
+                errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
                 continue;
             }
 
-            // Check for empty fields
             for (int i = 0; i < fieldNames.length; i++) {
                 if (fields[i].isBlank()) {
-                    fieldErrors.put(fieldNames[i],  " is Mandatory");
+                    fieldErrors.put(fieldNames[i], " is Mandatory");
                 }
             }
 
             if (!fieldErrors.isEmpty()) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "fieldErrors", fieldErrors
-                ));
+                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
             }
 
             try {
+                // Step 1: Fetch unitId from CMSPrincipalEmployer
+                String plantCode = fields[3];
+                String organization = fields[28];
+                String contractorCode = fields[29];
+                
+                Long unitId = fileUploadDao.getUnitIdByPlantCodeAndOrg(plantCode, organization);
+                if (unitId == null) {
+                    errorData.add(Map.of(
+                        "row", rowNum,
+                        "error", "No unitId found for plantCode: " + plantCode + " and organization: " + organization
+                    ));
+                    continue;
+                }
+             // Duplicate check for code (contractorCode)
+                if (fileUploadDao.isContractorCodeExists(contractorCode)) {
+                    errorData.add(Map.of(
+                        "row", rowNum,
+                        "error", "Duplicate contractorCode: " + contractorCode + " already exists"
+                    ));
+                    continue;
+                }
+                
+                // Step 2: Save Contractor
                 Contractor contractor = new Contractor();
                 contractor.setContractorName(fields[0]);
                 contractor.setContractorAddress(fields[1]);
-                contractor.setContractorCode(fields[27]);
-                contractor.setReference(fields[22]);
+                contractor.setContractorCode(contractorCode);
+                contractor.setReference(fields[23]);
                 contractor.setCity(fields[2]);
-                contractor.setMobileNumber(Long.parseLong(fields[23]));
-
+                contractor.setMobileNumber(Long.parseLong(fields[24]));
                 Long contractorId = fileUploadDao.saveContractor(contractor);
-                contractor.setContractorId(String.valueOf(contractorId));
 
+                // Step 3: Save PEMM (with unitId)
                 CMSContrPemm pemm = new CMSContrPemm();
                 pemm.setContractorId(contractorId);
-                pemm.setManagerNm(fields[3]);
-                pemm.setLicenseNumber(fields[4]);
-                pemm.setLicenseValidFrom(dateFormat.parse(fields[5]));
-                pemm.setLicenseValidTo(dateFormat.parse(fields[6]));
-                pemm.setCoverage(fields[7]);
-                pemm.setTotalStrength(Integer.parseInt(fields[8]));
-                pemm.setMaxNoEmp(Integer.parseInt(fields[9]));
-                pemm.setNatureofWork(fields[10]);
-                pemm.setLocationofWork(fields[11]);
-                pemm.setPeriodStartDt(dateFormat.parse(fields[12]));
-                pemm.setPeriodEndDt(dateFormat.parse(fields[13]));
-                pemm.setPfCode(fields[15]);
-                pemm.setPfNum(fields[20]);
-                pemm.setPfApplyDt(dateFormat.parse(fields[21]));
-                pemm.setEsiwc(fields[24]);
-                pemm.setEsiValidFrom(dateFormat.parse(fields[25]));
-                pemm.setEsiValidTo(dateFormat.parse(fields[26]));
+                pemm.setUnitId(unitId); // ✅ Save unitId here first
+                pemm.setManagerNm(fields[4]);
+                pemm.setLicenseNumber(fields[5]);
+                pemm.setLicenseValidFrom(dateFormat.parse(fields[6]));
+                pemm.setLicenseValidTo(dateFormat.parse(fields[7]));
+                pemm.setCoverage(fields[8]);
+                pemm.setTotalStrength(Integer.parseInt(fields[9]));
+                pemm.setMaxNoEmp(Integer.parseInt(fields[10]));
+                pemm.setNatureofWork(fields[11]);
+                pemm.setLocationofWork(fields[12]);
+                pemm.setPeriodStartDt(dateFormat.parse(fields[13]));
+                pemm.setPeriodEndDt(dateFormat.parse(fields[14]));
+                pemm.setPfCode(fields[16]);
+                pemm.setPfNum(fields[21]);
+                pemm.setPfApplyDt(dateFormat.parse(fields[22]));
+                pemm.setEsiwc(fields[25]);
+                pemm.setEsiValidFrom(dateFormat.parse(fields[26]));
+                pemm.setEsiValidTo(dateFormat.parse(fields[27]));
+                fileUploadDao.savePemm(pemm);
 
-                Long unitId = fileUploadDao.savePemm(pemm);
-                String unitIdString = String.valueOf(unitId);
-
+                // Step 4: Save SubContractor
                 CMSSubContractor csc = new CMSSubContractor();
-                csc.setUnitId(unitIdString);
-                csc.setContractorId(fields[14]);
-                csc.setWorkOrderNumber(fields[28]);
+                csc.setUnitId(String.valueOf(unitId));
+                csc.setContractorId(fields[15]);
+                csc.setWorkOrderNumber(fields[30]);
                 fileUploadDao.savecsc(csc);
 
+                // Step 5: Save WC with same unitId
                 CmsContractorWC wc = new CmsContractorWC();
                 wc.setContractorId(String.valueOf(contractorId));
-                wc.setUnitId(unitIdString);
-                wc.setWcCode(fields[16]);
-                wc.setWcFromDtm(fields[17]);
-                wc.setWcToDtm(fields[18]);
-                wc.setWcTotal(Integer.parseInt(fields[19]));
+                wc.setUnitId(String.valueOf(unitId)); // ✅ Use same unitId again
+                wc.setWcCode(fields[17]);
+                wc.setWcFromDtm(fields[18]);
+                wc.setWcToDtm(fields[19]);
+                wc.setWcTotal(Integer.parseInt(fields[20]));
                 fileUploadDao.savewc(wc);
 
                 Map<String, Object> map = new HashMap<>();
@@ -472,14 +479,13 @@ public class FileUploadServiceImpl implements FileUploadService {
                 map.put("esiValidTo", pemm.getEsiValidTo());
                 map.put("contractorCode", contractor.getContractorCode());
                 map.put("workOrderNumber", csc.getWorkOrderNumber());
+                map.put("plantCode", plantCode);
+                map.put("organization", organization);
 
                 successData.add(map);
 
             } catch (Exception e) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "error", "Exception while processing row: " + e.getMessage()
-                ));
+                errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
             }
         }
 
@@ -488,6 +494,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         result.put("errorData", errorData);
         return result;
     }
+
 
     
     private Map<String, Object> processWorkorder(BufferedReader reader) throws IOException {
@@ -669,7 +676,11 @@ public class FileUploadServiceImpl implements FileUploadService {
         return result;
     }
 
-
+	
+	@Override
+    public String getTemplateCSV(String templateType) {
+        return fileUploadDao.getCSVHeaders(templateType);
+    }
 
 	
    }

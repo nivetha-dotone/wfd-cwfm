@@ -822,121 +822,134 @@ function validateRenewFormData() {
 		}
 
 		
-		function saveRegistrationDetails() {
-		    let basicValid = validateFormData();
-		    if (!basicValid) return;
+	function saveRegistrationDetails() {
+    let basicValid = validateFormData();
+    if (!basicValid) return;
 
-			let otherFileds = validateDocuments();
-			if(!otherFileds) return;
-		    const data = new FormData();
-			var aadharFile = $("#aadharDocId").prop("files")[0];
-			    var panFile = $("#panDocId").prop("files")[0];
-		    const selectedOption = $("#vendorCodeId option:selected");
+    let otherFields = validateDocuments();
+    if (!otherFields) return;
 
-		    // Build the JSON object
-		    const jsonData = {
-		        contractorregId: $("#contractorregId").val().trim(),
-		        principalEmployer: $("#principalEmployerId").val(),
-		        contractorId: selectedOption.val(),
-		        vendorCode: selectedOption.data("code"),
-		       // contractorName: selectedOption.data("name"),
-			   contractorName: $("#contractorNameId").val().trim(),
-			   email: $("#emailId").val().trim(),
-			   mobile: $("#mobileId").val().trim(),
-			   aadhar: $("#aadharId").val().trim(),
-			   pan: $("#panId").val().trim(),
-			   gst: $("#gstId").val().trim(),
-			   address: $("#addressId").val().trim(),
-			   pfApplyDate: $("#pfApplyDateId").val().trim(),
-		        managerName: $("#managerNameId").val().trim(),
-		        locofWork: $("#locofWorkId").val().trim(),
-		        totalStrength: $("#totalStrengthId").val().trim(),
-		        rcMaxEmp: $("#rcMaxEmpId").val().trim(),
-		        pfNum: $("#pfNumId").val().trim(),
-		        natureOfWork: $("#natureOfWorkId").val().trim(),
-		        contractFrom: $("#contractFromId").val(),
-		        contractTo: $("#contractToId").val(),
-		        contractType: $("#contractTypeId").val(),
-		        rcVerified: $("#rcVerifiedId").is(":checked") ? "Yes" : "No",
-		        mainContractor: $("#mainContractorId").val().trim(),
-		        status: "1",
-		        requestType: "Create",
-		        regPolicy: []
-		    };
+    const data = new FormData();
+    const aadharFile = $("#aadharDocId").prop("files")[0];
+    const panFile = $("#panDocId").prop("files")[0];
+    const selectedOption = $("#vendorCodeId option:selected");
 
-			
-				
-		    // Loop through each work order/policy row
-		    $("#workOrderBody tr").each(function (index) {
-		        const row = $(this);
+    // ✅ Utility function for Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
 
-		        const policy = {
-		            woNumber: row.find(".woNumber").val(),
-		            natureOfJob: row.find(".natureOfJob").val(),
-		            documentType: row.find(".documentType").val(),
-		            documentNumber: row.find(".documentNumber").val(),
-		            coverage: row.find(".coverage").val(),
-		            validFrom: row.find(".validFrom").val(),
-		            validTo: row.find(".validTo").val()
-		        };
+    // ✅ Capital case transformation
+    const contractorName = toCapitalCase($("#contractorNameId").val().trim());
+    const managerName = toCapitalCase($("#managerNameId").val().trim());
+    const locofWork = toCapitalCase($("#locofWorkId").val().trim());
+    //const pan = toCapitalCase($("#panId").val().trim());
+    const natureOfWork = toCapitalCase($("#natureOfWorkId").val().trim());
+    const address = toCapitalCase($("#addressId").val().trim());
 
-		        jsonData.regPolicy.push(policy);
+    // Build the JSON object
+    const jsonData = {
+        contractorregId: $("#contractorregId").val().trim(),
+        principalEmployer: $("#principalEmployerId").val(),
+        contractorId: selectedOption.val(),
+        vendorCode: selectedOption.data("code"),
+        contractorName: contractorName,
+        email: $("#emailId").val().trim(),
+        mobile: $("#mobileId").val().trim(),
+        aadhar: $("#aadharId").val().trim(),
+        pan: $("#panId").val().trim().toUpperCase(),
+        gst: $("#gstId").val().trim().toUpperCase(),
+        address: address,
+        pfApplyDate: $("#pfApplyDateId").val().trim(),
+        managerName: managerName,
+        locofWork: locofWork,
+        totalStrength: $("#totalStrengthId").val().trim(),
+        rcMaxEmp: $("#rcMaxEmpId").val().trim(),
+        pfNum: $("#pfNumId").val().trim().toUpperCase(),
+        natureOfWork: natureOfWork,
+        contractFrom: $("#contractFromId").val(),
+        contractTo: $("#contractToId").val(),
+        contractType: $("#contractTypeId").val(),
+        rcVerified: $("#rcVerifiedId").is(":checked") ? "Yes" : "No",
+        mainContractor: $("#mainContractorId").val().trim(),
+        status: "1",
+        requestType: "Create",
+        regPolicy: []
+    };
 
-		        // Handle the file for this row
-		        const fileInput = row.find(".attachment")[0];
-		        if (fileInput && fileInput.files.length > 0) {
-		            data.append("policyAttachments", fileInput.files[0]);
-		        } else {
-		            // Add empty file as placeholder
-		            data.append("policyAttachments", new Blob([]));
-		        }
-		    });
+    // Loop through each work order/policy row
+    $("#workOrderBody tr").each(function () {
+        const row = $(this);
 
-			if (aadharFile) {
-						           data.append("aadharFile", aadharFile);
-						       }
-						       if (panFile) {
-						           data.append("panFile", panFile);
-						       }
-		    // Append the JSON data as a single field
-		    data.append("jsonData", JSON.stringify(jsonData));
+        const policy = {
+            woNumber: row.find(".woNumber").val(),
+            natureOfJob: row.find(".natureOfJob").val(),
+            documentType: row.find(".documentType").val(),
+            documentNumber: row.find(".documentNumber").val(),
+            coverage: row.find(".coverage").val(),
+            validFrom: row.find(".validFrom").val(),
+            validTo: row.find(".validTo").val()
+        };
 
-		    // Debug: Print form content
-		    for (const [key, value] of data.entries()) {
-		        console.log(key, value instanceof File ? value.name || "Empty file" : value);
-		    }
+        jsonData.regPolicy.push(policy);
 
-		    // Submit via AJAX
-		    const xhr = new XMLHttpRequest();
-		    xhr.open("POST", "/CWFM/contractor/saveReg", true);
+        const fileInput = row.find(".attachment")[0];
+        if (fileInput && fileInput.files.length > 0) {
+            data.append("policyAttachments", fileInput.files[0]);
+        } else {
+            data.append("policyAttachments", new Blob([])); // Placeholder
+        }
+    });
 
-		    xhr.onload = function () {
-		        if (xhr.status === 200) {
-		            alert("Contractor saved successfully!");
-		            loadCommonList('/contractor/contRegList', 'Contractor Registration');
-		        } else {
-		            alert("Failed to save contractor.");
-		            console.error("Error:", xhr.status, xhr.responseText);
-		        }
-		    };
+    if (aadharFile) {
+        data.append("aadharFile", aadharFile);
+    }
+    if (panFile) {
+        data.append("panFile", panFile);
+    }
 
-		    xhr.onerror = function () {
-		        alert("Error occurred while saving contractor.");
-		    };
+    // Append JSON data
+    data.append("jsonData", JSON.stringify(jsonData));
 
-		    xhr.send(data);
-		}
+    // Debug log
+    for (const [key, value] of data.entries()) {
+        console.log(key, value instanceof File ? value.name || "Empty file" : value);
+    }
 
+    // AJAX call
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/contractor/saveReg", true);
 
-		
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert("Contractor saved successfully!");
+            loadCommonList('/contractor/contRegList', 'Contractor Registration');
+        } else {
+            alert("Failed to save contractor.");
+            console.error("Error:", xhr.status, xhr.responseText);
+        }
+    };
 
-		document.addEventListener('click', function (e) {
-		    if (e.target.classList.contains('addRow')) {
-		        addRowCont();
-		    } else if (e.target.classList.contains('removeRow')) {
-		        deleteRowCont(e.target);
-		    }
-		});
+    xhr.onerror = function () {
+        alert("Error occurred while saving contractor.");
+    };
+
+    xhr.send(data);
+}
+
+// Row buttons event handler
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('addRow')) {
+        addRowCont();
+    } else if (e.target.classList.contains('removeRow')) {
+        deleteRowCont(e.target);
+    }
+});
+
 
 	
 			

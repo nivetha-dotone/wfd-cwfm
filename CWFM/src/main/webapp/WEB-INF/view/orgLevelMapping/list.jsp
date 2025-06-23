@@ -171,13 +171,14 @@
 </head>
 <body>
 <div class="page-header">
-    <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="shortNameSearch" name="searchQuery" placeholder="Search...">
+    <form id="searchForm" autocomplete="off">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="shortNameSearch" name="searchQuery" autocomplete="off" placeholder="Search...">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchUserByShortName()">Search</button>
     </form>
     <div>
    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapAdd()">New</button>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapEdit()">Edit</button>
+     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgLevelMappingView()">View</button>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportOrgLevelMapCSV()">Export</button>
 </div>
 </div>

@@ -365,12 +365,12 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="firstName" class="form-label">First Name</label>
-                <input id="firstName" name="firstName" class="form-control" type="text" maxlength="30">
+                <input id="firstName" name="firstName" class="form-control" type="text" maxlength="30" autocomplete="off">
                 <div id="error-firstName" class="text-danger d-none" style="display: none;">First Name is required</div>
             </div>
             <div class="col-md-6">
                 <label for="lastName" class="form-label">Last Name</label>
-                <input id="lastName" name="lastName" class="form-control" type="text" maxlength="30">
+                <input id="lastName" name="lastName" class="form-control" type="text" maxlength="30" autocomplete="off">
                 <div id="error-lastName" class="text-danger d-none" style="display: none;">Last Name is required</div>
             </div>
         </div>
@@ -379,7 +379,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                <input id="dateOfBirth" name="dateOfBirth" class="form-control datetimepickerformat" type="text" onfocus="initializeDatePicker()" onclick="initializeDatePicker()">
+                <input id="dateOfBirth" name="dateOfBirth" class="form-control datetimepickerformat" type="text" onfocus="initializeDatePicker()" onclick="initializeDatePicker()" autocomplete="off">
                 <div id="error-dateOfBirth" class="text-danger d-none" style="display: none;">Date Of Birth is required</div>
             </div>
             <div class="col-md-6">
@@ -398,12 +398,12 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="relationName" class="form-label">Father/Husband Name</label>
-                <input id="relationName" name="relationName" class="form-control" type="text" maxlength="30">
+                <input id="relationName" name="relationName" class="form-control" type="text" maxlength="30" autocomplete="off">
                 <div id="error-relationName" class="text-danger d-none" style="display: none;">Father / Husband name is required</div>
             </div>
             <div class="col-md-6">
                 <label for="idMark" class="form-label">ID Mark</label>
-                <input id="idMark" name="idMark" class="form-control" type="text" maxlength="30">
+                <input id="idMark" name="idMark" class="form-control" type="text" maxlength="30" autocomplete="off">
                 <div id="error-idMark" class="text-danger d-none" style="display: none;">ID Mark is required</div>
             </div>
         </div>
@@ -412,7 +412,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="mobileNumber" class="form-label">Mobile Number</label>
-                <input id="mobileNumber" name="mobileNumber" class="form-control" type="text" maxlength="30">
+                <input id="mobileNumber" name="mobileNumber" class="form-control" type="text" maxlength="30" autocomplete="off">
                 <div id="error-mobileNumber" class="text-danger d-none" style="display: none;">Mobile Number is required</div>
             </div>
             <div class="col-md-6">
@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row mb-3">
             <div class="col-md-12">
                 <label for="address" class="form-label">Address</label>
-                <input id="address" name="address" class="form-control" type="text">
+                <input id="address" name="address" class="form-control" type="text" autocomplete="off">
                 <div id="error-address" class="text-danger d-none" style="display: none;">Address is required</div>
             </div>
         </div>
