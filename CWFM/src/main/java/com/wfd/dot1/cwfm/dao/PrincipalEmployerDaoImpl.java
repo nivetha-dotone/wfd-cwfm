@@ -1,5 +1,7 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.sql.Timestamp;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,12 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import com.wfd.dot1.cwfm.pojo.KronosReport;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployerDocument;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
+
 @Repository
 public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 
@@ -31,6 +37,21 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	    
 	    public String getAllPesForAdmin() {
 		    return QueryFileWatcher.getQuery("GET_ALL_PES_FOR_ADMIN");
+		}
+	    public String getNextVersion() {
+		    return QueryFileWatcher.getQuery("GET_NEXT_VERSION_OF_DOCUMENT");
+		}
+	    public String savePeDocument() {
+		    return QueryFileWatcher.getQuery("SAVE_PE_DOCUMENTS");
+		}
+	    public String getDocumentsByEmployerId() {
+		    return QueryFileWatcher.getQuery("GET_DOCS_BY_EMPLOYERID");
+		}
+	    public String getAllPeDocTypes() {
+		    return QueryFileWatcher.getQuery("GET_ALL_DOCTYPES");
+		}
+	    public String getDocumentById() {
+		    return QueryFileWatcher.getQuery("GET_DOCUMENT_BY_ID");
 		}
 	 
 	@Override
@@ -151,5 +172,43 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 		log.info("Exiting from getAllPrincipalEmployerForAdmin dao method "+peList.size());
 		return peList;
 	}
+
+	@Override
+    public void saveDocument(PrincipalEmployerDocument doc) {
+		String query = savePeDocument();
+       // String sql = "INSERT INTO principal_employer_documents " +
+                   //  "(principal_employer_id, file_name, version, upload_date, uploaded_by, doc_type, file_path) " +
+                   //  "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(query, doc.getPrincipalEmployerId(), doc.getFileName(), doc.getVersion(),
+               doc.getUploadDate(), doc.getUploadedBy(), doc.getDocType(), doc.getFilePath());
+    }
+
+    @Override
+    public int getNextVersion(int employerId, String docType) {
+    	String query = getNextVersion();
+       // String sql = "SELECT MAX(version) FROM principal_employer_documents WHERE principal_employer_id = ? AND doc_type = ?";
+        Integer version = jdbcTemplate.queryForObject(query, Integer.class, employerId, docType);
+        return (version == null ? 1 : version + 1);
+    }
+
+    @Override
+    public List<PrincipalEmployerDocument> getDocumentsByEmployerId(String employerId) {
+    	String query = getDocumentsByEmployerId();
+        //String sql = "SELECT * FROM principal_employer_documents WHERE principal_employer_id = ? ORDER BY doc_type, version DESC";
+        return jdbcTemplate.query(query, new Object[]{employerId}, new BeanPropertyRowMapper<>(PrincipalEmployerDocument.class));
+    }
+
+    @Override
+    public List<KronosReport> getAllDocTypes() {
+    	String query = getAllPeDocTypes();
+        //String sql = "SELECT REPORTNAME FROM PeDocConfigKronos ORDER BY REPORTNAME";
+        return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(KronosReport.class));
+    }
+    @Override
+    public PrincipalEmployerDocument getDocumentById(int docId) {
+    	String query = getDocumentById();
+       // String sql = "SELECT * FROM principal_employer_documents WHERE id = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{docId}, new BeanPropertyRowMapper<>(PrincipalEmployerDocument.class));
+    }
 
 }

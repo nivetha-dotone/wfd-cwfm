@@ -7,8 +7,8 @@ LLWO(6,"LLWO"),
 WCWO(7,"WCWO"),
 LL(8,"LL"),
 WC(9,"WC"),
-WO(10,"WO");
-	
+WO(10,"WO"),
+RETIRE(11,"RETIRE");	
 	private int status;
 	private String name;
 	public int getStatus() {

@@ -382,7 +382,257 @@ console.log(formData);
     } else {
         checkbox.value = "false";
     }
-    
-    
 }
-    
+function toggleSection(id) {
+    $(".accordion-content").not("#" + id).slideUp();
+    $("#" + id).slideToggle();
+}
+  
+function addReportRow() {
+	console.log("Adding document row...");
+    const row = `
+        <div class="document-row">
+                            <input type="text" name="peDoc"  placeholder="Enter Document name" autocomplete="off" style="text-transform:capitalize;" />
+                            <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>
+                        </div>
+    `;
+    $("#documentsContainer").append(row);
+}
+
+function saveDocuments() {
+    const inputs = document.querySelectorAll('#documentsContainer input[name="peDoc"]');
+    const docNames = [];
+    const docNameMap = new Map();
+    let isValid = true;
+    let errorMessages = [];
+
+    // Clear previous styles
+    inputs.forEach(input => input.style.border = "");
+
+    // Convert to Capital Case
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+    // Validate and check duplicates
+    inputs.forEach((input, index) => {
+        const value = toCapitalCase(input.value.trim());
+        if (value) {
+            if (docNameMap.has(value)) {
+                isValid = false;
+                input.style.border = "2px solid red";
+                errorMessages.push(`• Duplicate Document "${value}" found at row ${index + 1}`);
+            } else {
+                docNameMap.set(value, true);
+                docNames.push(value);
+            }
+        }
+    });
+
+    // No documents entered
+    if (docNames.length === 0) {
+        showMessage("Please enter at least one document.", "error");
+        return;
+    }
+
+    // Show duplicate errors
+    if (!isValid) {
+        const message = `<b>Errors Found:</b><br>${errorMessages.join("<br>")}`;
+        showMessage(message, "error");
+        return;
+    }
+
+    // Send data to server
+    const formData = new URLSearchParams();
+    docNames.forEach(name => formData.append("peDoc", name));
+
+    fetch("/CWFM/pedocsetup/save", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(async response => {
+        const text = await response.text();
+        if (!response.ok) throw new Error(text);
+
+        showMessage("Documents saved successfully!", "success");
+
+        // ✅ Redirect to list page after 1.5 seconds
+        setTimeout(() => {
+			loadCommonList('/pedocsetup/list', 'PrincipalEmployer Documents');
+           // window.location.href = "/CWFM/pedocsetup/list";  // 🔁 Change this to your actual list page URL
+        }, 1500);
+    })
+    .catch(error => {
+        showMessage(error.message || "Save failed.", "error");
+    });
+}
+
+
+
+function resetDocumentForm() {
+    // Remove all dynamically added document rows
+    const container = document.getElementById("documentsContainer");
+    container.innerHTML = "";
+}
+
+function showMessage(message, type) {
+    const msgBox = document.getElementById("saveStatusMsg");
+    msgBox.innerHTML = message;
+    msgBox.style.color = type === "success" ? "green" : "red";
+    msgBox.style.fontWeight = "bold";
+    msgBox.style.display = "block";
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        msgBox.style.display = "none";
+    }, 5000);
+}
+
+
+
+function addFile(docType) {
+    const container = document.getElementById("container_" + docType);
+
+    const row = document.createElement("div");
+    row.className = "file-row";
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.gap = "10px";
+    row.style.marginBottom = "10px";
+    row.style.color = "black";
+    const input = document.createElement("input");
+    input.type = "file";
+    input.name = "files_" + docType;
+    input.required = true;
+    input.accept = ".pdf,.jpg,.jpeg,.png"; // ✅ restrict file chooser
+
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.innerText = "Delete";
+    delBtn.style.marginLeft = "5px";
+    delBtn.style.color = "black";
+    const preview = document.createElement("span");
+    preview.className = "preview";
+    preview.style.marginLeft = "10px";
+    preview.style.color = "black";
+
+    // Allowed MIME types and extensions
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+    const allowedExts = ["pdf", "jpg", "jpeg", "png"];
+    const maxSizeMB = 5;
+
+    input.onchange = function () {
+        const file = input.files[0];
+        preview.innerHTML = "";
+
+        if (!file) return;
+
+        const fileName = file.name;
+        const ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+
+        // Validate extension and MIME type
+        if (!allowedExts.includes(ext) || !allowedTypes.includes(file.type)) {
+            alert("Only PDF, JPG, or PNG files are allowed.");
+            input.value = "";
+            return;
+        }
+
+        // Validate size
+        if (file.size > maxSizeMB * 1024 * 1024) {
+            alert("Max file size is 5MB.");
+            input.value = "";
+            return;
+        }
+
+        // Preview
+        if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.innerHTML = `<img src="${e.target.result}" width="80"/>`;
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === "application/pdf") {
+            preview.innerHTML = `<span>📄 ${fileName}</span>`;
+        }
+    };
+
+    // Delete logic
+    delBtn.onclick = function () {
+        row.remove();
+        addFile(docType);
+    };
+
+    // Append elements
+    row.appendChild(input);
+    row.appendChild(delBtn);
+    row.appendChild(preview);
+
+    container.appendChild(row);
+}
+
+
+
+
+function savePeDocuments() {
+    const employerId = $("#employerId").val();
+    const data = new FormData();
+    const docData = [];
+
+    $(".doc-section").each(function () {
+        const docType = $(this).find("h4").text().trim();
+        const fileInputs = $(this).find("input[type='file']");
+
+        fileInputs.each(function () {
+            const file = this.files[0];
+            if (file) {
+                const fieldName = "files_" + docType;
+                data.append(fieldName, file);
+                docData.push({
+                    docType: docType,
+                    fileName: file.name
+                });
+            }
+        });
+    });
+
+    const payload = {
+        employerId: employerId,
+        documents: docData
+    };
+
+    data.append("jsonData", JSON.stringify(payload));
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/principalEmployer/saveAll", true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert("Documents uploaded successfully.");
+            loadCommonList('/principalEmployer/list', 'PrincipalEmployer');
+        } else {
+            alert("Upload failed: " + xhr.responseText);
+        }
+    };
+
+    xhr.onerror = function () {
+        alert("Network error.");
+    };
+
+    xhr.send(data);
+}
+
+
+function downloadFile(docId) {
+    const url = `/CWFM/principalEmployer/download/${docId}`;
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    //anchor.target = "_blank"; // optional: opens in new tab
+    anchor.click();
+}

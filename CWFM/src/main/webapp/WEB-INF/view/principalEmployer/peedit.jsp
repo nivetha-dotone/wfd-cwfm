@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
+    
       <!--  <script src="resources/js/commonjs.js"></script> -->
     <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/cms/contractor.js"></script>
@@ -154,6 +155,27 @@ table.ControlLayout td {
     padding: 10px; /* Add padding inside cells for spacing around content */
     vertical-align: top; /* Align the content to the top of the cell */
 }
+ .doc-section { border: 1px solid #ccc; margin-bottom: 30px; padding: 10px; }
+        .file-row { margin-top: 8px; }
+        .file-row input[type="file"] { margin-right: 10px; }
+        .preview img { vertical-align: middle; margin-right: 5px; }
+        #progressBar { width: 100%; display: none; height: 20px; }
+        
+         .doc-section {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+    }
+
+    .uploaded-docs {
+        padding-left: 10px;
+        color: #333;
+    }
+
+    .uploaded-docs span {
+        display: block;
+        margin-bottom: 4px;
+        color: black;
+    }
     </style>
     <script>
         function showTab(tabId) {
@@ -193,9 +215,12 @@ table.ControlLayout td {
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Unit Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
-        <button data-target="tab3" onclick="showTabOther('tab3')">Documents</button>
+          <button data-target="tab3" onclick="showTabOther('tab3')">Documents Information</button>
         </div>     <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer');">Cancel</button> -->
      <div class="action-buttons" > 
+    
+            <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="savePeDocuments()">save</button>
+
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer')">Cancel</button>
      </div> 
     </div>
@@ -219,7 +244,7 @@ table.ControlLayout td {
         <tbody>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitName"/></label></th>
-                <td><input type="text" name="NAME" value="${principalEmployer.name}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <td><input type="text" name="NAME"  value="${principalEmployer.name}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.peInactive"/></label></th>
                 <td>
                     <c:choose>
@@ -370,51 +395,57 @@ table.ControlLayout td {
                 </table>
             </form>
         </div>
-         <div id="tab3" class="tab-content">
-      <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+      <div id="tab3" class="tab-content">
+    <form id="docUploadForm" enctype="multipart/form-data">
+        <input type="hidden" id="employerId" value="${principalEmployer.unitId}" />
 
-<div class="accordion">
-    <div class="accordion-content" id="peDocSection">
-        <c:forEach var="docType" items="${docTypes}">
-            <div class="doc-section" style="margin-bottom: 20px;">
-                <h4 style="color:black;">${docType.reportName}</h4>
+        <c:forEach var="docType" items="${reportName}">
+            <div class="doc-section" style="margin-bottom: 30px;">
+                <!-- Title and Add Button -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="color: black; margin: 0;">${docType}</h4>
+                    <button type="button" style="color: grey;" onclick="addFile('${docType}')">Add Document</button>
+                </div>
 
-                <div class="doc-table">
+                <!-- Container for new file inputs -->
+                <div id="container_${docType}" class="doc-container" style="margin-top: 10px;"></div>
+
+                <!-- Table for existing uploaded files -->
+                <div class="doc-table" style="margin-top: 15px;">
                     <c:choose>
-                        <c:when test="${not empty docsByType[docType.reportName]}">
+                        <c:when test="${not empty docsByType[docType]}">
                             <table border="1" cellpadding="5" cellspacing="0" style="width: 100%;">
-                                <thead style="color:black;">
-                                    <tr>
-                                        <th>File Name</th>
-                                        <th>Version</th>
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="color: black;">File Name</th>
+                                        <!-- <th style="color: black;">Version</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="doc" items="${docsByType[docType.reportName]}">
+                                    <c:forEach var="doc" items="${docsByType[docType]}">
                                         <tr>
                                             <td>
-                                                <%-- <a href="${pageContext.request.contextPath}/documents/download/${doc.id}"  target="_blank"   style="text-decoration: none; color: blue;">   ${doc.fileName}  </a> --%>
-                                            <a href="#" onclick="downloadFile('${doc.id}')">${doc.fileName}</a>
+                                                <a href="#" onclick="downloadFile('${doc.id}')" style="text-decoration: none; color: blue;">
+                                                    ${doc.fileName}
+                                                </a>
                                             </td>
-                                            <td style="color:gray;">v${doc.version}</td>
+                                           <%--  <td style="color: gray;">v${doc.version}</td> --%>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
                             </table>
                         </c:when>
                         <c:otherwise>
-                            <p style="color: gray;">No documents uploaded for ${docType.reportName}</p>
+                            <%-- <p style="color: gray;">No documents uploaded for ${docType}</p> --%>
                         </c:otherwise>
                     </c:choose>
                 </div>
             </div>
         </c:forEach>
-    </div>
+
+        <progress id="progressBar" value="0" max="100" style="width: 100%; margin-top: 20px;"></progress>
+    </form>
 </div>
 
-         
-         </div>
-    </div>
 </body>
 </html>
