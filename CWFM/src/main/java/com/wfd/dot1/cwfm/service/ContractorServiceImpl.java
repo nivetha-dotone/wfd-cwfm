@@ -155,4 +155,10 @@ public class ContractorServiceImpl implements ContractorService{
 		// TODO Auto-generated method stub
 		return contrDao.getContractorComplianceExportData(unitId);
 	}
+	
+	@Override
+	public ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId) {
+		
+		return contrDao.getAllContractorDetailForRenewal(unitId,contractorId);
+	}
 }

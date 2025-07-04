@@ -54,6 +54,9 @@ public class ContractorDaoImpl implements ContractorDao{
 	 public String getAllContractors() {
 		    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTORS");
 		}
+	 public String getAllRenewalContractorsList() {
+		    return QueryFileWatcher.getQuery("GET_ALL_CONTR_RENEWAL_LIST");
+		}
 	 public String getContractorsDetails() {
 		    return QueryFileWatcher.getQuery("GET_CONTRACTOR_DETAILS");
 		}
@@ -248,6 +251,25 @@ public class ContractorDaoImpl implements ContractorDao{
 	}
 	
 	@Override
+	public List<ContractorRegistration> getContractorRenewalList(String userId) {
+	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
+	String query = getAllRenewalContractorsList();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+	while(rs.next()) {
+		ContractorRegistration pe = new ContractorRegistration();
+		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
+		pe.setPrincipalEmployer(rs.getString("UNITCODE"));
+		pe.setVendorCode(rs.getString("CODE"));
+		pe.setContractorName(rs.getString("CONTRACTORNAME"));
+		pe.setStatus(rs.getString("STATUS"));
+		pe.setRequestType(rs.getString("TYPE"));
+		
+		peList.add(pe);
+	}
+	return peList;
+	}
+	
+	@Override
 	public ContractorRenewal getContractorDetails(String contractorRenewId) {
 		ContractorRenewal contr = null;
 		String query = getContractorsDetails();
@@ -314,22 +336,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	        }
 			return contr;
 	}
-	@Override
-	public List<ContractorRegistration> getContractorRenewalList(String userId) {
-	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
-	String query = getAllRenewalContractors();
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
-	while(rs.next()) {
-		ContractorRegistration pe = new ContractorRegistration();
-		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
-		pe.setPrincipalEmployer(rs.getString("UNITCODE"));
-		pe.setVendorCode(rs.getString("CODE"));
-		pe.setContractorName(rs.getString("CONTRACTORNAME"));
-		pe.setStatus(rs.getString("STATUS"));
-		peList.add(pe);
-	}
-	return peList;
-	}
+	
 	
 	@Override
 	public List<ContractorRegistrationPolicy> viewContractorAddDetails(String contractorregId) {
@@ -496,6 +503,10 @@ public class ContractorDaoImpl implements ContractorDao{
 	public String getAllContractorDetailForReg() {
 	    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTOR_DETAIL_FOR_REG");
 	}
+	
+	public String getAllContractorDetailForRenewal() {
+	    return QueryFileWatcher.getQuery("GET_CONTRACTOR_DETAILS_FOR_RENEWAL");
+	}
 	@Override
 	public Contractor getAllContractorDetailForReg(String unitId, String contractorId) {
 		String query=getAllContractorDetailForReg();
@@ -532,6 +543,7 @@ public class ContractorDaoImpl implements ContractorDao{
 			cont.setRcValidated(rs.getString("RCVALIDATED"));
 			cont.setLlValidated(rs.getString("LLVALIDATED"));
 			cont.setWcValidated(rs.getString("WCVALIDATED"));
+			
 		}
 		return cont;
 	}
@@ -673,5 +685,41 @@ public class ContractorDaoImpl implements ContractorDao{
 		}
 		return peList;
 	}
+	
+	@Override
+	public ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId) {
+		String query=getAllContractorDetailForRenewal();
+		log.info("Query to getAllContractorBasedOnPE "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorId,unitId);
+		ContractorRegistration cont = new ContractorRegistration();
+		while(rs.next()) {
+			
+			cont.setPrincipalEmployer(rs.getString("UNITID"));
+			cont.setContractorName(rs.getString("CONTRACTORNAME"));
+			cont.setVendorCode(rs.getString("CODE"));
+			cont.setEmail(rs.getString("EMAILADDR"));
+			cont.setMobile(rs.getString("MOBILENO"));
+			cont.setAadhar(rs.getString("AADHARNUM"));
+			cont.setAadharDoc(rs.getString("AADHARDOCNAME"));
+			cont.setPan(rs.getString("PANNUM"));
+			cont.setPanDoc(rs.getString("PANDOCNAME"));
+			cont.setGst(rs.getString("GST"));
+			cont.setAddress(rs.getString("ADDRESS"));
+			cont.setPfNum(rs.getString("PFNUM"));
+			cont.setNatureOfWork(rs.getString("NATUREOFWORK"));
+			cont.setManagerName(rs.getString("MANAGERNM"));
+			cont.setLocofWork(rs.getString("LOCOFWORK"));
+			cont.setTotalStrength(rs.getString("TOTALSTRENGTH"));
+			cont.setRcMaxEmp(rs.getString("MAXNOEMP"));
+			cont.setContractFrom(rs.getString("PERIODSTARTDATE"));
+			cont.setContractTo(rs.getString("PERIODENDDATE"));
+			cont.setContractType(rs.getString("CONTTYPE"));
+			cont.setServices(rs.getString("SERVICES"));
+			cont.setEsicRegNo(rs.getString("ESICREGNO"));
+			cont.setContractorId(rs.getString("CONTRACTORID"));
+		}
+		return cont;
+	}
+
 }
 

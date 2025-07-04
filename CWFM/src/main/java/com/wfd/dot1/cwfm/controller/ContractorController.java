@@ -396,34 +396,7 @@ public class ContractorController {
 		return "contractors/contractorView"; // Return the JSP file name
 	}
 
-	@GetMapping("/contRenewal")
-	public String getContractorRenewal(HttpServletRequest request, HttpServletResponse response) {
-		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
-		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
-		return "contractors/contractorRenewal";
-	}
-
-	@GetMapping("/contRenewalList")
-	public String getContractorRenewalList(HttpServletRequest request, HttpServletResponse response) {
-
-		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
-		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
-		List<ContractorRegistration> listDto = contrService.getContractorRenewalList(String.valueOf(user.getUserId()));
-		request.setAttribute("contractorlist", listDto);
-		return "contractors/contractorRenewList";
-
-	}
-	@GetMapping("/contractorRenewalview/{contractorRenewId}")
-	public String viewContractorRenewDetails(@PathVariable String contractorRenewId, HttpServletRequest request,
-			HttpServletResponse response) {
-		ContractorRenewal renew = contrService.viewContractorRenewDetails(contractorRenewId);
-		request.setAttribute("contractRenew", renew);
-		List<ContractorRenewal> list = contrService.viewContractorRenewAddDetails(contractorRenewId);
-		request.setAttribute("renewDetails", list);
-		return "contractors/contractorRenewalView"; // Return the JSP file name
-	}
+	
 	@GetMapping("/role")
 	public String getRole(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
@@ -451,12 +424,7 @@ public class ContractorController {
 		String result = contrService.saveRole(user);
 		return new ResponseEntity<>("contractors/rolelist", HttpStatus.OK);
 	}
-	@PostMapping("/saveRenew")
-	public ResponseEntity<String> saveRenew(@RequestBody ContractorRenewal contrenew, HttpServletRequest request,
-			HttpServletResponse response) {
-		String result = contrService.saveRenew(contrenew);
-		return new ResponseEntity<>("contractors/contractorRegistrationList", HttpStatus.OK);
-	}
+	
 	
 	@GetMapping("/downloadFile/{contregId}/{userId}/{docName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("contregId") String contregId,@PathVariable("userId") String userId,  @PathVariable("docName") String docName) {

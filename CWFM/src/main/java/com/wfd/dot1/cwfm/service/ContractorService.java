@@ -65,6 +65,8 @@ public interface ContractorService {
 	public List<ContractorRegistration> getContractorMasterExportData(String unitId);
 
 	public List<ContractorComplianceDto> getContractorComplianceExportData(String unitId);
+
+	public ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId);
 	   
 	}
 

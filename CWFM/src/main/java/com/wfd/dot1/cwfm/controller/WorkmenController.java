@@ -363,6 +363,7 @@ public class WorkmenController {
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
     	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	List<PersonOrgLevel> businessType = groupedByLevelDef.getOrDefault("Business Type", new ArrayList<>());
     	
     	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
         CMSRoleRights rr =new CMSRoleRights();
@@ -371,6 +372,7 @@ public class WorkmenController {
    	    request.setAttribute("UserPermission", rr);
     	request.setAttribute("principalEmployers", peList);
     	  request.setAttribute("Dept", departments);
+    	request.setAttribute("BusinessType", businessType) ;
     	  
 		return "contractWorkmen/approverList";
 	}
@@ -379,6 +381,7 @@ public class WorkmenController {
     public ResponseEntity<List<GatePassListingDto>> gatePassListingDetails(
     		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
     		@RequestParam(value = "deptId", required = false) String deptId,
+    		@RequestParam(value = "businessType", required = false) String businessType,
     		@RequestParam(value = "type", required = false) String type,
     		HttpServletRequest request,HttpServletResponse response) {
     	

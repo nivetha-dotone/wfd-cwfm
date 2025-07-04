@@ -32,6 +32,7 @@
 
 
       <script src="resources/js/cms/export.js"></script>
+       <script src="resources/js/cms/contRenewal.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   

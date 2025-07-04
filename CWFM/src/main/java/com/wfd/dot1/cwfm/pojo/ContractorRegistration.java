@@ -214,6 +214,26 @@ public class ContractorRegistration{
 		this.createdBy = createdBy;
 	}
 	
+	private String services;
+
+
+	public String getServices() {
+		return services;
+	}
+	public void setServices(String services) {
+		this.services = services;
+	}
+
+private String esicRegNo;
+
+
+public String getEsicRegNo() {
+	return esicRegNo;
+}
+public void setEsicRegNo(String esicRegNo) {
+	this.esicRegNo = esicRegNo;
+}
+	
 	
 	
 	

@@ -67,6 +67,8 @@ public interface ContractorDao {
 	public List<ContractorRegistration> getContractorMasterExportData(String unitId);
 
 	public List<ContractorComplianceDto> getContractorComplianceExportData(String unitId);
+
+	ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId);
 	   
 	}
 
