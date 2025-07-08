@@ -227,6 +227,7 @@ public class ContractorDaoImpl implements ContractorDao{
            status  = jdbcTemplate.update(saveContractorDetails(), parameters);
            return contreg.getContractorregId();
         } catch (Exception e) {
+        	
         }
     return null;
 	}
@@ -500,6 +501,7 @@ public class ContractorDaoImpl implements ContractorDao{
 		log.info("Exiting from getAllContractorForReg dao method "+contList.size());
 		return contList;
 	}
+	
 	public String getAllContractorDetailForReg() {
 	    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTOR_DETAIL_FOR_REG");
 	}
@@ -507,6 +509,11 @@ public class ContractorDaoImpl implements ContractorDao{
 	public String getAllContractorDetailForRenewal() {
 	    return QueryFileWatcher.getQuery("GET_CONTRACTOR_DETAILS_FOR_RENEWAL");
 	}
+	
+	public String getAllAvailableWos() {
+	    return QueryFileWatcher.getQuery("AVAILABLE_WO_FOR_RENEW");
+	}
+	
 	@Override
 	public Contractor getAllContractorDetailForReg(String unitId, String contractorId) {
 		String query=getAllContractorDetailForReg();
@@ -718,6 +725,13 @@ public class ContractorDaoImpl implements ContractorDao{
 			cont.setEsicRegNo(rs.getString("ESICREGNO"));
 			cont.setContractorId(rs.getString("CONTRACTORID"));
 		}
+		String sqlWO = this.getAllAvailableWos();
+		SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sqlWO,cont.getVendorCode(),unitId);
+		List<String> woList = new ArrayList<>();
+		while(rs1.next()) {
+			woList.add(rs1.getString("SAP_WORKORDER_NUM"));
+		}
+		cont.setAvailableWos(woList);
 		return cont;
 	}
 

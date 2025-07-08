@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -101,7 +103,6 @@ public class ContractorRenewalController {
 		    request.setAttribute(attributeName, gmList1);
 		});
 		
-		
 		return "contRenewal/create";
 	}
 	
@@ -121,6 +122,29 @@ public class ContractorRenewalController {
 	            return new ResponseEntity<>(contractors, HttpStatus.OK);
 	        } catch (Exception e) {
 	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+	 
+	 @PostMapping("/save")
+	    @ResponseBody
+	    public ResponseEntity<String> saveRenewal(
+	            @RequestParam("jsonData") String jsonData,
+	            @RequestParam("aadharFile") MultipartFile aadharFile,
+	            @RequestParam("panFile") MultipartFile panFile,
+	            @RequestParam("renewalAttachments") List<MultipartFile> renewalAttachments,
+	            HttpServletRequest request) {
+
+		 HttpSession session = request.getSession(false);
+         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+	        String username = String.valueOf(user.getUserId());
+
+	        try {
+	        	contrService.saveRenewal(jsonData, aadharFile, panFile, renewalAttachments, username);
+	            return ResponseEntity.ok("Success");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                                 .body("Failed to save renewal: " + e.getMessage());
 	        }
 	    }
 }

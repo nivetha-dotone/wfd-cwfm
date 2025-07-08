@@ -66,6 +66,23 @@ function getAllContractorDetailForRenewal(contractorId) {
             setValueIfPresent("gstId", contractors.gst);
             setValueIfPresent("addressId", contractors.address);
             setValueIfPresent("contractTypeId", contractors.contractType);
+			
+			const availableBox = document.getElementById("availableWorkOrders");
+			            const selectedBox = document.getElementById("selectedWorkOrders");
+			            availableBox.innerHTML = "";
+			           selectedBox.innerHTML = "";
+
+			            const selectedSet = new Set(contractors.selectedWos || []);
+
+			            (contractors.availableWos || []).forEach(workOrder => {
+			                const option = new Option(workOrder, workOrder);
+							option.style.color = "black"; 
+			                if (selectedSet.has(workOrder)) {
+			                    selectedBox.add(option);
+			                } else {
+			                    availableBox.add(option);
+			                }
+			            });
         } else {
             console.error("Error:", xhr.statusText);
         }
@@ -77,6 +94,8 @@ function getAllContractorDetailForRenewal(contractorId) {
 
     xhr.send();
 }
+
+
 
 document.addEventListener('click', function (e) {
     if (e.target.matches('button.addRowNew')) {
@@ -105,6 +124,8 @@ function addRowContNew() {
         <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
         <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
         <td><input type="file" class="form-control attachment" name="attachment" /></td>
+		<td><input type="checkbox" class="form-control panIndia" name="panIndia" /></td>
+		<td><input type="checkbox" class="form-control subApplicable" name="subApplicable" /></td>
     `;
 
     const originalDropdown = document.querySelector('#licenseBody tr:first-child select.documentType');
@@ -128,5 +149,216 @@ function deleteRowContNew(buttonElement) {
         row.remove();
     } else {
         alert("At least one row must be present.");
+    }
+}
+
+function moveSelected(fromId, toId) {
+    const from = document.getElementById(fromId);
+    const to = document.getElementById(toId);
+    Array.from(from.selectedOptions).forEach(opt => {
+        const newOption = new Option(opt.text, opt.value);
+        to.add(newOption);
+        from.remove(opt.index);
+    });
+}
+
+function saveRenewalDetails() {
+    // Step 1: Optional validations
+    if (!validateFormData()) return;
+    if (!validateDocumentsForRenewal()) return;
+
+    const data = new FormData();
+
+    const aadharFile = $("#aadharDocId").prop("files")[0];
+    const panFile = $("#panDocId").prop("files")[0];
+	const selectedOption = $("#vendorCodeId option:selected");
+    function toCapitalCase(str) {
+        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    const contractorName = toCapitalCase($("#contractorNameId").val().trim());
+    const managerName = toCapitalCase($("#managerNameId").val().trim());
+    const locofWork = toCapitalCase($("#locofWorkId").val().trim());
+    const natureOfWork = toCapitalCase($("#natureOfWorkId").val().trim());
+    const address = toCapitalCase($("#addressId").val().trim());
+
+    // Step 2: Build JSON data
+    const jsonData = {
+        contractorregId: $("#contractorregId").val().trim(),
+        contractorId:selectedOption.val(),
+        principalEmployer: $("#principalEmployerId").val().trim(),
+        contractorName: contractorName,
+		vendorCode: selectedOption.data("code"),
+        email: $("#emailId").val().trim(),
+        mobile: $("#mobileId").val().trim(),
+        aadhar: $("#aadharId").val().trim(),
+        pan: $("#panId").val().trim().toUpperCase(),
+        gst: $("#gstId").val().trim().toUpperCase(),
+        address: address,
+        pfApplyDate: $("#pfApplyDateId").val().trim(),
+        managerName: managerName,
+        locofWork: locofWork,
+        totalStrength: $("#totalStrengthId").val().trim(),
+        rcMaxEmp: $("#rcMaxEmpId").val().trim(),
+        pfNum: $("#pfNumId").val().trim().toUpperCase(),
+        natureOfWork: natureOfWork,
+        contractFrom: $("#contractFromId").val(),
+        contractTo: $("#contractToId").val(),
+        contractType: $("#contractTypeId").val(),
+        rcVerified: $("#rcVerifiedId").is(":checked") ? "Yes" : "No",
+        mainContractor: $("#mainContractorId").val().trim(),
+        requestType: "Renewal",
+        renewalDocuments: [],
+        selectedWorkOrders: []
+    };
+
+    // Step 3: Collect selected work orders from right box
+    const selectedWorkOrders = Array.from(document.getElementById("selectedWorkOrders").options)
+        .map(opt => opt.value);
+    jsonData.selectedWorkOrders = selectedWorkOrders;
+
+    // Step 4: Collect license/doc rows
+    $("#licenseBody tr").each(function () {
+        const row = $(this);
+        const doc = {
+            documentType: row.find(".documentType").val(),
+            documentNumber: row.find(".documentNumber").val(),
+            coverage: row.find(".coverage").val(),
+            validFrom: row.find(".validFrom").val(),
+            validTo: row.find(".validTo").val(),
+            panIndia: row.find(".panIndia").is(":checked"),
+            subApplicable: row.find(".subApplicable").is(":checked")
+        };
+        jsonData.renewalDocuments.push(doc);
+
+        const fileInput = row.find(".attachment")[0];
+        if (fileInput && fileInput.files.length > 0) {
+            data.append("renewalAttachments", fileInput.files[0]);
+        } else {
+            data.append("renewalAttachments", new Blob([])); // placeholder
+        }
+    });
+
+    // Step 5: Append files
+    if (aadharFile) data.append("aadharFile", aadharFile);
+    if (panFile) data.append("panFile", panFile);
+
+    // Step 6: Append JSON
+    data.append("jsonData", JSON.stringify(jsonData));
+
+    // Debug log
+    for (const [key, value] of data.entries()) {
+        console.log(key, value instanceof File ? value.name || "Empty file" : value);
+    }
+
+    // Step 7: Send AJAX
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/renewal/save", true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert("Renewal saved successfully!");
+            loadCommonList('/renewal/list', 'Contractor Renewal List');
+        } else {
+            alert("Failed to save renewal.");
+            console.error("Error:", xhr.status, xhr.responseText);
+        }
+    };
+
+    xhr.onerror = function () {
+        alert("Error occurred while saving renewal.");
+    };
+
+    xhr.send(data);
+}
+
+function validateDocumentsForRenewal() {
+    const rows = document.querySelectorAll('#licenseBody tr');
+    const today = new Date();
+    const messages = [];
+
+    const seenDocTypes = new Set();
+    const seenDocNumbers = new Set();
+
+    let hasESIC = false;
+    let hasWC = false;
+
+    if (rows.length === 0) {
+        messages.push("At least one document row must be present.");
+    }
+
+    rows.forEach((row, index) => {
+        const rowNum = index + 1;
+
+        const docTypeElem = row.querySelector('.documentType');
+        const docType = docTypeElem?.value?.trim();
+        const docTypeText = docTypeElem?.selectedOptions?.[0]?.text?.trim();
+        const docNumber = row.querySelector('.documentNumber')?.value?.trim();
+        const validFromVal = row.querySelector('.validFrom')?.value;
+        const validToVal = row.querySelector('.validTo')?.value;
+        const fileInput = row.querySelector('.attachment');
+
+        const validFrom = validFromVal ? new Date(validFromVal) : null;
+        const validTo = validToVal ? new Date(validToVal) : null;
+        const isFilePresent = fileInput?.files?.length > 0;
+
+        // Check for ESIC/WC
+        if (docTypeText?.toUpperCase() === "ESIC") hasESIC = true;
+        if (docTypeText?.toUpperCase() === "WC") hasWC = true;
+
+        // Required fields
+        if (!docType) messages.push(`Row ${rowNum}: Document type is required.`);
+        if (!docNumber) messages.push(`Row ${rowNum}: Document number is required.`);
+        if (!isFilePresent) messages.push(`Row ${rowNum}: File attachment is required.`);
+
+        if (!validFrom || validFrom <= today) {
+            messages.push(`Row ${rowNum}: "Valid From" must be a future date.`);
+        }
+
+        if (!validTo || validTo <= today || (validFrom && validTo <= validFrom)) {
+            messages.push(`Row ${rowNum}: "Valid To" must be after "Valid From" and a future date.`);
+        }
+
+        // File size
+        if (isFilePresent && fileInput.files[0].size > 3 * 1024 * 1024) {
+            const file = fileInput.files[0];
+            messages.push(`Row ${rowNum}: File "${file.name}" is ${(file.size / (1024 * 1024)).toFixed(2)} MB. Max allowed size is 3 MB.`);
+        }
+
+        // Uniqueness validations (only if fields are present)
+        if (docType) {
+            if (seenDocTypes.has(docType)) {
+                messages.push(`Row ${rowNum}: Duplicate document type "${docTypeText}". Each type must be unique.`);
+            } else {
+                seenDocTypes.add(docType);
+            }
+        }
+
+        if (docNumber) {
+            if (seenDocNumbers.has(docNumber)) {
+                messages.push(`Row ${rowNum}: Duplicate document number "${docNumber}". Each must be unique.`);
+            } else {
+                seenDocNumbers.add(docNumber);
+            }
+        }
+    });
+
+    // Enforce ESIC/WC condition
+    if (!hasESIC && !hasWC) {
+        messages.push(`At least one document must be of type "ESIC" or "WC".`);
+    }
+
+    // Display or clear validation messages
+    const messageContainer = document.getElementById("validationMessages");
+    if (messages.length > 0) {
+        messageContainer.innerHTML = `
+            <ul style="list-style: disc; padding-left: 20px; color: red;">
+                ${messages.map(msg => `<li>${msg}</li>`).join('')}
+            </ul>
+        `;
+        return false;
+    } else {
+        messageContainer.innerHTML = '';
+        return true;
     }
 }

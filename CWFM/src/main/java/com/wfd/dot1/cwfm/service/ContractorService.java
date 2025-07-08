@@ -2,6 +2,8 @@ package com.wfd.dot1.cwfm.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
@@ -67,6 +69,9 @@ public interface ContractorService {
 	public List<ContractorComplianceDto> getContractorComplianceExportData(String unitId);
 
 	public ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId);
+
+	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile,
+			List<MultipartFile> renewalAttachments, String username);
 	   
 	}
 

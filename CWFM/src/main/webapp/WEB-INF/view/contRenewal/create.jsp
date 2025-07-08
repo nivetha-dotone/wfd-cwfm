@@ -315,12 +315,13 @@ label {
         <div class="tabs">
               <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
+            <button data-target="tab3" onclick="showTabOther('tab3')">Work Order Information</button>
            
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRegistrationDetails('${sessionScope.loginuser.userId}')">Save</button>
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Return</button>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRegistrationDetails()">Save</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRenewalDetails()">Save</button>
       
         </div> 
     </div> 
@@ -533,7 +534,8 @@ label {
 				<th><label class="custom-label"><spring:message code="label.validFrom"/></th>
 				<th><label class="custom-label"><spring:message code="label.validTo"/></th>
 				<th><label class="custom-label"><spring:message code="label.attachment"/></th>
-				
+				<th><label class="custom-label"><spring:message code="label.panIndia"/></th>
+				<th><label class="custom-label"><spring:message code="label.subContractorApplicable"/></th>
             </tr>
         </thead>
       <tbody id="licenseBody">
@@ -555,14 +557,77 @@ label {
         <td><input type="date" class="form-control validFrom" name="validFrom" autocomplete="off"/></td>
         <td><input type="date" class="form-control validTo" name="validTo" autocomplete="off"/></td>
         <td><input type="file" class="form-control attachment" name="attachment" autocomplete="off"/></td>
+        <td><input type="checkbox" class="form-control panIndia" name="panIndia" /></td>
+         <td><input type="checkbox" class="form-control subApplicable" name="subApplicable" /></td>
     </tr>
 </tbody>
       
                 </table>
             </div>
  
-        
  
+ <!--tab3  -->
+        
+  <div id="tab3" class="tab-content  ">
+  
+
+
+ <div class="multi-select-container">
+                    <!-- Available Entries -->
+                    <div class="multi-select-group">
+                        <label class="multi-select-label">Available Workorders</label>
+                        <select id="availableWorkOrders" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple >
+                            
+                        </select>
+                    </div>
+
+                    <!-- Move Buttons -->
+                    <div class="button-group">
+                       
+                        
+                        <button type="button" onclick="moveSelected('availableWorkOrders', 'selectedWorkOrders')">&gt;</button><br><br>
+        <button type="button" onclick="moveSelected('selectedWorkOrders', 'availableWorkOrders')">&lt;</button>
+  
+                    </div>
+
+                    <!-- Selected Entries -->
+                    <div class="multi-select-group">
+                        <label class="multi-select-label">Selected Workorders</label>
+                        <select id="selectedWorkOrders" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple>
+                           
+                        </select>
+                    </div>
+                </div>
+                
+ <div class="multi-select-container">
+                    <!-- Available Entries -->
+                    <div class="multi-select-group">
+                        <label class="multi-select-label">Available License</label>
+                        <select id="availableLicense" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple >
+                            
+                        </select>
+                    </div>
+
+                    <!-- Move Buttons -->
+                    <div class="button-group">
+                       
+                        
+                        <button type="button" onclick="moveSelected('availableLicense', 'selectedLicense')">&gt;</button><br><br>
+        <button type="button" onclick="moveSelected('selectedLicense', 'availableLicense')">&lt;</button>
+  
+                    </div>
+
+                    <!-- Selected Entries -->
+                    <div class="multi-select-group">
+                        <label class="multi-select-label">Selected License</label>
+                        <select id="selectedLicense" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple>
+                           
+                        </select>
+                    </div>
+                </div>
+
+
+  </div>
  </div>
   <script src="resources/js/cms/contRenewal.js" defer></script>
 </body>

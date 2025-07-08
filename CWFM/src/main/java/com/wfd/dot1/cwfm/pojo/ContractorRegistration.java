@@ -33,8 +33,21 @@ public class ContractorRegistration{
 	private String gst;
 	private String address;
 	private String pfApplyDate;
+	private List<String> availableWos;
+	private List<String> selectedWos;
 	
-	
+	public List<String> getSelectedWos() {
+		return selectedWos;
+	}
+	public void setSelectedWos(List<String> selectedWos) {
+		this.selectedWos = selectedWos;
+	}
+	public List<String> getAvailableWos() {
+		return availableWos;
+	}
+	public void setAvailableWos(List<String> availableWos) {
+		this.availableWos = availableWos;
+	}
 	public String getAadhar() {
 		return aadhar;
 	}

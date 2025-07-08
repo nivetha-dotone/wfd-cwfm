@@ -1,12 +1,22 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dao.ContractorDao;
+import com.wfd.dot1.cwfm.dto.RenewalDTO;
+import com.wfd.dot1.cwfm.dto.RenewalDocumentDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
@@ -160,5 +170,141 @@ public class ContractorServiceImpl implements ContractorService{
 	public ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId) {
 		
 		return contrDao.getAllContractorDetailForRenewal(unitId,contractorId);
+	}
+	
+	 private static final String ROOT_DIRECTORY = "D:/wfd_cwfm/contractor_docs/";
+	 public String uploadDocuments( MultipartFile aadharFile,
+			 String userId,
+			 String contractorRegId) {
+
+		 // Create directory path
+		 String directoryPath =ROOT_DIRECTORY + userId + "/"+contractorRegId+"/";
+
+		 try {
+			 // Ensure the directory exists, if not create it
+			 Path path = Paths.get(directoryPath);
+			 if (!Files.exists(path)) {
+				 Files.createDirectories(path);
+			 }
+
+			 // Save Aadhar PDF
+			 if (!aadharFile.isEmpty()) {
+				 String aadharFilePath = directoryPath +aadharFile.getOriginalFilename();
+				 saveFile(aadharFile, aadharFilePath);
+			 }
+
+			 
+
+			 // Return success message
+			 return "success";
+
+		 } catch (IOException e) {
+			 e.printStackTrace();
+			 return "failed";
+		 }
+	 }
+	 private void saveFile(MultipartFile file, String path) throws IOException {
+	        byte[] bytes = file.getBytes();
+	        Path filePath = Paths.get(path);
+	        Files.write(filePath, bytes);
+	    }
+	 
+	@Override
+	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile,
+			List<MultipartFile> attachments, String username) {
+		ObjectMapper mapper = new ObjectMapper();
+        ContractorRegistration reg=new ContractorRegistration();
+        RenewalDTO renewal = new RenewalDTO();
+		try {
+			//contreg = mapper.readValue(jsonData, ContractorRegistration.class);
+			  renewal = mapper.readValue(jsonData, RenewalDTO.class);
+			  reg.setContractorregId(String.valueOf(renewal.getContractorregId()));
+			  reg.setVendorCode(renewal.getVendorCode());
+		        reg.setContractorId(String.valueOf(renewal.getContractorId()));
+		        reg.setContractorName(renewal.getContractorName());
+		        reg.setPrincipalEmployer(renewal.getPrincipalEmployer());
+		        reg.setManagerName(renewal.getManagerName());
+		        reg.setTotalStrength(renewal.getTotalStrength());
+		        reg.setRcMaxEmp(renewal.getRcMaxEmp());
+		        reg.setNatureOfWork(renewal.getNatureOfWork());
+		        reg.setLocofWork(renewal.getLocofWork());
+		        reg.setPfNum(renewal.getPfNum());
+		        reg.setRcVerified(renewal.getRcVerified());
+		        reg.setMainContractor(renewal.getMainContractor());
+		        reg.setContractType(renewal.getContractType());
+		        reg.setContractFrom(renewal.getContractFrom());
+		        reg.setContractTo(renewal.getContractTo());
+		        reg.setEmail(renewal.getEmail());
+		        reg.setMobile(renewal.getMobile());
+		        reg.setAadhar(renewal.getAadhar());
+		        reg.setGst(renewal.getGst());
+		        reg.setAddress(renewal.getAddress());
+		        reg.setPfApplyDate(renewal.getPfApplyDate());
+		        reg.setAadharDoc(aadharFile.getOriginalFilename());
+				reg.setPanDoc(panFile.getOriginalFilename());
+				reg.setCreatedBy(username);
+
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+       
+		
+         String regId =contrDao.saveReg(reg);
+
+         
+         if (regId != null) {
+        	 uploadDocuments(aadharFile,username,regId);
+        	 uploadDocuments(panFile,username,regId);
+             List<ContractorRegistrationPolicy> policies = new ArrayList<ContractorRegistrationPolicy>();
+             List<RenewalDocumentDTO> dto= renewal.getRenewalDocuments();
+
+             // Set regId and file details in each policy
+             for (int i = 0; i < dto.size(); i++) {
+            	 RenewalDocumentDTO d = dto.get(i);
+            	 
+            	 ContractorRegistrationPolicy policy = new ContractorRegistrationPolicy();
+            	 policy.setContractorRegId(regId);
+            	 policy.setDocumentNumber(d.getDocumentNumber());
+            	 policy.setDocumentType(d.getDocumentType());
+            	 policy.setCoverage(Integer.parseInt(d.getCoverage()));
+            	 policy.setValidFrom(d.getValidFrom());
+            	 policy.setValidTo(d.getValidTo());
+            	 policy.setPanIndia(d.isPanIndia());
+            	 policy.setSubApplicable(d.isSubApplicable());
+            	 
+                 MultipartFile file = attachments.get(i);
+                 if (file != null && !file.isEmpty()) {
+                     policy.setFileName(file.getOriginalFilename());
+                     // Optionally: save file bytes or store to disk
+                     uploadDocuments(file,username,regId);
+                 } else {
+                     policy.setFileName(null);
+                 }
+                 policies.add(policy);
+             }
+
+             this.savePolicies(policies, reg);
+             
+        
+        // Save selected work orders
+//        for (String woNumber : renewal.getSelectedWorkOrders()) {
+//            CMSContractorRegistrationLLWC llwc = new CMSContractorRegistrationLLWC();
+//            llwc.setContractorregllwcid(contrDao.getNextLLWCId());
+//            llwc.setContractorregid(regId);
+//            llwc.setContractorid(renewal.getContractorId());
+//            llwc.setUnitid(Integer.parseInt(renewal.getPrincipalEmployer()));
+//            llwc.setWonumber(woNumber);
+//            llwc.setLicencetype("Renewal");
+//            llwc.setStatus(1);
+//          
+//            llwc.setCreatedby(username);
+//
+//            contrDao.saveContractorLLWC(llwc);
+//        }
+		
+	}else {
+		//renewal 
+	}
 	}
 }

@@ -86,6 +86,20 @@ public class ContractorRegistrationPolicy {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
+	public boolean isPanIndia() {
+		return isPanIndia;
+	}
+	public void setPanIndia(boolean isPanIndia) {
+		this.isPanIndia = isPanIndia;
+	}
+	public boolean isSubApplicable() {
+		return isSubApplicable;
+	}
+	public void setSubApplicable(boolean isSubApplicable) {
+		this.isSubApplicable = isSubApplicable;
+	}
+	private boolean isPanIndia;
+	private boolean isSubApplicable;
 	
 
 }
