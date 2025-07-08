@@ -97,4 +97,8 @@ public interface WorkmenService {
 
 	public List<WageDetailsDto> getWageMasterExportData(String unitId);
 
+	public String getOtherAadharLinkedToUan(String uan, String aadharNumber);
+
+	public String getOtherAadharLinkedTopfNumber(String pfNumber, String aadharNumber);
+
 }	

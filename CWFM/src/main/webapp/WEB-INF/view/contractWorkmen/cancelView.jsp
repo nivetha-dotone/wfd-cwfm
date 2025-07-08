@@ -570,6 +570,15 @@ textarea {
                             	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
                             	</td>
                         </tr>
+                        <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                            
+                            <td>
+        <input type="checkbox" id="pfApplicable" name="pfApplicable"
+               <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
+               disabled />
+    </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -681,17 +690,23 @@ textarea {
             <div id="tab5" class="tab-content">
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
+                    <tr>
+                		<td style="color:black"><spring:message code="label.profilePhoto"/></td>
+                <td>
+                   <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','${GatePassObj.photoName }')">Download Photo</a>
+                </td>
+            		</tr> 
                    <tr>
                 		<td style="color:black"><spring:message code="label.aadharDocument"/></td>
                 <td>
-                   <a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','aadhar')">Download Aadhar</a>
+                   <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','aadhar')">Download Aadhar</a>
                 </td>
             		</tr>
             		
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>
-                    <a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','police')">Download Police Verification Document</a>
+                    <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','police')">Download Police Verification Document</a>
                 </td>
                  <th><label class="custom-label"><spring:message code="label.policeVerificationDate"/></label></th>
                         	<td>
@@ -703,7 +718,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.bankDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','bank')">Download Bank Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','bank')">Download Bank Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -712,7 +727,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.trainingDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','training')">Download Training Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','training')">Download Training Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -721,7 +736,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.otherDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','other')">Download Other Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','other')">Download Other Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -730,7 +745,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.idProof2Document"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','id2')">Download Id Proof2 Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','id2')">Download Id Proof2 Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -739,7 +754,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.medicalDcocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','medical')">Download Medical Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','medical')">Download Medical Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -748,7 +763,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.educationDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','education')">Download Education Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','education')">Download Education Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -757,7 +772,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.form11Document"/></td>
                 		<td>
-                    	<a href="#" onclick="downloadDoc('${GatePassObj.gatePassId}','${GatePassObj.createdBy }','form11')">Download Form11 Document</a>
+                    	<a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','form11')">Download Form11 Document</a>
                 		</td>
             		</tr>
       				</c:if>

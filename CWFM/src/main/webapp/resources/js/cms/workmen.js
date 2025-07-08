@@ -450,14 +450,38 @@ function validateEmploymentInformation(){
     }else{
 		$("#error-accessArea").hide();
 	}
+	let uanCheckPassed = false;
+	
 	 const uan = $("#uanNumber").val().trim();
+	 
+	 const aadharNumber = $("#aadharNumber").val().trim();
 	 const uanRegex = /^\d{12}$/;
     if (!uanRegex.test(uan)) {
         $("#error-uanNumber").show();
         isValid = false;
     }else{
-		 $("#error-uanNumber").hide();
-	}
+	  // Check in backend if Aadhar exists
+		         $.ajax({
+		             url: "/CWFM/contractworkmen/checkUanExists",
+		             type: "GET",
+		             data: { uan: uan,aadharNumber : aadharNumber },
+		             async: false, // NOTE: synchronous to block form submission
+		             success: function (response) {
+		                 if (response.exists) {
+                             $("#error-uanNumber").text("UAN already exists with Aadhaar Number: " + response.otherAadhar).show();
+                             isValid = false;
+                           } else {
+		                     $("#error-uanNumber").hide();
+		                     uanCheckPassed = true;
+		                 }
+		             },
+		             error: function () {
+		                 $("#error-uanNumber").text("Error checking UAN").show();
+		                 isValid = false;
+		             }
+		         });
+		     }       
+
 	const healthCheckDate = $("#healthCheckDate").val().trim();
     if (healthCheckDate === "") {
         $("#error-healthCheckDate").show();
@@ -465,13 +489,33 @@ function validateEmploymentInformation(){
     }else{
 		 $("#error-healthCheckDate").hide();
 	}
+	let pfNumberCheckPassed = false;
 	const pfNumber = $("#pfNumber").val().trim();
     if (pfNumber === "") {
         $("#error-pfNumber").show();
         isValid = false;
     }else{
-		 $("#error-pfNumber").hide();
-	}
+		// Check in backend if Aadhar exists
+		         $.ajax({
+		             url: "/CWFM/contractworkmen/checkpfNumberExists",
+		             type: "GET",
+		             data: { pfNumber: pfNumber,aadharNumber : aadharNumber },
+		             async: false, // NOTE: synchronous to block form submission
+		             success: function (response) {
+		                 if (response.exists) {
+                             $("#error-pfNumber").text("PF Number already exists with Aadhaar Number: " + response.otherAadhar).show();
+                             isValid = false;
+                           } else {
+		                     $("#error-pfNumber").hide();
+		                     pfNumberCheckPassed = true;
+		                 }
+		             },
+		             error: function () {
+		                 $("#error-pfNumber").text("Error checking pfNumber").show();
+		                 isValid = false;
+		             }
+		         });
+		     }     
 	const esicNumber = $("#esicNumber").val().trim();
     if (esicNumber === "") {
         $("#error-esicNumber").show();
@@ -684,10 +728,10 @@ function validateFiles(aadharFile, policeFile, profilePc) {
 
     // Aadhar File - Mandatory & Size check
     if (!aadharFile) {
-        $("#aadharError").text("Aadhar file is required").css("color", "red");
+        $("#aadharError").text("Aadhar file is required").addClass("error-bold");
         valid = false;
     } else if (aadharFile.size > 5 * 1024 * 1024) {
-        $("#aadharError").text("Aadhar file must be less than 5MB").css("color", "red");
+        $("#aadharError").text("Aadhar file must be less than 5MB").addClass("error-bold");
         valid = false;
     } else {
         $("#aadharError").text("");
@@ -695,21 +739,30 @@ function validateFiles(aadharFile, policeFile, profilePc) {
 
     // Police Verification File - Mandatory & Size check
     if (!policeFile) {
-        $("#policeError").text("Police verification file is required").css("color", "red");
+        $("#policeError").text("Police verification file is required").addClass("error-bold");
         valid = false;
     } else if (policeFile.size > 5 * 1024 * 1024) {
-        $("#policeError").text("Police file must be less than 5MB").css("color", "red");
+        $("#policeError").text("Police file must be less than 5MB").addClass("error-bold");
         valid = false;
     } else {
         $("#policeError").text("");
     }
 
+// Police Verification Date - Mandatory  check
+const policeVerificationDate = $("#policeVerificationDate").val().trim();
+    if (policeVerificationDate === "") {
+        $("#error-policeVerificationDate").show();
+        valid = false;
+    }else {
+        $("#error-policeVerificationDate").hide("");
+    }
+    
     // Profile Photo - Mandatory & Size check
     if (!profilePc) {
-        $("#profilePcError").text("Profile photo is required").css("color", "red");
+        $("#profilePcError").text("Profile photo is required").addClass("error-bold");
         valid = false;
     } else if (profilePc.size > 5 * 1024 * 1024) {
-        $("#profilePcError").text("Photo/Image must be less than 5MB").css("color", "red");
+        $("#profilePcError").text("Photo/Image must be less than 5MB").addClass("error-bold");
         valid = false;
     } else {
         $("#profilePcError").text("");
@@ -824,9 +877,7 @@ function validateFiles(aadharFile, policeFile, profilePc) {
     var aadharFile = $("#aadharFile").prop("files")[0];
     var policeFile = $("#policeFile").prop("files")[0];
 	var profilePic = $("#imageFile").prop("files")[0];
-	
-	
-	
+
     // Validate the files (optional)
     if (!validateFiles(aadharFile, policeFile,profilePic)) {
         documentValid = false; // Stop the upload if validation fails
@@ -841,30 +892,32 @@ function validateFiles(aadharFile, policeFile, profilePc) {
     }
 
 	if(type=== "regular"){
-    if (!validateOtherInformation()) {
-        otherValid = false;
-    }
+        if (!validateOtherInformation()) {
+            otherValid = false;
+        }
 
-    if (!validateWages()) {
-        wagesValid = false;
+        if (!validateWages()) {
+            wagesValid = false;
+        }
+    }else{
+		otherValid = true;
+		wagesValid = true;
+		$("#uniformAllowance").val("0.00"); 
+		$("#washingAllowance").val("0.00");  	
+		$("#hra").val("0.00");  	
+		$("#da").val("0.00"); 
+		$("#basic").val("0.00"); 
+		$("#otherAllowance").val("0.00"); 
+	}
+  if (!validatePfForm11Requirement()) {
+        documentValid = false;
     }
-}else{
-	otherValid = true;
-	wagesValid = true;
-	$("#uniformAllowance").val("0.00"); 
-	$("#washingAllowance").val("0.00");  	
-	$("#hra").val("0.00");  	
-	$("#da").val("0.00"); 
-	$("#basic").val("0.00"); 
-	$("#otherAllowance").val("0.00"); 
-}
-	
     console.log("basicValid: " + basicValid);
     console.log("employmentValid: " + employmentValid);
     console.log("otherValid: " + otherValid);
     console.log("wagesValid: " + wagesValid);
     console.log("documentValid: " + documentValid);
-    
+
     // ✅ Utility function for Capital Case
     function toCapitalCase(str) {
         return str
@@ -882,6 +935,7 @@ function validateFiles(aadharFile, policeFile, profilePc) {
     const emergencyName = toCapitalCase($("#emergencyName").val().trim());
     const address = toCapitalCase($("#address").val().trim());
     const idMark = toCapitalCase($("#idMark").val().trim());
+    const pfApplicable = $("#pfApplicable").is(":checked") ? "Yes" : "No";
 
     if (basicValid && employmentValid && otherValid && wagesValid && documentValid) {
         const data = new FormData();
@@ -910,8 +964,8 @@ function validateFiles(aadharFile, policeFile, profilePc) {
             accessArea: $("#accessArea").val(),
             uanNumber: $("#uanNumber").val().trim(),
             healthCheckDate: $("#healthCheckDate").val().trim(),
-            pfNumber:$("#pfNumber").val(),
-			esicNumber:$("#esicNumber").val(),
+            pfNumber:$("#pfNumber").val().trim(),
+			esicNumber:$("#esicNumber").val().trim(),
             bloodGroup: $("#bloodGroup").val(),
             accommodation: $("#accommodation").val(),
             academic: $("#academic").val(),
@@ -935,47 +989,28 @@ function validateFiles(aadharFile, policeFile, profilePc) {
             comments: $("#comments").val().trim(),
 			address: address,
 			doj:$("#doj").val(),
+			pfApplicable:pfApplicable,
             policeVerificationDate: $("#policeVerificationDate").val().trim(),
-
 			onboardingType:type,
-
         };
 
-        // Serialize the JSON object to a string
-		const jsonString = JSON.stringify(jsonData);
-
-		// Append the JSON data to FormData
+        const jsonString = JSON.stringify(jsonData);
 		data.append("jsonData", jsonString);
 
-        // Append the files to the FormData
-        if (aadharFile) {
-            data.append("aadharFile", aadharFile);
-        }
-        if (policeFile) {
-            data.append("policeFile", policeFile);
-        }
-		
-		
-		if(profilePic){
-			data.append("profilePic",profilePic);
-		}
-		
-    	const additionalFields = document.querySelectorAll('.document-field');
-    additionalFields.forEach((field, index) => {
-        const docType = field.querySelector('select[name="documentType"]').value;
-        const fileInput = field.querySelector('input[type="file"]');
+        if (aadharFile) data.append("aadharFile", aadharFile);
+        if (policeFile) data.append("policeFile", policeFile);
+		if(profilePic) data.append("profilePic",profilePic);
 
-        if (docType && fileInput.files[0]) {
-            data.append('additionalFiles', fileInput.files[0]);
-            data.append('documentTypes', docType);
-        }
-    });
-        
-		/*// Log FormData content
-for (const [key, value] of data.entries()) {
-    console.log(key, value instanceof File ? value.name : value); // Log filename if it's a File
-}*/
-        // Send the data to the server using AJAX
+    	const additionalFields = document.querySelectorAll('.document-field');
+        additionalFields.forEach((field) => {
+            const docType = field.querySelector('select[name="documentType"]').value;
+            const fileInput = field.querySelector('input[type="file"]');
+            if (docType && fileInput.files[0]) {
+                data.append('additionalFiles', fileInput.files[0]);
+                data.append('documentTypes', docType);
+            }
+        });
+
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/CWFM/contractworkmen/saveGatePass", true);
 
@@ -984,7 +1019,6 @@ for (const [key, value] of data.entries()) {
                 console.log("Data saved successfully:", xhr.responseText);
 				sessionStorage.setItem("successMessage", "Gatepass saved successfully!");
                 loadCommonList('/contractworkmen/list', 'On-Boarding List');
-				
             } else {
                 console.error("Error saving data:", xhr.status, xhr.responseText);
 				sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
@@ -996,21 +1030,23 @@ for (const [key, value] of data.entries()) {
 			sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
         };
 
-        // Send the FormData object
         xhr.send(data);
     } else {
         console.error("Validation failed for one or more fields.");
     }
 }
-	
-	function downloadDoc(transactionId, userId, docType) {
+
+function downloadDoc(transactionId, userId, docType) {
     const baseUrl = '/CWFM/contractworkmen/downloadFile';
-    
-    // Construct the URL based on gatePassId, userId, and docType
     const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
+
+    // Open the document in a new browser tab
+    window.open(url, '_blank');
+    // Construct the URL based on gatePassId, userId, and docType
+    //const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
 	//alert("url is"+url);
     // Create a temporary anchor element
-    const a = document.createElement('a');
+   /* const a = document.createElement('a');
     a.href = url;
     a.download = ''; // This attribute tells the browser to download the file
 
@@ -1021,8 +1057,10 @@ for (const [key, value] of data.entries()) {
     a.click();
 
     // Remove the anchor from the document
-    document.body.removeChild(a);
+    document.body.removeChild(a);*/
 }
+
+
 
 
      function additionalDocUpload(){
@@ -2138,17 +2176,35 @@ function previewImage(event,inputId,displayId) {
 
 										    xhr.send();
 										}
-										function draftGatePass(userId) {
-										const data = new FormData();
+								function draftGatePass(userId) {
+											    // ✅ Utility function for Capital Case
+                                                   function toCapitalCase(str) {
+                                                     return str
+                                                    .toLowerCase()
+                                                    .split(' ')
+                                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                                    .join(' ');
+                                                   }
+                                         // ✅ Capital case transformation
+                                          const firstName = toCapitalCase($("#firstName").val().trim());
+                                          const lastName = toCapitalCase($("#lastName").val().trim());
+                                          const relationName = toCapitalCase($("#relationName").val().trim());
+                                          const natureOfJob = toCapitalCase($("#natureOfJob").val().trim());
+                                          const emergencyName = toCapitalCase($("#emergencyName").val().trim());
+                                          const address = toCapitalCase($("#address").val().trim());
+                                          const idMark = toCapitalCase($("#idMark").val().trim());
+                                          const pfApplicable = $("#pfApplicable").is(":checked") ? "Yes" : "No";
+										  const data = new FormData();
+										
 										        const jsonData = {
 													transactionId:$("#transactionId").val().trim(),
 										            aadhaarNumber: $("#aadharNumber").val().trim(),
-										            firstName: $("#firstName").val().trim(),
-										            lastName: $("#lastName").val().trim(),
+										            firstName: firstName,
+										            lastName: lastName,
 										            dateOfBirth: $("#dateOfBirth").val().trim(),
 										            gender: $("#gender").val(),
-										            relationName: $("#relationName").val().trim(),
-										            idMark: $("#idMark").val().trim(),
+										            relationName: relationName,
+										            idMark: idMark,
 										            mobileNumber: $("#mobileNumber").val().trim(),
 										            maritalStatus: $("#maritalStatus").val(),
 										            principalEmployer: $("#principalEmployer").val(),
@@ -2159,19 +2215,21 @@ function previewImage(event,inputId,displayId) {
 										            department: $("#department").val(),
 										            subdepartment: $("#subdepartment").val(),
 										            eic: $("#eic").val(),
-										            natureOfJob: $("#natureOfJob").val().trim(),
+										            natureOfJob: natureOfJob,
 										            wcEsicNo: $("#wc").val(),
 										            hazardousArea: $("#hazardousArea").val(),
 										            accessArea: $("#accessArea").val(),
 										            uanNumber: $("#uanNumber").val().trim(),
 										            healthCheckDate: $("#healthCheckDate").val().trim(),
+										            pfNumber:$("#pfNumber").val().trim(),
+			                                        esicNumber:$("#esicNumber").val().trim(),
 										            bloodGroup: $("#bloodGroup").val(),
 										            accommodation: $("#accommodation").val(),
 										            academic: $("#academic").val(),
 										            technical: $("#technical").val(),
 										            ifscCode: $("#ifscCode").val().trim(),
 										            accountNumber: $("#accountNumber").val().trim(),
-										            emergencyName: $("#emergencyName").val().trim(),
+										            emergencyName: emergencyName,
 										            emergencyNumber: $("#emergencyNumber").val().trim(),
 										            wageCategory: $("#wageCategory").val(),
 										            bonusPayout: $("#bonusPayout").val(),
@@ -2186,8 +2244,11 @@ function previewImage(event,inputId,displayId) {
 										            userId: userId,
 										            gatePassAction: "save",
 										            comments: $("#comments").val().trim(),
-													address:$("#address").val().trim(),
+													address:address,
 													doj:$("#doj").val(),
+													pfApplicable:pfApplicable,
+                                                    policeVerificationDate: $("#policeVerificationDate").val().trim(),
+			
 										        };
 
 										        // Serialize the JSON object to a string
@@ -2354,7 +2415,7 @@ function renewGatePass(userId) {
     console.log("otherValid: " + otherValid);
     console.log("wagesValid: " + wagesValid);
     console.log("documentValid: " + documentValid);
-
+ const pfApplicable = $("#pfApplicable").is(":checked") ? "Yes" : "No";
     if (basicValid && employmentValid && otherValid && wagesValid && documentValid) {
         const data = new FormData();
         const jsonData = {
@@ -2383,6 +2444,8 @@ function renewGatePass(userId) {
             accessArea: $("#accessArea").val(),
             uanNumber: $("#uanNumber").val().trim(),
             healthCheckDate: $("#healthCheckDate").val().trim(),
+            pfNumber:$("#pfNumber").val(),
+			esicNumber:$("#esicNumber").val(),
             bloodGroup: $("#bloodGroup").val(),
             accommodation: $("#accommodation").val(),
             academic: $("#academic").val(),
@@ -2406,6 +2469,8 @@ function renewGatePass(userId) {
             comments: $("#comments").val().trim(),
 			address:$("#address").val().trim(),
 			doj:$("#doj").val(),
+			pfApplicable:pfApplicable,
+            policeVerificationDate: $("#policeVerificationDate").val().trim(),
         };
 
         // Serialize the JSON object to a string
@@ -2719,4 +2784,35 @@ oneYearAgo.setFullYear(today.getFullYear() - 1);
     yearRange: `${today.getFullYear() - 1}:${today.getFullYear()}`
 });
 }
+
+function validatePfForm11Requirement() {
+    const pfApplicable = document.getElementById("pfApplicable").checked;
+    const form11ErrorContainer = document.getElementById("form11-error-message");
+    let form11Present = false;
+
+    if (!pfApplicable) {
+        const additionalFields = document.querySelectorAll('.document-field');
+
+        additionalFields.forEach((field) => {
+            const docType = field.querySelector('select[name="documentType"]')?.value;
+            const file = field.querySelector('input[type="file"]')?.files[0];
+
+            if (docType === "Form11" && file) {
+                form11Present = true;
+            }
+        });
+
+        if (!form11Present) {
+            form11ErrorContainer.textContent = "Form11 document is mandatory since PF is not applicable.";
+            form11ErrorContainer.style.display = "block";
+            return false;
+        }
+    }
+
+    // Clear error if condition passes or PF is applicable
+    form11ErrorContainer.textContent = "";
+    form11ErrorContainer.style.display = "none";
+    return true;
+}
+
 

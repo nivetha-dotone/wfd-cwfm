@@ -498,35 +498,45 @@ public class WorkmenController {
     }
     
     @GetMapping("/downloadFile/{transactionId}/{userId}/{docType}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("transactionId") String transactionId,@PathVariable("userId") String userId,  @PathVariable("docType") String docType) {
+    public ResponseEntity<Resource> downloadFile(
+            @PathVariable("transactionId") String transactionId,
+            @PathVariable("userId") String userId,
+            @PathVariable("docType") String docType) {
         try {
-        	String filePath=null;
-        	if(docType.equals("aadhar")||docType.equals("police")||docType.equals("bank")||docType.equals("training")
-        			||docType.equals("other")||docType.equals("id2")||docType.equals("medical")||docType.equals("education")||docType.equals("form11"))
-        	{
-        		// Construct the file path based on gatePassId and docType
-                filePath = ROOT_DIRECTORY+userId+"/" + transactionId + "/" + docType + ".pdf";
-        	}else {
-                filePath = ROOT_DIRECTORY+userId+"/" + transactionId + "/" + docType;
-        	}
-        	
-            File file = new File(filePath);
-            Resource resource = new FileSystemResource(file);
+            String filePath;
+            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") || 
+                docType.equals("training") || docType.equals("other") || docType.equals("id2") || 
+                docType.equals("medical") || docType.equals("education") || docType.equals("form11")) {
+                filePath = ROOT_DIRECTORY + userId + "/" + transactionId + "/" + docType + ".pdf";
+            } else {
+                filePath = ROOT_DIRECTORY + userId + "/" + transactionId + "/" + docType;
+            }
 
-            if (!resource.exists()) {
+            File file = new File(filePath);
+            if (!file.exists()) {
                 return ResponseEntity.notFound().build();
             }
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            // Detect content type
+            String contentType = Files.probeContentType(file.toPath());
+            if (contentType == null) {
+                contentType = "application/octet-stream"; // fallback
+            }
 
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + file.getName());
+
+            Resource resource = new FileSystemResource(file);
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(resource);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 //
 //
@@ -1698,6 +1708,39 @@ public class WorkmenController {
 		    request.setAttribute(attributeName, gmList1);
 		});
         return "contractWorkmen/quickOnboardingCreate";
+    }
+    
+    @GetMapping("/checkUanExists")
+    @ResponseBody
+    public Map<String, Object> checkUanExists(@RequestParam("uan") String uan,
+                                              @RequestParam("aadharNumber") String aadharNumber) {
+        Map<String, Object> response = new HashMap<>();
+        String otherAadhar = workmenService.getOtherAadharLinkedToUan(uan, aadharNumber);
+
+        if (otherAadhar != null) {
+            response.put("exists", true);
+            response.put("otherAadhar", otherAadhar);
+        } else {
+            response.put("exists", false);
+        }
+
+        return response;
+    }
+    @GetMapping("/checkpfNumberExists")
+    @ResponseBody
+    public Map<String, Object> checkpfNumberExists(@RequestParam("pfNumber") String pfNumber,
+                                              @RequestParam("aadharNumber") String aadharNumber) {
+        Map<String, Object> response = new HashMap<>();
+        String otherAadhar = workmenService.getOtherAadharLinkedTopfNumber(pfNumber, aadharNumber);
+
+        if (otherAadhar != null) {
+            response.put("exists", true);
+            response.put("otherAadhar", otherAadhar);
+        } else {
+            response.put("exists", false);
+        }
+
+        return response;
     }
 
 }

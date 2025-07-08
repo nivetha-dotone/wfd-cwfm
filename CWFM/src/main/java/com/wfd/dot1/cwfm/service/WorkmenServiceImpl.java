@@ -618,4 +618,13 @@ public class WorkmenServiceImpl implements WorkmenService{
 		// TODO Auto-generated method stub
 		return workmenDao.getWageMasterExportData(unitId);
 	}
+	@Override
+	public String getOtherAadharLinkedToUan(String uan, String aadhar) {
+	    return workmenDao.findAadharByUanIfExistsWithDifferentAadhar(uan, aadhar);
+	}
+	@Override
+	public String getOtherAadharLinkedTopfNumber(String pfNumber, String aadhar) {
+	    return workmenDao.findAadharBypfNumberIfExistsWithDifferentAadhar(pfNumber, aadhar);
+	}
+
 }

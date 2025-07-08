@@ -1114,7 +1114,7 @@ function saveGMMaster() {
     }
 
     masterName = toCapitalCase(masterName);
-    masterValue = toCapitalCase(masterValue);
+    masterValue = masterValue;
     
     console.log("📌 Valid Input:", { gmTypeId, masterName, masterValue }); // Log data
 

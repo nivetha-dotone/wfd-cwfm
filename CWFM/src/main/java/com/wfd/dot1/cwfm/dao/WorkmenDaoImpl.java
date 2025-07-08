@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -478,7 +479,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        gatePassMain.getWorkFlowType(),
 	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
-	        				gatePassMain.getDoj(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
+	        				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
 	        gatePassMain.getUserId(),
 	        gatePassMain.getOnboardingType()
 	        };
@@ -673,6 +674,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setComments(rs.getString("Comments"));
 			dto.setAddress(rs.getString("Address"));
 			dto.setDoj(rs.getString("DOJ"));
+			dto.setPfApplicable(rs.getString("pfapplicable"));
 			dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 			dto.setDot(rs.getString("DOT"));
 			dto.setOnboardingType(rs.getString("OnboardingType"));
@@ -1299,6 +1301,7 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
 	        gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
 	        gatePassMain.getDoj()!=null?gatePassMain.getDoj():" ",
+	        		gatePassMain.getPfApplicable()!=null?gatePassMain.getPfApplicable():" ",
 	        gatePassMain.getPoliceVerificationDate()!=null?gatePassMain.getPoliceVerificationDate():" ",
 	        gatePassMain.getDot()!=null?gatePassMain.getDot():" ",
 	        gatePassMain.getUserId(),
@@ -1458,6 +1461,7 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 		dto.setComments(rs.getString("Comments"));
 		dto.setAddress(rs.getString("Address"));
 		dto.setDoj(rs.getString("DOJ"));
+		dto.setPfApplicable(rs.getString("pfapplicable"));
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 	}
@@ -1520,7 +1524,7 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
        0,
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
-        				gatePassMain.getDoj(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
+        				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
         gatePassMain.getUserId(),transId
     };
 }
@@ -1616,6 +1620,7 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setComments(rs.getString("Comments"));
 		dto.setAddress(rs.getString("Address"));
 		dto.setDoj(rs.getString("DOJ"));
+		dto.setPfApplicable(rs.getString("pfapplicable"));
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 	}
@@ -1778,6 +1783,7 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setComments(rs.getString("Comments"));
 		dto.setAddress(rs.getString("Address"));
 		dto.setDoj(rs.getString("DOJ"));
+		dto.setPfApplicable(rs.getString("pfapplicable"));
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 	}
@@ -2053,6 +2059,12 @@ public List<ContractWorkmenExportDto> getContractWorkmenExportData(String unitId
 public String getAadharExistsQuery() {
 	return QueryFileWatcher.getQuery("AADHAR_EXISTS");
 }
+public String getUanExistsQuery() {
+	return QueryFileWatcher.getQuery("UAN_EXISTS");
+}
+public String getpfnumberExistsQuery() {
+	return QueryFileWatcher.getQuery("PFNUMBER_EXISTS");
+}
 
 @Override
 public boolean isAadharExists(String aadharNumber,String transactionId) {
@@ -2088,6 +2100,26 @@ public List<WageDetailsDto> getWageMasterExportData(String unitId) {
 		peList.add(pe);
 	}
 	return peList;
+}
+@Override
+public String findAadharByUanIfExistsWithDifferentAadhar(String uan, String aadhar) {
+    //String sql = "SELECT  TOP 1 gpm.AadharNumber FROM GATEPASSMAIN gpm WHERE gpm.UanNumber = ? AND gpm.AadharNumber != ?";
+    String sql = getUanExistsQuery();
+    try {
+        return jdbcTemplate.queryForObject(sql, new Object[]{uan, aadhar}, String.class);
+    } catch (EmptyResultDataAccessException e) {
+        return null; // Not found
+    }
+}
+@Override
+public String findAadharBypfNumberIfExistsWithDifferentAadhar(String pfNumber, String aadhar) {
+    //String sql = "SELECT  TOP 1 gpm.AadharNumber FROM GATEPASSMAIN gpm WHERE gpm.pfnumber = ? AND gpm.AadharNumber != ?";
+    String sql = getpfnumberExistsQuery();
+    try {
+        return jdbcTemplate.queryForObject(sql, new Object[]{pfNumber, aadhar}, String.class);
+    } catch (EmptyResultDataAccessException e) {
+        return null; // Not found
+    }
 }
 
 

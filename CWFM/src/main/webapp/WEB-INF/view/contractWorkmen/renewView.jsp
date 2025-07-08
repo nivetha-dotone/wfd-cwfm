@@ -582,6 +582,15 @@ textarea {
      value="${GatePassObj.dot }" readonly>
 			</td>
                         </tr>
+                        <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                            
+                            <td>
+        <input type="checkbox" id="pfApplicable" name="pfApplicable"
+               <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
+               disabled />
+    </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

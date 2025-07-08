@@ -289,6 +289,10 @@ label {
             max-height: 100%;
         }
        
+        .error-bold {
+    color: red;
+    font-weight: bold !important;
+}
         
     </style>
      <%
@@ -841,8 +845,16 @@ label {
                         		<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"    value="${ GatePassObj.doj}" autocomplete="off">
                         	</c:if>
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
-			</td>
-                        </tr>
+			        </td>
+			        <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                      <td><input type="checkbox" id="pfApplicable" name="pfApplicable"
+    <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
+    onclick="validatePfForm11Requirement()" />
+
+                     <!--  <label for="pfApplicable">Yes</label> -->
+                      <!-- <label id="error-pfApplicable"style="color: red;display: none;">Please check pfApplicable</label> -->
+                     </td>
+                  </tr>
                         
                     </tbody>
                 </table>
@@ -1109,6 +1121,8 @@ label {
             		<tr><td>
             		<a href="#" id="add_field_button" onclick="additionalDocUpload()"><spring:message code="label.addDocument"/></a>
             		<label>You can add a maximum of 7 additional documents.</label>
+            		<div id="form11-error-message" style="color: red; display: none; margin-top: 5px; font-weight: bold "></div>
+            		
             		</td>
             		<td><div id="additionalDoc" ></div></td></tr>
       		

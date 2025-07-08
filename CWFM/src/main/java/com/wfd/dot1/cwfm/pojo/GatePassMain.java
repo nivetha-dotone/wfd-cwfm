@@ -497,6 +497,14 @@ public class GatePassMain {
 	public void setPoliceVerificationDate(String policeVerificationDate) {
 		this.policeVerificationDate = policeVerificationDate;
 	}
+	public String pfApplicable;
+	public String getPfApplicable() {
+		return pfApplicable;
+	}
+	public void setPfApplicable(String pfApplicable) {
+		this.pfApplicable = pfApplicable;
+	}
+	
 	
 	}
 	

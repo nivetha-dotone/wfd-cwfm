@@ -126,7 +126,11 @@ public interface WorkmenDao {
 
 	public boolean isAadharExists(String aadharNumber,String transactionId);
 
-
+	
 
 	public List<WageDetailsDto> getWageMasterExportData(String unitId);
+
+	public String findAadharByUanIfExistsWithDifferentAadhar(String uan, String aadhar);
+
+	public String findAadharBypfNumberIfExistsWithDifferentAadhar(String pfNumber, String aadhar);
 }
