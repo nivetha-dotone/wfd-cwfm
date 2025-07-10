@@ -396,8 +396,8 @@ textarea {
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
             <% if (user != null && !"Contractor".equals(roleName)) { %>
-    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('4')">Approve</button>
-   				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('5')">Reject</button>
+    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('4','regular')">Approve</button>
+   				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('5','regular')">Reject</button>
 			<% } %>
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/list', 'Quick On-Bording List');">Cancel</button>
         </div> 

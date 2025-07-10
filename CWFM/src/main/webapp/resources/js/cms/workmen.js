@@ -813,7 +813,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
         event.target.disabled = true;
     }
     
-    function approveRejectGatePass(status){
+    function approveRejectGatePass(status,type){
 		let isValid=true;
 		 const approvercomments = $("#approvercomments").val().trim();
     if (approvercomments === "") {
@@ -841,7 +841,11 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
             // Handle successful response
             console.log("Data saved successfully:", xhr.responseText);
 			sessionStorage.setItem("successMessage", "Gatepass approved/rejected successfully!");
-            loadCommonList('/contractworkmen/list', 'Quick On-Bording List');
+            if(type=== "regular"){
+                    loadCommonList('/contractworkmen/list', 'On-Boarding List');
+                }else{
+                    loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
+                }
         } else {
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
@@ -1018,7 +1022,11 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
             if (xhr.status === 200) {
                 console.log("Data saved successfully:", xhr.responseText);
 				sessionStorage.setItem("successMessage", "Gatepass saved successfully!");
-                loadCommonList('/contractworkmen/list', 'On-Boarding List');
+                if(type=== "regular"){
+                    loadCommonList('/contractworkmen/list', 'On-Boarding List');
+                }else{
+                    loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
+                }
             } else {
                 console.error("Error saving data:", xhr.status, xhr.responseText);
 				sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");

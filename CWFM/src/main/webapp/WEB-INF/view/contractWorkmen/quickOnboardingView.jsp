@@ -396,10 +396,10 @@ textarea {
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
             <% if (user != null && !"Contractor".equals(roleName)) { %>
-    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('4')">Approve</button>
-   				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('5')">Reject</button>
+    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('4','quick')">Approve</button>
+   				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('5','quick')">Reject</button>
 			<% } %>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/list', 'Quick On-Bording List');">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/quickOnboardingList', 'Quick On-Bording List');">Cancel</button>
         </div> 
     </div>
 
@@ -562,6 +562,16 @@ textarea {
                             	</td>
                         </tr>
                         <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <td>
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.pfNumber }" readonly>
+                            </td>
+                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <td>
+                            	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
+                            	</td>
+                        </tr>
+                        <tr>
                          <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
                         	<td>
     				<input id="doj" name="doj" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
@@ -573,6 +583,15 @@ textarea {
     				<input id="dot" name="dot" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
      value="${GatePassObj.dot }" readonly>
 			</td>
+                        </tr>
+                        <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                            
+                            <td>
+        <input type="checkbox" id="pfApplicable" name="pfApplicable"
+               <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
+               disabled />
+    </td>
                         </tr>
                     </tbody>
                 </table>
@@ -705,6 +724,11 @@ textarea {
                 <td>
                     <a href="#" onclick="downloadDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','police')">Download Police Verification Document</a>
                 </td>
+                 <th><label class="custom-label"><spring:message code="label.policeVerificationDate"/></label></th>
+                        	<td>
+    				<input id="policeVerificationDate" name="policeVerificationDate" class="datetimepickerformat3" style="width: 100%; height: 20px;" type="text" 
+            value="${GatePassObj.policeVerificationDate }" readonly>
+			</td>
             		</tr>
             		<c:if test="${not empty GatePassObj.bankDocName}">
             		<tr>
