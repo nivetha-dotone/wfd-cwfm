@@ -162,6 +162,9 @@ function moveSelected(fromId, toId) {
     });
 }
 
+function toCapitalCase(str) {
+       return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+   }
 function saveRenewalDetails() {
     // Step 1: Optional validations
     if (!validateFormData()) return;
@@ -172,9 +175,7 @@ function saveRenewalDetails() {
     const aadharFile = $("#aadharDocId").prop("files")[0];
     const panFile = $("#panDocId").prop("files")[0];
 	const selectedOption = $("#vendorCodeId option:selected");
-    function toCapitalCase(str) {
-        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    }
+   
 
     const contractorName = toCapitalCase($("#contractorNameId").val().trim());
     const managerName = toCapitalCase($("#managerNameId").val().trim());
@@ -362,3 +363,166 @@ function validateDocumentsForRenewal() {
         return true;
     }
 }
+
+function saveTab2AndGoToTab3() {
+    if (!validateFormData()) return;
+    if (!validateDocumentsForRenewal()) return;
+
+    const data = new FormData();
+    const aadharFile = $("#aadharDocId").prop("files")[0];
+    const panFile = $("#panDocId").prop("files")[0];
+    const selectedOption = $("#vendorCodeId option:selected");
+
+    const jsonData = {
+        contractorregId: $("#contractorregId").val().trim(),
+        contractorId: selectedOption.val(),
+        vendorCode: selectedOption.data("code"),
+        principalEmployer: $("#principalEmployerId").val().trim(),
+        contractorName: toCapitalCase($("#contractorNameId").val().trim()),
+        email: $("#emailId").val().trim(),
+        mobile: $("#mobileId").val().trim(),
+        aadhar: $("#aadharId").val().trim(),
+        pan: $("#panId").val().trim().toUpperCase(),
+        gst: $("#gstId").val().trim().toUpperCase(),
+        address: toCapitalCase($("#addressId").val().trim()),
+        pfApplyDate: $("#pfApplyDateId").val().trim(),
+        managerName: toCapitalCase($("#managerNameId").val().trim()),
+        locofWork: toCapitalCase($("#locofWorkId").val().trim()),
+        totalStrength: $("#totalStrengthId").val().trim(),
+        rcMaxEmp: $("#rcMaxEmpId").val().trim(),
+        pfNum: $("#pfNumId").val().trim().toUpperCase(),
+        natureOfWork: toCapitalCase($("#natureOfWorkId").val().trim()),
+        contractFrom: $("#contractFromId").val(),
+        contractTo: $("#contractToId").val(),
+        contractType: $("#contractTypeId").val(),
+        rcVerified: $("#rcVerifiedId").is(":checked") ? "Yes" : "No",
+        mainContractor: $("#mainContractorId").val().trim(),
+        requestType: "Renewal",
+        renewalDocuments: []
+    };
+
+    $("#licenseBody tr").each(function () {
+        const row = $(this);
+        const doc = {
+            documentType: row.find(".documentType").val(),
+            documentNumber: row.find(".documentNumber").val(),
+            coverage: row.find(".coverage").val(),
+            validFrom: row.find(".validFrom").val(),
+            validTo: row.find(".validTo").val(),
+            panIndia: row.find(".panIndia").is(":checked"),
+            subApplicable: row.find(".subApplicable").is(":checked")
+        };
+        jsonData.renewalDocuments.push(doc);
+
+        const fileInput = row.find(".attachment")[0];
+        if (fileInput && fileInput.files.length > 0) {
+            data.append("renewalAttachments", fileInput.files[0]);
+        } else {
+            data.append("renewalAttachments", new Blob([]));
+        }
+    });
+
+    if (aadharFile) data.append("aadharFile", aadharFile);
+    if (panFile) data.append("panFile", panFile);
+    data.append("jsonData", JSON.stringify(jsonData));
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/renewal/save", true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert("Basic & license info saved successfully.");
+			// ✅ Disable all fields in tab1 and tab2
+			    disableTabs(['tab1', 'tab2']);
+
+			    // ✅ Hide Save button
+			    const saveButton = document.getElementById('saveButton');
+			    if (saveButton) saveButton.style.display = 'none';
+            populateTab3Data(jsonData.contractorId, jsonData.principalEmployer,jsonData.vendorCode,jsonData.contractorregId);
+        } else {
+            alert("Error saving.");
+        }
+    };
+    xhr.send(data);
+}
+function disableTabs(tabIds) {
+    tabIds.forEach(tabId => {
+        const tab = document.getElementById(tabId);
+        if (!tab) return;
+        
+        const inputs = tab.querySelectorAll("input, select, textarea, button");
+        inputs.forEach(el => {
+            el.disabled = true;
+            el.readOnly = true;
+            if (el.type === "checkbox" || el.type === "radio") {
+                el.disabled = true;
+            }
+        });
+    });
+}
+
+function populateTab3Data(contractorId, unitId, vendorCode, contractorregId) {
+    fetch(`/CWFM/renewal/getAllAvailableWoAndLicense?unitId=${unitId}&contractorId=${contractorId}&vendorCode=${vendorCode}&contractorregId=${contractorregId}`)
+        .then(res => {
+            if (!res.ok || res.status === 204) {
+                alert("No data found for selected contractor.");
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+
+            const availableBox = document.getElementById("availableWorkOrders");
+            const licenseDropdown = document.getElementById("availableLicense");
+            availableBox.innerHTML = "";
+            licenseDropdown.innerHTML = "";
+
+            (data.availableWos || []).forEach(wo => {
+                const option = new Option(wo, wo);
+                option.style.color = "black";
+                availableBox.add(option);
+            });
+
+            (data.availableLicenses || []).forEach(lic => {
+                const option = new Option(lic, lic);
+				option.style.color = "black";
+                licenseDropdown.add(option);
+            });
+			showTabOther('tab3');
+        })
+        .catch(err => {
+            console.error("Error fetching Tab 3 data:", err);
+            alert("Error loading work orders and licenses.");
+        });
+}
+
+function saveWorkOrderInfo() {
+    const selectedWOs = Array.from(document.getElementById("selectedWorkOrders").options)
+        .map(opt => opt.value);
+    const licenseId = 		Array.from(document.getElementById("selectedLicense").options)
+		        .map(opt => opt.value);
+    const contractorRegId = document.getElementById("contractorregId").value;
+
+    const payload = {
+        contractorRegId,
+        selectedWOs,
+        licenseId
+    };
+
+    fetch("/CWFM/renewal/saveWorkOrderInfo", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => {
+        if (res.ok) {
+            alert("Work order info saved.");
+            loadCommonList("/renewal/list", "Contractor Renewal List");
+        } else {
+            alert("Failed to save work order info.");
+        }
+    });
+}
+
+

@@ -106,7 +106,7 @@ public class ContractorRenewalController {
 		return "contRenewal/create";
 	}
 	
-	 @GetMapping("/getAllContractorDetailForRenewal")
+	@GetMapping("/getAllContractorDetailForRenewal")
 	@ResponseBody 
 		public ResponseEntity<ContractorRegistration> getAllContractorDetailForRenewal(
 	            @RequestParam("unitId") String unitId, @RequestParam("contractorId") String contractorId, 
@@ -124,6 +124,26 @@ public class ContractorRenewalController {
 	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	        }
 	    }
+	 
+	 @GetMapping("/getAllAvailableWoAndLicense")
+		@ResponseBody 
+			public ResponseEntity<ContractorRegistration> getAllAvailableWoAndLicense(
+		            @RequestParam("unitId") String unitId, @RequestParam("contractorId") String contractorId, @RequestParam("vendorCode") String contractorCode, @RequestParam("contractorregId") String regId, 
+		            HttpServletRequest request,HttpServletResponse response) {
+		        try {
+		        	ContractorRegistration contractors=new ContractorRegistration();
+		    			
+		    				contractors = contrService.getAllAvailableWoAndLicense(unitId,contractorId,contractorCode,regId);
+		    			
+		    				if (contractors == null || contractors.getContractorId() == null) {
+		    					return new ResponseEntity<>(new ContractorRegistration(), HttpStatus.OK);
+		    		        }
+		            return new ResponseEntity<>(contractors, HttpStatus.OK);
+		        } catch (Exception e) {
+		            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		        }
+		    }
+		 
 	 
 	 @PostMapping("/save")
 	    @ResponseBody

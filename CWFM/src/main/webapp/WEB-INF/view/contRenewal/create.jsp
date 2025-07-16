@@ -321,7 +321,7 @@ label {
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRegistrationDetails('${sessionScope.loginuser.userId}')">Save</button>
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Return</button>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRenewalDetails()">Save</button>
+           <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRenewalDetails()">Save</button> -->
       
         </div> 
     </div> 
@@ -513,9 +513,7 @@ label {
  </div>
 
 
-<div class="action-buttons z" >
-            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>
- </div>
+
  <div  class="tab-content "><spring:message code="label.additionalDocumets"/></div>
             <div id="tab2" class="tab-content  ">
             <div id="validationMessages" style="color: red; font-weight: bold; padding: 10px;"></div>
@@ -563,6 +561,10 @@ label {
 </tbody>
       
                 </table>
+                <div class="text-end mt-3">
+    <button type="button" class="btn btn-primary" id="saveButton" onclick="saveTab2AndGoToTab3()">Save</button>
+</div>
+                
             </div>
  
  
@@ -625,7 +627,9 @@ label {
                         </select>
                     </div>
                 </div>
-
+<div class="text-end mt-3">
+    <button type="button" class="btn btn-success" onclick="saveWorkOrderInfo()">Save Work Order & License</button>
+</div>
 
   </div>
  </div>

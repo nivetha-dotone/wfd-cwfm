@@ -513,7 +513,9 @@ public class ContractorDaoImpl implements ContractorDao{
 	public String getAllAvailableWos() {
 	    return QueryFileWatcher.getQuery("AVAILABLE_WO_FOR_RENEW");
 	}
-	
+	public String getAllAvailableLicense() {
+	    return QueryFileWatcher.getQuery("AVAILABLE_LICENSE_FOR_RENEW");
+	}
 	@Override
 	public Contractor getAllContractorDetailForReg(String unitId, String contractorId) {
 		String query=getAllContractorDetailForReg();
@@ -588,8 +590,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	@Override
 	public   void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg) {
 		 String sql = "INSERT INTO CMSContractorRegPolicy (" +
-		    		" [CONTRACTORID],[UNITID],[WONUMBER] ,[LICENCETYPE],[WCCODE] ,[NATUREOFID] ,[WCTOTAL]  ,[WCFROMDTM] ,[WCTODTM] ,[ATTACHMENTNAME],[CREATEDDTM] ,[CREATEDBY],[CONTRACTORREGID]) " +
-		            " VALUES (?,?,?,?, ?,?,?,? ,?,?,GETDATE(),?,?)";
+		    		" [CONTRACTORID],[UNITID],[WONUMBER] ,[LICENCETYPE],[WCCODE] ,[NATUREOFID] ,[WCTOTAL]  ,[WCFROMDTM] ,[WCTODTM] ,[ATTACHMENTNAME],[CREATEDDTM] ,[CREATEDBY],[CONTRACTORREGID],[DELETESW]) " +
+		            " VALUES (?,?,?,?, ?,?,?,? ,?,?,GETDATE(),?,?,0)";
 		int[] save = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				
@@ -725,13 +727,36 @@ public class ContractorDaoImpl implements ContractorDao{
 			cont.setEsicRegNo(rs.getString("ESICREGNO"));
 			cont.setContractorId(rs.getString("CONTRACTORID"));
 		}
+		//String sqlWO = this.getAllAvailableWos();
+		//SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sqlWO,cont.getVendorCode(),unitId);
+		//List<String> woList = new ArrayList<>();
+		//while(rs1.next()) {
+		//	woList.add(rs1.getString("SAP_WORKORDER_NUM"));
+		//}
+		//cont.setAvailableWos(woList);
+		return cont;
+	}
+	
+	@Override
+	public ContractorRegistration getWOAndLicense(String contractorId,String contractorCode,String unitId,String regId) {
+		ContractorRegistration cont = new ContractorRegistration();
 		String sqlWO = this.getAllAvailableWos();
-		SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sqlWO,cont.getVendorCode(),unitId);
+		SqlRowSet rs1 = jdbcTemplate.queryForRowSet(sqlWO,contractorCode,unitId);
 		List<String> woList = new ArrayList<>();
 		while(rs1.next()) {
 			woList.add(rs1.getString("SAP_WORKORDER_NUM"));
 		}
 		cont.setAvailableWos(woList);
+		
+		
+		String query =this.getAllAvailableLicense();
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,regId,contractorId,unitId);
+		List<String> licenseList = new ArrayList<>();
+		while(rs.next()) {
+			licenseList.add(rs.getString("license"));
+		}
+		cont.setAvailableLicenses(licenseList);
+		cont.setContractorId(contractorId);
 		return cont;
 	}
 

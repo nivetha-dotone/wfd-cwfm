@@ -36,6 +36,22 @@ public class ContractorRegistration{
 	private List<String> availableWos;
 	private List<String> selectedWos;
 	
+	private List<String> availableLicenses;
+	private List<String> selectedLicenses;
+	
+	
+	public List<String> getAvailableLicenses() {
+		return availableLicenses;
+	}
+	public void setAvailableLicenses(List<String> availableLicenses) {
+		this.availableLicenses = availableLicenses;
+	}
+	public List<String> getSelectedLicenses() {
+		return selectedLicenses;
+	}
+	public void setSelectedLicenses(List<String> selectedLicenses) {
+		this.selectedLicenses = selectedLicenses;
+	}
 	public List<String> getSelectedWos() {
 		return selectedWos;
 	}

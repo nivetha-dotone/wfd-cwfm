@@ -307,4 +307,10 @@ public class ContractorServiceImpl implements ContractorService{
 		//renewal 
 	}
 	}
+	@Override
+	public ContractorRegistration getAllAvailableWoAndLicense(String unitId, String contractorId, String contractorCode,
+			String regId) {
+		
+		return contrDao.getWOAndLicense(contractorId,contractorCode,unitId,regId);
+	}
 }
