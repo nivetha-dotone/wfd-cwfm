@@ -260,13 +260,14 @@ public class FileUploadController {
             } else if (!successData.isEmpty() && !errorData.isEmpty()) {
                 result.put("status", "partial");
                 result.put("message", "File uploaded with some errors. Some rows saved.");
-            } else if (successData.isEmpty() && !errorData.isEmpty()) {
+            } else{
                 result.put("status", "error");
                 result.put("message", "File upload failed. No valid rows to save.");
-            } else {
-                result.put("status", "error");
-                result.put("message", "File is empty or invalid.");
             }
+            //else if (successData.isEmpty() && !errorData.isEmpty())  {
+             //   result.put("status", "error");
+             //   result.put("message", "File is empty or invalid.");
+            //}
 
             result.put("templateType", templateType);
             return ResponseEntity.ok(result);

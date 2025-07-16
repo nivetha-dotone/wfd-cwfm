@@ -11,6 +11,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
+import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
@@ -50,5 +51,9 @@ public interface FileUploadDao {
 	Long getStateIdByName(String stateName);
 	
 	void savePEState(Long unitId, Long stateId);
+	
+	void saveWorkorderToStaging(KTCWorkorderStaging workorderStaging);
+	void callWorkorderProcessingSP();
+
 
 }

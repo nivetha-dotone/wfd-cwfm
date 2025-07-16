@@ -404,7 +404,7 @@ label {
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','quick')">Save</button>
            <%--  <button   type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="draftGatePass('${sessionScope.loginuser.userId}')">Draft</button> --%>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToquickonboardingList()">Cancel</button>
         </div> 
     </div>
 
@@ -1038,18 +1038,48 @@ label {
                     <tbody>
                    <tr>
                    
-                  <td>
-                  <label for="aadharFile"><span class="required-field">*</span><spring:message code="label.uploadPhoto"/></label>
-    <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
-        
-    </div>
-    <div style="display: flex; justify-content: start;">
-            <input type="file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event,'imageFile','imageFileName')" style="overflow: hidden;">
-    	
-     </div>
-     <span id="imageFileName" style="margin-left: 10px;color:black;"></span>
-     <div id="profilePcError"></div>  
-</td>
+                      <td>
+  <!-- Label -->
+  <label for="imageFile">
+    <span class="required-field">*</span>
+    <spring:message code="label.uploadPhoto"/>
+  </label>
+
+  <!-- Preview Box -->
+  <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc; margin-bottom: 10px;">
+  </div>
+
+  <!-- File & Camera Side by Side -->
+  <div style="display: flex; align-items: center;">
+    <!--  Choose File -->
+    <input type="file" id="imageFile" name="imageFile" accept="image/*"
+           onchange="previewImage(event,'imageFile','imageFileName')"
+           style="overflow: hidden;"/>
+
+    <!-- Use Camera -->
+    <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
+      Use Camera
+    </button>
+  </div>
+
+  <!-- File Name Display -->
+  <span id="imageFileName" style="margin-left: 10px; color: black;"></span>
+
+  <!-- Webcam Stream -->
+  <video id="webcam" autoplay playsinline style="width: 200px; display: none; border: 1px solid gray; margin-top: 10px;"></video>
+
+  <!-- Capture / Cancel Buttons -->
+  <div id="cameraButtons" style="display: none; margin-top: 8px;">
+    <button type="button" onclick="captureImage()" style="color: black;">Capture</button>
+    <button type="button" onclick="closeCamera()" style="color: black; margin-left: 10px;">Cancel</button>
+  </div>
+
+  <!-- Hidden Canvas -->
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <!-- Error Display -->
+  <div id="profilePcError"></div>
+</td> 
                   
                    
 						

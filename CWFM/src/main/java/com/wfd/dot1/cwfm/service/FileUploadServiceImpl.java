@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
+import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
@@ -70,7 +73,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 if (!headerLine.equalsIgnoreCase("GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
-                // savedData = processGeneralMaster(reader);
+                savedData = processGeneralMaster(reader);
                 break;
             case "contractor":
                 if (!headerLine.equalsIgnoreCase("CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,"
@@ -82,8 +85,8 @@ public class FileUploadServiceImpl implements FileUploadService {
                  savedData = processContractor(reader);
                 break;
             case "workorder":
-                if (!headerLine.equalsIgnoreCase("Work Order Number,Item,Short Text,Delivery Complition,Item Changed ON,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
-                        + "G/L Code,Plant code,Cost Center,Nature of Job,Rate,Quantity,PM Order No,WBS Element,Quantity Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Organisation")) {
+                if (!headerLine.equalsIgnoreCase("Document_Number,Item,Line,Line_Number,Activity_Number,Short_Text,Delivery_Complition,Item_Changed_ON,Vendor,Vendor_Name,Address,Blocked_Vendor,Work_Order_Validity_From,Work_Order_Validity_To,Work_Order_Type,"
+                        + "Plant_Code,Section_Code,Department_Code,GL_Code,Cost_Center,Job,Rate,Quantity,Base_Unit_of_Measure,Work_Order_Released,PM_Order_No,WBS_Element,Quantity_Completed,Work_Order_Release_Date,Service_Entry_Created_Date,Service_Entry_Updated_Date,Purchase_Org_Level,Company_code")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processWorkorder(reader);
@@ -116,24 +119,56 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 
 
-    private List<Map<String, Object>> processGeneralMaster(BufferedReader reader) throws IOException {
-        List<Map<String, Object>> dataList = new ArrayList<>();
-        String line;
+    private Map<String, Object> processGeneralMaster(BufferedReader reader) throws IOException {
+    	 List<Map<String, Object>> successData = new ArrayList<>();
+         List<Map<String, Object>> errorData = new ArrayList<>();
 
-        while ((line = reader.readLine()) != null) {
-            String[] fields = line.split(",", -1);
-            if (fields.length < 7) continue;
+         String line;
+         int rowNum = 0;
+         String[] fieldNames = {
+                 "gmName", "gmDescription", "gmTypeId", "isActive", "createdTM","updatedTM","updatedBy"};
+                
 
-            String gmName = fields[0].trim();
-            String gmDescription = fields[1].trim();
-            int gmTypeId = Integer.parseInt(fields[2].trim());
-            boolean isActive = "1".equals(fields[3].trim());
-            String createdTM = fields[4].trim();
-            String updatedTM = fields[5].trim();
-            String updatedBy = fields[6].trim();
-            
-            CmsGeneralMaster gm = new CmsGeneralMaster(gmName,gmDescription, gmTypeId,isActive,createdTM,updatedTM,updatedBy);
-            fileUploadDao.saveGeneralMaster(gm);
+             while ((line = reader.readLine()) != null) {
+                 rowNum++;
+                 line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
+
+                 if (line.trim().isEmpty()) continue;
+
+                 String[] rawFields = line.split(",", -1);
+                 String[] fields = new String[rawFields.length];
+                 for (int i = 0; i < rawFields.length; i++) {
+                     fields[i] = rawFields[i].trim().replaceAll("\"", "");
+                 }
+
+                 Map<String, String> fieldErrors = new LinkedHashMap<>();
+
+                 if (fields.length < 7) {
+                     errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
+                     continue;
+                 }
+
+                 for (int i = 0; i < fieldNames.length; i++) {
+                     if (fields[i].isBlank()) {
+                         fieldErrors.put(fieldNames[i], "is Mandatory");
+                     }
+                 }
+
+                 if (!fieldErrors.isEmpty()) {
+                     errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
+                     continue;
+                 }
+                 try {
+                	 CmsGeneralMaster gm = new CmsGeneralMaster();
+                	 gm.setGmName(fields[0]);
+                	 gm.setGmDescription(fields[1]);
+                	 gm.setGmTypeId(Integer.parseInt((fields[2])));
+                	 boolean isActive = "1".equals(fields[3].trim());
+                	 gm.setCreatedTM(fields[4]);
+                	 gm.setUpdatedTM(fields[5]);
+                	 gm.setUpdatedBy(fields[6]);
+                	 
+                    fileUploadDao.saveGeneralMaster(gm);
 
             // Map each POJO to a simple map for JSON-friendly structure
             Map<String, Object> map = new HashMap<>();
@@ -145,10 +180,17 @@ public class FileUploadServiceImpl implements FileUploadService {
             map.put("updatedTM", gm.getUpdatedTM());
             map.put("updatedBy", gm.getUpdatedBy());
             
-            dataList.add(map);
-        }
+            successData.add(map);
 
-        return dataList;
+                 } catch (Exception e) {
+                     errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
+                 }
+             }
+
+             Map<String, Object> result = new HashMap<>();
+             result.put("successData", successData);
+             result.put("errorData", errorData);
+             return result;
     }
     
 
@@ -500,31 +542,26 @@ public class FileUploadServiceImpl implements FileUploadService {
     private Map<String, Object> processWorkorder(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
-        String line;
-        int rowNum = 0; // Header is assumed to be line 0
 
-        // List of expected field names in order (length must match expected columns = 19)
+        String line;
+        int rowNum = 0;
+
         String[] fieldNames = {
-            "sapWorkorderNumber", // 0
-            "itemNum",            // 1
-            "shortName",          // 2
-            "deliveryCompletion", // 3
-            "changedon",          // 4
-            "validFrom",          // 5
-            "validTo",            // 6
-            "sapType",            // 7
-            "glCode",             // 8
-            "costCenter",         // 9
-            "job",                // 10
-            "rate",               // 11
-            "quantity",                // 12
-            "pmOrderNum",         // 13
-            "wbsElement",         // 14
-            "qtyCompleted",       // 15
-            "releasedDate",       // 16
-            "seCreatedOn",        // 17
-            "seUpdatedOn"         // 18
+            "workOrderNumber", "item", "line", "lineNumber", "serviceCode", "shortText", "deliveryCompletion",
+            "itemChangedON", "vendorCode", "vendorName", "vendorAddress", "blockedVendor",
+            "workOrderValiditiyFrom", "workOrderValiditiyTo", "workOrderType", "plantcode", "sectionCode",
+            "departmentCode", "GLCode", "costCenter", "natureofJob", "rateUnit", "quantity", "baseUnitofMeasure",
+            "workOrderReleased", "PMOrderNo", "WBSElement", "qtyCompleted", "workOrderReleaseDate",
+            "serviceEntryCreatedDate", "serviceEntryUpdatedDate", "purchaseOrgLevel", "companycode"
         };
+
+        Set<String> mandatoryFields = Set.of(
+            "workOrderNumber", "vendorCode", "vendorName", "vendorAddress",
+            "workOrderValiditiyFrom", "workOrderValiditiyTo",
+            "plantcode", "sectionCode"
+        );
+
+        Set<String> numericFields = Set.of("rateUnit", "quantity", "qtyCompleted");
 
         while ((line = reader.readLine()) != null) {
             rowNum++;
@@ -539,135 +576,97 @@ public class FileUploadServiceImpl implements FileUploadService {
 
             Map<String, String> fieldErrors = new LinkedHashMap<>();
 
-            if (fields.length < 19) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "error", "Insufficient number of fields"
-                ));
+            if (fields.length < fieldNames.length) {
+                errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
                 continue;
             }
 
-            // ❗ Check for mandatory fields using friendly names
+            // Check mandatory fields
             for (int i = 0; i < fieldNames.length; i++) {
-                if (fields[i].isBlank()) {
-                    fieldErrors.put(fieldNames[i],  " is Mandatory");
+                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
+                    fieldErrors.put(fieldNames[i], "is mandatory");
+                }
+            }
+
+            // Check numeric fields
+            for (int i = 0; i < fieldNames.length; i++) {
+                if (numericFields.contains(fieldNames[i]) && !fields[i].isBlank()) {
+                    try {
+                        Double.parseDouble(fields[i]);
+                    } catch (NumberFormatException ex) {
+                        fieldErrors.put(fieldNames[i], "Invalid numeric value");
+                    }
                 }
             }
 
             if (!fieldErrors.isEmpty()) {
-                errorData.add(Map.of(
-                    "row", rowNum,
-                    "fieldErrors", fieldErrors
-                ));
+                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
             }
 
             try {
-                // === Step 1: Contractor ===
-                Workorder workorder = new Workorder();
-                try {
-                    workorder.setSapWorkorderNumber(fields[0]);
-                } catch (Exception e) {
-                    fieldErrors.put("sapWorkorderNumber", e.getMessage());
-                }
-                try {
-                    workorder.setValidFrom(fields[5]);
-                } catch (Exception e) {
-                    fieldErrors.put("validFrom", e.getMessage());
-                }
-                try {
-                    workorder.setValidTo(fields[6]);
-                } catch (Exception e) {
-                    fieldErrors.put("validTo", e.getMessage());
-                }
-                try {
-                    workorder.setGlCode(fields[8]);
-                } catch (Exception e) {
-                    fieldErrors.put("glCode", e.getMessage());
-                }
-                try {
-                    workorder.setCostCenter(fields[9]);
-                } catch (Exception e) {
-                    fieldErrors.put("costCenter", e.getMessage());
-                }
-                try {
-                    workorder.setReleasedDate(fields[16]);
-                } catch (Exception e) {
-                    fieldErrors.put("releasedDate", e.getMessage());
-                }
+            	 
+                KTCWorkorderStaging staging = new KTCWorkorderStaging();
+                staging.setWorkOrderNumber(fields[0]);
+                staging.setItem(fields[1]);
+                staging.setLine(fields[2]);
+                staging.setLineNumber(fields[3]);
+                staging.setServiceCode(fields[4]);
+                staging.setShortText(fields[5]);
+                staging.setDeliveryCompletion(fields[6]);
+                staging.setItemChangedON(fields[7]);
+                staging.setVendorCode(fields[8]);
+                staging.setVendorName(fields[9]);
+                staging.setVendorAddress(fields[10]);
+                staging.setBlockedVendor(fields[11]);
+                staging.setWorkOrderValiditiyFrom(fields[12]);
+                staging.setWorkOrderValiditiyTo(fields[13]);
+                staging.setWorkOrderType(fields[14]);
+                staging.setPlantcode(fields[15]);
+                staging.setSectionCode(fields[16]);
+                staging.setDepartmentCode(fields[17]);
+                staging.setGLCode(fields[18]);
+                staging.setCostCenter(fields[19]);
+                staging.setNatureofJob(fields[20]);
+                staging.setRateUnit(fields[21]);
+                staging.setQuantity(fields[22]);
+                staging.setBaseUnitofMeasure(fields[23]);
+                staging.setWorkOrderReleased(fields[24]);
+                staging.setPMOrderNo(fields[25]);
+                staging.setWBSElement(fields[26]);
+                staging.setQtyCompleted(fields[27]);
+                staging.setWorkOrderReleaseDate(fields[28]);
+                staging.setServiceEntryCreatedDate(fields[29]);
+                staging.setServiceEntryUpdatedDate(fields[30]);
+                staging.setPurchaseOrgLevel(fields[31]);
+                staging.setCompanycode(fields[32]);
 
-                Long workorderId = fileUploadDao.saveWorkorder(workorder);
-                workorder.setWorkorderId(String.valueOf(workorderId));
+                fileUploadDao.saveWorkorderToStaging(staging);
 
-                // === Step 2: Workorder LN ===
-                CMSWorkorderLN woln = new CMSWorkorderLN();
-                try {
-                    woln.setWorkorderid(workorderId);
-                    woln.setItemNum(Integer.parseInt(fields[1]));
-                    woln.setDeliveryCompletion(fields[3]);
-                    woln.setChangedon(fields[4]);
-                    woln.setJob(fields[10]);
-                    woln.setRate(Integer.parseInt(fields[11]));
-                    woln.setQty(Integer.parseInt(fields[12]));
-                    woln.setPmOrderNum(fields[13]);
-                    woln.setWbsElement(fields[14]);
-                    woln.setQtyCompleted(Long.parseLong(fields[15]));
-                    woln.setSeCreatedOn(fields[17]);
-                    woln.setSeUpdatedOn(fields[18]);
-                } catch (Exception e) {
-                    fieldErrors.put("workorderLN", e.getMessage());
+                Map<String, Object> rowMap = new LinkedHashMap<>();
+                for (int i = 0; i < fieldNames.length; i++) {
+                    rowMap.put(fieldNames[i], fields[i]);
                 }
-
-                fileUploadDao.saveWorkorderLN(woln);
-
-                ContractorWorkorderTYP wotyp = new ContractorWorkorderTYP();
-                try {
-                    wotyp.setSapType(fields[7]);
-                    wotyp.setShortName(fields[2]);
-                } catch (Exception e) {
-                    fieldErrors.put("workorderTYP", e.getMessage());
-                }
-
-                fileUploadDao.saveWorkorderTyp(wotyp);
-
-                if (!fieldErrors.isEmpty()) {
-                    errorData.add(Map.of(
-                        "row", rowNum,
-                        "fieldErrors", fieldErrors
-                    ));
-                    continue;
-                }
-
-                // Add to success data
-                Map<String, Object> map = new LinkedHashMap<>();
-                map.put("sapWorkorderNumber", workorder.getSapWorkorderNumber());
-                map.put("itemNum", woln.getItemNum());
-                map.put("shortName", wotyp.getShortName());
-                map.put("deliveryCompletion", woln.getDeliveryCompletion());
-                map.put("changedon", woln.getChangedon());
-                map.put("validFrom", workorder.getValidFrom());
-                map.put("validTo", workorder.getValidTo());
-                map.put("sapType", wotyp.getSapType());
-                map.put("glCode", workorder.getGlCode());
-                map.put("costCenter", workorder.getCostCenter());
-                map.put("job", woln.getJob());
-                map.put("rate", woln.getRate());
-                map.put("qty", woln.getQty());
-                map.put("pmOrderNum", woln.getPmOrderNum());
-                map.put("wbsElement", woln.getWbsElement());
-                map.put("qtyCompleted", woln.getQtyCompleted());
-                map.put("releasedDate", workorder.getReleasedDate());
-                map.put("seCreatedOn", woln.getSeCreatedOn());
-                map.put("seUpdatedOn", woln.getSeUpdatedOn());
-
-                successData.add(map);
+                successData.add(rowMap);
 
             } catch (Exception e) {
+                // fallback if DB insert fails despite validations
+                Map<String, String> dbFieldErrors = new LinkedHashMap<>();
+                for (String field : numericFields) {
+                    dbFieldErrors.put(field, "Invalid numeric value");
+                }
                 errorData.add(Map.of(
                     "row", rowNum,
-                    "error", "Exception while processing row: " + e.getMessage()
+                    "error", "-",
+                    "fieldErrors", dbFieldErrors
                 ));
             }
+        }
+
+        try {
+            fileUploadDao.callWorkorderProcessingSP();
+        } catch (Exception e) {
+            errorData.add(Map.of("row", "Procedure", "error", "Stored Procedure Failed: " + e.getMessage()));
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -675,6 +674,9 @@ public class FileUploadServiceImpl implements FileUploadService {
         result.put("errorData", errorData);
         return result;
     }
+
+
+
 
 	
 	@Override

@@ -5,6 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +27,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
+import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
@@ -43,26 +50,36 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
     @Override
     public void saveGeneralMaster(CmsGeneralMaster gm) {
-    	 java.sql.Date createdDate = null;
-    	    java.sql.Date updatedDate = null;
-    	    
-    	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	    
-    	 // Parse CreatedTM if it's valid
-    	    if (gm.getCreatedTM() != null && !gm.getCreatedTM().trim().equalsIgnoreCase("NULL") && !gm.getCreatedTM().trim().isEmpty()) {
-    	        LocalDate createdLocalDate = LocalDate.parse(gm.getCreatedTM().trim(), formatter);
-    	        createdDate = java.sql.Date.valueOf(createdLocalDate);
-    	    }
+        java.sql.Date createdDate = null;
+        java.sql.Date updatedDate = null;
 
-    	    // Parse UpdatedTM if it's valid
-    	    if (gm.getUpdatedTM() != null && !gm.getUpdatedTM().trim().equalsIgnoreCase("NULL") && !gm.getUpdatedTM().trim().isEmpty()) {
-    	        LocalDate updatedLocalDate = LocalDate.parse(gm.getUpdatedTM().trim(), formatter);
-    	        updatedDate = java.sql.Date.valueOf(updatedLocalDate);
-    	    }
-    	    
-        String sql = "INSERT INTO CMSGENERALMASTER (GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY)VALUES(?,?,?,?,?,?,?)";
-        jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId(),gm.isActive(),createdDate, updatedDate, gm.getUpdatedBy());
-     }
+        // Flexible formatter: allows 2024-12-1, 2024-1-01, etc.
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+            .appendValue(ChronoField.YEAR)
+            .appendLiteral('-')
+            .appendValue(ChronoField.MONTH_OF_YEAR)
+            .appendLiteral('-')
+            .appendValue(ChronoField.DAY_OF_MONTH)
+            .toFormatter();
+
+        try {
+            if (gm.getCreatedTM() != null && !gm.getCreatedTM().trim().equalsIgnoreCase("NULL") && !gm.getCreatedTM().trim().isEmpty()) {
+                LocalDate createdLocalDate = LocalDate.parse(gm.getCreatedTM().trim(), formatter);
+                createdDate = java.sql.Date.valueOf(createdLocalDate);
+            }
+
+            if (gm.getUpdatedTM() != null && !gm.getUpdatedTM().trim().equalsIgnoreCase("NULL") && !gm.getUpdatedTM().trim().isEmpty()) {
+                LocalDate updatedLocalDate = LocalDate.parse(gm.getUpdatedTM().trim(), formatter);
+                updatedDate = java.sql.Date.valueOf(updatedLocalDate);
+            }
+        } catch (DateTimeParseException e) {
+            throw new RuntimeException("Date format error: " + e.getParsedString() + " — " + e.getMessage());
+        }
+
+        String sql = "INSERT INTO CMSGENERALMASTER (GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId(), gm.isActive(), createdDate, updatedDate, gm.getUpdatedBy());
+    }
+
     
     
     @Override
@@ -298,8 +315,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
                 		+ "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,"
                 		+ "Mobile Number,ESI NUMBER,ESI VALID FROM,ESI VALID TO,Organisation,Main Contractor Code,Work Order Number\n";
             case "workorder":
-            	return "Work Order Number,Item,Short Text,Delivery Complition,Item Changed ON,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
-            			+ "G/L Code,Plant code,Cost Center,Nature of Job,Rate,Quantity,PM Order No,WBS Element,Quantity Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Organisation\n";
+            	return "Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
+                        + "Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code\n";
             default:
                 // fallback/default template
                 return "Template is Not Found to Download";
@@ -335,5 +352,64 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	        String sql = "INSERT INTO CMSPESTATE (UNITID,STATEID ) VALUES (?, ?)";
 	        jdbcTemplate.update(sql, unitId, stateId);
 	    }
+	 private Date parseSqlDate(String input) {
+		    try {
+		        // Adjust to match your CSV date format
+		        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		        LocalDate localDate = LocalDate.parse(input, formatter);
+		        return Date.valueOf(localDate);
+		    } catch (Exception e) {
+		        return null; // or throw new RuntimeException("Invalid date: " + input);
+		    }
+		}
+
+	 @Override
+	 public void saveWorkorderToStaging(KTCWorkorderStaging workorder) {
+	     String sql = "insert into KTC_WORKORDER_STAGING_ON_REQ(WORKORDER_NUM,ITEM_NUM,SVC_LN_ITEM_DEL,SVC_LN_ITEM_NUM,SVC_NUM,SVC_LN_ITEM_NAME,DELV_COMPLETION_SW,ITEM_CHANGED_ON_DATE,\r\n"
+	     		+ "VENDOR_CODE,VENDOR_NAME,VENDOR_ADDRESS,BLOCKED_PO,WORKORDER_VALID_FROM,WORKORDER_VALID_TO,SAP_WORKORDER_TYPE,UNIT_CODE,SEC_NAME,DEPT_NAME,\r\n"
+	     		+ "GL_CODE,COST_CENTRE_CODE,JOB_NAME,RATE,QTY,UOM,WORKORDER_RELEASED_SW,PM_WORKORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,WORKORDER_RELEASED_DATE,\r\n"
+	     		+ "SERVICE_ENTRY_CREATE_DATE,SERVICE_ENTRY_UPDATED_DATE,PURCHASE_ORG_LEVEL,COMPANY_CODE,EIC_NUM,RECORD_CREATED_ON,RECORD_UPDATED_ON,\r\n"
+	     		+ "RECORD_PROCESSED,RECORD_STATUS,NATURE_OF_JOB)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?,?,?,?,?,null,null,null,null,null,null)\r\n";
+	     jdbcTemplate.update(sql,
+	         workorder.getWorkOrderNumber(),
+	         workorder.getItem(),
+	         workorder.getLine(),
+	         workorder.getLineNumber(),
+	         workorder.getServiceCode(),
+	         workorder.getShortText(),
+	         workorder.getDeliveryCompletion(),
+	         parseSqlDate(workorder.getItemChangedON()),
+	         workorder.getVendorCode(),
+	         workorder.getVendorName(),
+	         workorder.getVendorAddress(),
+	         workorder.getBlockedVendor(),
+	         parseSqlDate(workorder.getWorkOrderValiditiyFrom()),
+	         parseSqlDate(workorder.getWorkOrderValiditiyTo()),
+	         workorder.getWorkOrderType(),
+	         workorder.getPlantcode(),
+	         workorder.getSectionCode(),
+	         workorder.getDepartmentCode(),
+	         workorder.getGLCode(),
+	         workorder.getCostCenter(),
+	         workorder.getNatureofJob(),
+	         workorder.getRateUnit(),
+	         workorder.getQuantity(),
+	         workorder.getBaseUnitofMeasure(),
+	         workorder.getWorkOrderReleased(),
+	         workorder.getPMOrderNo(),
+	         workorder.getWBSElement(),
+	         parseSqlDate(workorder.getWorkOrderReleaseDate()),
+	         parseSqlDate(workorder.getServiceEntryCreatedDate()),
+	         parseSqlDate(workorder.getServiceEntryUpdatedDate()),
+	         workorder.getPurchaseOrgLevel(),
+	         workorder.getCompanycode()
+	     );
+	 }
+
+	 @Override
+	 public void callWorkorderProcessingSP() {
+	     jdbcTemplate.execute("EXEC CMS_PROCESS_WORKORDERS_ON_REQ");
+	 }
+
 }
 

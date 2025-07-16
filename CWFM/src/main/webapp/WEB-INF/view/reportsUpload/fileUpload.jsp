@@ -34,11 +34,11 @@
             display: inline-block;
             margin-right: -17px;
             font-weight:500;;
-            padding: 8px 5px;
+            padding: 4px 5px;
             border: none;
             background: none;
             color: darkcyan; 
-            font-size: 20px; /* Adjust icon size */
+            font-size: 23px; /* Adjust icon size */
             margin-bottom: -14px;
     /*  font-weight: bold; */
         }
@@ -238,7 +238,7 @@ background-color: #DDF3FF; /* Light green for the table header */
 <!-- Import/Export Data Button -->
 <div class="button-container">
     <!-- <button class="button openSidebar" onclick="fileUploadTemplateSideBar()">Import/Export Data</button> -->
-    <a href="#" class="button openSidebar" onclick="fileUploadTemplateSideBar()">Import/Export Data</a> 
+    <a href="#" class="button openSidebar" onclick="fileUploadTemplateSideBar()">Import Data</a> 
     <div><br>
     
     <table >
@@ -271,11 +271,11 @@ background-color: #DDF3FF; /* Light green for the table header */
 <div id="sidebar" class="sidebar">
     <div class="sidebar-content">
         <button id="closeSidebar" class="close-btn">&times;</button>
-        <h2 style="color:black;font-size: 0.875rem; ">Import/Export Data</h2>
+        <h2 style="color:black;font-size: 0.875rem; ">Import Data</h2>
         <hr style="color:gray;">
         <!-- Import & Export Buttons -->
     <button id="importBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="background-color: #007bff; color: white; border-radius: 5px;">Import</button>
-    <button id="exportBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="border: 1px solid #007bff; color: #007bff; border-radius: 5px;">Export</button>
+    <!-- <button id="exportBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="border: 1px solid #007bff; color: #007bff; border-radius: 5px;">Export</button> -->
 
     <br><br>
         <h4 style="color:grey;">Select a template to import data</h2>
@@ -323,6 +323,7 @@ background-color: #DDF3FF; /* Light green for the table header */
    
       <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveFileSidebar()"style="float:right;">Save</button> -->
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="openFileSidebar()"style="float:right;">Open File</button>
+       <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="cancelButton()"style="float:right;">cancel</button>  -->
         <h2 style="color: darkcyan;font-size: 1rem;">Template Data</h2> 
         </div>
     <div id="viewtable">
@@ -340,6 +341,7 @@ background-color: #DDF3FF; /* Light green for the table header */
     <!-- Open File Button -->
     
 </div>
+<div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
 <div id="fileUploadSidebar" class="sidebar" style="width: 0;">
     <div class="sidebar-content" id="fileUploadContainer">
         <button class="close-btn" onclick="closeFileSidebar()">&times;</button>
@@ -356,6 +358,9 @@ background-color: #DDF3FF; /* Light green for the table header */
         </button>
        
     </div>
+    <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
+    
 </div>
+<div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
 </body>
 </html>

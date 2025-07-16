@@ -1782,27 +1782,31 @@ function searchWorkmenWithGatePassId(){
 }	
 
 
-function previewImage(event,inputId,displayId) {
-	const fileInput = document.getElementById(inputId);
-	   const displayElement = document.getElementById(displayId);
+function previewImage(event, inputId, displayId) {
+    const fileInput = document.getElementById(inputId);
+    const displayElement = document.getElementById(displayId);
 
-	   // Get the selected file's name
-	   if (fileInput.files.length > 0) {
-	       const fileName = fileInput.files[0].name;
-	       displayElement.textContent = fileName; // Display the file name
-	   } else {
-	       displayElement.textContent = ''; // Clear the display if no file is selected
-	   }
-            const file = event.target.files[0];
-            if (file && file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const previewDiv = document.getElementById("preview");
-                    previewDiv.innerHTML = `<img src="${e.target.result}" alt="Image Preview">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+    // Display the file name
+    if (fileInput.files.length > 0) {
+        const fileName = fileInput.files[0].name;
+        displayElement.textContent = fileName;
+    } else {
+        displayElement.textContent = '';
+    }
+
+    // Preview image from file
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewDiv = document.getElementById("preview");
+            previewDiv.innerHTML = ""; // Clear previous content
+            previewDiv.innerHTML = `<img src="${e.target.result}" alt="Image Preview" style="max-width: 100%; max-height: 100%;">`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
         
         function exportCSVFormat() {
             var selectedRows = document.querySelectorAll('input[name="selectedWOs"]:checked');
@@ -2823,4 +2827,82 @@ function validatePfForm11Requirement() {
     return true;
 }
 
+let streams;
 
+  function previewImages(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById("preview");
+        img.src = e.target.result;
+        img.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+
+      // ✅ Show file name
+      document.getElementById("fileNameDisplay").textContent = file.name;
+    }
+  }
+
+  function openCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(s => {
+        streams = s;
+        const video = document.getElementById("webcam");
+        video.srcObject = streams;
+        video.style.display = "block";
+        document.getElementById("cameraButtons").style.display = "flex";
+        //document.getElementById("cameraButtons").style.gap = "5px";
+      })
+      .catch(err => {
+        alert("Camera access denied.");
+        console.error(err);
+      });
+  }
+
+  function captureImage() {
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("canvas");
+    const previewDiv = document.getElementById("preview");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(function(blob) {
+        // Create a File object with a dummy name
+        const file = new File([blob], "captured_profile.png", { type: "image/png" });
+
+        // Set this file into a hidden input (or use FormData later)
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById("imageFile").files = dataTransfer.files;
+
+        // Preview image
+        const imageUrl = URL.createObjectURL(blob);
+        previewDiv.innerHTML = `<img src="${imageUrl}" alt="Captured Image" style="max-width: 100%; max-height: 100%;">`;
+
+        // Show filename under preview
+        document.getElementById("imageFileName").textContent = file.name;
+
+        closeCamera();
+    }, "image/png");
+}
+
+
+
+  function closeCamera() {
+    if (streams) {
+      streams.getTracks().forEach(track => track.stop());
+    }
+    document.getElementById("webcam").style.display = "none";
+    document.getElementById("cameraButtons").style.display = "none";
+  }
+  
+  function goBackToonboardingList() {
+    	 loadCommonList('/contractworkmen/list', 'On-Boarding List');
+    }
+    function goBackToquickonboardingList() {
+    	 loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
+    }

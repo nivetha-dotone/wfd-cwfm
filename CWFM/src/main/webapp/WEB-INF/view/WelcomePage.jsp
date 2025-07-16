@@ -4744,10 +4744,10 @@ table th {
             headers = ["Trade", "Skill", "Basic","Da","Allowance","From Date","Unit Code","Organization"];
         }
         else if (selectedTemplate === "workorder") {
-            headers = ["Work Order Number", "Item", "Line","Line Number","Service Code","Short Text","Delivery Complition","Item Changed ON","Vendor Code","Vendor Name","Vendor Address",
-            	"Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code","G/L Code","Cost Center",
-            	"Nature of Job","Rate","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Quantity Completed","Work Order Release Date",
-            	"Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Organisation"];
+            headers = ["Work Order Number","Item","Line","Line Number","Service Code","Short Text","Delivery Completion","Item Changed ON","Vendor Code","Vendor Name",
+            	"Vendor Address","Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code",
+            	"G/L Code","Cost Center","Nature of Job","Rate / Unit","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Qty Completed",
+            	"Work Order Release Date","Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Company_code"];
         }
         else if (selectedTemplate === "contractor") {
             headers = ["Contractor Name", "Contractor Address","City","Plant Code","Contractor Manager Name","License Num","License Valid From","License Valid To",
@@ -4789,6 +4789,19 @@ table th {
     function closeFileSidebar() {
         document.getElementById("fileUploadSidebar").style.width = "0"; // Close sidebar
     }
+   
+    /* function cancelButton() {
+        // Hide all other sections (viewTemplate, sidebar, etc.)
+        document.getElementById("viewTemplateContainer").style.display = "none";
+        document.getElementById("fileUploadSidebar").style.width = "0";
+
+        // Show the initial section
+        document.querySelector(".button-container").style.display = "block";
+    } */
+
+   
+
+
 
    /*  function submitFile() {
         var fileInput = document.getElementById("fileInput");
@@ -4823,36 +4836,62 @@ table th {
         .then(result => {
             console.log("Server Response:", result);
 
+            const messageDiv = document.getElementById("uploadMessage");
+            messageDiv.innerHTML = "";
+            messageDiv.style.display = "block";
+
+            let messageColor = "black";
+            if (result.status === "success") {
+                messageColor = "green";
+            } else if (result.status === "partial") {
+                messageColor = "orange";
+            } else {
+                messageColor = "red";
+            }
+
+            messageDiv.innerText = result.message || "Unknown result.";
+            messageDiv.style.color = messageColor;
+
+            // Automatically hide message after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = "none";
+            }, 5000);
+
             // Clear previous error display
             document.getElementById("errorContainer").innerHTML = "";
-            const templateType = document.getElementById("templateType").value;
+
             const successData = result.data?.successData ?? [];
             const errorData = result.data?.errorData ?? [];
-
             let anyDataProcessed = false;
 
-            // ✅ Render saved data (non-duplicates)
             if (successData.length > 0) {
                 renderUploadedData(successData, templateType);
                 anyDataProcessed = true;
             }
 
-            // ❌ Render duplicate errors
             if (errorData.length > 0) {
                 renderErrors(errorData);
                 anyDataProcessed = true;
             }
 
-            // ❌ Only show this if truly no records were returned
-            if (!anyDataProcessed) {
-                alert("No records processed.");
-            }
+            closeFileSidebar();
+            fileInput.value = "";
         })
         .catch(err => {
             console.error("Upload error", err);
-            alert("Something went wrong during file upload.");
+            const messageDiv = document.getElementById("uploadMessage");
+            messageDiv.innerText = "Something went wrong during file upload.";
+            messageDiv.style.color = "red";
+            messageDiv.style.display = "block";
+
+            // Automatically hide error after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = "none";
+            }, 5000);
         });
     }
+
+
 
 
 
@@ -4885,8 +4924,8 @@ table th {
             headers = ["Trade", "Skill", "Basic", "Da", "Allowance", "From Date", "Unit Code", "Organization"];
             fieldMap = ["trade", "skill", "basic", "da", "allowamce", "fromDate", "unitCode", "organization"];
         } else if (templateType === "workorder") {
-            headers = ["Work Order Number", "Item", "Short Text", "Delivery Completion", "Item Changed ON", "Work Order Validity From", "Work Order Validity To", "Work Order Type", "G/L Code", "Cost Center", "Nature of Job", "Rate", "Quantity", "PM Order No", "WBS Element", "Quantity Completed", "Work Order Release Date", "Service Entry Created Date", "Service Entry Updated Date"];
-            fieldMap = ["sapWorkorderNumber", "itemNum", "shortName", "deliveryCompletion", "changedon", "validFrom", "validTo", "sapType", "glCode", "costCenter", "job", "rate", "qty", "pmOrderNum", "wbsElement", "qtyCompleted", "releasedDate", "seCreatedOn", "seUpdatedOn"];
+            headers = ["Work Order Number","Item","Line","Line Number","Service Code","Short Text","Delivery Completion","Item Changed ON","Vendor Code","Vendor Name","Vendor Address","Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code","G/L Code","Cost Center","Nature of Job","Rate / Unit","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Qty Completed","Work Order Release Date","Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Company_code"];
+            fieldMap = ["workOrderNumber", "item", "line", "lineNumber", "serviceCode", "shortText", "deliveryCompletion","itemChangedON", "vendorCode", "vendorName", "vendorAddress", "blockedVendor","workOrderValiditiyFrom", "workOrderValiditiyTo", "workOrderType", "plantcode", "sectionCode","departmentCode", "GLCode", "costCenter", "natureofJob", "rateUnit", "quantity", "baseUnitofMeasure","workOrderReleased", "PMOrderNo", "WBSElement", "qtyCompleted", "workOrderReleaseDate","serviceEntryCreatedDate", "serviceEntryUpdatedDate", "purchaseOrgLevel",  "companycode"];
         } else if (templateType === "contractor") {
             headers = ["CONTRACTOR NAME", "CONTRACTOR ADDRESS", "City", "Contractor MANAGER NAME", "LICENSE NUM", "LICENCSE VALID FROM", "LICENCSE VALID TO", "LICENCSE COVERAGE", "TOTAL STRENGTH", "MAXIMUM NUMBER OF WORKMEN", "NATURE OF WORK", "LOCATION OF WORK", "CONTRACTOR VALIDITY START DATE", "CONTRACTOR VALIDITY END DATE", "CONTRACTOR ID", "PF CODE", "EC/WC number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF NUMBER", "PF APPLY DATE", "Reference", "Mobile Number", "ESI NUMBER", "ESI VALID FROM", "ESI VALID TO", "Main Contractor Code", "Work Order Number"];
             fieldMap = ["contractorName", "contractorAddress", "city", "managerNm", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "totalStrength", "maxNoEmp", "natureofWork", "locationofWork", "periodStartDt", "periodEndDt", "contractorId", "pfCode", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "pfNum", "pfApplyDt", "reference", "mobileNumber", "esiwc", "esiValidFrom", "esiValidTo", "contractorCode", "workOrderNumber"];
@@ -4944,32 +4983,60 @@ table th {
         table.appendChild(headerRow);
 
         errorData.forEach(error => {
-            const row = document.createElement("tr");
+            if (error.fieldErrors) {
+                // Loop through all field-level errors
+                for (const [field, message] of Object.entries(error.fieldErrors)) {
+                    const row = document.createElement("tr");
 
-            const rowCell = document.createElement("td");
-            rowCell.textContent = error.row || "-";
-            rowCell.style.border = "1px solid #999";
-            rowCell.style.padding = "6px";
+                    const rowCell = document.createElement("td");
+                    rowCell.textContent = error.row || "-";
+                    rowCell.style.border = "1px solid #999";
+                    rowCell.style.padding = "6px";
 
-            const fieldCell = document.createElement("td");
-            fieldCell.textContent = "-"; // No field info in your structure
-            fieldCell.style.border = "1px solid #999";
-            fieldCell.style.padding = "6px";
+                    const fieldCell = document.createElement("td");
+                    fieldCell.textContent = field;
+                    fieldCell.style.border = "1px solid #999";
+                    fieldCell.style.padding = "6px";
 
-            const messageCell = document.createElement("td");
-            messageCell.textContent = error.error || "Unknown error";
-            messageCell.style.border = "1px solid #999";
-            messageCell.style.padding = "6px";
+                    const messageCell = document.createElement("td");
+                    messageCell.textContent = message;
+                    messageCell.style.border = "1px solid #999";
+                    messageCell.style.padding = "6px";
 
-            row.appendChild(rowCell);
-            row.appendChild(fieldCell);
-            row.appendChild(messageCell);
+                    row.appendChild(rowCell);
+                    row.appendChild(fieldCell);
+                    row.appendChild(messageCell);
+                    table.appendChild(row);
+                }
+            } else {
+                // General row-level error
+                const row = document.createElement("tr");
 
-            table.appendChild(row);
+                const rowCell = document.createElement("td");
+                rowCell.textContent = error.row || "-";
+                rowCell.style.border = "1px solid #999";
+                rowCell.style.padding = "6px";
+
+                const fieldCell = document.createElement("td");
+                fieldCell.textContent = "-";
+                fieldCell.style.border = "1px solid #999";
+                fieldCell.style.padding = "6px";
+
+                const messageCell = document.createElement("td");
+                messageCell.textContent = error.error || "Unknown error";
+                messageCell.style.border = "1px solid #999";
+                messageCell.style.padding = "6px";
+
+                row.appendChild(rowCell);
+                row.appendChild(fieldCell);
+                row.appendChild(messageCell);
+                table.appendChild(row);
+            }
         });
 
         container.appendChild(table);
     }
+
 
 
 
