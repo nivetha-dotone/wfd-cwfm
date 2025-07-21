@@ -33,6 +33,9 @@ function redirectToContractorRenewView() {
 function setValueIfPresent(elementId, value) {
     var input = document.getElementById(elementId);
     input.value = value || "";
+    if(elementId === "contractTypeId"){
+		makeSelectReadOnly("contractTypeId");
+	}
 }
 
 function getAllContractorDetailForRenewal(contractorId) {
@@ -503,11 +506,16 @@ function saveWorkOrderInfo() {
     const licenseId = 		Array.from(document.getElementById("selectedLicense").options)
 		        .map(opt => opt.value);
     const contractorRegId = document.getElementById("contractorregId").value;
-
+	const selectedOption = $("#vendorCodeId option:selected");
+	const contractorId =  selectedOption.val();
+	const unitId = $("#principalEmployerId").val().trim();
     const payload = {
         contractorRegId,
         selectedWOs,
-        licenseId
+        licenseId,
+		unitId,
+		contractorId
+		
     };
 
     fetch("/CWFM/renewal/saveWorkOrderInfo", {
@@ -523,6 +531,11 @@ function saveWorkOrderInfo() {
             alert("Failed to save work order info.");
         }
     });
+}
+function makeSelectReadOnly(selectId) {
+    const select = document.getElementById(selectId);
+    select.addEventListener("mousedown", e => e.preventDefault());
+    select.addEventListener("keydown", e => e.preventDefault());
 }
 
 

@@ -9,21 +9,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wfd.dot1.cwfm.dto.RenewalDTO;
+import com.wfd.dot1.cwfm.dto.RenewalDocumentDTO;
+import com.wfd.dot1.cwfm.dto.WorkOrderInfoDTO;
+import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.service.CommonService;
+import com.wfd.dot1.cwfm.service.ContractorLLWCService;
 import com.wfd.dot1.cwfm.service.ContractorService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
+import com.wfd.dot1.cwfm.service.RenewalViewService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -166,5 +175,70 @@ public class ContractorRenewalController {
 	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                                 .body("Failed to save renewal: " + e.getMessage());
 	        }
+	    }
+	 @Autowired
+	    private ContractorLLWCService contractorLLWCService;
+
+	    @PostMapping("/saveWorkOrderInfo")
+	    @ResponseBody
+	    public ResponseEntity<String> saveWorkOrderInfo(@RequestBody WorkOrderInfoDTO workOrderInfo,
+	                                                    HttpSession session) {
+	        try {
+	           MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+		        String createdBy = String.valueOf(user.getUserId());
+	            if (createdBy == null) createdBy = "SYSTEM";
+
+	            contractorLLWCService.saveLLWCRecords(workOrderInfo, createdBy);
+	            return ResponseEntity.ok("Work order info saved.");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                                 .body("Failed to save work order info.");
+	        }
+	    }
+	    
+	    @GetMapping("/contRenewList")
+		public String getContractorRenewList(HttpServletRequest request, HttpServletResponse response) {
+
+			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+			List<ContractorRegistration> listDto = contrService.getContractorRenewList(String.valueOf(user.getUserId()));
+			List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+			 CMSRoleRights rr =new CMSRoleRights();
+	       if(user!=null) {
+	       if(user.getRoleName().equals("System Admin")) {
+	       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+			        rr.setEditRights(1);
+			        rr.setDeleteRights(1);
+			        rr.setImportRights(1);
+			        rr.setExportRights(1);
+			        rr.setViewRights(1);
+	       	peList = peService.getAllPrincipalEmployerForAdmin();
+	       }else {
+	       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/renewal/contRenewList");
+	       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+	       }
+	       }
+			request.setAttribute("contractorlist", listDto);
+			request.setAttribute("UserPermission", rr);
+			return "contRenewal/list";
+
+		}
+	    
+	    @Autowired
+	    private RenewalViewService renewalViewService;
+
+	    @GetMapping("/view/{contractorRegId}")
+	    public String viewRenewalDetails(@PathVariable Long contractorRegId, Model model) {
+	        RenewalDTO renewal = renewalViewService.getRegistrationDetails(contractorRegId);
+	        List<RenewalDocumentDTO> documents = renewalViewService.getPolicyDocuments(contractorRegId);
+	        List<CMSContractorRegistrationLLWC> llwcRecords = renewalViewService.getLLWCDetails(contractorRegId);
+
+	        model.addAttribute("renewal", renewal);
+	        model.addAttribute("documents", documents);
+	        model.addAttribute("llwcRecords", llwcRecords);
+
+	        return "renewal/view"; // JSP name
 	    }
 }

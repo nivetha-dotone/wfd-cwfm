@@ -256,13 +256,13 @@
   </div>
    <div>
     <c:if test="${UserPermission.addRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenCancelView('add')">Add</button> 
     </c:if>
     <c:if test="${UserPermission.editRights eq 1 }">
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEEdit('${cmSPRINCIPALEMPLOYER.UNITID}')">Edit</button> 
      </c:if>
      <c:if test="${UserPermission.viewRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenCancelView()">View</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenCancelView('view')">View</button>
 
      </c:if>
        <c:if test="${UserPermission.exportRights eq 1 }">

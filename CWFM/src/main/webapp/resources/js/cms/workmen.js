@@ -1627,7 +1627,7 @@ xhr.send(JSON.stringify(data));
 	//error 
 }
 }//eofunc
-function redirectToWorkmenCancelView() {
+function redirectToWorkmenCancelView(mode) {
     var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     if (selectedCheckboxes.length !== 1) {
         alert("Please select exactly one row to view.");
@@ -1635,7 +1635,7 @@ function redirectToWorkmenCancelView() {
     }
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
-    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -1643,10 +1643,10 @@ function redirectToWorkmenCancelView() {
             document.getElementById("mainContent").innerHTML = xhr.responseText;
         }
     };
-    xhr.open("GET", "/CWFM/contractworkmen/cancelview/" + transactionId, true);
+    xhr.open("GET", "/CWFM/contractworkmen/cancelview/" + gatePassId+"/"+mode, true);
     xhr.send();
 }
-function redirectToWorkmenBlockView() {
+function redirectToWorkmenBlockView(mode) {
  var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
  if (selectedCheckboxes.length !== 1) {
      alert("Please select exactly one row to view.");
@@ -1662,10 +1662,10 @@ function redirectToWorkmenBlockView() {
          document.getElementById("mainContent").innerHTML = xhr.responseText;
      }
  };
- xhr.open("GET", "/CWFM/contractworkmen/blockview/" + transactionId, true);
+ xhr.open("GET", "/CWFM/contractworkmen/blockview/" + transactionId+ "/" + mode, true);
  xhr.send();
  }
- function redirectToWorkmenUnblockView() {
+ function redirectToWorkmenUnblockView(mode) {
   var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
   if (selectedCheckboxes.length !== 1) {
       alert("Please select exactly one row to view.");
@@ -1681,10 +1681,10 @@ function redirectToWorkmenBlockView() {
           document.getElementById("mainContent").innerHTML = xhr.responseText;
       }
   };
-  xhr.open("GET", "/CWFM/contractworkmen/unblockview/" + transactionId, true);
+  xhr.open("GET", "/CWFM/contractworkmen/unblockview/" + transactionId+"/"+mode, true);
   xhr.send();
   }
-  function redirectToWorkmenBlackView() {
+  function redirectToWorkmenBlackView(mode) {
     var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     if (selectedCheckboxes.length !== 1) {
         alert("Please select exactly one row to view.");
@@ -1700,10 +1700,10 @@ function redirectToWorkmenBlockView() {
             document.getElementById("mainContent").innerHTML = xhr.responseText;
         }
     };
-    xhr.open("GET", "/CWFM/contractworkmen/blackview/" + transactionId, true);
+    xhr.open("GET", "/CWFM/contractworkmen/blackview/" + transactionId+ "/" + mode, true);
     xhr.send();
     }
-	function redirectToWorkmenDeblackView() {
+	function redirectToWorkmenDeblackView(mode) {
 	  var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
 	  if (selectedCheckboxes.length !== 1) {
 	      alert("Please select exactly one row to view.");
@@ -1719,10 +1719,10 @@ function redirectToWorkmenBlockView() {
 	          document.getElementById("mainContent").innerHTML = xhr.responseText;
 	      }
 	  };
-	  xhr.open("GET", "/CWFM/contractworkmen/deblackview/" + transactionId, true);
+	  xhr.open("GET", "/CWFM/contractworkmen/deblackview/" + transactionId+"/"+mode, true);
 	  xhr.send();
 	  }
-	  function redirectToWorkmenLostView() {
+	  function redirectToWorkmenLostView(mode) {
 	    var selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
 	    if (selectedCheckboxes.length !== 1) {
 	        alert("Please select exactly one row to view.");
@@ -1738,7 +1738,7 @@ function redirectToWorkmenBlockView() {
 	            document.getElementById("mainContent").innerHTML = xhr.responseText;
 	        }
 	    };
-	    xhr.open("GET", "/CWFM/contractworkmen/lostordamageview/" + transactionId, true);
+	    xhr.open("GET", "/CWFM/contractworkmen/lostordamageview/" + transactionId+"/"+mode, true);
 	    xhr.send();
 	    }	
 function searchWorkmenWithGatePassId(){

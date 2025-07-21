@@ -71,6 +71,12 @@ public class ContractorServiceImpl implements ContractorService{
 		// TODO Auto-generated method stub
 		return contrDao.getContractorRegistrationList(userId);
 	}
+	
+	@Override
+	public List<ContractorRegistration> getContractorRenewList(String userId) {
+		// TODO Auto-generated method stub
+		return contrDao.getContractorRenewList(userId);
+	}
 
 	@Override
 	public ContractorRenewal getContractorDetails(String contractorRenewId) {
@@ -243,6 +249,7 @@ public class ContractorServiceImpl implements ContractorService{
 		        reg.setAadharDoc(aadharFile.getOriginalFilename());
 				reg.setPanDoc(panFile.getOriginalFilename());
 				reg.setCreatedBy(username);
+				reg.setRequestType("Renew");
 
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block

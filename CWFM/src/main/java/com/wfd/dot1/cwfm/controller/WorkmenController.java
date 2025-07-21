@@ -903,14 +903,15 @@ public class WorkmenController {
     	 
     }
     
-    @GetMapping("/cancelview/{gatePassId}")
-    public String cancelviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    @GetMapping("/cancelview/{gatePassId}/{mode}")
+    public String cancelviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
-          
+
+    		 request.setAttribute("mode", mode);
     		
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -946,14 +947,14 @@ public class WorkmenController {
     		return "contractWorkmen/cancelView";
     	
     }
-    @GetMapping("/blockview/{transactionId}")
-    public String blockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    @GetMapping("/blockview/{transactionId}/{mode}")
+    public String blockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId, @PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
-          
+    		 request.setAttribute("mode", mode);
     		
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -989,14 +990,15 @@ public class WorkmenController {
     		return "contractWorkmen/blockView";
     	
     }
-    @GetMapping("/unblockview/{transactionId}")
-    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    @GetMapping("/unblockview/{transactionId}/{mode}")
+    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
-          
+    		 request.setAttribute("mode", mode);
     		
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -1032,14 +1034,15 @@ public class WorkmenController {
     		return "contractWorkmen/unblockView";
     	
     }
-    @GetMapping("/blackview/{transactionId}")
-    public String blackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    @GetMapping("/blackview/{transactionId}/{mode}")
+    public String blackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
-          
+    		 request.setAttribute("mode", mode);
     		
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -1076,15 +1079,17 @@ public class WorkmenController {
     	
     }
     
-    @GetMapping("/deblackview/{transactionId}")
-    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    @GetMapping("/deblackview/{transactionId}/{mode}")
+    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    		@PathVariable("mode") String mode,
+    		HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
-    		
+    		 request.setAttribute("mode", mode);
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1119,14 +1124,16 @@ public class WorkmenController {
     		return "contractWorkmen/deblackView";
     	
     }
-    @GetMapping("/lostordamageview/{transactionId}")
-    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
+    @GetMapping("/lostordamageview/{transactionId}/{mode}")
+    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    		    		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
     	GatePassMain gatePassMainObj =null;
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
-          
+
+    		 request.setAttribute("mode", mode);
     		
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -1329,7 +1336,7 @@ public class WorkmenController {
    	public String renewFilter(HttpServletRequest request, HttpServletResponse response) {
    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-
+   	
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
@@ -1338,6 +1345,12 @@ public class WorkmenController {
        	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
        	  request.setAttribute("Dept", departments);
+       	  
+       	 CMSRoleRights rr =new CMSRoleRights();
+         rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/renewFilter");
+    	   
+    	    request.setAttribute("UserPermission", rr);
+    	    
    		return "contractWorkmen/renewListing";
    	}
     

@@ -255,9 +255,16 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchRenew()">Search</button>
   </div>
     <div>
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewEdit()">Edit</button>
+     <c:if test="${UserPermission.addRights eq 1 }">
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewEdit()">Add</button>
+      </c:if>
+       <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewView()">View</button>
+        
+        </c:if>
+        <c:if test="${UserPermission.exportRights eq 1 }">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
+   </c:if>
     </div>
 </div>
 

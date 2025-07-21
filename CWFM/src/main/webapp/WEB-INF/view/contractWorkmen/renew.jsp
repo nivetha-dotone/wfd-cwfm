@@ -289,7 +289,10 @@ label {
             max-height: 100%;
         }
        
-        
+          .error-bold {
+    color: red;
+    font-weight: bold !important;
+}   
     </style>
      <%
     MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -769,7 +772,25 @@ label {
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
                         </tr>
-                        
+                        <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <td>
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.pfNumber }" readonly>
+                            </td>
+                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <td>
+                            	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
+                            	</td>
+                        </tr>
+                        <tr>
+                            <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                            
+                            <td>
+        <input type="checkbox" id="pfApplicable" name="pfApplicable"
+               <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
+               disabled />
+    </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -982,44 +1003,90 @@ label {
                 </table>
             </div>
 
-            <div id="tab5" class="tab-content">
+              <div id="tab5" class="tab-content">
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
                    <tr>
                    
                   <td>
-                  <label for="aadharFile"><spring:message code="label.uploadPhoto"/></label>
-    <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
-        
-    </div>
-    <div style="display: flex; justify-content: start;">
-            <input type="file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event,'imageFile','imageFileName')" style="overflow: hidden;">
-     </div>
-     <span id="imageFileName" style="margin-left: 10px;color:black;"></span> 
+  <!-- Label -->
+  <label for="imageFile">
+    <span class="required-field">*</span>
+    <spring:message code="label.uploadPhoto"/>
+  </label>
+
+  <!-- Preview Box -->
+  <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc; margin-bottom: 10px;">
+  </div>
+
+  <!-- File & Camera Side by Side -->
+  <div style="display: flex; align-items: center;">
+    <!-- 📁 Choose File -->
+    <input type="file" id="imageFile" name="imageFile" accept="image/*"
+           onchange="previewImage(event,'imageFile','imageFileName')"
+           style="overflow: hidden;"/>
+
+    <!--  Use Camera -->
+    <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
+      Use Camera
+    </button>
+  </div>
+
+  <!-- File Name Display -->
+  <span id="imageFileName" style="margin-left: 10px; color: black;"></span>
+
+  <!-- Webcam Stream -->
+  <video id="webcam" autoplay playsinline style="width: 200px; display: none; border: 1px solid gray; margin-top: 10px;"></video>
+
+  <!-- Capture / Cancel Buttons -->
+  <div id="cameraButtons" style="display: none; margin-top: 8px;">
+    <button type="button" onclick="captureImage()" style="color: black;">Capture</button>
+    <button type="button" onclick="closeCamera()" style="color: black; margin-left: 10px;">Cancel</button>
+  </div>
+
+  <!-- Hidden Canvas -->
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <!-- Error Display -->
+  <div id="profilePcError"></div>
 </td>
-                  
-                   
+
 						
                 		<td>
-                		 	<label for="aadharFile"><spring:message code="label.uploadAadharCard"/></label>
+                		 	<label for="aadharFile"><span class="required-field">*</span><spring:message code="label.uploadAadharCard"/></label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">
        					 	  <span id="aadharFileName" style="margin-left: 10px;color:black;"></span> 
         					<div id="aadharError"></div> <!-- Error message for Aadhar file -->
                 		</td>
-                		<td>
-                			<label for="policeFile"><spring:message code="label.uploadPoliceVerificationReport"/></label> 
+                </tr>  		
+           <tr>
+                	  <td>
+                			<label for="policeFile"><span class="required-field">*</span><spring:message code="label.uploadPoliceVerificationReport"/></label> 
                 			<input type="file"	id="policeFile" name="policeFile" accept="application/pdf" onchange="displayFileName1('policeFile', 'policeFileName')">
                 			  <span id="policeFileName" style="margin-left: 10px;color:black;"></span> 
 							<div id="policeError"></div> <!-- Error message for Police file -->
 						</td>
 						
-						
+					
+                         <td><label for="policeDate"><span class="required-field">*</span><spring:message code="label.policeVerificationDate"/></label>
+                       
+                        	<c:if test="${ empty GatePassObj.policeVerificationDate }">
+                        		<input id="policeVerificationDate" name="policeVerificationDate" class="datetimepickerformat3" style="margin-left: 10px;color:black;" type="text" size="30" maxlength="30"  autocomplete="off"  >
+                        	</c:if>    				
+    						<c:if test="${ not empty GatePassObj.policeVerificationDate }">
+                        		<input id="policeVerificationDate" name="policeVerificationDate" class="datetimepickerformat3" style="margin-left: 10px;color:black;" type="text" size="30" maxlength="30"    value="${ GatePassObj.policeVerificationDate}" autocomplete="off">
+                        	</c:if>
+					  <label id="error-policeVerificationDate" style="color: red;display: none;">Please enter a valid Police Verification Date </label>
+			         </td>
+                      
             		</tr>
             		
             		
             		<tr><td>
             		<a href="#" id="add_field_button" onclick="additionalDocUpload()"><spring:message code="label.addDocument"/></a>
             		<label>You can add a maximum of 7 additional documents.</label>
+            		<div id="form11-error-message" style="color: red; display: none; margin-top: 5px; font-weight: bold "></div>
+            		
             		</td>
             		<td><div id="additionalDoc" ></div></td></tr>
       		
@@ -1027,7 +1094,7 @@ label {
         <tr>
             <td colspan="20">
                 <div>
-                    <p id="p3"><b><font color="darkblue" size="3"><spring:message code="label.comments"/></font></b></p>
+                    <p id="p3"><b><font color="darkblue" size="3"><span class="required-field">*</span><spring:message code="label.comments"/></font></b></p>
                     <hr10 style="color:rgb(0, 102, 204);">
                 </div>
             </td>
@@ -1037,6 +1104,7 @@ label {
 				<td><input type="textarea" name="value(prevComment)" style="width:220px;height:100px;text-transform: capitalize;" readonly="true" cols="35" rows="7"  onchange="setDataChanged();"/></td>
 				 --><th><label class="custom-label"><spring:message code="label.comment"/></label></th>
 				<td><textarea id="comments"  name="comments" placeholder="Type here..." style="width: 501px; height: 70px;text-transform: capitalize;"></textarea>
+				<label id="error-comments" style="color: red;display: none;">Enter comments</label>
 				</td>
 			</tr>
 		<tr>
@@ -1045,7 +1113,8 @@ label {
 				<td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;"><b>
 				<input type="checkbox" name="acceptCheck" id="acceptCheck"  /> 
 				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
-				</b></td>
+				</b>
+				<label id="acceptError" style="color: red;display: none;">You must accept the declaration</label></td>
 			</tr>
 				<!-- <tr >
 				<td colspan="4"><input type="checkbox" name="acceptCheck" id="acceptCheck"  />

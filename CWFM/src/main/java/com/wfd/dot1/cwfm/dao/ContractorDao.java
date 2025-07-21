@@ -35,6 +35,8 @@ public interface ContractorDao {
 	public List<ContractorRegistration> getContractorRegistrationList();
 
 	public List<ContractorRegistration> getContractorRegistrationList(String contractorregId);
+	
+	public List<ContractorRegistration> getContractorRenewList(String contractorregId);
 
 	public ContractorRegistration viewContractorDetails(String contractorregId);
 

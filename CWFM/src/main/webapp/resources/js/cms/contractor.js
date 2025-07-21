@@ -850,6 +850,13 @@ function validateRenewFormData() {
     //const pan = toCapitalCase($("#panId").val().trim());
     const natureOfWork = toCapitalCase($("#natureOfWorkId").val().trim());
     const address = toCapitalCase($("#addressId").val().trim());
+	let mainContractor;
+	const contractorType = document.getElementById("contractTypeId").value;
+	if(contractorType === "Main Contractor"){
+		mainContractor = $("#vendorCodeId").val();
+	}else{
+		mainContractor =  $("#mainContractorId").val().trim();
+	}
 
     // Build the JSON object
     const jsonData = {
@@ -875,7 +882,7 @@ function validateRenewFormData() {
         contractTo: $("#contractToId").val(),
         contractType: $("#contractTypeId").val(),
         rcVerified: $("#rcVerifiedId").is(":checked") ? "Yes" : "No",
-        mainContractor: $("#mainContractorId").val().trim(),
+        mainContractor:mainContractor,
         status: "1",
         requestType: "Create",
         regPolicy: []

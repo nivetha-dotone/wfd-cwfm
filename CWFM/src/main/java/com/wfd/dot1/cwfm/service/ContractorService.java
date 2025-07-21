@@ -75,6 +75,8 @@ public interface ContractorService {
 
 	public ContractorRegistration getAllAvailableWoAndLicense(String unitId, String contractorId, String contractorCode,
 			String regId);
+
+	public List<ContractorRegistration> getContractorRenewList(String valueOf);
 	   
 	}
 

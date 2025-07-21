@@ -216,18 +216,57 @@ public class ContractorDaoImpl implements ContractorDao{
 	public String saveReg(ContractorRegistration contreg) {
 		int status=0;
 		
-        Object[] parameters = new Object[] {
-        		contreg.getContractorregId(),contreg.getContractorId(),contreg.getVendorCode(),contreg.getPrincipalEmployer(),contreg.getContractorName(),
-        		contreg.getManagerName(),Integer.parseInt(contreg.getTotalStrength()),Integer.parseInt(contreg.getRcMaxEmp()),
-        		contreg.getNatureOfWork(),contreg.getLocofWork(),contreg.getPfNum(),contreg.getRcVerified(),contreg.getMainContractor(),
-        		contreg.getContractType(),contreg.getContractFrom(),contreg.getContractTo(),contreg.getRequestType(),contreg.getStatus(),contreg.getCreatedBy(),
-        		contreg.getAadhar(),contreg.getAadharDoc(),contreg.getPan(),contreg.getPanDoc(),contreg.getPfApplyDate(),contreg.getGst(),contreg.getAddress(),contreg.getEmail(),contreg.getMobile()
-		};
+		Object[] parameters = new Object[] {
+			    contreg.getContractorregId(),
+			    contreg.getContractorId(),
+			    contreg.getVendorCode(),
+			    contreg.getPrincipalEmployer(),
+			    contreg.getContractorName(),
+			    contreg.getManagerName(),
+
+			    // Ensure these are Integers
+			    contreg.getTotalStrength() != null ? Integer.parseInt(contreg.getTotalStrength()) : null,
+			    contreg.getRcMaxEmp() != null ? Integer.parseInt(contreg.getRcMaxEmp()) : null,
+
+			    contreg.getNatureOfWork(),
+			    contreg.getLocofWork(),
+			    contreg.getPfNum(),
+			    contreg.getRcVerified(),
+			    contreg.getMainContractor(),
+			    contreg.getContractType(),
+
+			    // Convert to java.sql.Date
+			    contreg.getContractFrom() != null ? java.sql.Date.valueOf(contreg.getContractFrom()) : null,
+			    contreg.getContractTo() != null ? java.sql.Date.valueOf(contreg.getContractTo()) : null,
+
+			    contreg.getRequestType(),
+			    1, // STATUS
+			    contreg.getCreatedBy(),
+			    contreg.getAadhar(),
+			    contreg.getAadharDoc(),
+			    contreg.getPan(),
+			    contreg.getPanDoc(),
+
+			    contreg.getPfApplyDate() != null ? java.sql.Date.valueOf(contreg.getPfApplyDate()) : null,
+			    contreg.getGst(),
+			    contreg.getAddress(),
+			    contreg.getEmail(),
+			    contreg.getMobile()
+			};
+
         try {
-           status  = jdbcTemplate.update(saveContractorDetails(), parameters);
+        	String query = "INSERT INTO CMSContractorRegistration(" +
+        		    "CONTRACTORREGID, CONTRACTORID, CODE, UNITID, CONTRACTORNAME, MANAGERNM, " +
+        		    "TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, " +
+        		    "MAINCONTRACTOR, CONTTYPE, PERIODSTARTDATE, PERIODENDDATE, TYPE, STATUS, " +
+        		    "CREATEDBY, AADHARNUM, AADHARDOCNAME, PANNUM, PANDOCNAME, PFAPPLYDT, GST, " +
+        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM) " +
+        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE())";
+
+           status  = jdbcTemplate.update(query, parameters);
            return contreg.getContractorregId();
         } catch (Exception e) {
-        	
+        	e.printStackTrace();
         }
     return null;
 	}
@@ -236,6 +275,25 @@ public class ContractorDaoImpl implements ContractorDao{
 	public List<ContractorRegistration> getContractorRegistrationList(String userId) {
 	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
 	String query = getAllContractors();
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+	while(rs.next()) {
+		ContractorRegistration pe = new ContractorRegistration();
+		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
+		pe.setPrincipalEmployer(rs.getString("UNITCODE"));
+		pe.setVendorCode(rs.getString("CODE"));
+		pe.setContractorName(rs.getString("CONTRACTORNAME"));
+		pe.setStatus(rs.getString("STATUS"));
+		pe.setRequestType(rs.getString("TYPE"));
+		
+		peList.add(pe);
+	}
+	return peList;
+	}
+	
+	@Override
+	public List<ContractorRegistration> getContractorRenewList(String userId) {
+	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
+	String query = "SELECT CONTRACTORREGID,UNITCODE,CODE,CONTRACTORNAME,STATUS,TYPE FROM CMSContractorRegistration where TYPE='Renew'";
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	while(rs.next()) {
 		ContractorRegistration pe = new ContractorRegistration();

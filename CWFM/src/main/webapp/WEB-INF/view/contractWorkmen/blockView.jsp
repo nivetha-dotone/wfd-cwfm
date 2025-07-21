@@ -391,8 +391,9 @@ textarea {
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
         </div>
          <div class="action-buttons" >
-         <c:if test="${GatePassObj.gatePassAction eq '1' }">
-          <% if (user != null && "Contractor".equals(roleName)) { %>
+        
+         <c:if test="${GatePassObj.gatePassAction eq '1' && mode eq 'add' }">
+          <% if (user != null && "Contractor".equals(roleName) ) { %>
              <button id="actionButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitBlock('${sessionScope.loginuser.userId}','4')">Block GatePass</button> 
            <% } %>
            </c:if>
