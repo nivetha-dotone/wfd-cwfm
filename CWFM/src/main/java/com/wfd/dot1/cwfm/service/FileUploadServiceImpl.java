@@ -85,8 +85,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                  savedData = processContractor(reader);
                 break;
             case "workorder":
-                if (!headerLine.equalsIgnoreCase("Document_Number,Item,Line,Line_Number,Activity_Number,Short_Text,Delivery_Complition,Item_Changed_ON,Vendor,Vendor_Name,Address,Blocked_Vendor,Work_Order_Validity_From,Work_Order_Validity_To,Work_Order_Type,"
-                        + "Plant_Code,Section_Code,Department_Code,GL_Code,Cost_Center,Job,Rate,Quantity,Base_Unit_of_Measure,Work_Order_Released,PM_Order_No,WBS_Element,Quantity_Completed,Work_Order_Release_Date,Service_Entry_Created_Date,Service_Entry_Updated_Date,Purchase_Org_Level,Company_code")) {
+                if (!headerLine.equalsIgnoreCase("Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processWorkorder(reader);

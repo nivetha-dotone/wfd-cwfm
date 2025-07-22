@@ -282,14 +282,15 @@
                     <!-- Add more table headers for each column -->
                     <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.firstName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.FullName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<%-- <th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.gender"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.dateOfBirth"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    --%> <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+                    <%-- <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                   --%>  <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.TransactionType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> 
                     <th class="header-text"  onclick="sortTable(11)"><spring:message code="label.status"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th> 
             </tr>

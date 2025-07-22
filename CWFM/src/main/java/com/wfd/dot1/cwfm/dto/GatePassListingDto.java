@@ -85,5 +85,11 @@ public class GatePassListingDto {
 	public void setUnitName(String unitName) {
 		this.unitName = unitName;
 	}
-
+private String onboardingType;
+public String getOnboardingType() {
+	return onboardingType;
+}
+public void setOnboardingType(String onboardingType) {
+	this.onboardingType = onboardingType;
+}
 }

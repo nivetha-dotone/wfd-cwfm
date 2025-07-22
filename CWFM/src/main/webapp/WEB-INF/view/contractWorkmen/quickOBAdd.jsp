@@ -804,7 +804,7 @@ label {
 
                         
 
-                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             <c:if test="${empty GatePassObj.pfNumber }">
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
@@ -816,21 +816,21 @@ label {
                             
                             		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
                             </td>
-                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicNumber"/></label></th>
                             <td>
                             	<c:if test="${ empty GatePassObj.esicNumber }">
-                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="10" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             
                             	</c:if>
                             	<c:if test="${ not empty GatePassObj.esicNumber }">
-                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.esicNumber }" autocomplete="off">
+                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="10" value="${GatePassObj.esicNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             
                             	</c:if>
                             		<label id="error-esicNumber"style="color: red;display: none;">Please enter a valid ESIC Number</label>
                             	</td>
                         </tr>
                         <tr>
-                         <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfJoining"/></label></th>
 
                         	<td>
                         	<c:if test="${ empty GatePassObj.doj }">
@@ -1087,10 +1087,10 @@ label {
            onchange="previewImage(event,'imageFile','imageFileName')"
            style="overflow: hidden;"/>
 
-    <!--  Use Camera -->
+   <!--  
     <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
       Use Camera
-    </button>
+    </button> -->
   </div>
 
   <!-- File Name Display -->
@@ -1110,7 +1110,8 @@ label {
 
   <!-- Error Display -->
   <div id="profilePcError"></div>
-</td>
+</td></tr>
+<tr>
 
 						
                 		<td>

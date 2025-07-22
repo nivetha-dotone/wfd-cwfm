@@ -459,7 +459,11 @@ function validateEmploymentInformation(){
     if (!uanRegex.test(uan)) {
         $("#error-uanNumber").show();
         isValid = false;
-    }else{
+    }else if (uan === "000000000000") {
+		    // UAN is 12 zeros, skip duplicate check
+		    $("#error-uanNumber").hide();
+		    uanCheckPassed = true;
+		}else{
 	  // Check in backend if Aadhar exists
 		         $.ajax({
 		             url: "/CWFM/contractworkmen/checkUanExists",
@@ -469,7 +473,8 @@ function validateEmploymentInformation(){
 		             success: function (response) {
 		                 if (response.exists) {
                              $("#error-uanNumber").text("UAN already exists with Aadhaar Number: " + response.otherAadhar).show();
-                             isValid = false;
+							 uanCheckPassed = true;
+                              isValid = false;
                            } else {
 		                     $("#error-uanNumber").hide();
 		                     uanCheckPassed = true;
@@ -491,31 +496,60 @@ function validateEmploymentInformation(){
 	}
 	let pfNumberCheckPassed = false;
 	const pfNumber = $("#pfNumber").val().trim();
-    if (pfNumber === "") {
-        $("#error-pfNumber").show();
-        isValid = false;
-    }else{
-		// Check in backend if Aadhar exists
-		         $.ajax({
-		             url: "/CWFM/contractworkmen/checkpfNumberExists",
-		             type: "GET",
-		             data: { pfNumber: pfNumber,aadharNumber : aadharNumber },
-		             async: false, // NOTE: synchronous to block form submission
-		             success: function (response) {
-		                 if (response.exists) {
-                             $("#error-pfNumber").text("PF Number already exists with Aadhaar Number: " + response.otherAadhar).show();
-                             isValid = false;
-                           } else {
-		                     $("#error-pfNumber").hide();
-		                     pfNumberCheckPassed = true;
-		                 }
-		             },
-		             error: function () {
-		                 $("#error-pfNumber").text("Error checking pfNumber").show();
-		                 isValid = false;
-		             }
-		         });
-		     }     
+	const cleanedPf = pfNumber.trim().replace(/\s+/g, '').toLowerCase();
+	if (!cleanedPf ) {
+	    $("#error-pfNumber").show();
+	    isValid = false;
+	} 
+	else if (cleanedPf === "newjoinee") {
+	    // Special case → skip validation, do NOT show error
+	    $("#error-pfNumber").hide();
+	    pfNumberCheckPassed = true;
+	}else {
+	    const pfRegex = /^[A-Z]{2}[A-Z]{3}\d{7}\d{2}[A-Z0-9]\d{7}$/;
+	    
+		const cmpPfRegex = /^CMPPF[A-Z0-9]+$/i;
+
+	    let isPfValid = false;
+
+	    if (pfNumber.length === 22) {
+	        if (pfRegex.test(pfNumber)) {
+	            isPfValid = true;
+	        } else {
+	            $("#error-pfNumber").text("Invalid PF Number format. Expected 22-character structured PF number.").show();
+	            isValid = false;
+	        }
+	    } else if (cmpPfRegex.test(pfNumber)) {
+	        isPfValid = true;
+	    } else {
+	        $("#error-pfNumber").text("Invalid PF Number. It should either be 22 characters in PF format or start with CMPPF.").show();
+	        isValid = false;
+	    }
+
+	    // Only proceed with AJAX call if PF format is valid
+	    if (isPfValid) {
+	        $.ajax({
+	            url: "/CWFM/contractworkmen/checkpfNumberExists",
+	            type: "GET",
+	            data: { pfNumber: pfNumber, aadharNumber: aadharNumber },
+	            async: false,
+	            success: function (response) {
+	                if (response.exists) {
+	                    $("#error-pfNumber").text("PF Number already exists with Aadhaar Number: " + response.otherAadhar).show();
+	                    isValid = false;
+	                } else {
+	                    $("#error-pfNumber").hide();
+	                    pfNumberCheckPassed = true;
+	                }
+	            },
+	            error: function () {
+	                $("#error-pfNumber").text("Error checking PF Number").show();
+	                isValid = false;
+	            }
+	        });
+	    }
+	}
+    
 	const esicNumber = $("#esicNumber").val().trim();
     if (esicNumber === "") {
         $("#error-esicNumber").show();
@@ -1636,6 +1670,15 @@ function redirectToWorkmenCancelView(mode) {
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
     var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
+	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+	if(mode === "add"){
+	 												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
+
+	 												   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+	 												       alert("Cancel request already created.");
+	 												       return;
+	 												   }}
+
 
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -1655,7 +1698,14 @@ function redirectToWorkmenBlockView(mode) {
  
  var selectedRow = selectedCheckboxes[0].closest('tr');
  var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
+ var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+ 												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
+												   if(mode === "add"){
+ 												   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+ 												       alert("Block request already created.");
+ 												       return;
+ 												   }
+												   }
  var xhr = new XMLHttpRequest();
  xhr.onreadystatechange = function() {
      if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1674,7 +1724,13 @@ function redirectToWorkmenBlockView(mode) {
   
   var selectedRow = selectedCheckboxes[0].closest('tr');
   var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
+  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
+												   if(mode === "add"){
+  												   if (gatePassType.toLowerCase() !== "block" || status.toLowerCase() !== "approved") {
+  												       alert("UnBlock request already created.");
+  												       return;
+  												   }}
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
       if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1693,7 +1749,13 @@ function redirectToWorkmenBlockView(mode) {
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
     var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
+	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+													   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
+													   if(mode === "add"){
+													   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+													       alert("Black request already created.");
+													       return;
+													   }}
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1712,7 +1774,13 @@ function redirectToWorkmenBlockView(mode) {
 	  
 	  var selectedRow = selectedCheckboxes[0].closest('tr');
 	  var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
+	  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+	  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
+													   if(mode === "add"){
+	  												   if (gatePassType.toLowerCase() !== "blacklist" || status.toLowerCase() !== "approved") {
+	  												       alert("Deblack request already created.");
+	  												       return;
+	  												   }}
 	  var xhr = new XMLHttpRequest();
 	  xhr.onreadystatechange = function() {
 	      if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1731,7 +1799,13 @@ function redirectToWorkmenBlockView(mode) {
 	    
 	    var selectedRow = selectedCheckboxes[0].closest('tr');
 	    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-
+		var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+														   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
+														   if(mode === "add"){
+														   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+														       alert("Lost or damange request already created.");
+														       return;
+														   }}
 	    var xhr = new XMLHttpRequest();
 	    xhr.onreadystatechange = function() {
 	        if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1854,16 +1928,16 @@ function previewImage(event, inputId, displayId) {
 												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 												'<td  >' + wo.transactionId + '</td>' +
 												 '<td  >' + wo.gatePassId + '</td>' +
-					                              '<td  >' + wo.firstName + '</td>' +
-												  '<td  >' + wo.lastName + '</td>' +	
+					                              '<td  >' + wo.firstName+' ' +wo.lastName + '</td>' +
+												 
 												  
-												  '<td  >' + wo.gender + '</td>' +
-												  '<td  >' + wo.dateOfBirth + '</td>' +
+												  
 												  '<td  >' + wo.aadhaarNumber + '</td>' +	
 												  '<td  >' + wo.contractorName + '</td>' +	
-												  '<td  >' +wo.vendorCode + '</td>' +	
+												 
 												  '<td  >' +wo.unitName + '</td>' +	
-												  '<td  >' + wo.gatePassType + '</td>' +	
+												  '<td  >' + wo.gatePassType + '</td>' +
+												  '<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +
 												  '<td  >' + wo.status + '</td>' +				                             
 					                              '</tr>';
 					                    tableBody.append(row);
@@ -1897,16 +1971,16 @@ function previewImage(event, inputId, displayId) {
 																	'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																	'<td  >' + wo.transactionId + '</td>' +
 										                              '<td  >' + wo.gatePassId + '</td>' +
-										                              '<td  >' + wo.firstName + '</td>' +
-																	  '<td  >' + wo.lastName + '</td>' +	
+										                              '<td  >' + wo.firstName + ' '+wo.lastName +'</td>' +
 																	  
-																	  '<td  >' + wo.gender + '</td>' +
-																	  '<td  >' + wo.dateOfBirth + '</td>' +
+																	  
+																	  
 																	  '<td  >' + wo.aadhaarNumber + '</td>' +	
 																	  '<td  >' + wo.contractorName + '</td>' +	
-																	  '<td  >' +wo.vendorCode + '</td>' +	
+																	
 																	  '<td  >' +wo.unitName + '</td>' +	
-																	  '<td  >' + wo.gatePassType + '</td>' +	
+																	  '<td  >' + wo.gatePassType + '</td>' +
+																	  '<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +	
 																	  '<td  >' + wo.status + '</td>' +				                             
 										                              '</tr>';
 										                    tableBody.append(row);
@@ -1939,16 +2013,14 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName + '</td>' +
-																 '<td  >' + wo.lastName + '</td>' +	
-																											  
-																'<td  >' + wo.gender + '</td>' +
-																'<td  >' + wo.dateOfBirth + '</td>' +
+										                          '<td  >' + wo.firstName +' '+ wo.lastName + '</td>' +
+																
 																'<td  >' + wo.aadhaarNumber + '</td>' +	
 																'<td  >' + wo.contractorName + '</td>' +	
-																 '<td  >' +wo.vendorCode + '</td>' +	
+																
 																'<td  >' +wo.unitName + '</td>' +	
 																'<td  >' + wo.gatePassType + '</td>' +	
+																  '<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +
 																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
@@ -1981,16 +2053,16 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName + '</td>' +
-																 '<td  >' + wo.lastName + '</td>' +	
+										                          '<td  >' + wo.firstName + ' '+ wo.lastName +'</td>' +
+																
 																											  
-																'<td  >' + wo.gender + '</td>' +
-																'<td  >' + wo.dateOfBirth + '</td>' +
+															
 																'<td  >' + wo.aadhaarNumber + '</td>' +	
 																'<td  >' + wo.contractorName + '</td>' +	
-																 '<td  >' +wo.vendorCode + '</td>' +	
+																	
 																'<td  >' +wo.unitName + '</td>' +	
 																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +
 																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
@@ -2024,16 +2096,16 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName + '</td>' +
-																 '<td  >' + wo.lastName + '</td>' +	
+										                          '<td  >' + wo.firstName + ''  + wo.lastName + '</td>' +
+																
 																											  
-																'<td  >' + wo.gender + '</td>' +
-																'<td  >' + wo.dateOfBirth + '</td>' +
+																
 																'<td  >' + wo.aadhaarNumber + '</td>' +	
 																'<td  >' + wo.contractorName + '</td>' +	
-																 '<td  >' +wo.vendorCode + '</td>' +	
+																 	
 																'<td  >' +wo.unitName + '</td>' +	
 																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +
 																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
@@ -2066,16 +2138,14 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName + '</td>' +
-																 '<td  >' + wo.lastName + '</td>' +	
-																											  
-																'<td  >' + wo.gender + '</td>' +
-																'<td  >' + wo.dateOfBirth + '</td>' +
+										                          '<td  >' + wo.firstName + ' '+ wo.lastName +'</td>' +
+																
 																'<td  >' + wo.aadhaarNumber + '</td>' +	
 																'<td  >' + wo.contractorName + '</td>' +	
-																 '<td  >' +wo.vendorCode + '</td>' +	
+														
 																'<td  >' +wo.unitName + '</td>' +	
-																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + wo.gatePassType + '</td>' +
+																'<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +	
 																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
@@ -2108,16 +2178,14 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName + '</td>' +
-																 '<td  >' + wo.lastName + '</td>' +	
-																											  
-																'<td  >' + wo.gender + '</td>' +
-																'<td  >' + wo.dateOfBirth + '</td>' +
+										                          '<td  >' + wo.firstName +''+ wo.lastName + '</td>' +
+																
 																'<td  >' + wo.aadhaarNumber + '</td>' +	
 																'<td  >' + wo.contractorName + '</td>' +	
-																 '<td  >' +wo.vendorCode + '</td>' +	
+															
 																'<td  >' +wo.unitName + '</td>' +	
 																'<td  >' + wo.gatePassType + '</td>' +	
+																'<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +
 																'<td  >' + wo.status + '</td>' +				                             
 										                          '</tr>';
 										                tableBody.append(row);
@@ -2304,8 +2372,8 @@ function previewImage(event, inputId, displayId) {
 											    
 											    var selectedRow = selectedCheckboxes[0].closest('tr');
 											    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-												var gatePassType = selectedRow.cells[11].innerText.trim(); // Adjust index if needed
-												   var status = selectedRow.cells[12].innerText.trim(); // Adjust index if needed
+												var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 
 												   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "draft") {
 												       alert("Edit is only allowed when Gate Pass Type is 'Create' and Status is 'Draft'.");
@@ -2341,16 +2409,14 @@ function previewImage(event, inputId, displayId) {
 																							'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
 																							'<td  >' + wo.transactionId + '</td>' +
 																							 '<td  >' + wo.gatePassId + '</td>' +
-											                          '<td  >' + wo.firstName + '</td>' +
-																							  '<td  >' + wo.lastName + '</td>' +	
-																							  
-																							  '<td  >' + wo.gender + '</td>' +
-																							  '<td  >' + wo.dateOfBirth + '</td>' +
+											                          '<td  >' + wo.firstName + ' ' + wo.lastName +'</td>' +
+																							 
 																							  '<td  >' + wo.aadhaarNumber + '</td>' +	
 																							  '<td  >' + wo.contractorName + '</td>' +	
-																							  '<td  >' +wo.vendorCode + '</td>' +	
+																							
 																							  '<td  >' +wo.unitName + '</td>' +	
-																							  '<td  >' + wo.gatePassType + '</td>' +	
+																							  '<td  >' + wo.gatePassType + '</td>' +
+																							  '<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +	
 																							  '<td  >' + wo.status + '</td>' +				                             
 											                          '</tr>';
 											                tableBody.append(row);
@@ -2374,8 +2440,8 @@ function redirectToWorkmenRenewEdit() {
 																 
 	var selectedRow = selectedCheckboxes[0].closest('tr');
 	var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
-	var gatePassType = selectedRow.cells[11].innerText.trim(); // Adjust index if needed
-	   var status = selectedRow.cells[12].innerText.trim(); // Adjust index if needed
+	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+	   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 
 	   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
 	       alert("Edit is only allowed when Gate Pass Type is 'Create' and Status is 'Approved'.");

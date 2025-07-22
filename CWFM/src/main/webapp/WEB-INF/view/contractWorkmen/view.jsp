@@ -652,17 +652,17 @@ textarea {
                      
 		   <tr>
 				
-				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenWageCategory"/></label></th>
+				<th><label class="custom-label"><spring:message code="label.workmenWageCategory"/></label></th>
 				<td >
 				<input style="width: 100%;height: 20px;" type="text"  id="wageCategory" name="wageCategory"   value="${GatePassObj.wageCategory}" readonly    />
 						</td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.bonusPayout"/></label></th>
+				<th><label class="custom-label"><spring:message code="label.bonusPayout"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text"  id="bonusPayout" name="bonusPayout"   value="${GatePassObj.bonusPayout}" readonly    />
 					</td>
 				</tr>
         <tr>
-				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.zone"/></label></th>
+				<th><label class="custom-label"><spring:message code="label.zone"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text"  id="zone" name="zone"   value="${GatePassObj.zone}" readonly    />
 					</td>
 		

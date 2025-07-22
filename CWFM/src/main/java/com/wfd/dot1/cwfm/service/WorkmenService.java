@@ -101,4 +101,6 @@ public interface WorkmenService {
 
 	public String getOtherAadharLinkedTopfNumber(String pfNumber, String aadharNumber);
 
+	public void createDraftGatepass(String transactionId, String userId);
+
 }	

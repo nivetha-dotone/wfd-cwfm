@@ -63,19 +63,15 @@ public class PrincipalEmployerController {
          CMSRoleRights rr =new CMSRoleRights();
          if(user!=null) {
          if(user.getRoleName().equals("System Admin")) {
-        	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
-		        rr.setEditRights(1);
-		        rr.setDeleteRights(1);
-		        rr.setImportRights(1);
-		        rr.setExportRights(1);
-		        rr.setViewRights(1);
+        	
         	 listDto = peService.getAllPrincipalEmployerForAdmin();
          }else {
-        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/principalEmployer/list");
+        	
         	 listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
          }
          }
     		request.setAttribute("cmSPRINCIPALEMPLOYERs", listDto);
+    		rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/principalEmployer/list");
     		request.setAttribute("UserPermission", rr);
     	 
     	return "principalEmployer/list";

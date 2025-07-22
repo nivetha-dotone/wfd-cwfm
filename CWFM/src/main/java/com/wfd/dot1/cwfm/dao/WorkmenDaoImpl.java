@@ -532,6 +532,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
 				dto.setStatus("Draft");
 			}
+			dto.setOnboardingType(type);
 			listDto.add(dto);
 		}
 		log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
@@ -594,6 +595,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
 				dto.setStatus("Draft");
 			}
+			dto.setOnboardingType(rs.getString("OnboardingType"));
 			listDto.add(dto);
 		}
 		log.info("Exiting from getGatePassListingForApprovers dao method "+listDto.size());
@@ -964,6 +966,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
 				dto.setStatus("Draft");
 			}
+			dto.setOnboardingType(rs.getString("OnboardingType"));
 			listDto.add(dto);
 		}
 		log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
@@ -1677,6 +1680,7 @@ public List<GatePassListingDto> getRenewListingDetails(String userId,String gate
 		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
 			dto.setStatus("Draft");
 		}
+		dto.setOnboardingType(rs.getString("OnboardingType"));
 		listDto.add(dto);
 	}
 	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
@@ -1847,6 +1851,7 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
 			dto.setStatus("Draft");
 		}
+		dto.setOnboardingType(rs.getString("OnboardingType"));
 		listDto.add(dto);
 	}
 	log.info("Exiting from getGatePassListingForApprovers dao method "+listDto.size());
@@ -2122,5 +2127,24 @@ public String findAadharBypfNumberIfExistsWithDifferentAadhar(String pfNumber, S
     }
 }
 
+@Override
+public String getNextTransactionId() {
+	String transactionId=null;
+	try {
+		 transactionId = jdbcTemplate.queryForObject("EXEC GetNextGatepassTransactionId", String.class);
+
+
+}catch(Exception e) {
+	 System.out.println("Failed to fetch transaction ID: " + e.getMessage());
+	e.printStackTrace();
+}
+    return transactionId;
+}
+@Override
+public void createDraftGatepass(String transactionId, String userId) {
+	String status = GatePassStatus.DRAFT.getStatus();
+    String sql = "INSERT INTO GATEPASSMAIN (TransactionId, GatePassStatus, UpdatedDate, UpdatedBy) VALUES (?, ?, GETDATE(), ?)";
+    jdbcTemplate.update(sql, transactionId,status, userId);
+}
 
 }

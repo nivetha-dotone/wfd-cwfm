@@ -133,4 +133,8 @@ public interface WorkmenDao {
 	public String findAadharByUanIfExistsWithDifferentAadhar(String uan, String aadhar);
 
 	public String findAadharBypfNumberIfExistsWithDifferentAadhar(String pfNumber, String aadhar);
+
+	String getNextTransactionId();
+
+	void createDraftGatepass(String transactionId, String userId);
 }

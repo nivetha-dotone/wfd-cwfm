@@ -219,7 +219,7 @@ table.ControlLayout td {
         </div>     <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer');">Cancel</button> -->
      <div class="action-buttons" > 
     
-            <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="savePeDocuments()">save</button>
+            <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="savePeDocuments()">Save</button>
 
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer')">Cancel</button>
      </div> 
@@ -404,7 +404,7 @@ table.ControlLayout td {
                 <!-- Title and Add Button -->
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h4 style="color: black; margin: 0;">${docType}</h4>
-                    <button type="button" style="color: grey;" onclick="addFile('${docType}')">Add Document</button>
+                    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="addFile('${docType}')">Add Document</button>
                 </div>
 
                 <!-- Container for new file inputs -->

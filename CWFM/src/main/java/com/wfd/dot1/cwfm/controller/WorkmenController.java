@@ -87,7 +87,7 @@ public class WorkmenController {
     	
     	String transactionId= workmenService.generateTransactionId();
     	request.setAttribute("transactionId", transactionId);
-    	
+    	// workmenService.createDraftGatepass(transactionId,String.valueOf(user.getUserId()));
     	List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
@@ -1673,7 +1673,7 @@ public class WorkmenController {
 		return "contractWorkmen/quickOnboardingList";
 	}
     
-
+   
     @GetMapping("/quickOnboardingCreation")
     public String quickOnboardingCreation(HttpServletRequest request,HttpServletResponse response) {
 	

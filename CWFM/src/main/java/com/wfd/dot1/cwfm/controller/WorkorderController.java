@@ -56,19 +56,16 @@ public class WorkorderController {
 	 		 CMSRoleRights rr =new CMSRoleRights();
 	 	       if(user!=null) {
 	 	       if(user.getRoleName().equals("System Admin")) {
-	 	       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
-	 			        rr.setEditRights(1);
-	 			        rr.setDeleteRights(1);
-	 			        rr.setImportRights(1);
-	 			        rr.setExportRights(1);
-	 			        rr.setViewRights(1);
+	 	       	
+	 	    	 
 	 	       	peList = peService.getAllPrincipalEmployerForAdmin();
 	 	       }else {
-	 	       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/workorders/list");
+	 	       
 	 	       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
 	 	       }
 	 	       }
 	        request.setAttribute("principalEmployers", peList);
+	    	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/workorders/list");
 	        request.setAttribute("UserPermission", rr);
 	        if (principalEmployerId != null) {
 	            request.setAttribute("selectedPrincipalEmployerId", principalEmployerId);
@@ -111,7 +108,7 @@ public class WorkorderController {
 	        	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 	            MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 	        
-	            List<Workorder> woList = contrService.getWorkOrdersByContractorIdAndUnitId(principalEmployerId,contractorId);
+	            List<Workorder> woList = contrService.getWorkOrdersByContractorIdAndUnitId(contractorId,principalEmployerId);
 	            
 	            PrincipalEmployer principalEmployer = peService.getIndividualPEDetailByUnitId(principalEmployerId);
 	            

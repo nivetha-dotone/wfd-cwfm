@@ -429,7 +429,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	
 	@Override
 	public String generateTransactionId() {
-		return workmenDao.generateTransationId();
+		return workmenDao.getNextTransactionId();
 	}
 	
 	@Override
@@ -625,6 +625,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	@Override
 	public String getOtherAadharLinkedTopfNumber(String pfNumber, String aadhar) {
 	    return workmenDao.findAadharBypfNumberIfExistsWithDifferentAadhar(pfNumber, aadhar);
+	}
+	@Override
+	public void createDraftGatepass(String transactionId, String userId) {
+		// TODO Auto-generated method stub
+		workmenDao.createDraftGatepass(transactionId, userId);
 	}
 
 }
