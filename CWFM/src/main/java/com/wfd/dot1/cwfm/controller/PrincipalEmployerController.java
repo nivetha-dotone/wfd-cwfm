@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import java.util.Iterator;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.MediaType;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +29,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dao.PrincipalEmployerDao;
-import com.wfd.dot1.cwfm.pojo.BillReportFile;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.KronosReport;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
@@ -150,22 +153,31 @@ public class PrincipalEmployerController {
 
 	        File file = new File(doc.getFilePath());
 	        if (!file.exists()) {
-	            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist on disk");
+	            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist");
 	            return;
 	        }
 
-	        response.setContentType("application/octet-stream");
-	        response.setHeader("Content-Disposition", "attachment; filename=\"" + doc.getFileName() + "\"");
+	        // Detect content type
+	        String contentType = Files.probeContentType(file.toPath());
+	        if (contentType == null) {
+	            contentType = "application/octet-stream"; // fallback
+	        }
+
+	        response.setContentType(contentType);
+
+	        // Open inline in browser (do not set attachment)
+	        response.setHeader("Content-Disposition", "inline; filename=\"" + doc.getFileName() + "\"");
 
 	        Files.copy(file.toPath(), response.getOutputStream());
 	        response.getOutputStream().flush();
 	    } catch (Exception e) {
-	        try {
-	            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during file download");
-	        } catch (IOException ignored) {}
 	        e.printStackTrace();
+	        try {
+	            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error opening file");
+	        } catch (IOException ignored) {}
 	    }
 	}
+
 
 
 

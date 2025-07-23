@@ -274,7 +274,7 @@ background-color: #DDF3FF; /* Light green for the table header */
         <h2 style="color:black;font-size: 0.875rem; ">Import Data</h2>
         <hr style="color:gray;">
         <!-- Import & Export Buttons -->
-    <button id="importBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="background-color: #007bff; color: white; border-radius: 5px;">Import</button>
+    <!-- <button id="importBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="background-color: #007bff; color: white; border-radius: 5px;">Import</button> -->
     <!-- <button id="exportBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="border: 1px solid #007bff; color: #007bff; border-radius: 5px;">Export</button> -->
 
     <br><br>
@@ -286,6 +286,7 @@ background-color: #DDF3FF; /* Light green for the table header */
                 <option value="principalEmployer"style="color:gray;">Data-Principal Employer</option>
                 <option value="contractor"style="color:gray;">Data-Contractor</option>
                  <option value="workorder"style="color:gray;">Data-Workorder</option> 
+                 <option value="workmenbulkupload"style="color:gray;">Data-Workmen Bulk Upload Draft</option>
               </select>
               <a href="#" onclick="fetchTemplateInfo()"id="templateinfo">Template Information</a><br><br>
               <a href="#" onclick="viewTemplateInfo()" id="viewtemplate">View Template</a><br><br>
@@ -307,7 +308,7 @@ background-color: #DDF3FF; /* Light green for the table header */
         <br> 
         <br>
         <br><br> <br><br><br><br><br><br><br>
-        <button style="border: 1px solid #007bff; color: #007bff; border-radius: 5px;align: center;">Done</button>
+        <!-- <button style="border: 1px solid #007bff; color: #007bff; border-radius: 5px;align: center;">Done</button> -->
     </div>
     <!-- View Template Container (Initially Hidden) -->
 <!-- View Template Table (Initially Hidden) -->

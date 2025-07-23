@@ -14,6 +14,7 @@ import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
 public interface FileUploadDao {
@@ -53,7 +54,39 @@ public interface FileUploadDao {
 	void savePEState(Long unitId, Long stateId);
 	
 	void saveWorkorderToStaging(KTCWorkorderStaging workorderStaging);
+	
 	void callWorkorderProcessingSP();
+
+	boolean isGmNameGmDescriptionExists(String gmName, String gmDescription);
+
+	void saveWorkmenBulkUploadDraftToStaging(WorkmenBulkUpload staging);
+
+	void callWorkmenBulkUploadDraftProcessingSP();
+
+	Integer getUnitIdByName(String unitCode);
+	
+	Integer getContractorIdByName(String vendorCode);
+
+	Integer getTradeIdByName(String tradeName);
+
+    // Get Workmen Wage Category ID by name
+    Integer getWageCategoryId(String EICNumber);
+
+    // Get GMID (Generic Master ID) by GMNAME and master type (like skill, dept, access area, etc.)
+    Integer getGeneralMasterId(String gmName);
+
+	Integer getWorkorderId(String workorderNumber);
+
+	Integer getSkillIdByName(String skill);
+
+	Integer geteicId(String department, Integer unitId, String ECnumber);
+
+	//void saveToGatePassMain(WorkmenBulkUpload record);
+
+	
+
+	
+
 
 
 }

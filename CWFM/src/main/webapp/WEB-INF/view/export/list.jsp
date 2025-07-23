@@ -242,7 +242,7 @@
 <div class="page-header">
     
     <label for="gmTypeId" style="color: darkcyan;">Principal Employer:</label>
-        <select class="custom-select" id="principalEmployer" name="principalEmployerId" required>
+        <select class="custom-select" id="principalEmployer" name="principalEmployerId" required style="color:gray;padding:3px;">
                                 <option value="">Please select Principal Employer</option>
 								<c:forEach var="pe" items="${PrincipalEmployer}">
                 					<option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
@@ -250,7 +250,7 @@
                                 </select>
         
        <label for="masterValue" style="color: darkcyan;">Module:</label>
-         <select class="custom-select" id="module" name="moduleId"  required onchange="fetchData(this.value)">
+         <select class="custom-select" id="module" name="moduleId"  required onchange="fetchData(this.value)" style="color:gray;padding:3px;">
                                 <option value="">Please select Module</option>
 								<c:forEach var="pe" items="${ExportOptions}">
                 					<option value="${pe.gmId}">${pe.gmName}</option>

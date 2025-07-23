@@ -394,6 +394,7 @@ textarea {
           <!--   <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> -->
         </div>
          <div class="action-buttons" >
+         <button id="actionButton"  type="submit"   class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('${sessionScope.loginuser.userId}','2')">Renew GatePass</button>
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="renewGatePass('${sessionScope.loginuser.userId}')">Save</button>
             <% if (user != null && !"Contractor".equals(roleName)) { %>
     			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('4','2')">Approve</button>

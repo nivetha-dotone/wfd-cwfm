@@ -4757,9 +4757,15 @@ table th {
         }
         else if (selectedTemplate === "principalEmployer") {
             headers = ["Organization","Plant Code","Name", "Address","Manager Name","Manager Address","Bussiness Type","Max Workmen","Max Contract Workmen","BOCW Applicability",
-            	"Is MW Applicability","License Number","PF Code","ESWC Number","Factory License Number"];
+            	"Is MW Applicability","License Number","PF Code","ESWC Number","Factory License Number",,"State"];
         }
-
+        else if (selectedTemplate === "workmenbulkupload") {
+            headers = ["First Name","Last Name","Father's Name or Husband's Name","Date of Birth","Trade","Skil","Nature of Work","Hazardous Area","Aadhar/Id proof number",
+            	"Vendor Code","Gender","Date of Joining","Department","Area","Work Order Number","PF A/C Number","Marital Status" ,"Technical/Non Technical","Academic",
+            	"Blood Group","Accommodation","Bank Name","Account Number","Mobile Number","Emergency Contact Number","Police verification Date Valid To","Health chekup Date",
+            	"Access Levels","ESIC Number","UNIT CODE","Organization name" ,"EIC Number","EC number","UAN Number","Emergency Contact Person",
+            	"Is eligible for PF","SpecializationName","Insurance type","LL number","Address","Zone","IdMark"];
+        }
         // Populate table headers
         headers.forEach(function(header) {
             var th = document.createElement("th");
@@ -4930,8 +4936,11 @@ table th {
             headers = ["CONTRACTOR NAME", "CONTRACTOR ADDRESS", "City", "Contractor MANAGER NAME", "LICENSE NUM", "LICENCSE VALID FROM", "LICENCSE VALID TO", "LICENCSE COVERAGE", "TOTAL STRENGTH", "MAXIMUM NUMBER OF WORKMEN", "NATURE OF WORK", "LOCATION OF WORK", "CONTRACTOR VALIDITY START DATE", "CONTRACTOR VALIDITY END DATE", "CONTRACTOR ID", "PF CODE", "EC/WC number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF NUMBER", "PF APPLY DATE", "Reference", "Mobile Number", "ESI NUMBER", "ESI VALID FROM", "ESI VALID TO", "Main Contractor Code", "Work Order Number"];
             fieldMap = ["contractorName", "contractorAddress", "city", "managerNm", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "totalStrength", "maxNoEmp", "natureofWork", "locationofWork", "periodStartDt", "periodEndDt", "contractorId", "pfCode", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "pfNum", "pfApplyDt", "reference", "mobileNumber", "esiwc", "esiValidFrom", "esiValidTo", "contractorCode", "workOrderNumber"];
         } else if (templateType === "principalEmployer") {
-            headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number"];
-            fieldMap = ["organization", "code", "name", "address", "managerName", "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen", "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode", "wcNumber", "factoryLicenseNumber"];
+            headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number","State"];
+            fieldMap = ["organization", "code", "name", "address", "managerName", "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen", "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode", "wcNumber", "factoryLicenseNumber","stateNM"];
+        }else if (templateType === "workmenbulkupload") {
+            headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
+            fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
         }
 
         headers.forEach(header => {
@@ -5109,6 +5118,92 @@ table th {
         const downloadUrl = "/CWFM/data/downloadTemplate?templateType=" + encodeURIComponent(templateType);
         window.location.href = downloadUrl;
     }
+    function saveSelectedRows() {
+        const selected = [];
+        document.querySelectorAll('input[type="checkbox"][name="selectedWOs"]:checked').forEach(cb => {
+            selected.push(parseInt(cb.value)); // Ensure it's an integer
+        });
+
+        const successDiv = document.getElementById("successMessage");
+        const errorDiv = document.getElementById("errorMessage");
+
+        // Clear previous messages
+        successDiv.style.display = "none";
+        errorDiv.style.display = "none";
+        successDiv.innerText = "";
+        errorDiv.innerText = "";
+
+        if (selected.length === 0) {
+            errorDiv.innerText = "Please select at least one row to save.";
+            errorDiv.style.display = "block";
+            setTimeout(() => errorDiv.style.display = "none", 5000);
+            return;
+        }
+
+        fetch('/CWFM/workmenBulkUpload/validateAndSave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(selected)
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.status === "success") {
+                successDiv.innerText = result.message;
+                successDiv.style.display = "block";
+            } else if (result.status === "partial") {
+                successDiv.innerText = result.message;
+                successDiv.style.display = "block";
+            } else {
+                errorDiv.innerText = result.message || "Something went wrong.";
+                errorDiv.style.display = "block";
+            }
+
+            // ✅ Delay the reload until after message disappears
+            setTimeout(() => {
+                successDiv.style.display = "none";
+                errorDiv.style.display = "none";
+                loadCommonList('/workmenBulkUpload/list', 'Workmen Bulk Upload');
+            }, 5000);
+        })
+        .catch(err => {
+            console.error("Save error:", err);
+            errorDiv.innerText = "An unexpected error occurred.";
+            errorDiv.style.display = "block";
+
+            // Auto-hide error and reload after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = "none";
+                loadCommonList('/workmenBulkUpload/list', 'Workmen Bulk Upload');
+            }, 5000);
+        });
+    }
+
+
+    function ContrExportToCSV() {
+        var selectedRows = document.querySelectorAll('input[name="selectedWOs"]:checked');
+        if (selectedRows.length === 0) {
+            alert("Please select at least one record to export.");
+            return;
+        }
+
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Transaction Id,First Name,Last Name,	Gender,Date of Birth,Aadhar Number,	Contractor Name,Unit Name,Record Status\n"; // Add headers here
+        selectedRows.forEach(function(row) {
+            var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4),td:nth-child(5), td:nth-child(6), td:nth-child(7),td:nth-child(8), td:nth-child(9), td:nth-child(10)'); // Adjust column indices as needed
+            var rowArray = [];
+            rowData.forEach(function(cell) {
+                rowArray.push(cell.innerText);
+            });
+            csvContent += rowArray.join(",") + "\n";
+        });
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "ContractorList.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+
 
     </script>
     

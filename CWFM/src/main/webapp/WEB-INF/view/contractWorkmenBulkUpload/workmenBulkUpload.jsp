@@ -182,6 +182,12 @@
     }
    
 </style>
+<script>
+function toggleSelectAllGMTYPE() {
+    const checkboxes = document.querySelectorAll('input[name="selectedWOs"]');
+    checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllCheckbox').checked);
+}
+</script>
 </head>
 <body>
 <div class="page-header">
@@ -189,48 +195,23 @@
         <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
     </form> -->
-        <div>
-   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
-         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
-         <option value="">Select Principal Employer</option>
-   
+     <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveSelectedRows()">Save</button>  
     
-    <c:forEach items="${principalEmployers}" var="pe" varStatus="status">
-        <option value="${pe.id}" 
-            <c:if test="${principalEmployers.size() == 1}">selected</c:if>>
-            ${pe.description}
-        </option>
-    </c:forEach>
-    
-</select>
-<input type="hidden" id="principalEmployerId" name="principalEmployerId">
-
-<label for="departmentId" style=" color: darkcyan;"   >Department:</label>
-         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
-         <option value="">Select Department</option>
-    <c:forEach items="${Dept}" var="dept">
-      
-        <option value="${dept.id}"  <c:if test="${Dept.size() == 1}">selected</c:if>>${dept.description}</option>
-    </c:forEach>
-</select>
-
-
-<input type="hidden" id="deptId" name="deptId">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE('quick')">Search</button>
-
-  </div>
     <div>
-    <c:if test="${UserPermission.addRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenQuickAdd()">Add</button> 
-     </c:if>
+    <%-- <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','regular')">Save</button> --%>
     
-  
+    <c:if test="${UserPermission.addRights eq 1 }">
+          <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveSelectedRows()">Add</button> 
+     </c:if> 
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenBulkUploadEdit()">Edit</button> 
+     </c:if>
      <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
 
      </c:if>
        <c:if test="${UserPermission.exportRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
     	</c:if>
 
     </div>
@@ -241,44 +222,66 @@
     
      
                          <div class="table-container">
+              <!-- Success Message -->
+<div id="successMessage" style="color: green; font-weight: bold; display: none;"></div>
+
+<!-- Error Message -->
+<div id="errorMessage" style="color: red; font-weight: bold; display: none;"></div>
                         
     <table id="workmenTable"  cellspacing="0" cellpadding="0" >
         <thead>
 <tr >
                     <td >
-                        <input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()" >
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllGMTYPE()">
                     </td> 
                     <!-- Add more table headers for each column -->
                     <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.FullName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<%-- <th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <%-- <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
+					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.firstName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.gender"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.dateOfBirth"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    --%> <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
                     <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                   <%--  <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
-                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.TransactionType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-                    <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.status"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+                    <%-- <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
+                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
+                     <%-- <th class="header-text"  onclick="sortTable(11)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> --%> 
+                    <th class="header-text"  onclick="sortTable(12)"><spring:message code="label.recordStatus"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th> 
             </tr>
         </thead>
         <tbody>
-            
-        </tbody>
+				<c:forEach items="${wbudata}" var="wo">
+					<tr>
+						<td ><input type="checkbox"
+							name="selectedWOs" value="${wo.transactionid}"></td>
+						<td  >${wo.transactionid}</td>
+						<%-- <td  >${wo.principalEmployer}</td> --%>
+						<%-- <td  >${wo.gatepassid}</td> --%>
+						<td  >${wo.firstName}</td>
+						<td  >${wo.lastName}</td>
+						<td  >${wo.gender}</td>
+						<td  >${wo.dateOfBirth}</td>
+						<td  >${wo.aadhaarNumber}</td>
+						<td  >${wo.vendorCode}</td>
+						<td  >${wo.unitCode}</td>
+						 <td  >${wo.recordstatus}</td>
+						<%-- <td  >${wo.gatepassstatus}</td> --%> 
+						<%--<td  >${principalEmployer.NAME}</td>
+                    <td  >${${wo.requestType}}</td> --%>
+					</tr>
+				</c:forEach>
+			</tbody>
+
     </table>
     
                         </form>
-                         </div>
-                         <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+                         
+                          <%-- <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
     <script>
         setTimeout(function () {
-            searchGatePassBasedOnPE('quick');
+            searchGatePassBasedOnPE('regular');
         }, 10); // Delay ensures DOM is rendered after innerHTML
     </script>
-    
-</c:if>
-                         
+    </c:if> --%>
 </body>
 </html>

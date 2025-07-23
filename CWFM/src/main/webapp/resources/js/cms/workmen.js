@@ -2972,3 +2972,5 @@ let streams;
     function goBackToquickonboardingList() {
     	 loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
     }
+    
+   

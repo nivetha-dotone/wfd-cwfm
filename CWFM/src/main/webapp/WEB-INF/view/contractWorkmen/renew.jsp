@@ -760,6 +760,35 @@ label {
                             	</td>
                         </tr>
                         <tr>
+
+                        
+
+                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <td>
+                            <c:if test="${empty GatePassObj.pfNumber }">
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                            </c:if>
+                            
+                            <c:if test="${not empty GatePassObj.pfNumber }">
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.pfNumber }" autocomplete="off">
+                            </c:if>
+                            
+                            		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
+                            </td>
+                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <td>
+                            	<c:if test="${ empty GatePassObj.esicNumber }">
+                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                            
+                            	</c:if>
+                            	<c:if test="${ not empty GatePassObj.esicNumber }">
+                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.esicNumber }" autocomplete="off">
+                            
+                            	</c:if>
+                            		<label id="error-esicNumber"style="color: red;display: none;">Please enter a valid ESIC Number</label>
+                            	</td>
+                        </tr>
+                        <tr>
                          <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
                         	<td>
                         	<c:if test="${ empty GatePassObj.doj }">
@@ -771,6 +800,14 @@ label {
                         	</c:if>
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
+			<th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                      <td><input type="checkbox" id="pfApplicable" name="pfApplicable"
+    <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
+    onclick="validatePfForm11Requirement()" />
+
+                     <!--  <label for="pfApplicable">Yes</label> -->
+                      <!-- <label id="error-pfApplicable"style="color: red;display: none;">Please check pfApplicable</label> -->
+                     </td>
                         </tr>
                         <tr>
                             <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
@@ -1008,7 +1045,9 @@ label {
                     <tbody>
                    <tr>
                    
+
                   <td>
+
   <!-- Label -->
   <label for="imageFile">
     <span class="required-field">*</span>
@@ -1027,9 +1066,11 @@ label {
            style="overflow: hidden;"/>
 
     <!--  Use Camera -->
+
     <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
       Use Camera
     </button>
+
   </div>
 
   <!-- File Name Display -->
@@ -1049,26 +1090,32 @@ label {
 
   <!-- Error Display -->
   <div id="profilePcError"></div>
+
 </td>
 
 						
+
                 		<td>
                 		 	<label for="aadharFile"><span class="required-field">*</span><spring:message code="label.uploadAadharCard"/></label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">
        					 	  <span id="aadharFileName" style="margin-left: 10px;color:black;"></span> 
         					<div id="aadharError"></div> <!-- Error message for Aadhar file -->
                 		</td>
+
                 </tr>  		
            <tr>
                 	  <td>
                 			<label for="policeFile"><span class="required-field">*</span><spring:message code="label.uploadPoliceVerificationReport"/></label> 
+
                 			<input type="file"	id="policeFile" name="policeFile" accept="application/pdf" onchange="displayFileName1('policeFile', 'policeFileName')">
                 			  <span id="policeFileName" style="margin-left: 10px;color:black;"></span> 
 							<div id="policeError"></div> <!-- Error message for Police file -->
 						</td>
+
 						
 					
                          <td><label for="policeDate"><span class="required-field">*</span><spring:message code="label.policeVerificationDate"/></label>
+
                        
                         	<c:if test="${ empty GatePassObj.policeVerificationDate }">
                         		<input id="policeVerificationDate" name="policeVerificationDate" class="datetimepickerformat3" style="margin-left: 10px;color:black;" type="text" size="30" maxlength="30"  autocomplete="off"  >
@@ -1078,7 +1125,7 @@ label {
                         	</c:if>
 					  <label id="error-policeVerificationDate" style="color: red;display: none;">Please enter a valid Police Verification Date </label>
 			         </td>
-                      
+
             		</tr>
             		
             		

@@ -242,7 +242,7 @@
 <div class="page-header" method="POST" onsubmit="return validateMasterValue()">
     
     <label for="gmTypeId" style="color: darkcyan;">Principal Employer:</label>
-        <select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getBusinessType(this.value)" required>
+        <select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getBusinessType(this.value)" required style="color:gray;padding:3px;">
                                 <option value="">Please select Principal Employer</option>
 								<c:forEach var="pe" items="${PrincipalEmployer}">
                 					<option value="${pe.unitId}">${pe.name}</option>
@@ -254,21 +254,21 @@
     
     
         <label for="masterName" style="color: darkcyan;">Business Type</label>
-         <select class="custom-select" id="businessType" name="businessTypeId" required>
+         <select class="custom-select" id="businessType" name="businessTypeId" required style="color:gray;padding:3px;">
                                 <option value="">Please select Business Type</option>
 								
                                 </select>
        
 
         <label for="masterValue" style="color: darkcyan;">Module:</label>
-         <select class="custom-select" id="module" name="moduleId"  required>
+         <select class="custom-select" id="module" name="moduleId"  required style="color:gray;padding:3px;">
                                 <option value="">Please select Module</option>
 								<c:forEach var="pe" items="${Modules}">
                 					<option value="${pe.gmId}">${pe.gmName}</option>
             					</c:forEach>
                                 </select>
                                 <label for="masterValue" style="color: darkcyan;">Action:</label>
-                                  <select class="custom-select" name="action" id="actionDropdown" onchange="onModuleChange()"  required>
+                                  <select class="custom-select" name="action" id="actionDropdown" onchange="onModuleChange()"  required style="color:gray;padding:3px;">
                         <option value="">Please select Action</option>
                         <c:forEach var="pe" items="${Actions}">
                             <option value="${pe.gmId}">${pe.gmName}</option>
@@ -311,7 +311,7 @@
                 <td><input type="checkbox" class="rowSelect"></td>
                 
                 <td>
-                    <select class="custom-select" name="role" required>
+                    <select class="custom-select" name="role" required style="color:gray;padding:3px;">
                         <option value="">Please select Role</option>
                         <c:forEach var="pe" items="${Roles}">
                             <option value="${pe.gmId}">${pe.gmName}</option>
@@ -319,7 +319,7 @@
                     </select>
                 </td>
                 <td class="hierarchy-col">
-                    <input type="number" name="hierarchyIndex" required autocomplete="off">
+                    <input type="number" name="hierarchyIndex" required autocomplete="off" style="color:gray;">
                 </td>
             </tr>
         </tbody>

@@ -465,7 +465,7 @@ function saveDocuments() {
 
         // ✅ Redirect to list page after 1.5 seconds
         setTimeout(() => {
-			loadCommonList('/pedocsetup/list', 'PrincipalEmployer Documents');
+			loadCommonList('/pedocsetup/list', 'Principal Employer Documents');
            // window.location.href = "/CWFM/pedocsetup/list";  // 🔁 Change this to your actual list page URL
         }, 1500);
     })
@@ -566,7 +566,7 @@ function addFile(docType) {
     // Delete logic
     delBtn.onclick = function () {
         row.remove();
-        addFile(docType);
+        //addFile(docType);
     };
 
     // Append elements
@@ -615,7 +615,7 @@ function savePeDocuments() {
     xhr.onload = function () {
         if (xhr.status === 200) {
             alert("Documents uploaded successfully.");
-            loadCommonList('/principalEmployer/list', 'PrincipalEmployer');
+            loadCommonList('/principalEmployer/list', 'Principal Employer');
         } else {
             alert("Upload failed: " + xhr.responseText);
         }
@@ -631,8 +631,5 @@ function savePeDocuments() {
 
 function downloadFile(docId) {
     const url = `/CWFM/principalEmployer/download/${docId}`;
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    //anchor.target = "_blank"; // optional: opens in new tab
-    anchor.click();
+    window.open(url, '_blank');
 }
