@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -30,6 +31,7 @@ import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
 @Repository
@@ -80,7 +82,12 @@ public class FileUploadDaoImpl implements FileUploadDao {
         jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId(), gm.isActive(), createdDate, updatedDate, gm.getUpdatedBy());
     }
 
-    
+    @Override
+	public boolean isGmNameGmDescriptionExists(String gmName, String gmDescription) {
+		 String sql = "select count (*) from CMSGENERALMASTER where GMNAME=? and GMDESCRIPTION =?";
+		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, gmName,gmDescription);
+		    return count != null && count > 0;
+	}
     
     @Override
     public Long insertIntoWageTable(MinimumWageDTO dto) {
@@ -317,6 +324,12 @@ public class FileUploadDaoImpl implements FileUploadDao {
             case "workorder":
             	return "Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
                         + "Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code\n";
+            case "workmenbulkupload":
+            	return "First Name*,Last Name*,Father's Name or Husband's Name*,Date of Birth*,Trade*,Skill*,Nature of Work*,Hazardous Area*,"
+                		+ "Aadhar/Id proof number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
+                		+ "Technical Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Name Branch,Account Number,"
+                		+ "Mobile Number,Emergency Contact Number*,Police verification Date Valid To,Health chekup Date,Access Levels*,ESIC Number,UNIT CODE*,Organization name,"
+                		+ "EIC Number*,EC number*,UAN Number,Emergency Contact Person*,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark\n";
             default:
                 // fallback/default template
                 return "Template is Not Found to Download";
@@ -411,5 +424,128 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	     jdbcTemplate.execute("EXEC CMS_PROCESS_WORKORDERS_ON_REQ");
 	 }
 
-}
+	 public Integer getTradeIdByName(String name) {
+		    String sql = "SELECT TRADEID FROM CMSTRADE WHERE NAME = ?";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, name);
+		}
+
+		public Integer getGeneralMasterId(String gmName) {
+		    String sql = "SELECT GMID FROM CMSGENERALMASTER WHERE GMNAME = ? ";
+		    List<Integer> result = jdbcTemplate.query(sql, new Object[]{gmName},
+		        (rs, rowNum) -> rs.getInt("GMID"));
+		    return result.isEmpty() ? null : result.get(0);
+		}
+
+		public Integer getWageCategoryId(String EICNumber) {
+		    String sql = "select WCID from CMSCONTRACTOR_WC where WC_CODE=? ";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, EICNumber);
+		}
+
+		@Override
+		public Integer getUnitIdByName(String unitCode) {
+			String sql = "select UNITID from CMSPRINCIPALEMPLOYER where CODE=?";
+			 return jdbcTemplate.queryForObject(sql, Integer.class, unitCode);
+		}
+
+		@Override
+		public Integer getContractorIdByName(String vendorCode) {
+			String sql = "select CONTRACTORID from CMSCONTRACTOR where code=?";
+			 return jdbcTemplate.queryForObject(sql, Integer.class, vendorCode);
+		}
+		
+		@Override
+		public Integer getSkillIdByName(String skill) {
+			String sql = "select SKILLID from CMSSKILL where SKILLNM=?";
+			 return jdbcTemplate.queryForObject(sql, Integer.class, skill);
+		}
+		
+		@Override
+		public Integer geteicId(String department, Integer unitId, String ECnumber) {
+			String sql = "SELECT DISTINCT mu.UserId FROM ORGLEVELENTRY ole JOIN ORGLEVELDEF old ON old.ORGLEVELDEFID = ole.ORGLEVELDEFID \r\n"
+					+ "JOIN OLACCTSETMM oasm ON oasm.ORGLEVELENTRYID = ole.ORGLEVELENTRYID JOIN ORGACCTSET oas ON oas.ORGACCTSETID = oasm.ORGACCTSETID \r\n"
+					+ "JOIN MASTERUSER mu ON mu.userAccount = oas.SHORTNM JOIN UserRoleMapping urm ON urm.UserId = mu.UserId \r\n"
+					+ "JOIN CMSGENERALMASTER cgm ON cgm.GMID = urm.RoleId \r\n"
+					+ "LEFT JOIN CMSPRINCIPALEMPLOYER cpe ON cpe.CODE  = ole.NAME AND old.NAME \r\n"
+					+ "LIKE 'Principal%' WHERE cgm.GMNAME   IN ('EIC')  and ((old.NAME LIKE 'Dep%' AND ole.NAME = ?)  OR  (cpe.UNITID=?)) and mu.userAccount=?\r\n"
+					+ "GROUP BY mu.UserId, mu.userAccount,mu.FirstName,  mu.LastName, urm.RoleId, cgm.GMNAME";
+			 return jdbcTemplate.queryForObject(sql, Integer.class, department,unitId,ECnumber);
+		}
+
+		@Override
+		public Integer getWorkorderId(String workorderNumber) {
+			String sql = "select WORKORDERID  from CMSWORKORDER where  NAME=?";
+			 return jdbcTemplate.queryForObject(sql, Integer.class, workorderNumber);
+		 }
+		
+	@Override
+	public void saveWorkmenBulkUploadDraftToStaging(WorkmenBulkUpload staging) {
+		String sql = "insert into CMSRequestItemBulkUpload(TransactionID,GatePassStatus,AadharNumber,FirstName,LastName,DOB,Gender,RelativeName,IdMark,MobileNumber,\r\n"
+				+ "MaritalStatus,UnitId,ContractorId,WorkorderId,TradeId,SkillId,DepartmentId,AreaId,EicId,NatureOfJob,WcEsicNo,HazardousArea,AccessAreaId,\r\n"
+				+ "UanNumber,HealthCheckDate,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName,\r\n"
+				+ "WorkmenWageCategoryId,PfCap,AadharDocName,PoliceVerificationDocName,UpdatedDate,Address,DOJ,pfnumber,esicNumber,policeverificationDate,specialization,\r\n"
+				+ "LLNumber,pfapplicable,RecordProcessed,RecordStatus,organizationname,insurencetype,gatepasstypeid,Gatepassid,zoneid)values((SELECT ISNULL(MAX(TransactionID),0)+1 FROM CMSRequestItemBulkUpload),1,?,?,?,?,?,?,?,?,?,?,\r\n"
+				+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,'Yes',null,null,getdate(),?,?,?,?,?,?,?,?,'N',null,?,?,1,null,?)\r\n";
+				 jdbcTemplate.update(sql,
+						 staging.getAadhaarNumber(),
+						 staging.getFirstName(),
+						 staging.getLastName(),
+						 staging.getDateOfBirth(),
+						 staging.getGender(),
+						 staging.getRelationName(),
+						 staging.getIdMark(),
+						 staging.getMobileNumber(),
+						 staging.getMaritalStatus(),
+						 staging.getUnitCode(),
+						 staging.getVendorCode(),
+						 staging.getWorkorderNumber(),
+						 staging.getTrade(),
+						 staging.getSkill(),
+						 staging.getDepartment(),
+						 staging.getArea(),
+						 staging.getECnumber(),
+						 staging.getNatureOfWork(),
+						 staging.getEICNumber(),
+						 staging.getHazardousArea(),
+						 staging.getAccessArea(),
+						 staging.getUanNumber(),
+						 staging.getHealthCheckDate(),
+						 staging.getBloodGroup(),
+						 staging.getAccommodation(),
+						 staging.getAcademic(),
+						 staging.getTechnical(),
+						 staging.getBankName(),
+						 staging.getAccountNumber(),
+						 staging.getEmergencyNumber(),
+						 staging.getEmergencyName(),
+						 staging.getAddress(),
+						 staging.getDoj(),
+						 staging.getPfNumber(),
+						 staging.getEsicNumber(),
+						 staging.getPoliceVerificationDate(),
+						 staging.getSpecializationName(),
+						 staging.getLLnumber(),
+						 staging.getPfApplicable(),
+						 staging.getOrganizationName(),
+						 staging.getInsuranceType(),
+						 staging.getZone());
+		 
+	}
+
+
+
+	@Override
+	public void callWorkmenBulkUploadDraftProcessingSP() {
+		jdbcTemplate.execute("EXEC KTC_ENTRYPASS_BULK_UPLOAD");
+	 }
+
+
+
+	
+	
+
+	
+		
+	}
+
+
 
