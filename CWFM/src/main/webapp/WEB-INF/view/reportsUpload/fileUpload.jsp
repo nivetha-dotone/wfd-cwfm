@@ -286,7 +286,8 @@ background-color: #DDF3FF; /* Light green for the table header */
                 <option value="principalEmployer"style="color:gray;">Data-Principal Employer</option>
                 <option value="contractor"style="color:gray;">Data-Contractor</option>
                  <option value="workorder"style="color:gray;">Data-Workorder</option> 
-                 <option value="workmenbulkupload"style="color:gray;">Data-Workmen Bulk Upload Draft</option>
+                 <option value="workmenbulkupload"style="color:gray;">Data-Workmen Bulk Upload</option>
+                 <option value="workmenbulkuploaddraft"style="color:gray;">Data-Workmen Bulk Upload Draft</option>
               </select>
               <a href="#" onclick="fetchTemplateInfo()"id="templateinfo">Template Information</a><br><br>
               <a href="#" onclick="viewTemplateInfo()" id="viewtemplate">View Template</a><br><br>

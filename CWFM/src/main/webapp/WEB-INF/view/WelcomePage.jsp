@@ -4766,6 +4766,13 @@ table th {
             	"Access Levels","ESIC Number","UNIT CODE","Organization name" ,"EIC Number","EC number","UAN Number","Emergency Contact Person",
             	"Is eligible for PF","SpecializationName","Insurance type","LL number","Address","Zone","IdMark"];
         }
+        else if (selectedTemplate === "workmenbulkuploaddraft") {
+            headers = ["First Name","Last Name","Father's Name or Husband's Name","Date of Birth","Trade","Skil","Nature of Work","Hazardous Area","Aadhar/Id proof number",
+            	"Vendor Code","Gender","Date of Joining","Department","Area","Work Order Number","PF A/C Number","Marital Status" ,"Technical/Non Technical","Academic",
+            	"Blood Group","Accommodation","Bank Name","Account Number","Mobile Number","Emergency Contact Number","Police verification Date Valid To","Health chekup Date",
+            	"Access Levels","ESIC Number","UNIT CODE","Organization name" ,"EIC Number","EC number","UAN Number","Emergency Contact Person",
+            	"Is eligible for PF","SpecializationName","Insurance type","LL number","Address","Zone","IdMark"];
+        }
         // Populate table headers
         headers.forEach(function(header) {
             var th = document.createElement("th");
@@ -4939,6 +4946,10 @@ table th {
             headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number","State"];
             fieldMap = ["organization", "code", "name", "address", "managerName", "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen", "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode", "wcNumber", "factoryLicenseNumber","stateNM"];
         }else if (templateType === "workmenbulkupload") {
+            headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
+            fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
+        }
+        else if (templateType === "workmenbulkuploaddraft") {
             headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
             fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
         }
@@ -5204,6 +5215,44 @@ table th {
         link.click();
     }
 
+    function searchGatePassStatus() {
+	    var transactionId = $('#transactionId').val().trim();
+	    
+		var gatepassId=$("#gatepassId").val().trim();
+	    $.ajax({
+	        url: '/CWFM/entrypassstatus/list',
+	        type: 'POST',
+	        data: {
+	        	transactionId: transactionId,
+	            gatepassId:gatepassId
+	        },
+	        success: function(response) {
+	             var tableBody = $('#workmenTable tbody');
+	            tableBody.empty();
+	            if (response.length > 0) {
+	                $.each(response, function(index, wo) {
+	                    var row = '<tr  >' +
+								'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+								'<td  >' + wo.transactionId + '</td>' +
+								 '<td  >' + wo.gatePassId + '</td>' +
+	                              '<td  >' + wo.firstName+' ' +wo.lastName + '</td>' +
+								  '<td  >' + wo.aadhaarNumber + '</td>' +	
+								  '<td  >' +wo.approvedby + '</td>' +	
+								  '<td  >' + wo.pendingwith + '</td>' +
+								  '<td  >' + wo.gatePassType + '</td>' +
+								  '<td  >' + wo.status + '</td>' +				                             
+	                              '</tr>';
+	                    tableBody.append(row);
+	                });
+	            } else {
+	                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+	            } 
+	        },
+	        error: function(xhr, status, error) {
+	            console.error("Error fetching data:", error);
+	        }
+	    });
+	}
 
     </script>
     

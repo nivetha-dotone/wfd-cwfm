@@ -59,7 +59,7 @@ public interface FileUploadDao {
 
 	boolean isGmNameGmDescriptionExists(String gmName, String gmDescription);
 
-	void saveWorkmenBulkUploadDraftToStaging(WorkmenBulkUpload staging);
+	void saveWorkmenBulkUploadToStaging(WorkmenBulkUpload staging);
 
 	void callWorkmenBulkUploadDraftProcessingSP();
 
@@ -81,7 +81,14 @@ public interface FileUploadDao {
 
 	Integer geteicId(String department, Integer unitId, String ECnumber);
 
+	int saveWorkmenBulkDraftUploadToStaging(WorkmenBulkUpload staging);
+
 	//void saveToGatePassMain(WorkmenBulkUpload record);
+	WorkmenBulkUpload getByTransactionId(int transactionId);
+
+	void saveToGatePassMain(WorkmenBulkUpload data);
+	
+	void updateRecordStatusByTransactionId(int txnId, String combinedErrors);
 
 	
 

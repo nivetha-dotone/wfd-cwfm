@@ -99,10 +99,11 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (!isBlank(record.getTechnical()) && !record.getTechnical().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("Technical", "Only alphabets allowed");
 	        }
-	        if (!isBlank(record.getMobileNumber()) && !record.getMobileNumber().matches("\\d{10}")) {
-	            fieldErrors.put("MobileNumber", "Must be 10 digits");
+	        if (!isBlank(record.getMobileNumber()) && !record.getMobileNumber().matches("^[6-9]\\d{9}$")) {
+	            fieldErrors.put("MobileNumber", "Must be 10 digits and start with 6-9");
 	        }
-	        if (!isBlank(record.getEmergencyNumber()) && !record.getEmergencyNumber().matches("\\d{10}")) {
+
+	        if (!isBlank(record.getEmergencyNumber()) && !record.getEmergencyNumber().matches("^[6-9]\\d{9}$")) {
 	            fieldErrors.put("EmergencyNumber", "Must be 10 digits");
 	        }
 	        // ➕ Add your other validation rules here (DOJ, account number, etc.)
@@ -170,14 +171,16 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		            record.setWorkorderNumber(String.valueOf(fileUploadDao.getWorkorderId(record.getWorkorderNumber())));
 		            record.setTrade(String.valueOf(fileUploadDao.getTradeIdByName(record.getTrade())));
 		            record.setSkill(String.valueOf(fileUploadDao.getSkillIdByName(record.getSkill())));
-		            record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
+		           // record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
 		            record.setArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getArea())));
 		            record.setAccessArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAccessArea())));
 		            record.setBloodGroup(String.valueOf(fileUploadDao.getGeneralMasterId(record.getBloodGroup())));
 		            record.setAcademic(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAcademic())));
-		            record.setEICNumber(String.valueOf(fileUploadDao.getWageCategoryId(record.getEICNumber())));
+		            record.setECnumber(String.valueOf(fileUploadDao.getWageCategoryId(record.getECnumber())));
 		            record.setZone(String.valueOf(fileUploadDao.getGeneralMasterId(record.getZone())));
 		            record.setGender(String.valueOf(fileUploadDao.getGeneralMasterId(record.getGender())));
+		            record.setEICNumber(String.valueOf(fileUploadDao.geteicId(record.getDepartment(),Integer.parseInt(record.getUnitCode()),record.getEICNumber())));
+		            record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
 		            
 		        } catch (Exception e) {
 		            fieldErrors.put("IDMapping", "Failed to resolve IDs: " + e.getMessage());

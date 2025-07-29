@@ -261,6 +261,55 @@ public class FileUploadController {
             fields.add(Map.of("name", "IdMark", "type", "Text", "example", "A Mole on Right Jaw"));
             
             templateInfo.put("fields", fields);
+        }else if("workmenbulkuploaddraft".equals(templateType)){
+        	templateInfo.put("title", "Data - Workmen Bulk Draft Upload Event");
+            templateInfo.put("description", "Workmen Bulk Draft Upload events.");
+
+            List<Map<String, String>> fields = new ArrayList<>();
+            fields.add(Map.of("name", "First Name", "type", "Text", "example", "Harshal"));
+            fields.add(Map.of("name", "Last Name", "type", "Text", "example", "Patel"));
+            fields.add(Map.of("name", "Father's Name or Husband's Name", "type", "Text", "example", "Patel"));
+            fields.add(Map.of("name", "Date of Birth", "type", "Number", "example", "2002-07-11"));
+            fields.add(Map.of("name", "Trade", "type", "Text", "example", "Trade 1"));
+            fields.add(Map.of("name", "Skill", "type", "Text", "example", "Skilled"));
+            fields.add(Map.of("name", "Nature of Work", "type", "Text", "example", "Supplier"));
+            fields.add(Map.of("name", "Hazardous Area", "type", "Text", "example", "NO"));
+            fields.add(Map.of("name", "Aadhar/Id proof number", "type", "Number", "example", "863462109280"));
+            fields.add(Map.of("name", "Vendor Code", "type", "Number", "example", "314265"));
+            fields.add(Map.of("name", "Gender", "type", "Text", "example", "Male"));
+            fields.add(Map.of("name", "Date of Joining", "type", "Date", "example", "2025-07-31"));
+            fields.add(Map.of("name", "Department", "type", "Text", "example", "DEP001"));
+            fields.add(Map.of("name", "Area", "type", "Text", "example", "Area 1"));
+            fields.add(Map.of("name", "Work Order Number", "type", "Number", "example", "461265"));
+            fields.add(Map.of("name", "PF A/C Number", "type", "Text", "example", "New Joinee"));
+            fields.add(Map.of("name", "Marital Status", "type", "Text", "example", "Married"));
+            fields.add(Map.of("name", "Technical Technical/Non Technical", "type", "Text", "example", "Technical"));
+            fields.add(Map.of("name", "Academic", "type", "Text", "example", "BTech"));
+            fields.add(Map.of("name", "Blood Group", "type", "Text", "example", "O+"));
+            fields.add(Map.of("name", "Accommodation", "type", "Text", "example", "NO"));
+            fields.add(Map.of("name", "Bank Name Branch", "type", "Text", "example", "New Joinee"));
+            fields.add(Map.of("name", "Account Number", "type", "Number", "example", "New Joinee"));
+            fields.add(Map.of("name", "Mobile Number", "type", "Number", "example", "9989546476"));
+            fields.add(Map.of("name", "Emergency Contact Number", "type", "Date", "example", "9989546476"));
+            fields.add(Map.of("name", "Police verification Date Valid To", "type", "Number", "example", "2025-04-09"));
+            fields.add(Map.of("name", "Health chekup Date", "type", "Number", "example", "2025-04-09"));
+            fields.add(Map.of("name", "Access Levels", "type", "Text", "example", "L1"));
+            fields.add(Map.of("name", "ESIC Number", "type", "Number", "example", "863462900031"));
+            fields.add(Map.of("name", "UNIT CODE", "type", "Text", "example", "2024-04-09"));
+            fields.add(Map.of("name", "Organization name", "type", "Text", "example", "Adani Wilmar Limited"));
+            fields.add(Map.of("name", "EIC Number", "type", "Text", "example", "Master Leo"));
+            fields.add(Map.of("name", "EC number", "type", "Number", "example", "0"));
+            fields.add(Map.of("name", "UAN Number", "type", "Number", "example", "803367170921"));
+            fields.add(Map.of("name", "Emergency Contact Person", "Number", "Date", "example", "2024-04-09"));
+            fields.add(Map.of("name", "Is eligible for PF", "type", "Text", "example", "Yes"));
+            fields.add(Map.of("name", "SpecializationName", "type", "Text", "example", "General"));
+            fields.add(Map.of("name", "Insurance type", "type", "Text", "example", "WC"));
+            fields.add(Map.of("name", "LL number", "type", "Number", "example", "89034774"));
+            fields.add(Map.of("name", "Address", "type", "Text", "example", "Ardante Office One TowerA Banglore"));
+            fields.add(Map.of("name", "Zone", "type", "Text", "example", "Zone1"));
+            fields.add(Map.of("name", "IdMark", "type", "Text", "example", "A Mole on Right Jaw"));
+            
+            templateInfo.put("fields", fields);
         }
         else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

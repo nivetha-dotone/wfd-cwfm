@@ -6,13 +6,16 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -113,6 +116,16 @@ public class FileUploadServiceImpl implements FileUploadService {
                 		+ "Technical Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Name Branch,Account Number,"
                 		+ "Mobile Number,Emergency Contact Number*,Police verification Date Valid To,Health chekup Date,Access Levels*,ESIC Number,UNIT CODE*,Organization name,"
                 		+ "EIC Number*,EC number*,UAN Number,Emergency Contact Person*,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark*")) {
+                    throw new Exception("File can not upload due to incorrect format.");
+                }
+                savedData = processworkmenbulkupload(reader);
+                break;
+            case "workmenbulkuploaddraft":
+                if (!headerLine.equalsIgnoreCase("First Name,Last Name,Father's Name or Husband's Name,Date of Birth,Trade,Skill,Nature of Work,Hazardous Area,"
+                		+ "Aadhar/Id proof number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
+                		+ "Technical Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Name Branch,Account Number,"
+                		+ "Mobile Number,Emergency Contact Number,Police verification Date Valid To,Health chekup Date,Access Levels,ESIC Number,UNIT CODE,Organization name,"
+                		+ "EIC Number,EC number,UAN Number,Emergency Contact Person,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processworkmenbulkuploaddraft(reader);
@@ -701,7 +714,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         result.put("errorData", errorData);
         return result;
     }
-    private Map<String, Object> processworkmenbulkuploaddraft(BufferedReader reader) throws IOException {
+    private Map<String, Object> processworkmenbulkupload(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
 
@@ -776,7 +789,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer workorderId = fileUploadDao.getWorkorderId(fields[14]);
             Integer zoneId = fileUploadDao.getGeneralMasterId(fields[40]);
             Integer genderId = fileUploadDao.getGeneralMasterId(fields[10]);
-            //Integer ecId = fileUploadDao.geteicId(fields[12],unitId,fields[32]);
+            Integer ecId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
 
 
             if (tradeId == null) fieldErrors.put("trade", "Invalid or not found");
@@ -788,7 +801,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             if (academicId == null) fieldErrors.put("academic", "Invalid or not found");
             if (zoneId == null) fieldErrors.put("zone", "Invalid or not found");
             if (genderId == null) fieldErrors.put("Gender", "Invalid or not found");
-            //if (ecId == null) fieldErrors.put("EIC", "Invalid or not found");
+            if (ecId == null) fieldErrors.put("EIC", "Invalid or not found");
 
 
             if (!fieldErrors.isEmpty()) {
@@ -829,8 +842,8 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setEsicNumber(fields[28]);
                 staging.setUnitCode(String.valueOf(unitId));
                 staging.setOrganizationName(fields[30]);
-                staging.setEICNumber(String.valueOf(wageCategoryId));
-                staging.setECnumber(fields[32]);
+                staging.setEICNumber(String.valueOf(ecId));
+                staging.setECnumber(String.valueOf(wageCategoryId));
                 staging.setUanNumber(fields[33]);
                 staging.setEmergencyName(fields[34]);
                 staging.setPfApplicable(fields[35]);
@@ -841,7 +854,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setZone(String.valueOf(zoneId));
                 staging.setIdMark(fields[41]);
 
-                fileUploadDao.saveWorkmenBulkUploadDraftToStaging(staging);
+                fileUploadDao.saveWorkmenBulkUploadToStaging(staging);
 
                 Map<String, Object> rowMap = new LinkedHashMap<>();
                 for (int i = 0; i < fieldNames.length; i++) {
@@ -861,10 +874,253 @@ public class FileUploadServiceImpl implements FileUploadService {
         return result;
     }
 
+    private Map<String, Object> processworkmenbulkuploaddraft(BufferedReader reader) throws IOException {
+        List<Map<String, Object>> successData = new ArrayList<>();
+        List<Map<String, Object>> errorData = new ArrayList<>();
+        List<Integer> savedTransactionIds = new ArrayList<>();
+        String line;
+        int rowNum = 0;
+
+        String[] fieldNames = {
+            "firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork",
+            "hazardousArea", "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area",
+            "workorderNumber", "pfNumber", "maritalStatus", "technical", "academic",
+            "bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate",
+            "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName",
+            "EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"
+        };
+
+       // Set<String> mandatoryFields = Set.of(
+       //     "firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork",
+       //     "hazardousArea", "aadhaarNumber", "vendorCode", "gender", "department", "workorderNumber",
+       //     "maritalStatus", "technical", "accommodation", "accountNumber", "emergencyNumber",
+       //     "accessArea", "unitCode", "EICNumber", "ECnumber", "emergencyName","idMark"
+      //  );
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        while ((line = reader.readLine()) != null) {
+            rowNum++;
+            line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
+            if (line.trim().isEmpty()) continue;
+
+            String[] rawFields = line.split(",", -1);
+            String[] fields = new String[fieldNames.length];
+            for (int i = 0; i < fieldNames.length; i++) {
+                fields[i] = (i < rawFields.length) ? rawFields[i].trim().replaceAll("\"", "") : "";
+            }
+
+            if (rawFields.length < fieldNames.length) {
+                System.out.println("Row " + rowNum + " had only " + rawFields.length + " fields. Padding with empty strings.");
+            }
 
 
+            Map<String, String> fieldErrors = new LinkedHashMap<>();
 
-	
+           // if (fields.length < fieldNames.length) {
+           //     errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
+            //    continue;
+           // }
+
+           // for (int i = 0; i < fieldNames.length; i++) {
+           //     if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
+           //         fieldErrors.put(fieldNames[i], "is mandatory");
+           //     }
+          //  }
+           
+            // Validate Date Format
+            String[] dateValues = { fields[3], fields[11], fields[25], fields[26] }; // actual values
+            String[] dateFieldNames = { "dateOfBirth", "doj", "policeVerificationDate", "healthCheckDate" };
+
+            for (int i = 0; i < dateValues.length; i++) {
+                String value = dateValues[i];
+                if (!value.isBlank()) {
+                    try {
+                        LocalDate parsed = LocalDate.parse(value, dateFormatter);
+                    } catch (DateTimeException e) {
+                        fieldErrors.put(dateFieldNames[i], "Invalid date format, expected yyyy-MM-dd");
+                    }
+                }
+            }
+
+
+            // Lookups
+            Integer unitId = fileUploadDao.getUnitIdByName(fields[29]);
+            Integer contractorId = fileUploadDao.getContractorIdByName( fields[9]);
+            Integer tradeId = fileUploadDao.getTradeIdByName(fields[4]);
+            Integer skillId = fileUploadDao.getSkillIdByName(fields[5]);
+            Integer departmentId = fileUploadDao.getGeneralMasterId(fields[12]);
+            Integer accessAreaId = fileUploadDao.getGeneralMasterId(fields[27]);
+            Integer bloodGroupId = fileUploadDao.getGeneralMasterId(fields[19]);
+            Integer areaId = fileUploadDao.getGeneralMasterId(fields[13]);
+            Integer academicId = fileUploadDao.getGeneralMasterId(fields[18]);
+            Integer wageCategoryId = fileUploadDao.getWageCategoryId(fields[32]);
+            Integer workorderId = fileUploadDao.getWorkorderId(fields[14]);
+            Integer zoneId = fileUploadDao.getGeneralMasterId(fields[40]);
+            Integer genderId = fileUploadDao.getGeneralMasterId(fields[10]);
+            Integer ecId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
+
+
+            Integer trade = !fields[4].isBlank() ? fileUploadDao.getTradeIdByName(fields[4]) : null;
+            if (!fields[4].isBlank() && trade == null) fieldErrors.put("trade", "Invalid or not found");
+
+            Integer skill = !fields[5].isBlank() ? fileUploadDao.getSkillIdByName(fields[5]) : null;
+            if (!fields[5].isBlank() && skill == null) fieldErrors.put("skill", "Invalid or not found");
+
+            Integer department = !fields[12].isBlank() ? fileUploadDao.getGeneralMasterId(fields[12]) : null;
+            if (!fields[12].isBlank() && department == null) fieldErrors.put("department", "Invalid or not found");
+
+            Integer accessArea = !fields[27].isBlank() ? fileUploadDao.getGeneralMasterId(fields[27]) : null;
+            if (!fields[27].isBlank() && accessArea == null) fieldErrors.put("accessArea", "Invalid or not found");
+
+            Integer zone = !fields[40].isBlank() ? fileUploadDao.getGeneralMasterId(fields[40]) : null;
+            if (!fields[40].isBlank() && zone == null) fieldErrors.put("zone", "Invalid or not found");
+
+            Integer ec = (!fields[31].isBlank() && unitId != null && !fields[12].isBlank())
+                ? fileUploadDao.geteicId(fields[12], unitId, fields[31])
+                : null;
+            if (!fields[31].isBlank() && ec == null) fieldErrors.put("EIC", "Invalid or not found");
+
+            if (!fieldErrors.isEmpty()) {
+                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
+                continue;
+            }
+
+            try {
+                WorkmenBulkUpload staging = new WorkmenBulkUpload();
+                staging.setFirstName(fields[0]);
+                staging.setLastName(fields[1]);
+                staging.setRelationName(fields[2]);
+                staging.setDateOfBirth(fields[3]);
+                staging.setTrade(String.valueOf(tradeId));               
+                staging.setSkill(String.valueOf(skillId));
+                staging.setNatureOfWork(fields[6]);
+                staging.setHazardousArea(fields[7]);
+                staging.setAadhaarNumber(fields[8]);
+                staging.setVendorCode(String.valueOf(contractorId));
+                staging.setGender(String.valueOf(genderId));
+                staging.setDoj(fields[11]);
+                staging.setDepartment(String.valueOf(departmentId));
+                staging.setArea(String.valueOf(areaId));
+                staging.setWorkorderNumber(String.valueOf(workorderId));
+                staging.setPfNumber(fields[15]);
+                staging.setMaritalStatus(fields[16]);
+                staging.setTechnical(fields[17]);
+                staging.setAcademic(String.valueOf(academicId));
+                staging.setBloodGroup(String.valueOf(bloodGroupId));
+                staging.setAccommodation(fields[20]);
+                staging.setBankName(fields[21]);
+                staging.setAccountNumber(fields[22]);
+                staging.setMobileNumber(fields[23]);
+                staging.setEmergencyNumber(fields[24]);
+                staging.setPoliceVerificationDate(fields[25]);
+                staging.setHealthCheckDate(fields[26]);
+                staging.setAccessArea(String.valueOf(accessAreaId));
+                staging.setEsicNumber(fields[28]);
+                staging.setUnitCode(String.valueOf(unitId));
+                staging.setOrganizationName(fields[30]);
+                staging.setEICNumber(String.valueOf(ecId));
+                staging.setECnumber(String.valueOf(wageCategoryId));
+                staging.setUanNumber(fields[33]);
+                staging.setEmergencyName(fields[34]);
+                staging.setPfApplicable(fields[35]);
+                staging.setSpecializationName(fields[36]);
+                staging.setInsuranceType(fields[37]);
+                staging.setLLnumber(fields[38]);
+                staging.setAddress(fields[39]);
+                staging.setZone(String.valueOf(zoneId));
+                staging.setIdMark(fields[41]);
+
+                int transactionId = fileUploadDao.saveWorkmenBulkDraftUploadToStaging(staging); // RETURN the transaction ID
+                savedTransactionIds.add(transactionId); // collect for post validation
+ 
+                // For success list
+                Map<String, Object> rowMap = new LinkedHashMap<>();
+                for (int i = 0; i < fieldNames.length; i++) {
+                    rowMap.put(fieldNames[i], fields[i]);
+                }
+                successData.add(rowMap);
+
+                fileUploadDao.saveToGatePassMain(staging);
+                
+            } catch (Exception e) {
+                errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
+            }
+        }
+		/*
+		 * try { fileUploadDao.saveToGatePassMain(staging); } catch (Exception e) {
+		 * errorData.add(Map.of("row", "Procedure", "error", "Stored Procedure Failed: "
+		 * + e.getMessage())); }
+		 */
+        // ✅ Automatically validate & save to GATEPASSMAIN
+       // if (!savedTransactionIds.isEmpty()) {
+       //     Map<String, Object> gatePassResult = validateAndSaveSelectedWorkmen(savedTransactionIds);
+       //     errorData.addAll((List<Map<String, Object>>) gatePassResult.get("errorData")); // append validation errors
+       // }
+
+       
+        Map<String, Object> result = new HashMap<>();
+        result.put("successData", successData);
+        result.put("errorData", errorData);
+        return result;
+    }
+
+   // @Override
+	//public List<WorkmenBulkUpload> getAllWorkmenBulkDraftUploadData() {
+	//	return fileUploadDao.getAllWorkmenBulkDraftUploadData();
+	//}
+    //@Override
+	public Map<String, Object> validateAndSaveSelectedWorkmen(List<Integer> transactionIds) {
+	    List<Map<String, Object>> successData = new ArrayList<>();
+	    List<Map<String, Object>> errorData = new ArrayList<>();
+
+	    for (Integer txnId : transactionIds) {
+	        WorkmenBulkUpload record = fileUploadDao.getByTransactionId(txnId);
+
+	        if (record == null) {
+	            String errMsg = "No record found for transactionId: " + txnId;
+	            errorData.add(Map.of("transactionId", txnId, "error", errMsg));
+	            fileUploadDao.updateRecordStatusByTransactionId(txnId, errMsg);
+	            continue;
+	        }
+
+	        Map<String, String> fieldErrors = new LinkedHashMap<>();
+
+		     try {
+		            record.setUnitCode(String.valueOf(fileUploadDao.getUnitIdByName(record.getUnitCode())));
+		            record.setVendorCode(String.valueOf(fileUploadDao.getContractorIdByName(record.getVendorCode())));
+		            record.setWorkorderNumber(String.valueOf(fileUploadDao.getWorkorderId(record.getWorkorderNumber())));
+		            record.setTrade(String.valueOf(fileUploadDao.getTradeIdByName(record.getTrade())));
+		            record.setSkill(String.valueOf(fileUploadDao.getSkillIdByName(record.getSkill())));
+		           // record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
+		            record.setArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getArea())));
+		            record.setAccessArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAccessArea())));
+		            record.setBloodGroup(String.valueOf(fileUploadDao.getGeneralMasterId(record.getBloodGroup())));
+		            record.setAcademic(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAcademic())));
+		            record.setECnumber(String.valueOf(fileUploadDao.getWageCategoryId(record.getECnumber())));
+		            record.setZone(String.valueOf(fileUploadDao.getGeneralMasterId(record.getZone())));
+		            record.setGender(String.valueOf(fileUploadDao.getGeneralMasterId(record.getGender())));
+		            record.setEICNumber(String.valueOf(fileUploadDao.geteicId(record.getDepartment(),Integer.parseInt(record.getUnitCode()),record.getEICNumber())));
+		            record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
+		            
+		        } catch (Exception e) {
+		            fieldErrors.put("IDMapping", "Failed to resolve IDs: " + e.getMessage());
+		        }
+	        if (!fieldErrors.isEmpty()) {
+	            String combinedErrors = fieldErrors.entrySet().stream()
+	                .map(e -> e.getKey() + ": " + e.getValue())
+	                .collect(Collectors.joining("; "));
+
+	            errorData.add(Map.of("transactionId", txnId, "fieldErrors", fieldErrors));
+	            fileUploadDao.updateRecordStatusByTransactionId(txnId, combinedErrors);
+	        } else {
+	        	fileUploadDao.saveToGatePassMain(record);
+	            successData.add(Map.of("transactionId", txnId));
+	           // fileUploadDao.updateRecordProcessedByTransactionId(txnId);
+	        }
+	    }
+
+	    return Map.of("successData", successData, "errorData", errorData);
+	}
+
 	@Override
     public String getTemplateCSV(String templateType) {
         return fileUploadDao.getCSVHeaders(templateType);

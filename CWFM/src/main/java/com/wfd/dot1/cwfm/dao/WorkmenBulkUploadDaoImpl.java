@@ -82,26 +82,20 @@ public class WorkmenBulkUploadDaoImpl implements WorkmenBulkUploadDao{
 
 	@Override
 	public WorkmenBulkUpload getByTransactionId(int transactionId) {
-	    String sql = "select cribu.AadharNumber as aadhaarNumber,cribu.FirstName as firstName,cribu.LastName as lastName,cribu.DOB as dateOfBirth,cgmg.GMNAME as gender,cribu.RelativeName as relationName,cribu.IdMark as idMark,cribu.MobileNumber as mobileNumber,  \r\n"
-	    		+ "	cribu.MaritalStatus as maritalStatus,cpe.CODE as unitCode,cmsc.CODE as vendorCode,cmswo.NAME as workorderNumber,  \r\n"
-	    		+ "cmst.NAME as trade,cmss.SKILLNM as skill,cmsgmdep.GMNAME as department,cmsgma.GMNAME as area,cribu.EicId as ECNumber,cribu.NatureOfJob as natureOfWork,  \r\n"
-	    		+ " ccwc.WC_CODE as EICNumber,cribu.HazardousArea as hazardousArea,cmsgmaa.GMNAME as accessArea,  \r\n"
-	    		+ "cribu.uanNumber,cribu.healthCheckDate,cmsgmb.GMNAME as bloodGroup,cribu.Accommodation as accommodation,cmsgmac.GMNAME as academic,cribu.Technical as technical,  \r\n"
-	    		+ "cribu.IfscCode as bankName,cribu.AccountNumber as accountNumber,cribu.EmergencyContactNumber as emergencyNumber,cribu.EmergencyContactName  as emergencyName  \r\n"
-	    		+ ",cribu.doj,cribu.pfNumber,cribu.esicNumber,cribu.policeVerificationDate,cribu.pfApplicable,cmsgmz.GMNAME as zone,cribu.Address as address from CMSRequestItemBulkUpload cribu  \r\n"
-	    		+ " left join CMSPRINCIPALEMPLOYER cpe on cpe.unitid=cribu.UnitId\r\n"
-	    		+ "	left join CMSCONTRACTOR cmsc on cmsc.CONTRACTORID=cribu.ContractorId\r\n"
-	    		+ "	left join CMSWORKORDER cmswo on cmswo.WORKORDERID=cribu.WorkorderId\r\n"
-	    		+ "left join CMSTRADE cmst on cmst.TRADEID = cribu.TradeId  \r\n"
-	    		+ " left join CMSSKILL cmss on cmss.skillid=cribu.SkillId\r\n"
-	    		+ " left join CMSGENERALMASTER cmsgmdep on cmsgmdep.GMID=cribu.DepartmentId\r\n"
-	    		+ "left join CMSGENERALMASTER cmsgma on cmsgma.GMID=cribu.AreaId\r\n"
-	    		+ "	left join CMSGENERALMASTER cmsgmaa on cmsgmaa.GMID=cribu.AccessAreaId\r\n"
-	    		+ " left join CMSGENERALMASTER cmsgmb on cmsgmb.GMID=cribu.BloodGroupId\r\n"
-	    		+ " left join CMSGENERALMASTER cmsgmac on cmsgmac.GMID=cribu.AcademicId\r\n"
-	    		+ " left join CMSGENERALMASTER cmsgmz on cmsgmz.GMID=cribu.zoneid\r\n"
-	    		+ "LEFT JOIN CMSGENERALMASTER cgmg ON cgmg.GMID = TRY_CAST(cribu.Gender AS BIGINT)\r\n"
-	    		+ "	left join CMSCONTRACTOR_WC ccwc on ccwc.WCID=cribu.WcEsicNo where TransactionID=?";
+	    String sql = "select cribu.AadharNumber as aadhaarNumber,cribu.FirstName as firstName,cribu.LastName as lastName,cribu.DOB as dateOfBirth,cgmg.GMNAME as gender,\r\n"
+	    		+ "cribu.RelativeName as relationName,cribu.IdMark as idMark,cribu.MobileNumber as mobileNumber,   \r\n"
+	    		+ "cribu.MaritalStatus as maritalStatus,cpe.CODE as unitCode,cmsc.CODE as vendorCode,cmswo.NAME as workorderNumber,   \r\n"
+	    		+ "cmst.NAME as trade,cmss.SKILLNM as skill,cmsgmdep.GMNAME as department,cmsgma.GMNAME as area,mu.userAccount  AS EICNumber,cribu.NatureOfJob as natureOfWork,   \r\n"
+	    		+ "ccwc.WC_CODE as ECnumber,cribu.HazardousArea as hazardousArea,cmsgmaa.GMNAME as accessArea,   \r\n"
+	    		+ "cribu.uanNumber,cribu.healthCheckDate,cmsgmb.GMNAME as bloodGroup,cribu.Accommodation as accommodation,cmsgmac.GMNAME as academic,cribu.Technical as technical,   \r\n"
+	    		+ "cribu.IfscCode as bankName,cribu.AccountNumber as accountNumber,cribu.EmergencyContactNumber as emergencyNumber,cribu.EmergencyContactName  as emergencyName   \r\n"
+	    		+ ",cribu.doj,cribu.pfNumber,cribu.esicNumber,cribu.policeVerificationDate,cribu.pfApplicable,cmsgmz.GMNAME as zone,cribu.Address as address from CMSRequestItemBulkUpload cribu   \r\n"
+	    		+ "left join CMSPRINCIPALEMPLOYER cpe on cpe.unitid=cribu.UnitId left join CMSCONTRACTOR cmsc on cmsc.CONTRACTORID=cribu.ContractorId left join CMSWORKORDER cmswo on cmswo.WORKORDERID=cribu.WorkorderId \r\n"
+	    		+ "left join CMSTRADE cmst on cmst.TRADEID = cribu.TradeId   left join CMSSKILL cmss on cmss.skillid=cribu.SkillId \r\n"
+	    		+ "left join CMSGENERALMASTER cmsgmdep on cmsgmdep.GMID=cribu.DepartmentId left join CMSGENERALMASTER cmsgma on cmsgma.GMID=cribu.AreaId \r\n"
+	    		+ "left join CMSGENERALMASTER cmsgmaa on cmsgmaa.GMID=cribu.AccessAreaId left join CMSGENERALMASTER cmsgmb on cmsgmb.GMID=cribu.BloodGroupId \r\n"
+	    		+ "left join CMSGENERALMASTER cmsgmac on cmsgmac.GMID=cribu.AcademicId left join CMSGENERALMASTER cmsgmz on cmsgmz.GMID=cribu.zoneid LEFT JOIN CMSGENERALMASTER cgmg ON cgmg.GMID = cribu.gender \r\n"
+	    		+ "LEFT JOIN MASTERUSER mu ON mu.UserId = cribu.EicId left join CMSCONTRACTOR_WC ccwc on ccwc.WCID=cribu.WcEsicNo where TransactionID=?";
 	    return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(WorkmenBulkUpload.class), transactionId);
 	}
 	 
@@ -150,7 +144,7 @@ public class WorkmenBulkUploadDaoImpl implements WorkmenBulkUploadDao{
 	    		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?)";
 	    jdbcTemplate.update(sql, gatePassId,
 	    		data.getAadhaarNumber(),  data.getFirstName(),data.getLastName(), data.getDateOfBirth(), data.getGender(), data.getRelationName(),data.getIdMark(),data.getMobileNumber(),
-	            data.getMaritalStatus(), data.getUnitCode(), data.getVendorCode(), data.getWorkorderNumber(),data.getTrade(),data.getSkill(),data.getDepartment(),data.getArea(),"7",data.getNatureOfWork(),data.getEICNumber(),data.getHazardousArea(),
+	            data.getMaritalStatus(), data.getUnitCode(), data.getVendorCode(), data.getWorkorderNumber(),data.getTrade(),data.getSkill(),data.getDepartment(),data.getArea(),data.getEICNumber(),data.getNatureOfWork(),data.getECnumber(),data.getHazardousArea(),
 	            data.getAccessArea(),data.getUanNumber(),data.getHealthCheckDate(),data.getBloodGroup(),data.getAccommodation(),data.getAcademic(),data.getTechnical(),data.getBankName(),data.getAccountNumber(),data.getEmergencyNumber(),
 	            data.getEmergencyName(),data.getZone(),data.getAddress(),data.getDoj(),data.getPfNumber(),data.getEsicNumber(),data.getPoliceVerificationDate(),data.getPfApplicable());
 	}
