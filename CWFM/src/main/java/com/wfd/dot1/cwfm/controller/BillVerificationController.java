@@ -101,7 +101,7 @@ public class BillVerificationController {
     }
     @PostMapping("/list")
     @ResponseBody
-    public ResponseEntity<List<CMSWageCostDTO>> gatePassListingDetails(
+    public ResponseEntity<List<CMSWageCostDTO>> list(
     		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
     		@RequestParam(value = "deptId", required = false) String deptId,//deptId is contractorId not department
     		HttpServletRequest request,HttpServletResponse response) {

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,20 +18,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wfd.dot1.cwfm.dto.RenewalDTO;
-import com.wfd.dot1.cwfm.dto.RenewalDocumentDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
 import com.wfd.dot1.cwfm.dto.WorkOrderInfoDTO;
+import com.wfd.dot1.cwfm.enums.UserRole;
 import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractorRegistration;
+import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.ContractorLLWCService;
 import com.wfd.dot1.cwfm.service.ContractorService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
-import com.wfd.dot1.cwfm.service.RenewalViewService;
 import com.wfd.dot1.cwfm.service.WorkmenService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,36 +55,86 @@ public class ContractorRenewalController {
 	
 	@Autowired
 	WorkmenService workmenService;
+	  @GetMapping("/listingFilter")
+	    public String getRenewalList(HttpServletRequest request, HttpServletResponse response) {
 
+	    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 
-	@GetMapping("/list")
-	public String getContractorRenewalList(HttpServletRequest request, HttpServletResponse response) {
+			
+			List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+	    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+	    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+	    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+	    	List<PersonOrgLevel> contractors = groupedByLevelDef.getOrDefault("Contractor", new ArrayList<>());
+	    	
+	    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+	        CMSRoleRights rr =new CMSRoleRights();
+	        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/renewal/listingFilter");
+	   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+	   	    request.setAttribute("UserPermission", rr);
+	    	request.setAttribute("principalEmployers", peList);
+	    	  request.setAttribute("Contr", contractors);
+	    		return "contRenewal/list";
 
-		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
-		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+	    	
+	    }
 
-		List<ContractorRegistration> listDto = contrService.getContractorRenewalList(String.valueOf(user.getUserId()));
-		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
-		 CMSRoleRights rr =new CMSRoleRights();
-       if(user!=null) {
-       if(user.getRoleName().equals("System Admin")) {
-       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
-		        rr.setEditRights(1);
-		        rr.setDeleteRights(1);
-		        rr.setImportRights(1);
-		        rr.setExportRights(1);
-		        rr.setViewRights(1);
-       	peList = peService.getAllPrincipalEmployerForAdmin();
-       }else {
-       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/renewal/list");
-       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
-       }
-       }
-		request.setAttribute("contractorlist", listDto);
-		request.setAttribute("UserPermission", rr);
-		return "contRenewal/list";
-
-	}
+//	@GetMapping("/list")
+//	public String getContractorRenewalList(HttpServletRequest request, HttpServletResponse response) {
+//
+//		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+//		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+//
+//		List<ContractorRegistration> listDto = contrService.getContractorRenewalList(String.valueOf(user.getUserId()));
+//		List<PrincipalEmployer> peList =new ArrayList<PrincipalEmployer>();
+//		 CMSRoleRights rr =new CMSRoleRights();
+//       if(user!=null) {
+//       if(user.getRoleName().equals("System Admin")) {
+//       	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+//		        rr.setEditRights(1);
+//		        rr.setDeleteRights(1);
+//		        rr.setImportRights(1);
+//		        rr.setExportRights(1);
+//		        rr.setViewRights(1);
+//       	peList = peService.getAllPrincipalEmployerForAdmin();
+//       }else {
+//       	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/renewal/list");
+//       	peList = peService.getAllPrincipalEmployer(user.getUserAccount());
+//       }
+//       }
+//		request.setAttribute("contractorlist", listDto);
+//		request.setAttribute("UserPermission", rr);
+//		return "contRenewal/list";
+//
+//	}
+	
+	 @PostMapping("/list")
+	    @ResponseBody
+	    public ResponseEntity<List<ContractorRegistration>> list(
+	    		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
+	    		@RequestParam(value = "deptId", required = false) String deptId,//deptId is contractorId not department
+	    		HttpServletRequest request,HttpServletResponse response) {
+	    	
+	    	try {
+				HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+				MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+				List<ContractorRegistration> listDto = new ArrayList<ContractorRegistration>();
+				if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+	    		listDto=contrService.getContRenewList(String.valueOf(user.getUserId()),deptId,principalEmployerId);
+				}else {	
+				
+					listDto=contrService.getContRenewListForApprovers(principalEmployerId,deptId,user);
+	    		}	
+					if (listDto.isEmpty()) {
+						return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+					}
+				
+				return new ResponseEntity<>(listDto, HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+	    }
 	
 	@GetMapping("/create")
 	public String createRewnal(HttpServletRequest request, HttpServletResponse response) {
@@ -226,19 +277,43 @@ public class ContractorRenewalController {
 
 		}
 	    
-	    @Autowired
-	    private RenewalViewService renewalViewService;
+	   
 
 	    @GetMapping("/view/{contractorRegId}")
-	    public String viewRenewalDetails(@PathVariable Long contractorRegId, Model model) {
-	        RenewalDTO renewal = renewalViewService.getRegistrationDetails(contractorRegId);
-	        List<RenewalDocumentDTO> documents = renewalViewService.getPolicyDocuments(contractorRegId);
-	        List<CMSContractorRegistrationLLWC> llwcRecords = renewalViewService.getLLWCDetails(contractorRegId);
+	    public String viewContractorDetails(@PathVariable("contractorRegId") String contractorRegId,
+	                                        HttpServletRequest request) {
+	        try {
+	            ContractorRegistration contractor = contrService.getContractorRegistration(contractorRegId);
+	            request.setAttribute("contractor", contractor);
 
-	        model.addAttribute("renewal", renewal);
-	        model.addAttribute("documents", documents);
-	        model.addAttribute("llwcRecords", llwcRecords);
+	            List<ContractorRegistrationPolicy> policies = contrService.getPolicies(contractorRegId);
+	            request.setAttribute("policies", policies);
 
-	        return "renewal/view"; // JSP name
+	            List<CMSContractorRegistrationLLWC> llwcRecords = contrService.getLLWC(contractorRegId);
+	            request.setAttribute("llwcRecords", llwcRecords);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return "contRenewal/view";  // ✅ JSP page that will display all details
+	    }
+	    @PostMapping("/approveRejectContRenew")
+	    public ResponseEntity<String> approveRejectBill(@RequestBody ApproveRejectContRenewDto dto,HttpServletRequest request,HttpServletResponse response) {
+	    	String result=null; 
+	    	try {
+	             ObjectMapper objectMapper = new ObjectMapper();
+	             String approveRejectGatePass = objectMapper.writeValueAsString(dto);
+	         } catch (Exception e) {
+	         }
+	         try {
+	        	 result = contrService.approveRejectContRenew(dto);
+	         	if(null!=result) {
+	         		return new ResponseEntity<>(result,HttpStatus.OK);
+	         	}
+	         	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	         } catch (Exception e) {
+	             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                                  .body("Error saving data: " + e.getMessage());
+	         } 
 	    }
 }

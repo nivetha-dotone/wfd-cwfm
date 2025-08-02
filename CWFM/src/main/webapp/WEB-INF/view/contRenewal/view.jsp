@@ -297,67 +297,70 @@ label {
         
     </style>
    
-		 <%
-    MasterUser user = (MasterUser) session.getAttribute("loginuser");
-    String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
-%>
+		
 		<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-   
+   <%
+	MasterUser user = (MasterUser) session.getAttribute("loginuser");
+ String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
+    String roleName = user != null ? user.getRoleName() : "";
+    String roleId = user!=null?user.getRoleId():"";
+    String contextPath =  request.getContextPath() ;
+	%>
 </head>
 <body>
        
        
-    <div id="principalEmployerContent">
+    
+ <div id="principalEmployerContent">
         <div class="tabs-container">
         <div class="tabs">
-              <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
-            <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
-            <button data-target="tab3" onclick="showTabOther('tab3')">Work Order Information</button>
-           
+              <button class="active" data-target="tab1" onclick="showTabNew('tab1')">Basic Information</button>
+            <button data-target="tab2" onclick="showTabNew('tab2')">License Information</button>
+            <button data-target="tab3" onclick="showTabNew('tab3')">Work Order Information</button>
+           <button data-target="tab5" onclick="showTabNew('tab5')">Comments</button>
         </div>
          <div class="action-buttons" >
-            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRegistrationDetails('${sessionScope.loginuser.userId}')">Save</button>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Return</button>
-           <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRenewalDetails()">Save</button> -->
+             <% if (user != null && !"Contractor".equals(roleName)) { %>
+    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectContRenew('4')">Approve</button>
+   				 <button id="rejectButton"  style="display:none;"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectContRenew('5')">Reject</button>
+			<% } %>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/renewal/listingFilter', 'Contractor Renewal');">Cancel</button>
+  
       
         </div> 
     </div> 
 
-       
+  
 <div id="tab1" class="tab-content active ">
 
     <table cellspacing="0" cellpadding="0">
         <tbody>
             <tr>
+            <input type="hidden" id="userId" name="userId" value="<%= userId %>">
+			<input type="hidden" id="roleName" name="roleName" value="<%= roleName %>">
+			<input type="hidden" id="roleId" name="roleId" value="<%= roleId %>">
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorRenewalId"/> </label></th>
                 <td>
-                	<input id="contractorregId" name="contractorregId" value="${contractorregId}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly>
+                	<input id="contractorregId" name="contractorregId" value="${contractor.contractorregId}" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" readonly>
                 	<label id="error-registrationid" style="color: red;display: none;">Registration ID is required</label>
                 </td>
                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
-				 <td><select class="custom-select" id="principalEmployerId" name="principalEmployer" onchange="getAllContractorsForReg(this.value)" style="width: 100%;height: 25px; ">
-                                <option value="">Please select Principal Employer</option>
-                                <c:forEach var="pe" items="${PrincipalEmployer}">
-                					<option value="${pe.unitId}">${pe.name}</option>
-            					</c:forEach>
-                                </select>
-                    </td>
+				 <td><input type="text" value="${contractor.principalEmployer}" readonly></td>
            </tr>
             <tr>
               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
-                <td>
-                	<input id="contractorNameId" name="contractorName" style="width: 100%;height: 20px; text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" readonly>
+                <td> 
+                	<input id="contractorNameId" name="contractorName"  value="${contractor.contractorName}"  style="width: 100%;height: 20px; text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" readonly>
                 	<label id="error-contractorname" style="color: red;display: none;">Contractor name is required</label>
                 </td>
                  
           <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
                 <td>
-                	 <select class="custom-select" id="vendorCodeId" name="vendorCode"  onchange="getAllContractorDetailForRenewal(this.value)">
-            						<option value="">Please select Vendor Code</option>
-            		</select> 
+                	<input id="vendorCodeId" name="vendorCode" value="${contractor.vendorCode}" style="width: 100%;height: 20px; text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" readonly>
+            						
             		<!-- <input id="vendorCodeId" name="vendorCode" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30"> -->
                 	 <label id="error-vendorCode" style="color: red;display: none;">Vendor Code is required</label>
                 </td>
@@ -366,12 +369,12 @@ label {
              <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
                 <td>
-                	<input id="emailId" name="email" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="emailId" name="email" style="width: 100%;height: 20px;" type="text" value="${contractor.email}" readonly size="30" maxlength="30" autocomplete="off">
                 	<label id="error-email" style="color: red;display: none;">Email is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
                 <td>
-                	<input id="mobileId" name="mobile" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" autocomplete="off">
+                	<input id="mobileId" name="mobile" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" autocomplete="off" value="${contractor.mobile}" readonly>
                 	<label id="error-mobile"style="color: red;display: none;">Mobile number is required</label>
                 </td>
                 
@@ -380,12 +383,12 @@ label {
              <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAadhar"/></label></th>
                 <td>
-                	<input id="aadharId" name="aadhar" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off">
+                	<input id="aadharId" name="aadhar" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" value="${contractor.aadhar}" readonly>
                 	<label id="error-aadhar" style="color: red;display: none;">Aadhar Number is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharDoc"/></label></th>
                 <td>
-                	<input type="file" class="form-control aadhardoc" id="aadharDocId" name="aadharDoc"  accept="application/pdf" autocomplete="off"/>
+                	<input type="text" id="aadharDocId" name="aadharDoc"  autocomplete="off" value="${contractor.aadharDoc}" readonly/>
                 	<label id="error-aadharDoc" style="color: red;display: none;">Aadhar Document is required</label>
                 </td>
                
@@ -394,24 +397,24 @@ label {
            	   
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorPan"/></label></th>
                 <td>
-                	<input id="panId" name="pan" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="panId" name="pan" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.pan}" readonly>
                 	<label id="error-pan" style="color: red;display: none;">Pan Number is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.panDoc"/></label></th>
                 <td>
-                	<input type="file" class="form-control pandoc" id="panDocId" name="panDoc"  accept="application/pdf" autocomplete="off"/>
+                	<input type="text" id="panDocId" name="panDoc"  accept="application/pdf" autocomplete="off" value="${contractor.panDoc}" readonly>
                 	<label id="error-panDoc" style="color: red;display: none;">Pan Document is required</label>
                 </td>
            </tr>
             <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorGst"/></label></th>
                 <td>
-                	<input id="gstId" name="gst" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="gstId" name="gst" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.gst}" readonly>
                 	<label id="error-gst" style="color: red;display: none;">GST is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAddress"/></label></th>
                 <td>
-                	<input id="addressId" name="address" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="addressId" name="address" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.address}" readonly>
                 	<label id="error-address" style="color: red;display: none;">Address is required</label>
                 </td>
                
@@ -419,12 +422,12 @@ label {
            <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                 <td>
-                	<input id="pfNumId" name="pfNum" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="pfNumId" name="pfNum" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.pfNum}" readonly>
                 	<label id="error-pfnumber" style="color: red;display: none;">PF Number is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
                 <td>
-                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.natureOfWork}" readonly>
                 	<label id="error-natureOfWork" style="color: red;display: none;">Nature Of Work is required</label>
                 </td>
                
@@ -432,12 +435,12 @@ label {
            <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                 <td>
-                	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.managerName}" readonly>
                 	<label id="error-managername" style="color: red;display: none;">Manager name is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.locationOfWork"/></label></th>
                 <td>
-                	<input id="locofWorkId" name="locofWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="locofWorkId" name="locofWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.locofWork}" readonly>
                 	<label id="error-locofwork"style="color: red;display: none;">Location Of Work is required</label>
                 </td>
                 
@@ -445,12 +448,12 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.totalStrength"/></label></th>
                 <td>
-                	<input id="totalStrengthId" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="totalStrengthId" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.totalStrength}" readonly>
                 	<label id="error-totalStrength" style="color: red;display: none;">Total Strength is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.rcMaxEmployees"/></label></th>
                 <td>
-                	<input id="rcMaxEmpId" name="rcMaxEmp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="rcMaxEmpId" name="rcMaxEmp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.rcMaxEmp}" readonly>
                 	<label id="error-rcmaxemployees" style="color: red;display: none;">RC Max Employees is required</label>
                 </td>
                
@@ -458,12 +461,12 @@ label {
             <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractFrom"/></label></th>
                 <td>
-                	<input id="contractFromId" name="contractFrom" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off">
+                	<input id="contractFromId" name="contractFrom" style="width: 100%;height: 20px; color: black;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.contractFrom}" readonly>
                 	<label id="error-contractFrom" style="color: red;display: none;">Contract From is required</label>
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractTo"/></label></th>
                 <td>
-                	<input id="contractToId" name="contractTo" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off">
+                	<input id="contractToId" name="contractTo" style="width: 100%;height: 20px; color: black;" type="text" size="30" maxlength="30" autocomplete="off" value="${contractor.contractTo}" readonly>
                 	<label id="error-contractTo" style="color: red;display: none;">Contract To is required</label>
                 </td>
                
@@ -472,11 +475,8 @@ label {
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractType"/></label></th>
            <td>
     <!-- Dropdown for contractor type -->
-              <select id="contractTypeId" name="contractType" onchange="toggleMainContractorRow()" style="width: 100%; height: 25px; color: black;">
-    <option value="">Select Contractor Type</option>
-    <option value="Main Contractor">Main Contractor</option>
-    <option value="Sub Contractor">Sub Contractor</option>
-</select>
+             <input id="contractTypeId" name="contractType" type="text" style="width: 100%; height: 25px;color:black;" value="${contractor.contractType}" readonly>
+   
 <label id="error-contractType" style="color: red; display: none;">Contract Type is required</label>
               
              <label id="error-contractType" style="color: red; display: none;">Contract Type is required</label>
@@ -493,7 +493,7 @@ label {
            <!-- Main Contractor row -->
        <tr id="mainContractorRow" style="display: none;"><th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mainContractor"/></label></th>
     <td>
-        <select class="custom-select" id="mainContractorId" name="mainContractor"  >
+        <select class="custom-select" id="mainContractorId" name="mainContractor"  style="color:black">
             						<option value="">Please select Main Contractor</option>
             		</select>
         <label id="error-mainContractor" style="color: red; display: none;">Main Contractor is required</label>
@@ -503,7 +503,7 @@ label {
 <tr>
 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplyDate"/></label></th>
                 <td>
-                	<input id="pfApplyDateId" name="pfApplyDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off">
+                	<input id="pfApplyDateId" name="pfApplyDate" style="width: 100%;height: 20px; color: black;" type="text" size="30" value="${contractor.pfApplyDate}" readonly> 
                 	<label id="error-contractFrom" style="color: red;display: none;">PF apply date is required</label>
                 </td>
 </tr>
@@ -511,128 +511,94 @@ label {
    </tbody>
   </table>
  </div>
-
-
-
+   
+    
  <div  class="tab-content "><spring:message code="label.additionalDocumets"/></div>
             <div id="tab2" class="tab-content  ">
             <div id="validationMessages" style="color: red; font-weight: bold; padding: 10px;"></div>
-            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;">
                    
         <thead>
             <tr style=" border: 1px solid #ddd;">
             
-                <th><label class="custom-label"></th>
-                <th><label class="custom-label"></th>
-               <%--  <th><label class="custom-label">  <spring:message code="label.workOrderNumber"/></th> --%>
-				<%-- <th><label class="custom-label"> <spring:message code="label.natureOfJob"/></th> --%>
+                
 				<th><label class="custom-label"> <spring:message code="label.documentType"/></th>
 				<th><label class="custom-label"> <spring:message code="label.documentNumber"/></th>
 				<th><label class="custom-label"> <spring:message code="label.coverage"/></th>
 				<th><label class="custom-label"><spring:message code="label.validFrom"/></th>
 				<th><label class="custom-label"><spring:message code="label.validTo"/></th>
 				<th><label class="custom-label"><spring:message code="label.attachment"/></th>
-				<th><label class="custom-label"><spring:message code="label.panIndia"/></th>
-				<th><label class="custom-label"><spring:message code="label.subContractorApplicable"/></th>
+				
             </tr>
         </thead>
       <tbody id="licenseBody">
-    <tr>
-        <td><button type="button" class="btn btn-success addRowNew" style="color:white;background-color:green;">+</button></td>
-        <td><button type="button" class="btn btn-danger removeRowNew" style="color:white;background-color:red;">−</button></td>
-       
-        <td>
-            <select class="form-control documentType" name="documentType" id="documentTypeId">
-            
-                 <option value="">Please select Document Type</option>
-                                <c:forEach var="doc" items="${DocumentType}">
-                					<option value="${doc.gmId}">${doc.gmName}</option>
-            					</c:forEach>
-                                </select>
-        </td>
-        <td><input type="text" class="form-control documentNumber" name="documentNumber" autocomplete="off"/></td>
-        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" autocomplete="off"/></td>
-        <td><input type="date" class="form-control validFrom" name="validFrom" autocomplete="off"/></td>
-        <td><input type="date" class="form-control validTo" name="validTo" autocomplete="off"/></td>
-        <td><input type="file" class="form-control attachment" name="attachment" autocomplete="off"/></td>
-        <td><input type="checkbox" class="form-control panIndia" name="panIndia" /></td>
-         <td><input type="checkbox" class="form-control subApplicable" name="subApplicable" /></td>
-    </tr>
+    <c:forEach var="item" items="${policies}">
+                    <tr>
+                      
+                    <td style="color:black;text-align:center">${item.documentType }</td>
+                    <td style="color:black;text-align:center">${item.documentNumber }</td>
+                    <td style="color:black;text-align:center">${item.coverage }</td>
+                    <td style="color:black;text-align:center">${item.validFrom }</td >
+                    <td style="color:black;text-align:center">${item.validTo}</td>
+                    <td style="color:black;text-align:center">
+                     ${item.fileName}
+                     </td>
+                    </tr>
+                </c:forEach>
 </tbody>
       
                 </table>
-                <div class="text-end mt-3">
-    <button type="button" class="btn btn-primary" id="saveButton" onclick="saveTab2AndGoToTab3()">Save</button>
-</div>
-                
+             
             </div>
- 
- 
- <!--tab3  -->
-        
-  <div id="tab3" class="tab-content  ">
-  
 
-
- <div class="multi-select-container">
-                    <!-- Available Entries -->
-                    <div class="multi-select-group">
-                        <label class="multi-select-label">Available Workorders</label>
-                        <select id="availableWorkOrders" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple >
-                            
-                        </select>
-                    </div>
-
-                    <!-- Move Buttons -->
-                    <div class="button-group">
+    <!-- ✅ TAB 3 – LLWC -->
+   <div id="tab3" class="tab-content  ">
+        <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;">
+            <thead>
+                <tr style=" border: 1px solid #ddd;">
+                    <th><label class="custom-label">Work Order Number</label></th>
+                    <th><label class="custom-label">License Type</label></th>
+                    <th><label class="custom-label">WC Code</label></th>
+                    
+                    <th><label class="custom-label">Created Date</label></th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="ll" items="${llwcRecords}">
+                    <tr>
+                        <td><input type="text" value="${ll.workOrderNumber}" readonly></td>
+                        <td><input type="text" value="${ll.licenseType}" readonly></td>
+                        <td><input type="text" value="${ll.wcCode}" readonly></td>
                        
-                        
-                        <button type="button" onclick="moveSelected('availableWorkOrders', 'selectedWorkOrders')">&gt;</button><br><br>
-        <button type="button" onclick="moveSelected('selectedWorkOrders', 'availableWorkOrders')">&lt;</button>
-  
-                    </div>
-
-                    <!-- Selected Entries -->
-                    <div class="multi-select-group">
-                        <label class="multi-select-label">Selected Workorders</label>
-                        <select id="selectedWorkOrders" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple>
-                           
-                        </select>
-                    </div>
-                </div>
-                
- <div class="multi-select-container">
-                    <!-- Available Entries -->
-                    <div class="multi-select-group">
-                        <label class="multi-select-label">Available License</label>
-                        <select id="availableLicense" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple >
-                            
-                        </select>
-                    </div>
-
-                    <!-- Move Buttons -->
-                    <div class="button-group">
-                       
-                        
-                        <button type="button" onclick="moveSelected('availableLicense', 'selectedLicense')">&gt;</button><br><br>
-        <button type="button" onclick="moveSelected('selectedLicense', 'availableLicense')">&lt;</button>
-  
-                    </div>
-
-                    <!-- Selected Entries -->
-                    <div class="multi-select-group">
-                        <label class="multi-select-label">Selected License</label>
-                        <select id="selectedLicense" class="multi-select-box" style="height:200px;width:250px;color:black;" multiple>
-                           
-                        </select>
-                    </div>
-                </div>
-<div class="text-end mt-3">
-    <button type="button" class="btn btn-success" onclick="saveWorkOrderInfo()">Save Work Order & License</button>
+                        <td><input type="text" value="${ll.createdDtm}" readonly></td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="tab5" class="tab-content">
+            <div class="Panel">
+            
+            <table class="ControlLayout" cellspacing="0" cellpadding="0">
+		<tbody>
+		<tr>
+				
+				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+				 <th><label class="custom-label"><spring:message code="label.approveComment"/></label></th>
+				<td><textarea id="approvercomments"  name="approvercomments" placeholder="Type here..."></textarea>
+				<label id="error-approvercomments" style="color: red;display: none;">Comments is required</label>
+				</td>
+				<% } %>
+			</tr>
+		</tbody>
+ </table> 
+	
+</div>
+</div>	
 </div>
 
-  </div>
- </div>
-  <script src="resources/js/cms/contRenewal.js" defer></script>
+
+
 </body>
 </html>

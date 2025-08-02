@@ -74,6 +74,7 @@ public class ContractorLLWCService {
 
         if (!recordsToInsert.isEmpty()) {
             llwcDAO.insertLLWCRecords(recordsToInsert);
+            //
         }
     }
 }

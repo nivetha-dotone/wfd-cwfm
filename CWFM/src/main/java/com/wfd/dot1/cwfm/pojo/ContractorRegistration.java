@@ -264,6 +264,24 @@ public void setEsicRegNo(String esicRegNo) {
 }
 	
 	
+	private String statusValue;
+
+
+	public String getStatusValue() {
+		return statusValue;
+	}
+	public void setStatusValue(String statusValue) {
+		this.statusValue = statusValue;
+	}
+	private String actionId;
+
+
+	public String getActionId() {
+		return actionId;
+	}
+	public void setActionId(String actionId) {
+		this.actionId = actionId;
+	}
 	
 	
 }

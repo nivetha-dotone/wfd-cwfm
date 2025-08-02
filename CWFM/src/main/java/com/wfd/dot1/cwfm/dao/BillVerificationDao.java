@@ -3,6 +3,7 @@ package com.wfd.dot1.cwfm.dao;
 import java.util.List;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
+import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
 import com.wfd.dot1.cwfm.pojo.BillReportFile;
@@ -58,5 +59,6 @@ public interface BillVerificationDao {
 	boolean isLastApproverForParallel(String transactionId, String roleId);
 
 	boolean isLastApprover(String roleName);
+
 }
 

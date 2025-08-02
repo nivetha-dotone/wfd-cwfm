@@ -65,5 +65,7 @@ public class ContractorRegistrationLLWCDAOImpl implements ContractorRegistration
             }
         });
     }
+    
+    
 }
 

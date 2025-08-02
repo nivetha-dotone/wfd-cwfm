@@ -320,7 +320,7 @@ label {
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRegistrationDetails('${sessionScope.loginuser.userId}')">Save</button>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitForm()">Return</button>
+           <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/renewal/listingFilter', 'Contractor Renewal');">Cancel</button>
            <!--  <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveRenewalDetails()">Save</button> -->
       
         </div> 

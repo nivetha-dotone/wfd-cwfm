@@ -224,6 +224,32 @@
 </head>
 <body>
 	<div class="page-header">
+	     <div>
+   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
+         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
+         <option value="">Select Principal Employer</option>
+    <c:forEach items="${principalEmployers}" var="pe">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${pe.id}"  <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
+    </c:forEach>
+</select>
+<input type="hidden" id="principalEmployerId" name="principalEmployerId">
+
+<label for="departmentId" style=" color: darkcyan;"   >Contractor:</label>
+         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
+         <option value="">Select Contractor</option>
+    <c:forEach items="${Contr}" var="c">
+       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
+            ${principalEmployer.name}
+        </option> --%>
+        <option value="${c.id}" <c:if test="${Contr.size() == 1}">selected</c:if>>${c.description}</option>
+    </c:forEach>
+</select>
+<input type="hidden" id="deptId" name="deptId">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchContRenewBasedOnPE()">Search</button>
+  </div>
 		 <div>
     <c:if test="${UserPermission.addRights eq 1 }">
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContractorRenew()">Add</button> 
@@ -266,22 +292,29 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${contractorlist}" var="wo">
+				<%-- <c:forEach items="${contractorlist}" var="wo">
 					<tr>
 						<td ><input type="checkbox"
 							name="selectedWOs" value="${wo.contractorregId}"></td>
 						<td  >${wo.contractorregId}</td>
-						<%-- <td  >${wo.principalEmployer}</td> --%>
+						<td  >${wo.principalEmployer}</td>
 						<td  >${wo.vendorCode}</td>
 						<td  >${wo.contractorName}</td>
 						<td  >${wo.status}</td>
 						<td  >${wo.requestType}</td>
-						<%--<td  >${principalEmployer.NAME}</td>
-                    <td  >${${wo.requestType}}</td> --%>
+						<td  >${principalEmployer.NAME}</td>
+                    <td  >${${wo.requestType}}</td>
 					</tr>
-				</c:forEach>
+				</c:forEach> --%>
 			</tbody>
 		</table>
 		</div>
+		<c:if test="${principalEmployers.size() == 1 && Contr.size() == 1}">
+    <script>
+        setTimeout(function () {
+        	searchContRenewBasedOnPE();
+        }, 10); // Delay ensures DOM is rendered after innerHTML
+    </script>
+    </c:if>
 </body>
 </html>

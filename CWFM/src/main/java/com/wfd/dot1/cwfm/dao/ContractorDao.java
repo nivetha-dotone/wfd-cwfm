@@ -2,7 +2,10 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.List;
 
+import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
+import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
@@ -73,6 +76,30 @@ public interface ContractorDao {
 	ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId);
 
 	ContractorRegistration getWOAndLicense(String contractorId, String contractorCode, String unitId, String regId);
+
+	ContractorRegistration getContractorRegistration(String contractorRegId);
+
+	List<ContractorRegistrationPolicy> getPoliciesByContractorRegId(String contractorRegId);
+
+	List<CMSContractorRegistrationLLWC> getLLWCByContractorRegId(String contractorRegId);
+
+	public List<ContractorRegistration> getContRenewList(String userId, String deptId, String principalEmployerId);
+
+	
+	int getWorkflowType(String module, String unitId);
+
+	public List<ContractorRegistration> getContRenewListForApprovers(String roleId, int workFlowType, String deptId,
+			String principalEmployerId);
+
+	public String approveRejectContRenew(ApproveRejectContRenewDto dto);
+
+	boolean updateContStatusByTransactionId(String transactionId, String status);
+
+	int getWorkFlowTYpeByTransactionId(String transactionId);
+
+	boolean isLastApprover(String roleName);
+
+	boolean isLastApproverForParallel(String transactionId, String roleId);
 	   
 	}
 

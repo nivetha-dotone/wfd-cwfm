@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
+import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
@@ -77,6 +80,19 @@ public interface ContractorService {
 			String regId);
 
 	public List<ContractorRegistration> getContractorRenewList(String valueOf);
+
+	List<CMSContractorRegistrationLLWC> getLLWC(String contractorRegId);
+
+	List<ContractorRegistrationPolicy> getPolicies(String contractorRegId);
+
+	ContractorRegistration getContractorRegistration(String contractorRegId);
+
+	public List<ContractorRegistration> getContRenewList(String userId, String deptId, String principalEmployerId);
+
+	public List<ContractorRegistration> getContRenewListForApprovers(String principalEmployerId, String deptId,
+			MasterUser user);
+
+	public String approveRejectContRenew(ApproveRejectContRenewDto dto);
 	   
 	}
 

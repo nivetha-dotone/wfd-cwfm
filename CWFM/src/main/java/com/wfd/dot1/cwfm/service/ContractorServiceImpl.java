@@ -14,10 +14,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfd.dot1.cwfm.dao.BillVerificationDao;
 import com.wfd.dot1.cwfm.dao.ContractorDao;
+import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.RenewalDTO;
 import com.wfd.dot1.cwfm.dto.RenewalDocumentDTO;
+import com.wfd.dot1.cwfm.enums.GatePassStatus;
+import com.wfd.dot1.cwfm.enums.WorkFlowType;
+import com.wfd.dot1.cwfm.pojo.BillStatusLogDto;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
+import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
@@ -64,6 +71,7 @@ public class ContractorServiceImpl implements ContractorService{
 	@Override
 	public String saveReg(ContractorRegistration contreg) {
 		// TODO Auto-generated method stub
+		contreg.setStatus("1");
 		return contrDao.saveReg(contreg);
 	}
 	@Override
@@ -214,13 +222,20 @@ public class ContractorServiceImpl implements ContractorService{
 	        Path filePath = Paths.get(path);
 	        Files.write(filePath, bytes);
 	    }
-	 
+	 @Autowired
+	 BillVerificationDao billDao;
 	@Override
 	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile,
 			List<MultipartFile> attachments, String username) {
 		ObjectMapper mapper = new ObjectMapper();
         ContractorRegistration reg=new ContractorRegistration();
         RenewalDTO renewal = new RenewalDTO();
+        int workFlowTypeId=billDao.getWorkflowType("Contractor", String.valueOf(reg.getPrincipalEmployer()));
+		if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+			reg.setStatus(GatePassStatus.APPROVED.getStatus());
+		}else {
+			reg.setStatus(GatePassStatus.APPROVALPENDING.getStatus());
+		}
 		try {
 			//contreg = mapper.readValue(jsonData, ContractorRegistration.class);
 			  renewal = mapper.readValue(jsonData, RenewalDTO.class);
@@ -294,24 +309,10 @@ public class ContractorServiceImpl implements ContractorService{
              this.savePolicies(policies, reg);
              
         
-        // Save selected work orders
-//        for (String woNumber : renewal.getSelectedWorkOrders()) {
-//            CMSContractorRegistrationLLWC llwc = new CMSContractorRegistrationLLWC();
-//            llwc.setContractorregllwcid(contrDao.getNextLLWCId());
-//            llwc.setContractorregid(regId);
-//            llwc.setContractorid(renewal.getContractorId());
-//            llwc.setUnitid(Integer.parseInt(renewal.getPrincipalEmployer()));
-//            llwc.setWonumber(woNumber);
-//            llwc.setLicencetype("Renewal");
-//            llwc.setStatus(1);
-//          
-//            llwc.setCreatedby(username);
-//
-//            contrDao.saveContractorLLWC(llwc);
-//        }
+        
 		
 	}else {
-		//renewal 
+		//renewal  failed
 	}
 	}
 	@Override
@@ -319,5 +320,57 @@ public class ContractorServiceImpl implements ContractorService{
 			String regId) {
 		
 		return contrDao.getWOAndLicense(contractorId,contractorCode,unitId,regId);
+	}
+	@Override
+	public ContractorRegistration getContractorRegistration(String contractorRegId) {
+        return contrDao.getContractorRegistration(contractorRegId);
+    }
+	@Override
+    public List<ContractorRegistrationPolicy> getPolicies(String contractorRegId) {
+        return contrDao.getPoliciesByContractorRegId(contractorRegId);
+    }
+	@Override
+    public List<CMSContractorRegistrationLLWC> getLLWC(String contractorRegId) {
+        return contrDao.getLLWCByContractorRegId(contractorRegId);
+    }
+	@Override
+	public List<ContractorRegistration> getContRenewList(String userId, String deptId, String principalEmployerId) {
+		// TODO Auto-generated method stub
+		return contrDao.getContRenewList(userId,deptId,principalEmployerId);
+	}
+	@Override
+	public List<ContractorRegistration> getContRenewListForApprovers(String principalEmployerId, String deptId,
+			MasterUser user) {
+		int workFlowType=contrDao.getWorkflowType("CONTRACTOR RENEWAL", principalEmployerId);
+		return contrDao.getContRenewListForApprovers(user.getRoleId(), workFlowType, deptId, principalEmployerId);
+	}
+	@Override
+	public String approveRejectContRenew(ApproveRejectContRenewDto dto) {
+		ContractorRegistration gpm = contrDao.getContractorRegistration(dto.getTransactionId());
+		String result=null;
+		 result = contrDao.approveRejectContRenew(dto);
+		
+		boolean status=false;
+		if(dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
+			status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
+		}else {
+			boolean isLastApprover=false;
+			int workFlowTypeId = contrDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
+			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
+				 isLastApprover = contrDao.isLastApprover(dto.getApproverRole());
+			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
+				 isLastApprover = contrDao.isLastApproverForParallel(dto.getTransactionId(),dto.getRoleId());
+				
+			}
+			
+			//check if last approver, if last approver change the status of gate pass main to approved
+			
+			if(isLastApprover) {
+				status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
+				
+			}
+		}
+
+		return result;
 	}
 }

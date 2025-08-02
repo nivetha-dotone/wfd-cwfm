@@ -526,7 +526,7 @@ function saveWorkOrderInfo() {
     .then(res => {
         if (res.ok) {
             alert("Work order info saved.");
-            loadCommonList("/renewal/list", "Contractor Renewal List");
+            loadCommonList("/renewal/listingFilter", "Contractor Renewal List");
         } else {
             alert("Failed to save work order info.");
         }
@@ -538,4 +538,94 @@ function makeSelectReadOnly(selectId) {
     select.addEventListener("keydown", e => e.preventDefault());
 }
 
+function searchContRenewBasedOnPE() {
+					    var principalEmployerId = $('#principalEmployerId').val();
+					    
+						var deptId=$("#deptId").val();
+					    $.ajax({
+					        url: '/CWFM/renewal/list',
+					        type: 'POST',
+					        data: {
+					            principalEmployerId: principalEmployerId,
+								deptId:deptId
+					        },
+					        success: function(response) {
+					            var tableBody = $('#contractorlisttable tbody');
+								   if ($.fn.DataTable.isDataTable('#contractorlisttable')) {
+									$('#contractorlisttable').DataTable().destroy();
+								}
+					            tableBody.empty();
+					            if (response.length > 0) {
+					                $.each(response, function(index, wo) {
+					                    var row = '<tr  >' +
+												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.contractorregId + '"></td>'+
+												'<td  >' + wo.contractorregId + '</td>' +
+												 '<td  >' + wo.vendorCode + '</td>' +
+					                              '<td  >' + wo.contractorName + '</td>' +
+												  '<td  >' + wo.statusValue + '</td>' +	
+												  
+												  '<td  >' + wo.requestType + '</td>' +
+												 
+												 			                             
+					                              '</tr>';
+					                    tableBody.append(row);
+					                });
+					            } 								// ✅ Always init after rows are drawn
+									initWorkmenTable("contractorlisttable");
+					        },
+					        error: function(xhr, status, error) {
+					            console.error("Error fetching data:", error);
+					        }
+					    });
+					}  
+					function approveRejectContRenew(status){
+											let isValid=true;
+										
+											 const approvercomments = $("#approvercomments").val().trim();
+										if (approvercomments === "") {
+										    $("#error-approvercomments").show();
+										    isValid = false;
+										}else{
+											$("#error-approvercomments").hide();
+										}
+										if(isValid){
+											const data = {
+												approverId : $("#userId").val().trim(),
+												comments : $("#approvercomments").val().trim(),
+												status : status,
+												transactionId : $("#contractorregId").val().trim(),
+												approverRole : $("#roleName").val().trim(),
+												roleId :$("#roleId").val().trim(),
+												type : '1',
+											};
+												  const xhr = new XMLHttpRequest();
+										xhr.open("POST", "/CWFM/renewal/approveRejectContRenew", true); // Replace with your actual controller URL
+										xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+										xhr.onload = function() {
+										    if (xhr.status === 200) {
+										        // Handle successful response
+										        console.log("Data saved successfully:", xhr.responseText);
+												sessionStorage.setItem("successMessage", "Contractor Renewal approved/rejected successfully!");
+										      
+										                loadCommonList('/renewal/listingFilter', 'Contractor Renewal');
+										            
+										    } else {
+										        // Handle error response
+										        console.error("Error saving data:", xhr.statusText);
+												sessionStorage.setItem("errorMessage", "Failed to approve/reject Contractor Renewal!");
+										    }
+										};
 
+										xhr.onerror = function() {
+										    console.error("Request failed");
+											sessionStorage.setItem("errorMessage", "Failed to approve/reject Contractor Renewal!");
+										};
+
+										// Send the data object as a JSON string
+										xhr.send(JSON.stringify(data));
+											}else{
+												//error 
+											}
+											}//eofunc
+											
+															

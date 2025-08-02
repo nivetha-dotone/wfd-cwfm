@@ -218,7 +218,7 @@
 						<%-- <td  >${wo.principalEmployer}</td> --%>
 						<td  >${wo.vendorCode}</td>
 						<td  >${wo.contractorName}</td>
-						<td  >${wo.status}</td>
+						<td  >Approved</td>
 						<td  >${wo.requestType}</td>
 						<%--<td  >${principalEmployer.NAME}</td>
                     <td  >${${wo.requestType}}</td> --%>

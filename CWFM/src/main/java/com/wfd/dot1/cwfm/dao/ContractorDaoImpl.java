@@ -13,7 +13,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
+import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
+import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
+import com.wfd.dot1.cwfm.enums.GatePassStatus;
+import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
+import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
@@ -23,7 +29,6 @@ import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.queries.ContractorQueryBank;
-import com.wfd.dot1.cwfm.queries.WorkmenQueryBank;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 @Repository
 public class ContractorDaoImpl implements ContractorDao{
@@ -215,7 +220,13 @@ public class ContractorDaoImpl implements ContractorDao{
 	@Override
 	public String saveReg(ContractorRegistration contreg) {
 		int status=0;
-		
+		String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
+		   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
+		   		+ "		    where cgt.GMTYPE='ACTION' and cgm.GMNAME like 'Contractor Renewal%'";
+		   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
+		   while(rs.next()) {
+			   contreg.setActionId(rs.getString("GMID"));
+		   }
 		Object[] parameters = new Object[] {
 			    contreg.getContractorregId(),
 			    contreg.getContractorId(),
@@ -240,7 +251,7 @@ public class ContractorDaoImpl implements ContractorDao{
 			    contreg.getContractTo() != null ? java.sql.Date.valueOf(contreg.getContractTo()) : null,
 
 			    contreg.getRequestType(),
-			    1, // STATUS
+			    contreg.getStatus(),
 			    contreg.getCreatedBy(),
 			    contreg.getAadhar(),
 			    contreg.getAadharDoc(),
@@ -251,7 +262,8 @@ public class ContractorDaoImpl implements ContractorDao{
 			    contreg.getGst(),
 			    contreg.getAddress(),
 			    contreg.getEmail(),
-			    contreg.getMobile()
+			    contreg.getMobile(),
+			    contreg.getActionId()
 			};
 
         try {
@@ -260,8 +272,8 @@ public class ContractorDaoImpl implements ContractorDao{
         		    "TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, " +
         		    "MAINCONTRACTOR, CONTTYPE, PERIODSTARTDATE, PERIODENDDATE, TYPE, STATUS, " +
         		    "CREATEDBY, AADHARNUM, AADHARDOCNAME, PANNUM, PANDOCNAME, PFAPPLYDT, GST, " +
-        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM) " +
-        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE())";
+        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM,ACTIONID) " +
+        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?)";
 
            status  = jdbcTemplate.update(query, parameters);
            return contreg.getContractorregId();
@@ -817,6 +829,278 @@ public class ContractorDaoImpl implements ContractorDao{
 		cont.setContractorId(contractorId);
 		return cont;
 	}
+	
+	@Override
+	public ContractorRegistration getContractorRegistration(String contractorRegId) {
+	    String sql = "SELECT * FROM CMSContractorRegistration WHERE CONTRACTORREGID = ?";
+	    return jdbcTemplate.queryForObject(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
+	        ContractorRegistration cr = new ContractorRegistration();
+	        cr.setContractorregId(rs.getString("CONTRACTORREGID"));
+	        cr.setContractorId(rs.getString("CONTRACTORID"));
+	        cr.setVendorCode(rs.getString("CODE"));
+	        cr.setPrincipalEmployer(rs.getString("UNITID"));
+	        cr.setContractorName(rs.getString("CONTRACTORNAME"));
+	        cr.setManagerName(rs.getString("MANAGERNM"));
+	        cr.setTotalStrength(String.valueOf(rs.getInt("TOTALSTRENGTH")));
+	        cr.setRcMaxEmp(String.valueOf(rs.getInt("MAXNOEMP")));
+	        cr.setNatureOfWork(rs.getString("NATUREOFWORK"));
+	        cr.setLocofWork(rs.getString("LOCOFWORK"));
+	        cr.setPfNum(rs.getString("PFNUM"));
+	        cr.setRcVerified(rs.getString("RCVALIDATED"));
+	        cr.setMainContractor(rs.getString("MAINCONTRACTOR"));
+	        cr.setContractType(rs.getString("CONTTYPE"));
+	        cr.setContractFrom(rs.getDate("PERIODSTARTDATE") != null ? rs.getDate("PERIODSTARTDATE").toString() : null);
+	        cr.setContractTo(rs.getDate("PERIODENDDATE") != null ? rs.getDate("PERIODENDDATE").toString() : null);
+	        cr.setRequestType(rs.getString("TYPE"));
+	        cr.setCreatedBy(rs.getString("CREATEDBY"));
+	        cr.setAadhar(rs.getString("AADHARNUM"));
+	        cr.setAadharDoc(rs.getString("AADHARDOCNAME"));
+	        cr.setPan(rs.getString("PANNUM"));
+	        cr.setPanDoc(rs.getString("PANDOCNAME"));
+	        cr.setPfApplyDate(rs.getDate("PFAPPLYDT") != null ? rs.getDate("PFAPPLYDT").toString() : null);
+	        cr.setGst(rs.getString("GST"));
+	        cr.setAddress(rs.getString("ADDRESS"));
+	        cr.setEmail(rs.getString("EMAILADDR"));
+	        cr.setMobile(rs.getString("MOBILENO"));
+	        return cr;
+	    });
+	}
+
+	@Override
+	public List<ContractorRegistrationPolicy> getPoliciesByContractorRegId(String contractorRegId) {
+	    String sql = "SELECT * FROM CMSContractorRegPolicy WHERE CONTRACTORREGID = ?";
+	    return jdbcTemplate.query(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
+	        ContractorRegistrationPolicy policy = new ContractorRegistrationPolicy();
+	        policy.setWoNumber(rs.getString("WONUMBER"));
+	        policy.setDocumentType(rs.getString("LICENCETYPE"));
+	        policy.setDocumentNumber(rs.getString("WCCODE"));
+	        policy.setNatureOfJob(rs.getString("NATUREOFID"));
+	        policy.setCoverage(rs.getInt("WCTOTAL"));
+	        policy.setValidFrom(rs.getString("WCFROMDTM"));
+	        policy.setValidTo(rs.getString("WCTODTM"));
+	        policy.setFileName(rs.getString("ATTACHMENTNAME"));
+	        return policy;
+	    });
+	}
+
+	@Override
+	public List<CMSContractorRegistrationLLWC> getLLWCByContractorRegId(String contractorRegId) {
+	    String sql = "SELECT * FROM CMSContractorRegistrationLLWC WHERE CONTRACTORREGID = ?";
+	    return jdbcTemplate.query(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
+	        CMSContractorRegistrationLLWC record = new CMSContractorRegistrationLLWC();
+	        record.setContractorRegId(rs.getLong("CONTRACTORREGID"));
+	        record.setContractorId(rs.getInt("CONTRACTORID"));
+	        record.setUnitId(rs.getInt("UNITID"));
+	        record.setWorkOrderId(rs.getInt("WOID"));
+	        record.setLicenseType(rs.getString("LICENCETYPE"));
+	        record.setWorkOrderNumber(rs.getString("WONUMBER"));
+	        record.setWcCode(rs.getString("WCCODE"));
+	        record.setCreatedDtm(rs.getTimestamp("CREATEDDTM"));
+	        record.setCreatedBy(rs.getString("CREATEDBY"));
+	        return record;
+	    });
+	}
+
+	
+	 public String getAllRenewalContractorsListForCreator() {
+	    return QueryFileWatcher.getQuery("GET_CONTRENEW_FOR_CREATOR");
+	}
+	@Override
+	public List<ContractorRegistration> getContRenewList(String userId, String deptId, String principalEmployerId) {
+		List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
+		String query = getAllRenewalContractorsListForCreator();
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,principalEmployerId);
+		while(rs.next()) {
+			ContractorRegistration pe = new ContractorRegistration();
+			pe.setContractorregId(rs.getString("CONTRACTORREGID"));
+			pe.setPrincipalEmployer(rs.getString("NAME"));
+			pe.setVendorCode(rs.getString("CODE"));
+			pe.setContractorName(rs.getString("CONTRACTORNAME"));
+			pe.setStatus(rs.getString("STATUS"));
+			pe.setRequestType(rs.getString("TYPE"));
+			String status =String.valueOf(rs.getInt("Status"));
+			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+				pe.setStatusValue("Approval Pending");
+			}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+				pe.setStatusValue("Approved");
+			}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+				pe.setStatusValue("Rejected");
+			}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+				pe.setStatusValue("Draft");
+			}
+			peList.add(pe);
+		}
+		return peList;
+	}
+	public String getWorkflowType() {
+	    return QueryFileWatcher.getQuery("GET_WORKFLOWTYPE");
+	}
+ 
+@Override
+public int getWorkflowType(String module,String unitId) {
+log.info("Entering into getWorkFlowTYpeNew dao method ");
+int workflowTypeId = 0;
+String query = getWorkflowType();
+log.info("Query to getWorkFlowTYpeNew "+query);
+SqlRowSet rs = jdbcTemplate.queryForRowSet(query,module,unitId);
+if(rs.next()) {
+workflowTypeId = rs.getInt("WorkflowType");
+}
+log.info("Exiting from getWorkFlowTYpeNew dao method "+unitId);
+return workflowTypeId;
+}
+
+@Override
+public List<ContractorRegistration> getContRenewListForApprovers(String roleId, int workFlowType, String deptId,
+		String principalEmployerId) {
+	List<ContractorRegistration> listDto= new ArrayList<ContractorRegistration>();
+	SqlRowSet rs =null;
+	String query=null;
+	if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
+		query="select CCR.CONTRACTORREGID,cpe.NAME,ccr.CODE,CCR.CONTRACTORNAME,CCR.STATUS,CCR.TYPE \r\n"
+				+ " FROM CMSContractorRegistration  CCR join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID\r\n"
+				+ " JOIN CMSAPPROVERHIERARCHY cah   ON  cah.ACTION_ID =CCR.ActionId \r\n"
+				+ " AND cah.[Index] = (SELECT COUNT(DISTINCT gas.ContRenewApprovalStatusId) + 1 \r\n"
+				+ " FROM CONTRENEWAPPROVALSTATUS gas JOIN CMSAPPROVERHIERARCHY cah1 ON gas.RoleId = cah1.ROLE_ID \r\n"
+				+ " WHERE gas.status = 4   AND gas.CONTRACTORREGID = CCR.CONTRACTORREGID  ) \r\n"
+				+ " LEFT JOIN CONTRENEWAPPROVALSTATUS gas  ON CCR.CONTRACTORREGID = gas.CONTRACTORREGID AND cah.ROLE_ID = gas.RoleId   \r\n"
+				+ " WHERE CCR.status = '3'    AND CCR.ContractorId =? AND CCR.UnitId = ? AND gas.CONTRACTORREGID IS NULL AND cah.ROLE_ID = ? and CCR.TYPE='renew'\r\n"
+				+ "";
+		log.info("Query to getBVRListingForApprovers "+query);
+		
+		 rs = jdbcTemplate.queryForRowSet(query,deptId,principalEmployerId,roleId);
+	}else {
+		query="select CCR.CONTRACTORREGID,cpe.NAME,ccr.CODE,CCR.CONTRACTORNAME,CCR.STATUS,CCR.TYPE \r\n"
+				+ " FROM CMSContractorRegistration  CCR join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID\r\n"
+				+ " JOIN CMSAPPROVERHIERARCHY cah   ON  cah.ACTION_ID =CCR.ActionId \r\n"
+				+ " left join  CONTRENEWAPPROVALSTATUS gas ON gas.CONTRACTORREGID = CCR.CONTRACTORREGID AND gas.RoleId =? \r\n"
+				+ " where (cah.ROLE_ID=?) and gas.CONTRACTORREGID IS NULL and CCR.Status='3' \r\n"
+				+ " and CCR.ContractorId=? and CCR.UnitId=? and ccr.TYPE='renew'";
+		log.info("Query to getBVRListingForApprovers "+query);
+		 rs = jdbcTemplate.queryForRowSet(query,roleId,roleId,deptId,principalEmployerId);
+	}
+	
+	while(rs.next()) {
+		ContractorRegistration pe  = new ContractorRegistration();
+		pe.setContractorregId(rs.getString("CONTRACTORREGID"));
+		pe.setPrincipalEmployer(rs.getString("NAME"));
+		pe.setVendorCode(rs.getString("CODE"));
+		pe.setContractorName(rs.getString("CONTRACTORNAME"));
+		pe.setStatus(rs.getString("STATUS"));
+		pe.setRequestType(rs.getString("TYPE"));
+		String status =String.valueOf(rs.getInt("Status"));
+		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+			pe.setStatusValue("Approval Pending");
+		}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+			pe.setStatusValue("Approved");
+		}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+			pe.setStatusValue("Rejected");
+		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+			pe.setStatusValue("Draft");
+		}
+		listDto.add(pe);
+	}
+	
+	return listDto;
+}
+
+@Override
+public String approveRejectContRenew(ApproveRejectContRenewDto dto) {
+		 String result = null; 
+
+
+		        Object[] parameters = new Object[] {dto.getTransactionId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),1,dto.getRoleId()}; 
+
+		        try {
+		        	String query = "INSERT INTO CONTRENEWAPPROVALSTATUS(ContractorRegId,UserId,UserRole,Status,Comments,ContTypeId,RoleId,LastUpdatedDate)\r\n"
+		        			+ " VALUES (?,?,?,?,?,?,?,GETDATE())";
+		            int status = jdbcTemplate.update(query, parameters);
+		            if (status > 0) {
+		                result="Contractor Renewal approved/rejected successfully";
+		            } else {
+		                log.warn("Failed to approve/reject Contractor Renewal for transactionId: " +  dto.getTransactionId());
+		            }
+		        } catch (Exception e) {
+		            log.error("Error approving/rejecting Contractor Renewal for transactionId: " +  dto.getTransactionId(), e);
+		            return null;
+		        }
+		    
+
+		    return result;
+	}
+
+@Override
+public synchronized boolean updateContStatusByTransactionId(String transactionId, String status) {
+	boolean res=false;
+	Object[] object=new Object[]{status,transactionId};
+	String query= "update CMSContractorRegistration set STATUS=? where CONTRACTORREGID=?";
+	int i = jdbcTemplate.update(query,object);
+	if(i>0){
+		res=true;
+	}
+	return res;
+}
+@Override
+public int getWorkFlowTYpeByTransactionId(String transactionId) {
+	log.info("Entering into getWorkFlowTYpe dao method ");
+	int workflowTypeId = 0;
+	String query ="select distinct cwt.WorkflowType from CMSContractorRegistration ccr \r\n"
+			+ " join CMSPRINCIPALEMPLOYER CPE on cpe.UNITID=ccr.UnitId\r\n"
+			+ " join CMSBUUnitMapping cbt on cbt.UnitID=cpe.UNITID \r\n"
+			+ " join CMSWORKFLOWTYPE cwt on cwt.BusinessTypeId = cbt.BUId \r\n"
+			+ " join CMSAPPROVERHIERARCHY cah on cah.WorkFlowTypeId=cwt.WorkFlowTypeId\r\n"
+			+ " WHERE ccr.CONTRACTORREGID=?  and cah.ACTION_NAME='Contractor Renewal'";
+	log.info("Query to getWorkFlowTYpe "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
+	if(rs.next()) {
+		workflowTypeId = rs.getInt("WorkflowType");
+	}
+	log.info("Exiting from getWorkFlowTYpe dao method "+transactionId);
+	return workflowTypeId;
+}
+@Override
+public boolean isLastApprover(String roleName) {
+	boolean status=false;
+	String query="select Role_Name FROM CMSAPPROVERHIERARCHY WHERE  [Index] = (SELECT MAX([Index]) \r\n"
+			+ " FROM CMSAPPROVERHIERARCHY  WHERE ACTION_NAME = 'Contractor Renewal') and ACTION_NAME='Contractor Renewal'";
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+	if(rs.next()){
+		if(roleName.equals(rs.getString("Role_Name")))
+			status = true;
+	}
+	log.info("exit from isLastApprover method = "+status);
+	return status; 
+}
+
+@Override
+public boolean isLastApproverForParallel( String transactionId, String roleId) {
+    boolean status = false;
+
+    String query = "WITH RequiredApprovers AS (SELECT ROLE_ID FROM CMSAPPROVERHIERARCHY WHERE ACTION_NAME = 'Contractor Renewal' \r\n"
+    		+ " AND [INDEX] != 0  ), ApprovedRoles AS (SELECT DISTINCT RoleId FROM CONTRENEWAPPROVALSTATUS \r\n"
+    		+ " WHERE CONTRACTORREGID = ? and ContTypeId=1 )  SELECT CASE WHEN (SELECT COUNT(*) FROM ApprovedRoles) = \r\n"
+    		+ " (SELECT COUNT(*) FROM RequiredApprovers) AND\r\n"
+    		+ " EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?) THEN 'YES' ELSE 'NO' END AS IsLastApprover";
+
+    try {
+        // Ensure proper data type conversion
+       
+        int approverRoleId = Integer.parseInt(roleId);
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, transactionId, approverRoleId);
+        if (rs.next()) {
+            String result = rs.getString("IsLastApprover");
+            status = "YES".equals(result);
+        }
+    } catch (NumberFormatException e) {
+        log.error("Invalid number format: gatePassTypeId={}, roleId={}",  roleId, e);
+    } catch (Exception e) {
+        log.error("Error executing isLastApproverForParallel query", e);
+    }
+
+    log.info("Exit from isLastApproverForParallel method = " + status);
+    return status;
+}
 
 }
 
