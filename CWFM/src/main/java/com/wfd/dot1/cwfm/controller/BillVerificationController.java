@@ -18,11 +18,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
 import com.wfd.dot1.cwfm.enums.UserRole;
@@ -97,6 +100,7 @@ public class BillVerificationController {
     	
     }
     @PostMapping("/list")
+    @ResponseBody
     public ResponseEntity<List<CMSWageCostDTO>> gatePassListingDetails(
     		@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
     		@RequestParam(value = "deptId", required = false) String deptId,//deptId is contractorId not department
@@ -135,6 +139,8 @@ public class BillVerificationController {
     		request.setAttribute("kronosFiles", kronosReport);
     		List<BillReportFile>  statReport= billService.findByTransactionIdAndType(transactionId, "Statutory");
     		request.setAttribute("statutoryFiles", statReport);
+    		 List<ChecklistItemDTO> checklistItems = billService.getChecklistByTransactionId(transactionId);
+    	        request.setAttribute("checklistItems", checklistItems);
     	}catch(Exception e) {
     		
     	}
@@ -227,7 +233,7 @@ public class BillVerificationController {
             );
 
             // Save core data
-          String wcTransId= billService.save(workflowData);
+          String wcTransId= billService.save(workflowData,checklistItems);
           if (wcTransId != null) {
         	  //save reports to drive and checklist to db
         	  
@@ -289,7 +295,7 @@ public class BillVerificationController {
         	  }
 
         	  //save checklist
-        	  //billService.saveChecklist(checklistItems,wcTransId);
+        	 //billService.saveChecklist(checklistItems,wcTransId,String.valueOf(user.getUserId()));
         	  
         	   return new ResponseEntity<>("billVerification/list", HttpStatus.OK);
           }
@@ -328,6 +334,26 @@ public class BillVerificationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    
+    @PostMapping("/approveRejectBill")
+    public ResponseEntity<String> approveRejectBill(@RequestBody ApproveRejectBillDto dto,HttpServletRequest request,HttpServletResponse response) {
+    	String result=null; 
+    	try {
+             ObjectMapper objectMapper = new ObjectMapper();
+             String approveRejectGatePass = objectMapper.writeValueAsString(dto);
+         } catch (Exception e) {
+         }
+         try {
+        	 result = billService.approveRejectBill(dto);
+         	if(null!=result) {
+         		return new ResponseEntity<>(result,HttpStatus.OK);
+         	}
+         	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+         } catch (Exception e) {
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                  .body("Error saving data: " + e.getMessage());
+         } 
     }
 
 }

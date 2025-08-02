@@ -264,9 +264,9 @@
             
         </tbody>
     </table>
-    
+    </div>
                         </form>
-                         </div>
+                         
                           <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
     <script>
         setTimeout(function () {

@@ -60,7 +60,7 @@
     .table-container {
         overflow-x: auto;
         margin: 0; /* Remove space before the table */
-        padding: 0; /* Remove padding if any */
+        padding: 10px; /* Remove padding if any */
     }
 
     table {
@@ -183,11 +183,8 @@ function redirectToPEAdd() {
 </script>
 </head>
 <body>
-<div class="page-header">
-    <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
-    </form>
+<div class="page-header d-flex justify-content-between align-items-center"">
+   
     <div>
     <c:if test="${UserPermission.addRights eq 1 }">
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 

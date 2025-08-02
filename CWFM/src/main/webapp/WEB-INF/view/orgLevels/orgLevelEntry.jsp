@@ -252,11 +252,7 @@
                     </tr>
                 </c:forEach>
             </c:when>
-            <c:otherwise>
-                <tr>
-                    <td colspan="4" style="color:gray;">No entries available for the selected organization level.</td>
-                </tr>
-            </c:otherwise>
+           
         </c:choose>
     </tbody>
 </table>

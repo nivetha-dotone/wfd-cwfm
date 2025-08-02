@@ -706,7 +706,7 @@ public class WorkmenController {
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
     		}	
 				if (listDto.isEmpty()) {
-					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+					return new ResponseEntity<>(listDto,HttpStatus.NO_CONTENT);
 				}
 			
 			return new ResponseEntity<>(listDto, HttpStatus.OK);
@@ -716,6 +716,9 @@ public class WorkmenController {
     			//listDto = workmenService.getGatePassListingForApprovers(user,GatePassType.UNBLOCK.getStatus());
     		
     }
+    
+    
+    	
     
     @GetMapping("/blackListFilter")
    	public String blackListFilter(HttpServletRequest request, HttpServletResponse response) {
@@ -798,7 +801,7 @@ public class WorkmenController {
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
     		}	
 				if (listDto.isEmpty()) {
-					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+					return new ResponseEntity<>(listDto,HttpStatus.NO_CONTENT);
 				}
 			
 			return new ResponseEntity<>(listDto, HttpStatus.OK);

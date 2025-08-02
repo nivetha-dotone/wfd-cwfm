@@ -129,9 +129,24 @@ public class WorkmenBulkUploadDaoImpl implements WorkmenBulkUploadDao{
 	    }
 	    return gatePassId;
 	}
+	
+	public String getNextTransactionId() {
+		String transactionId=null;
+		try {
+			 transactionId = jdbcTemplate.queryForObject("EXEC GetNextGatepassTransactionId", String.class);
+
+
+	}catch(Exception e) {
+		 System.out.println("Failed to fetch transaction ID: " + e.getMessage());
+		e.printStackTrace();
+	}
+	    return transactionId;
+	}
 	@Override
 	public void saveToGatePassMain(WorkmenBulkUpload data,String createdBy) {
 		String gatePassId = this.generateGatePassId();
+		
+		String transactionId=getNextTransactionId();
 	    String sql = "INSERT INTO  GATEPASSMAIN (TransactionId, GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName, IdMark, MobileNumber,\r\n"
 	    		+ "MaritalStatus, UnitId, ContractorId, WorkorderId, TradeId, SkillId, DepartmentId, AreaId, EicId, NatureOfJob, WcEsicNo, HazardousArea  \r\n"
 	    		+ ",  AccessAreaId ,  UanNumber,  HealthCheckDate,  BloodGroupId,  Accommodation,  AcademicId ,  Technical ,  IfscCode,  AccountNumber,  EmergencyContactNumber  \r\n"
@@ -139,10 +154,10 @@ public class WorkmenBulkUploadDaoImpl implements WorkmenBulkUploadDao{
 	    		+ ",  UniformAllowance,  PfCap,  AadharDocName ,  PhotoName ,  BankDocName ,  PoliceVerificationDocName,  IdProof2DocName,  MedicalDocName,  EducationDocName,  Form11DocName  \r\n"
 	    		+ ",  TrainingDocName,  OtherDocName,  UpdatedDate,  UpdatedBy,  WorkFlowType,  Comments,  Address,  DOJ,  DOT,  pfnumber,  esicNumber,  policeverificationDate  \r\n"
 	    		+ ",  OnboardingType ,  pfapplicable )\r\n"
-	    		+ "VALUES ( (SELECT CAST(ISNULL(MAX(CAST(TransactionID AS BIGINT)), 0) + 1 AS NVARCHAR(20)) FROM GATEPASSMAIN),?,1,4,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
+	    		+ "VALUES ( ?,?,1,4,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
 	    		+ "?,?,?,?,?,?,?,?,?,?,?,null,null,?,'0.00','0.00','0.00','0.00','0.00','0.00','Yes',null,null,null,null,null,null,null,null,\r\n"
 	    		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?)";
-	    jdbcTemplate.update(sql, gatePassId,
+	    jdbcTemplate.update(sql, transactionId,gatePassId,
 	    		data.getAadhaarNumber(),  data.getFirstName(),data.getLastName(), data.getDateOfBirth(), data.getGender(), data.getRelationName(),data.getIdMark(),data.getMobileNumber(),
 	            data.getMaritalStatus(), data.getUnitCode(), data.getVendorCode(), data.getWorkorderNumber(),data.getTrade(),data.getSkill(),data.getDepartment(),data.getArea(),data.getEICNumber(),data.getNatureOfWork(),data.getECnumber(),data.getHazardousArea(),
 	            data.getAccessArea(),data.getUanNumber(),data.getHealthCheckDate(),data.getBloodGroup(),data.getAccommodation(),data.getAcademic(),data.getTechnical(),data.getBankName(),data.getAccountNumber(),data.getEmergencyNumber(),

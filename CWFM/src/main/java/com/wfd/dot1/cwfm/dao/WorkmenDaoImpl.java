@@ -289,6 +289,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			CmsContractorWC wc = new CmsContractorWC();
 			wc.setWcId(rs.getString("WCID"));
 			wc.setWcCode(rs.getString("WC_CODE"));
+			wc.setLicenceType(rs.getString("LICENCE_TYPE"));;
 			wcList.add(wc);
 		}
 		log.info("Exiting from getAllWCBasedOnPEAndCont dao method "+wcList.size());
@@ -481,7 +482,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
 	        				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
 	        gatePassMain.getUserId(),
-	        gatePassMain.getOnboardingType()
+	        gatePassMain.getOnboardingType(),gatePassMain.getLlNo()
 	        };
 
 	}
@@ -680,6 +681,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 			dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 			dto.setDot(rs.getString("DOT"));
 			dto.setOnboardingType(rs.getString("OnboardingType"));
+			dto.setLlNo(rs.getString("LLNo"));
 		}
 		log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 		return dto;
@@ -1528,7 +1530,7 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
         				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
-        gatePassMain.getUserId(),transId
+        gatePassMain.getUserId(),gatePassMain.getLlNo(),transId
     };
 }
 

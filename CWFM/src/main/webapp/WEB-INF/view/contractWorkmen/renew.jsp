@@ -701,13 +701,28 @@ label {
                             <td><select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
-								
+								<c:if test="${pe.licenceType eq 'WC'}">
                 					<option value="${pe.wcId}"
 									${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"':''}>
 									${pe.wcCode}</option>
+									</c:if>
             					</c:forEach>
                                 </select>
                                 <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
+                                </td>
+                                
+                                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                            <td><select class="custom-select" id="ll" name="llId" >
+                                <option value="">Please select Labor License Number</option>
+                                <c:forEach var="pe" items="${Wcs}">
+								<c:if test="${pe.licenceType eq 'LL'}">
+                					<option value="${pe.wcId}"
+									${GatePassObj.llNo eq pe.wcId ? 'selected="selected"':''}>
+									${pe.wcCode}</option>
+									</c:if>
+            					</c:forEach>
+                                </select>
+                                <label id="error-ll"style="color: red;display: none;">Labor License Number is required</label>
                                 </td>
                         </tr>
                         <tr>
@@ -1067,9 +1082,9 @@ label {
 
     <!--  Use Camera -->
 
-    <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
+    <!-- <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
       Use Camera
-    </button>
+    </button> -->
 
   </div>
 
@@ -1094,7 +1109,7 @@ label {
 </td>
 
 						
-
+</tr><tr>
                 		<td>
                 		 	<label for="aadharFile"><span class="required-field">*</span><spring:message code="label.uploadAadharCard"/></label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">

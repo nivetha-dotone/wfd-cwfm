@@ -504,6 +504,13 @@ public class GatePassMain {
 	public void setPfApplicable(String pfApplicable) {
 		this.pfApplicable = pfApplicable;
 	}
+	private String llNo;
+	public String getLlNo() {
+		return llNo;
+	}
+	public void setLlNo(String llNo) {
+		this.llNo = llNo;
+	}
 	
 	
 	}

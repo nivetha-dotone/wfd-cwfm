@@ -224,7 +224,7 @@ function editRow(gmId) {
     </div>
 
     <h3 style="color:gray;">Existing General Masters</h3>
-    <table border="1" >
+    <table border="1"  id="gmTable">
         <thead>
             <tr>
             <td>
@@ -271,11 +271,7 @@ function editRow(gmId) {
                     </tr>
                 </c:forEach>
             </c:when>
-            <c:otherwise>
-                <tr>
-                    <td colspan="4" style="color:gray;">No entries available for the selected General Type.</td>
-                </tr>
-            </c:otherwise>
+           
         </c:choose>
         </tbody>
     </table>

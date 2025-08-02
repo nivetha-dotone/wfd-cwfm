@@ -329,25 +329,25 @@ table.ControlLayout td {
             </tr> --%>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.licenseNumber"/></label></th>
-                <td><input type="text" name="licenseNumber" value="${principalEmployer.licenseNumber}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <td><input type="text" name="licenseNumber" value="LIC12312" style="height: 20px;" size="30" maxlength="30" readonly/></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfCode"/></label></th>
                 <td><input type="text" name="pfCode" value="${principalEmployer.pfCode}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcNumber"/></label></th>
-                <td><input type="text" name="wcNumber" value="${principalEmployer.wcNumber}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <td><input type="text" name="wcNumber" value="4010/367354794/00/000" style="height: 20px;" size="30" maxlength="30" readonly/></td>
                 <th><label class="custom-label"><span class="required-field">*</span> <spring:message code="label.esicNumber"/></label></th>
-                <td><input type="text" name="esicNumber" value="${principalEmployer.esicNumber}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <td><input type="text" name="esicNumber" value="4010/367354794/00/000" style="height: 20px;" size="30" maxlength="30" readonly /></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.ptRegistrationNo"/></label></th>
-                <td><input type="text" name="ptRegNo" value="${principalEmployer.ptRegNo}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <td><input type="text" name="ptRegNo" value="PT001" style="height: 20px;" size="30" maxlength="30" readonly /></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.lwfRegistrationNo"/></label></th>
-                <td><input type="text" name="lwfRegNo" value="${principalEmployer.lwfRegNo}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <td><input type="text" name="lwfRegNo" value="LWF001" style="height: 20px;" size="30" maxlength="30" readonly/></td>
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.factoryLicenseNumber"/></label></th>
-                <td><input type="text" name="factoryLicenseNumber" value="${principalEmployer.factoryLicenseNumber}" style="height: 20px;" size="30" maxlength="30" readonly/></td>
+                <td><input type="text" name="factoryLicenseNumber" value="FLIC001" style="height: 20px;" size="30" maxlength="30" readonly/></td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isrcApplicable"/></label></th>
                 <td>
                     <c:choose>
@@ -362,7 +362,7 @@ table.ControlLayout td {
             </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.rcNumber"/></label></th>
-                <td><input type="text" name="rcNumber" value="${principalEmployer.rcNumber}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+                <td><input type="text" name="rcNumber" value="RC001" style="height: 20px;" size="30" maxlength="30" readonly /></td>
                 <%-- <th><label class="custom-label"><span class="required-field">*</span>RC Validity</label></th>
                 <td><input type="text" name="RCVALIDITY" value="${principalEmployer.RCVALIDITY}" style="height: 20px;" size="30" maxlength="30" /></td>
              --%></tr>

@@ -9,11 +9,7 @@
  <title>Reset Password</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="resources/js/jquery.min.js"></script>
-   <!--  <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
-    <script src="resources/js/cms/principalEmployer.js"></script> -->
- <!--    <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
+   
 
     <style>
          body {
@@ -133,7 +129,7 @@ th label {
 </div>
 
 <form id="resetPasswordForm" autocomplete="off">
-    <table class="ControlLayout">
+    <table class="no-dt">
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
             <td>

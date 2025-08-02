@@ -386,6 +386,7 @@ label {
 <body>
     
     <div id="principalEmployerContent">
+    <div class="tabs-container">
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">Kronos Reports</button> 
@@ -394,9 +395,11 @@ label {
              <button data-target="tab5" onclick="showTabOther('tab5')">Comments</button> 
             
     </div>
-     <!-- <div class="action-buttons" >
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
-    </div> -->
+    <div class="action-buttons" >
+             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveBtn();">Save</button>
+          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/billVerification/listingFilter', 'Bill Verification List');">Cancel</button>
+    </div> 
+    </div>
         <div id="tab1" class="tab-content active">
         
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
@@ -592,9 +595,7 @@ label {
     </div> 
   <div id="tab5" class="tab-content">
             <div class="Panel">
-             <div class="action-buttons" >
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveBtn();"
-            id="saveBtn">Save</button>
+            
     </div>
 	<table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>

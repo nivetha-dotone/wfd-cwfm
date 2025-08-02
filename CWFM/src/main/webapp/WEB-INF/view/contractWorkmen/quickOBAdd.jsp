@@ -522,9 +522,9 @@ label {
                 </td>
           
             </tr>
-            <tr  id="error-equalNames" style="display: none;" >
+            <!-- <tr  id="error-equalNames" style="display: none;" >
            <label  id="error-equalNames" style="display:none;">First name cannot be the same as last name.</label>
-            </tr>
+            </tr> -->
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <td>
@@ -740,13 +740,25 @@ label {
                             <td><select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
-								
-                					<option value="${pe.wcId}"
-									<c:if test="${Wcs.size() == 1}">selected</c:if>>
+								<c:if test="${pe.licenceType eq 'WC'}">
+                					<option value="${pe.wcId}">
 									${pe.wcCode}</option>
+									</c:if>
             					</c:forEach>
                                 </select>
                                 <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
+                                </td>
+                                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                            <td><select class="custom-select" id="ll" name="llId" >
+                                <option value="">Please select Labor License Number</option>
+                                <c:forEach var="pe" items="${Wcs}">
+								<c:if test="${pe.licenceType eq 'LL'}">
+                					<option value="${pe.wcId}">
+									${pe.wcCode}</option>
+									</c:if>
+            					</c:forEach>
+                                </select>
+                                <label id="error-ll"style="color: red;display: none;">Labor License Number is required</label>
                                 </td>
                         </tr>
                         <tr>
@@ -842,7 +854,7 @@ label {
                         	</c:if>
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			        </td>
-			        <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+			        <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplicable"/></label></th>
                       <td><input type="checkbox" id="pfApplicable" name="pfApplicable"
     <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
     onclick="validatePfForm11Requirement()" />

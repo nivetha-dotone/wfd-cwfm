@@ -169,14 +169,18 @@ function getWC(unitId,contractorId) {
             console.log("Response:", wcs);
             
             var wcSelect = document.getElementById("wc");
-            
+			var llSelect = document.getElementById("ll");
             wcSelect.innerHTML = '<option value="">Please select WC Policy/ESIC Reg Number</option>';
-            
+			llSelect.innerHTML = '<option value="">Please select Labor License</option>';
             wcs.forEach(function(wc) {
                 var option = document.createElement("option");
                 option.value = wc.wcId;
                 option.text = wc.wcCode;
-                wcSelect.appendChild(option);
+				if (wc.licenceType === "LL") {
+				                    llSelect.appendChild(option);
+				                } else if (wc.licenceType === "WC") {
+				                    wcSelect.appendChild(option);
+				                }
             });
         } else {
             console.error("Error:", xhr.statusText);
@@ -297,12 +301,12 @@ function initializeDatePicker() {
     }else{
 		 $("#error-lastName").hide();
 	}
-	if (firstName.toLowerCase() === lastName.toLowerCase()) {
+	/*if (firstName.toLowerCase() === lastName.toLowerCase()) {
     $("#error-equalNames").show();
     isValid = false;
     } else {
     $("#error-equalNames").hide();
-    }
+    }*/
     const dateOfBirth = $("#dateOfBirth").val().trim();
     if (dateOfBirth === "") {
         $("#error-dateOfBirth").show();
@@ -998,6 +1002,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
             eic: $("#eic").val(),
             natureOfJob: natureOfJob,
             wcEsicNo: $("#wc").val(),
+			llNo:$("#ll").val(),
             hazardousArea: $("#hazardousArea").val(),
             accessArea: $("#accessArea").val(),
             uanNumber: $("#uanNumber").val().trim(),
@@ -1921,8 +1926,12 @@ function previewImage(event, inputId, displayId) {
 					        },
 					        success: function(response) {
 					            var tableBody = $('#workmenTable tbody');
-					            tableBody.empty();
-					            if (response.length > 0) {
+								// 🔄 Clear previous DataTable and its config
+								           if ($.fn.DataTable.isDataTable('#workmenTable')) {
+								               $('#workmenTable').DataTable().destroy();
+								           }
+										   tableBody.empty();
+					            if (Array.isArray(response) &&response.length > 0) {
 					                $.each(response, function(index, wo) {
 					                    var row = '<tr  >' +
 												'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -1942,10 +1951,13 @@ function previewImage(event, inputId, displayId) {
 					                              '</tr>';
 					                    tableBody.append(row);
 					                });
-					            } else {
-					                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-					            }
-					        },
+									
+					            } 								
+
+																	            // ✅ Always init after rows are drawn
+																	            initWorkmenTable("workmenTable");
+																	        },
+					       
 					        error: function(xhr, status, error) {
 					            console.error("Error fetching data:", error);
 					        }
@@ -1964,8 +1976,12 @@ function previewImage(event, inputId, displayId) {
 										        },
 										        success: function(response) {
 										            var tableBody = $('#workmenTable tbody');
+													// 🔄 Clear previous DataTable and its config
+																					           if ($.fn.DataTable.isDataTable('#workmenTable')) {
+																					               $('#workmenTable').DataTable().destroy();
+																					           }
 										            tableBody.empty();
-										            if (response.length > 0) {
+										            if (Array.isArray(response) &&response.length > 0) {
 										                $.each(response, function(index, wo) {
 										                    var row = '<tr  >' +
 																	'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -1985,9 +2001,10 @@ function previewImage(event, inputId, displayId) {
 										                              '</tr>';
 										                    tableBody.append(row);
 										                });
-										            } else {
-										                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
 										            }
+													// ✅ Always init after rows are drawn
+													 initWorkmenTable("workmenTable");
+													 
 										        },
 										        error: function(xhr, status, error) {
 										            console.error("Error fetching data:", error);
@@ -1995,45 +2012,55 @@ function previewImage(event, inputId, displayId) {
 										    });
 										}
 										function searchUnBlockList() {
-										var principalEmployerId = $('#principalEmployerId').val();
-										var deptId=$("#deptId").val();
-										$.ajax({
-										    url: '/CWFM/contractworkmen/unblockList',
-										    type: 'POST',
-										    data: {
-										        principalEmployerId: principalEmployerId,
-												deptId:deptId
-										    },
-										    success: function(response) {
-										        var tableBody = $('#workmenTable tbody');
-										        tableBody.empty();
-										        if (response.length > 0) {
-										            $.each(response, function(index, wo) {
-										                var row = '<tr  >' +
-																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
-																											'<td  >' + wo.transactionId + '</td>' +
-																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName +' '+ wo.lastName + '</td>' +
-																
-																'<td  >' + wo.aadhaarNumber + '</td>' +	
-																'<td  >' + wo.contractorName + '</td>' +	
-																
-																'<td  >' +wo.unitName + '</td>' +	
-																'<td  >' + wo.gatePassType + '</td>' +	
-																  '<td  >' + toCapitalCase(wo.onboardingType) + '</td>' +
-																'<td  >' + wo.status + '</td>' +				                             
-										                          '</tr>';
-										                tableBody.append(row);
-										            });
-										        } else {
-										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
+										    var principalEmployerId = $('#principalEmployerId').val();
+										    var deptId = $("#deptId").val();
+
+										    $.ajax({
+										        url: '/CWFM/contractworkmen/unblockList',
+										        type: 'POST',
+										        data: {
+										            principalEmployerId: principalEmployerId,
+										            deptId: deptId
+										        },
+										        success: function(response) {
+										            var tableBody = $('#workmenTable tbody');
+
+										            if ($.fn.DataTable.isDataTable('#workmenTable')) {
+										                $('#workmenTable').DataTable().destroy();
+										            }
+
+										            tableBody.empty();
+
+										            if (Array.isArray(response) && response.length > 0) {
+										                $.each(response, function(index, wo) {
+										                    var row = '<tr>' +
+										                        '<td><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>' +
+										                        '<td>' + wo.transactionId + '</td>' +
+										                        '<td>' + wo.gatePassId + '</td>' +
+										                        '<td>' + wo.firstName + ' ' + wo.lastName + '</td>' +
+										                        '<td>' + wo.aadhaarNumber + '</td>' +
+										                        '<td>' + wo.contractorName + '</td>' +
+										                        '<td>' + wo.unitName + '</td>' +
+										                        '<td>' + wo.gatePassType + '</td>' +
+										                        '<td>' + toCapitalCase(wo.onboardingType) + '</td>' +
+										                        '<td>' + wo.status + '</td>' +
+										                        '</tr>';
+										                    tableBody.append(row);
+										                });
+										            } 
+
+										            // ✅ Always init after rows are drawn
+										            initWorkmenTable("workmenTable");
+										        },
+										        error: function(xhr, status, error) {
+										            console.error("Error fetching data:", error);
 										        }
-										    },
-										    error: function(xhr, status, error) {
-										        console.error("Error fetching data:", error);
-										    }
-										});
+										    });
 										}
+
+
+
+
 										function searchBlackList() {
 										var principalEmployerId = $('#principalEmployerId').val();
 										var deptId=$("#deptId").val();
@@ -2046,8 +2073,11 @@ function previewImage(event, inputId, displayId) {
 										    },
 										    success: function(response) {
 										        var tableBody = $('#workmenTable tbody');
+												if ($.fn.DataTable.isDataTable('#workmenTable')) {
+																			               $('#workmenTable').DataTable().destroy();
+																			           }
 										        tableBody.empty();
-										        if (response.length > 0) {
+										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -2067,10 +2097,10 @@ function previewImage(event, inputId, displayId) {
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
-										        } else {
-										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
 										        }
-										    },
+												// ✅ Always init after rows are drawn
+												 initWorkmenTable("workmenTable");
+												 },
 										    error: function(xhr, status, error) {
 										        console.error("Error fetching data:", error);
 										    }
@@ -2089,8 +2119,11 @@ function previewImage(event, inputId, displayId) {
 										    },
 										    success: function(response) {
 										        var tableBody = $('#workmenTable tbody');
+												if ($.fn.DataTable.isDataTable('#workmenTable')) {
+													 $('#workmenTable').DataTable().destroy();
+												}
 										        tableBody.empty();
-										        if (response.length > 0) {
+										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -2110,10 +2143,10 @@ function previewImage(event, inputId, displayId) {
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
-										        } else {
-										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-										        }
-										    },
+										        } 
+												// ✅ Always init after rows are drawn
+												 initWorkmenTable("workmenTable");
+												 },
 										    error: function(xhr, status, error) {
 										        console.error("Error fetching data:", error);
 										    }
@@ -2131,8 +2164,11 @@ function previewImage(event, inputId, displayId) {
 										    },
 										    success: function(response) {
 										        var tableBody = $('#workmenTable tbody');
+												if ($.fn.DataTable.isDataTable('#workmenTable')) {
+													 $('#workmenTable').DataTable().destroy();
+												}
 										        tableBody.empty();
-										        if (response.length > 0) {
+										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -2150,10 +2186,10 @@ function previewImage(event, inputId, displayId) {
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
-										        } else {
-										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
 										        }
-										    },
+												// ✅ Always init after rows are drawn
+												 initWorkmenTable("workmenTable");
+												 },
 										    error: function(xhr, status, error) {
 										        console.error("Error fetching data:", error);
 										    }
@@ -2171,8 +2207,11 @@ function previewImage(event, inputId, displayId) {
 										    },
 										    success: function(response) {
 										        var tableBody = $('#workmenTable tbody');
+												if ($.fn.DataTable.isDataTable('#workmenTable')) {
+													 $('#workmenTable').DataTable().destroy();
+												}
 										        tableBody.empty();
-										        if (response.length > 0) {
+										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -2190,10 +2229,10 @@ function previewImage(event, inputId, displayId) {
 										                          '</tr>';
 										                tableBody.append(row);
 										            });
-										        } else {
-										            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-										        }
-										    },
+										        } 
+												// ✅ Always init after rows are drawn
+												 initWorkmenTable("workmenTable");
+												 },
 										    error: function(xhr, status, error) {
 										        console.error("Error fetching data:", error);
 										    }
@@ -2297,6 +2336,7 @@ function previewImage(event, inputId, displayId) {
 										            eic: $("#eic").val(),
 										            natureOfJob: natureOfJob,
 										            wcEsicNo: $("#wc").val(),
+													llNo:$("#ll").val(),
 										            hazardousArea: $("#hazardousArea").val(),
 										            accessArea: $("#accessArea").val(),
 										            uanNumber: $("#uanNumber").val().trim(),
@@ -2402,8 +2442,11 @@ function previewImage(event, inputId, displayId) {
 											    },
 											    success: function(response) {
 											        var tableBody = $('#workmenTable tbody');
+													  if ($.fn.DataTable.isDataTable('#workmenTable')) {
+														$('#workmenTable').DataTable().destroy();
+													}
 											        tableBody.empty();
-											        if (response.length > 0) {
+											        if (Array.isArray(response) &&response.length > 0) {
 											            $.each(response, function(index, wo) {
 											                var row = '<tr  >' +
 																							'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
@@ -2421,9 +2464,9 @@ function previewImage(event, inputId, displayId) {
 											                          '</tr>';
 											                tableBody.append(row);
 											            });
-											        } else {
-											            tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-											        }
+											        } 
+													// ✅ Always init after rows are drawn
+														initWorkmenTable("workmenTable");
 											    },
 											    error: function(xhr, status, error) {
 											        console.error("Error fetching data:", error);
@@ -2518,6 +2561,7 @@ function renewGatePass(userId) {
             eic: $("#eic").val(),
             natureOfJob: $("#natureOfJob").val().trim(),
             wcEsicNo: $("#wc").val(),
+			llNo:$("#ll").val(),
             hazardousArea: $("#hazardousArea").val(),
             accessArea: $("#accessArea").val(),
             uanNumber: $("#uanNumber").val().trim(),
@@ -2973,4 +3017,16 @@ let streams;
     	 loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
     }
     
-   
+	function initWorkmenTable(tablename) {
+	    const selector = '#' + tablename;
+
+	    if ($.fn.DataTable.isDataTable(selector)) {
+	        $(selector).DataTable().destroy();
+	    }
+
+	    $(selector).DataTable({
+	        paging: true,
+	        searching: true,
+	        ordering: true
+	    });
+	}

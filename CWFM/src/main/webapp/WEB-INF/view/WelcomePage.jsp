@@ -6,18 +6,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Latest Font Awesome CDN -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
-      <!--  <script src="resources/js/commonjs.js"></script> -->
-   
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- Your custom styles -->
+<link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">
+
+<!-- jQuery first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- jQuery UI after jQuery -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<!-- DataTables CSS and JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+
      <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/cms/contractor.js"></script>
     <script src="resources/js/cms/workorder.js"></script>
@@ -144,7 +153,7 @@ function redirectToPEAdd() {
 function loadCommonList(path, heading) {
     updateHeading(heading);
     var url = contextPath + path;
-    console.log("Constructed URL:", url);
+    console.log("Constructed URL in load:", url);
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -152,7 +161,25 @@ function loadCommonList(path, heading) {
             const mainContent = document.getElementById("mainContent");
             mainContent.innerHTML = this.responseText;
 
-            // ✅ Run all inline scripts manually
+              
+                    const tables = mainContent.querySelectorAll("table");
+                    tables.forEach(table => {
+                    	if (!table.classList.contains("no-dt")) {  // ✅ Skip tables with class 'no-dt'
+                        $(table).DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            lengthChange: true,
+                            info: true,
+                            dom: '<"top"f>rt<"bottom"lip><"clear">'
+                        });
+                    	}
+                    });
+                
+          
+
+
+           // ✅ Run inline scripts
             const scripts = mainContent.querySelectorAll("script");
             scripts.forEach(script => {
                 const newScript = document.createElement("script");
@@ -163,9 +190,8 @@ function loadCommonList(path, heading) {
                     newScript.textContent = script.textContent;
                 }
                 document.body.appendChild(newScript);
-                // Optional: remove afterward to keep DOM clean
                 script.remove();
-            });
+            }); 
 
             // ✅ Show messages if any
             const successMessage = sessionStorage.getItem("successMessage");
@@ -187,15 +213,14 @@ function loadCommonList(path, heading) {
                     messageDiv.style.display = "none";
                 }, 5000);
             }
-			setDateRange();
+
+            setDateRange();
             resetSessionTimer();
-            
         }
     };
     xhttp.open("GET", url, true);
     xhttp.send();
 }
-
 function loadQobAdd(path,heading,userId) {
 	//alert("loadQobAdd"+userId);
 	 updateHeading(heading);
@@ -741,7 +766,11 @@ function navigateToOrgLevel() {
     xhr.open("GET", "/CWFM/org-level-entryController/showorg-level-entry/" + orgLevelDefId, true);
     xhr.onload = function () {
         if (xhr.status === 200) {
+        	   if ($.fn.DataTable.isDataTable('#table-body')) {
+        			$('#table-body').DataTable().destroy();
+        		}
             document.getElementById("mainContent").innerHTML = xhr.responseText;
+            initWorkmenTable("table-body");
         } else {
             alert("Failed to load organization level data. Please try again.");
             document.getElementById("mainContent").innerHTML = "<p>Error loading data. Please try again.</p>";
@@ -1051,7 +1080,11 @@ function fetchGmData() {
     xhr.open("GET", "/CWFM/generalController/getGmData/" + gmTypeId, true);
     xhr.onload = function () {
         if (xhr.status === 200) {
+        	   if ($.fn.DataTable.isDataTable('#gmTable')) {
+        			$('#gmTable').DataTable().destroy();
+        		}
             document.getElementById("mainContent").innerHTML = xhr.responseText;
+            initWorkmenTable("gmTable");
         } else {
             alert("Failed to load organization level data. Please try again.");
             document.getElementById("mainContent").innerHTML = "<p>Error loading data. Please try again.</p>";
@@ -2390,6 +2423,37 @@ function convertToCSV(json) {
 }
     </script>
     <style>
+    /* Fix DataTable full width to match the control row */
+div.dataTables_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: auto !important;
+    margin: 0 auto; /* Center align if needed */
+}
+
+/* Table itself should not stretch unnecessarily */
+table.dataTable {
+    width: auto !important;
+    margin: 0 !important;
+}
+
+/* Align filter and length selectors in one row */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    display: inline-block;
+    vertical-align: top;
+}
+
+/* Optional: Align both controls to justify content between them */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin: 0 10px;
+}
+
+/* Optional: Full alignment with Search input */
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+}
     
   /* Tabs */
 #tabs {

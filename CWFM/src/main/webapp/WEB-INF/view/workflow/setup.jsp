@@ -292,7 +292,7 @@
     <button type="button" onclick="deleteSelected()">Delete Selected</button>
     <br><br>
 
-    <table id="approverTable" border="1">
+    <table id="approverTable" border="1" class="no-dt">
         <thead>
             <tr>
                 <th>Select</th>
@@ -305,7 +305,7 @@
     </table>
 
     <!-- Hidden Template Row -->
-    <table style="display: none;">
+    <table style="display: none;" class="no-dt">
         <tbody>
             <tr id="templateRow">
                 <td><input type="checkbox" class="rowSelect"></td>

@@ -13,7 +13,14 @@ public class CMSWageCostDTO {
     private String woValidTo;
     private String billType;
     private String services;
-    // Getters & Setters
+    private String statusValue;
+    public String getStatusValue() {
+		return statusValue;
+	}
+	public void setStatusValue(String statusValue) {
+		this.statusValue = statusValue;
+	}
+	// Getters & Setters
 	public Long getWcTransId() {
 		return wcTransId;
 	}

@@ -32,6 +32,9 @@
 			        },
 			        success: function(response) {
 			            var tableBody = $('#contractorTable tbody');
+						  if ($.fn.DataTable.isDataTable('#contractorTable')) {
+							$('#contractorTable').DataTable().destroy();
+						}
 			            tableBody.empty();
 			            if (response.length > 0) {
 			                $.each(response, function(index, contr) {
@@ -43,9 +46,8 @@
 			                              '</tr>';
 			                    tableBody.append(row);
 			                });
-			            } else {
-			                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-			            }
+			            } 						// ✅ Always init after rows are drawn
+							initWorkmenTable("contractorTable");
 			        },
 			        error: function(xhr, status, error) {
 			            console.error("Error fetching data:", error);

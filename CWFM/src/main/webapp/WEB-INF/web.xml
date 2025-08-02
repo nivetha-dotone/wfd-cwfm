@@ -36,7 +36,7 @@
     <url-pattern>/</url-pattern>
     </servlet-mapping>
     <session-config>
-    <session-timeout>10</session-timeout> <!-- Timeout in minutes -->
+    <session-timeout>30</session-timeout> <!-- Timeout in minutes -->
 </session-config>
     
 </web-app>

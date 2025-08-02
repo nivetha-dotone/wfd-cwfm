@@ -712,10 +712,24 @@ label {
                             <td><select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
-								
-                					<option value="${pe.wcId}"
-									<c:if test="${Wcs.size() == 1}">selected</c:if>>
+								<c:if test="${pe.licenceType eq 'WC'}">
+                					<option value="${pe.wcId}">
+									
 									${pe.wcCode}</option>
+									</c:if>
+            					</c:forEach>
+                                </select>
+                                <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
+                                </td>
+                                
+                                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                            <td><select class="custom-select" id="ll" name="llId" >
+                                <option value="">Please select Labor License Number</option>
+                                <c:forEach var="pe" items="${Wcs}">
+								<c:if test="${pe.licenceType eq 'LL'}">
+                					<option value="${pe.wcId}">
+									
+									${pe.wcCode}</option></c:if>
             					</c:forEach>
                                 </select>
                                 <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
@@ -774,7 +788,7 @@ label {
                         </tr>
                         <tr>
 
-                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             <c:if test="${empty GatePassObj.pfNumber }">
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
@@ -786,14 +800,14 @@ label {
                             
                             		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
                             </td>
-                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicNumber"/></label></th>
                             <td>
                             	<c:if test="${ empty GatePassObj.esicNumber }">
-                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="10" autocomplete="off">
                             
                             	</c:if>
                             	<c:if test="${ not empty GatePassObj.esicNumber }">
-                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.esicNumber }" autocomplete="off">
+                            		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="10" value="${GatePassObj.esicNumber }" autocomplete="off">
                             
                             	</c:if>
                             		<label id="error-esicNumber"style="color: red;display: none;">Please enter a valid ESIC Number</label>
@@ -811,7 +825,7 @@ label {
                         	</c:if>
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
-			<th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplicable"/></label></th>
                       <td><input type="checkbox" id="pfApplicable" name="pfApplicable"
     <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
     onclick="validatePfForm11Requirement()" />
@@ -1056,10 +1070,10 @@ label {
            onchange="previewImage(event,'imageFile','imageFileName')"
            style="overflow: hidden;"/>
 
-    <!-- Use Camera -->
+   <!--  
     <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
       Use Camera
-    </button>
+    </button> -->
   </div>
 
   <!-- File Name Display -->
@@ -1082,7 +1096,7 @@ label {
 </td> 
                   
                    
-						
+					</tr><tr>	
                 		<td>
                 		 	<label for="aadharFile"><span class="required-field">*</span><spring:message code="label.uploadAadharCard"/></label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">

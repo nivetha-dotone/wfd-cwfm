@@ -12,6 +12,7 @@ import com.wfd.dot1.cwfm.pojo.ContractorRenewal;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.Workorder;
+import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
 import com.wfd.dot1.cwfm.pojo.BillReportFile;
@@ -35,7 +36,7 @@ public interface BillVerificationService {
 
 	public List<PrincipalEmployer> getPEDetailByUser(String userAccount);
 
-	public String save(CMSWageCostDTO workflowData);
+	public String save(CMSWageCostDTO workflowData,  List<ChecklistItemDTO> listDto);
 
 	public List<CMSWageCostDTO> getBillVerificationListForApprovers(String principalEmployerId, String deptId,
 			MasterUser user);
@@ -46,6 +47,11 @@ public interface BillVerificationService {
 
 	public List<BillReportFile> findByTransactionIdAndType(String transactionId, String type);
 
-	public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId);
+
+	void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId, String userId);
+
+	List<ChecklistItemDTO> getChecklistByTransactionId(String wcTransId);
+
+	public String approveRejectBill(ApproveRejectBillDto dto);
 
 }

@@ -260,7 +260,7 @@ table.ControlLayout td {
                             <td><input type="text" name="" value="${contractorPEMM.validTo }" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.isRcVerified"/></label></th>
+                            <th><label class="custom-label"><spring:message code="label.isRcVerified"/></label></th>
                             <td>
     <c:choose>
         <c:when test="${contractorPEMM.rcValidated}">
@@ -356,7 +356,7 @@ table.ControlLayout td {
                      <td style="color:black;">${laborLicenses.wcFromDtm}</td>
                      <td style="color:black;">${laborLicenses.wcToDtm}</td>
                      <td style="color:black;">${laborLicenses.wcTotal}</td>
-                     <td style="color:black;"></td>
+                     <td style="color:black;">7</td>
                 </tr>
             </c:forEach>
 	<!-- <tr>
@@ -401,7 +401,7 @@ table.ControlLayout td {
                    <td style="color:black;">${contractorWCList.wcFromDtm}</td>
                    <td style="color:black;">${contractorWCList.wcToDtm}</td>
                    <td style="color:black;">${contractorWCList.wcTotal}</td>
-                   <td style="color:black;"></td>
+                   <td style="color:black;">7</td>
                 </tr>
             </c:forEach>
 	<!-- <tr>
@@ -462,7 +462,7 @@ table.ControlLayout td {
                       <td style="color:black;text-align:left">${workOrderList.sapWorkorderNumber}</td>
                       <td style="color:black;text-align:left">${workOrderList.validFrom}</td>
                       <td style="color:black;text-align:left">${workOrderList.validTo}</td>
-                      <td style="color:black;text-align:left"></td>
+                      <td style="color:black;text-align:left">7</td>
                       <td style="color:black;text-align:left">Manpower Supply</td>
             
                   <%--  <td>${workOrderList.wcTotal}

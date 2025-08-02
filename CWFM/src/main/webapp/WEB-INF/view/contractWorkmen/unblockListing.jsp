@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unblock List</title>
+    <title>Block List</title>
     <script src="resources/js/cms/workmen.js"></script>
 
 
@@ -30,6 +30,9 @@
             border: 1px solid red;
             margin-bottom: 1rem;
         }
+
+         
+ 
  
     body {
         background-color: #FFFFFF; /* White background for the page */
@@ -185,11 +188,11 @@
 </head>
 <body>
 <div class="page-header">
-  <%--   <form id="searchForm">
+   <%--  <form id="searchForm">
         <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search...">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
     </form> --%>
-    <div>
+     <div>
    <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
          <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
          <option value="">Select Principal Employer</option>
@@ -227,7 +230,7 @@
 
      </c:if>
        <c:if test="${UserPermission.exportRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
     	</c:if>
     </div>
 </div>
@@ -235,37 +238,28 @@
      <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
      <div id="messageDiv" style="font-weight: bold; margin-top: 10px;"></div>
                          <div class="table-container">
-    <table id="workmenTable"  cellspacing="0" cellpadding="0">
-        <thead>
-<tr>
-                    <td >
-                        <input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()">
-                    </td> 
-                    <!-- Add more table headers for each column -->
-                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.transactionId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.FullName"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<%-- <th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.gender"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
-					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.dateOfBirth"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                     --%><th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                   <%--  <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                    --%> <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-           			<th class="header-text"  onclick="sortTable(10)"><spring:message code="label.TransactionType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-           			<th class="header-text"  onclick="sortTable(10)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                   <th class="header-text"  onclick="sortTable(11)"><spring:message code="label.status"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc">&#x25B2;</span></th> 
-           			
-            </tr>
-        </thead>
-        <tbody>
-            
-        </tbody>
-    </table>
-    
+  <table id="workmenTable" class="display nowrap" style="width:100%" cellspacing="0" cellpadding="0">
+  <thead>
+    <tr>
+      <th><input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()"></th>
+      <th><spring:message code="label.transactionId"/></th>
+      <th><spring:message code="label.gatePassId"/></th>
+      <th><spring:message code="label.FullName"/></th>
+      <th><spring:message code="label.aadharNumber"/></th>
+      <th><spring:message code="label.contractorName"/></th>
+      <th><spring:message code="label.unitName"/></th>
+      <th><spring:message code="label.TransactionType"/></th>
+      <th><spring:message code="label.gatePassType"/></th>
+      <th><spring:message code="label.status"/></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+  
+    </div>
                         </form>
-                         </div>
-                         	 <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+                        
+                          <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
     <script>
         setTimeout(function () {
             searchUnBlockList();

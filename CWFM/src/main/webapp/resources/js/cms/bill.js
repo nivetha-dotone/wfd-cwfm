@@ -440,6 +440,9 @@ function showFileNameBill(input, id) {
 					        },
 					        success: function(response) {
 					            var tableBody = $('#workmenTable tbody');
+								   if ($.fn.DataTable.isDataTable('#workmenTable')) {
+									$('#workmenTable').DataTable().destroy();
+								}
 					            tableBody.empty();
 					            if (response.length > 0) {
 					                $.each(response, function(index, wo) {
@@ -453,15 +456,14 @@ function showFileNameBill(input, id) {
 												  '<td  >' + wo.workOrderNumber + '</td>' +
 												  '<td  >' + wo.startDate + '</td>' +
 												  '<td  >' + wo.endDate + '</td>' +	
-												  '<td  >' + wo.status + '</td>' +	
+												  '<td  >' + wo.statusValue + '</td>' +	
 												  '<td  >' +wo.services + '</td>' +	
 												 			                             
 					                              '</tr>';
 					                    tableBody.append(row);
 					                });
-					            } else {
-					                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-					            }
+					            } 								// ✅ Always init after rows are drawn
+									initWorkmenTable("workmenTable");
 					        },
 					        error: function(xhr, status, error) {
 					            console.error("Error fetching data:", error);
@@ -490,3 +492,55 @@ function showFileNameBill(input, id) {
 					    // Remove the anchor from the document
 					    document.body.removeChild(a);
 					} 
+					function approveRejectBill(status){
+						let isValid=true;
+					
+						 const approvercomments = $("#approvercomments").val().trim();
+					if (approvercomments === "") {
+					    $("#error-approvercomments").show();
+					    isValid = false;
+					}else{
+						$("#error-approvercomments").hide();
+					}
+					if(isValid){
+						const data = {
+							approverId : $("#userId").val().trim(),
+							comments : $("#approvercomments").val().trim(),
+							status : status,
+							transactionId : $("#transactionId").val().trim(),
+							approverRole : $("#roleName").val().trim(),
+							roleId :$("#roleId").val().trim(),
+							type : '1',
+						};
+							  const xhr = new XMLHttpRequest();
+					xhr.open("POST", "/CWFM/billVerification/approveRejectBill", true); // Replace with your actual controller URL
+					xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
+					xhr.onload = function() {
+					    if (xhr.status === 200) {
+					        // Handle successful response
+					        console.log("Data saved successfully:", xhr.responseText);
+							sessionStorage.setItem("successMessage", "Bill approved/rejected successfully!");
+					      
+					                loadCommonList('/billVerification/listingFilter', 'Quick Onboarding List');
+					            
+					    } else {
+					        // Handle error response
+					        console.error("Error saving data:", xhr.statusText);
+							sessionStorage.setItem("errorMessage", "Failed to approve/reject Bill!");
+					    }
+					};
+
+					xhr.onerror = function() {
+					    console.error("Request failed");
+						sessionStorage.setItem("errorMessage", "Failed to approve/reject Bill!");
+					};
+
+					// Send the data object as a JSON string
+					xhr.send(JSON.stringify(data));
+						}else{
+							//error 
+						}
+						}//eofunc
+						
+						
+						

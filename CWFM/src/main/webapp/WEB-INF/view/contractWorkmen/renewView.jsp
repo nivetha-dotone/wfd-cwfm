@@ -394,8 +394,14 @@ textarea {
           <!--   <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> -->
         </div>
          <div class="action-buttons" >
-         <button id="actionButton"  type="submit"   class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('${sessionScope.loginuser.userId}','2')">Renew GatePass</button>
-            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="renewGatePass('${sessionScope.loginuser.userId}')">Save</button>
+         
+         <c:if test="${GatePassObj.gatePassAction eq '2' && mode eq 'add' }">
+         <% if (user != null && "Contractor".equals(roleName)) { %>
+             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="renewGatePass('${sessionScope.loginuser.userId}')">Save</button> 
+           <% } %> 
+         </c:if>
+         
+           
             <% if (user != null && !"Contractor".equals(roleName)) { %>
     			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('4','2')">Approve</button>
    				 <button id="rejectButton"  style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectRenew('5','2')">Reject</button>
@@ -494,7 +500,7 @@ textarea {
                 	 </td>
             </tr>
            <tr>
-           	 <th><label class="custom-label"><spring:message code="label.address"/></label></th>
+           	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td>
                 	<input id="address" name="address" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.address }" readonly>
                 	<label id="error-address" style="color: red;display: none;">Address is required</label>
@@ -543,6 +549,9 @@ textarea {
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcPolicyesicRegNumber"/></label></th>
                             <td><input id="wcEsicNo" name="wcEsicNo" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.wcEsicNo }" readonly> </td>
+                       		<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                            <td><input id="llNo" name="llNo" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.llNo }" readonly> </td>
+                      
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.hazardeousArea"/></label></th>
@@ -551,40 +560,40 @@ textarea {
                             <td><input id="accessArea" name="accessArea" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.accessArea }" readonly>  </td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><spring:message code="label.uanNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.uanNumber"/></label></th>
                             <td>
                             	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.uanNumber }" readonly>
                             </td>
-                            <th><label class="custom-label"><spring:message code="label.healthCheckUpDate"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.healthCheckUpDate"/></label></th>
                             <td>
                             	<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.healthCheckDate }" readonly>
                             	</td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.pfNumber }" readonly>
                             </td>
-                            <th><label class="custom-label"><spring:message code="label.esicNumber"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicNumber"/></label></th>
                             <td>
                             	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
                             	</td>
                         </tr>
                         <tr>
-                         <th><label class="custom-label"><spring:message code="label.dateOfJoining"/></label></th>
+                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfJoining"/></label></th>
                         	<td>
     				<input id="doj" name="doj" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
      value="${GatePassObj.doj }" readonly>
 			</td>
 			
-			 <th><label class="custom-label"><spring:message code="label.dateOfTermination"/></label></th>
+			 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfTermination"/></label></th>
                         	<td>
     				<input id="dot" name="dot" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" 
      value="${GatePassObj.dot }" readonly>
 			</td>
                         </tr>
                         <tr>
-                            <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
+                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplicable"/></label></th>
                             
                             <td>
         <input type="checkbox" id="pfApplicable" name="pfApplicable"
@@ -632,11 +641,11 @@ textarea {
 			</tr>
 			
 		   <tr>
-				<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.emergencyContactName"/></label></th>
+				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emergencyContactName"/></label></th>
 				<td>
 				<input style="width: 100%;height: 20px;" type="text" id="emergencyName" name="emergencyName"   value="${GatePassObj.emergencyName }" readonly  />
 				</td>			
-			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.emergencyContactNumber"/></label></th>
+			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emergencyContactNumber"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text"  id="emergencyNumber" name="emergencyNumber"   value="${GatePassObj.emergencyNumber}" readonly    />
 				</td>				
 			
@@ -651,17 +660,17 @@ textarea {
                      
 		   <tr>
 				
-				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenWageCategory"/></label></th>
+				<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.workmenWageCategory"/></label></th>
 				<td >
 				<input style="width: 100%;height: 20px;" type="text"  id="wageCategory" name="wageCategory"   value="${GatePassObj.wageCategory}" readonly    />
 						</td>
 				
-				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.bonusPayout"/></label></th>
+				<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.bonusPayout"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text"  id="bonusPayout" name="bonusPayout"   value="${GatePassObj.bonusPayout}" readonly    />
 					</td>
 				</tr>
         <tr>
-				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.zone"/></label></th>
+				<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.zone"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text"  id="zone" name="zone"   value="${GatePassObj.zone}" readonly    />
 					</td>
 		

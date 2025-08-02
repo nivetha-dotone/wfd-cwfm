@@ -292,10 +292,7 @@ label {
        
         
     </style>
-     <%
-    MasterUser user = (MasterUser) session.getAttribute("loginuser");
-    String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
-%>
+   
 
 	
     <script>
@@ -378,31 +375,48 @@ label {
        
 
     
-  
+   
   
 
     </script>
+     <%
+	MasterUser user = (MasterUser) session.getAttribute("loginuser");
+ String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
+    String roleName = user != null ? user.getRoleName() : "";
+    String roleId = user!=null?user.getRoleId():"";
+    String contextPath =  request.getContextPath() ;
+	%>
 </head>
 <body>
     
     <div id="principalEmployerContent">
+    <div class="tabs-container">
         <div class="tabs">
-            <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
-            <button data-target="tab2" onclick="showTabOther('tab2')">Kronos Reports</button> 
-            <button data-target="tab3" onclick="showTabOther('tab3')">Statuory Regulatory Attachments</button> 
-            <button data-target="tab4" onclick="showTabOther('tab4')">Check List - HR Clearance</button> 
-             <button data-target="tab5" onclick="showTabOther('tab5')">Comments</button> 
+            <button class="active" data-target="tab1" onclick="showTabNew('tab1')">Basic Information</button>
+            <button data-target="tab2" onclick="showTabNew('tab2')">Kronos Reports</button> 
+            <button data-target="tab3" onclick="showTabNew('tab3')">Statuory Regulatory Attachments</button> 
+            <button data-target="tab4" onclick="showTabNew('tab4')">Check List - HR Clearance</button> 
+             <button data-target="tab5" onclick="showTabNew('tab5')">Comments</button> 
             
     </div>
-     <!-- <div class="action-buttons" >
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
-    </div> -->
+   <div class="action-buttons" >
+ 
+            <% if (user != null && !"Contractor".equals(roleName)) { %>
+    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBill('4')">Approve</button>
+   				 <button id="rejectButton"  style="display:none;"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBill('5')">Reject</button>
+			<% } %>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/billVerification/listingFilter', 'Bill Verification List');">Cancel</button>
+        </div> 
+        </div>
         <div id="tab1" class="tab-content active">
         
     <table class="ControlLayout" cellspacing="0" cellpadding="0">
         <tbody>
            <tbody>
 			<tr>
+			<input type="hidden" id="userId" name="userId" value="<%= userId %>">
+			<input type="hidden" id="roleName" name="roleName" value="<%= roleName %>">
+			<input type="hidden" id="roleId" name="roleId" value="<%= roleId %>">
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.transactioId"/></label></th>
                 <td><input type="text" id="transactionId" name="transactionId" value="${bvr.wcTransId}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
                  </tr>
@@ -529,21 +543,12 @@ label {
                </thead>    
             <tbody>
 				<c:forEach var="item" items="${checklistItems}">
-            <tr><td> <input type="hidden" name="id_${item.id}">${item.checkpointName}</td>
-            	<td> <select class="custom-select" id="statusValue" name="statusValue"  >
-                                <option value="">Please select status</option>
-								<c:forEach var="status" items="${ChecklistStatus}">
-								
-                					<option value="${status.gmId}">${status.gmName}</option>
-            					</c:forEach>
-                                </select> </td>
-            	<td> <c:if test="${item.licenseRequired}">
-                <input type="text" name="licenseNumber_${item.id}" placeholder="Enter License Number" />
-            </c:if> </td>
-            	<td> <c:if test="${item.validUptoRequired}">
-                <input type="date"  name="validUpto_${item.id}"  />
-            </c:if> </td>
-            </tr>
+            <tr>
+        <td>${item.id}</td>
+        <td>${item.statusValue}</td>
+        <td>${item.licenseNumber}</td>
+        <td>${item.validUpto}</td>
+    </tr>
         </c:forEach>
    
       </tbody>
@@ -551,10 +556,7 @@ label {
     </div> 
   <div id="tab5" class="tab-content">
             <div class="Panel">
-             <div class="action-buttons" >
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveBtn();"
-            id="saveBtn">Save</button>
-    </div>
+             
 	<table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
 		<tr>
@@ -571,6 +573,15 @@ label {
 				<th><label class="custom-label"><spring:message code="label.comment"/></label></th>
 				<td><input type="text" id="commentsId" value="${bvr.comments}"  name="comments" style="width: 265px;height: 150px;" readonly/></td>
 				</tr>
+				<tr>
+				
+				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+				 <th><label class="custom-label"><spring:message code="label.approveComment"/></label></th>
+				<td><textarea id="approvercomments"  name="approvercomments" placeholder="Type here..."></textarea>
+				<label id="error-approvercomments" style="color: red;display: none;">Comments is required</label>
+				</td>
+				<% } %>
+			</tr>
 		</tbody>
  </table> 
 	

@@ -10,22 +10,8 @@ function redirectToPEAdd() {
     xhr.open("GET", "/CWFM/principalEmployer/add", true);
     xhr.send();
 }
-function loadCommonList(path,heading) {
-	 updateHeading(heading);
-	    var url = contextPath + path;
-    // Construct the URL using the contextPath variable
-  //  var url = contextPath + path;
-    console.log("Constructed URL:", url); // Log the constructed URL to the console
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("mainContent").innerHTML = this.responseText;
-              resetSessionTimer();
-        }
-    };
-    xhttp.open("GET", url, true);
-    xhttp.send();
-}
+
+
 function checkSessionStatus() {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {

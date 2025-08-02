@@ -241,11 +241,11 @@ background-color: #DDF3FF; /* Light green for the table header */
     <a href="#" class="button openSidebar" onclick="fileUploadTemplateSideBar()">Import Data</a> 
     <div><br>
     
-    <table >
+    <!-- <table >
     <thead >
 				<tr>
 					<th id="tablerow" ><input type="checkbox"></th>
-					<!-- Add more table headers for each column -->
+					Add more table headers for each column
 					<th id="tablerow" onclick="sortTable(1)">Template Name<span></span></th>
 					<th id="tablerow" onclick="sortTable(2)">Status<span></span></th>
 					<th id="tablerow" onclick="sortTable(3)">Created By<span></span></th>
@@ -257,7 +257,7 @@ background-color: #DDF3FF; /* Light green for the table header */
 			<br>
 			<td Style="font-family:'Noto Sans', sans-serif;font-size: 90%;color:grey;font-weight: 700;">No Records Found</td>
 			</tbody>
-    </table><br>
+    </table> --><br>
      <p style="color:grey;"><b>Note:</b></p>
      <p style="color:grey;">1.Should not upload different format as[for (.xlsx) should not upload(.xlx)]</p>
      <p style="color:grey;">2.only upload file as[for(.csv)]</p>

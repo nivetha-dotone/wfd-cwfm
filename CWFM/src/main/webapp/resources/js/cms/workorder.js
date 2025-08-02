@@ -131,6 +131,9 @@ function searchWithPEContractorInWO(contextPath) {
 					        },
 					        success: function(response) {
 					            var tableBody = $('#workorderTable tbody');
+								   if ($.fn.DataTable.isDataTable('#workorderTable')) {
+									$('#workorderTable').DataTable().destroy();
+								}
 					            tableBody.empty();
 								if (response.woList && response.woList.length > 0) {
 								               $.each(response.woList, function(index, wo) {
@@ -150,9 +153,8 @@ function searchWithPEContractorInWO(contextPath) {
 								                       '</tr>';
 								                   tableBody.append(row);
 								               });
-					            } else {
-					                tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-					            }
+					            }										   // ✅ Always init after rows are drawn
+										   initWorkmenTable("workorderTable");
 					        },
 					        error: function(xhr, status, error) {
 					            console.error("Error fetching data:", error);

@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.List;
 
+import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
 import com.wfd.dot1.cwfm.pojo.BillReportFile;
@@ -43,6 +44,19 @@ public interface BillVerificationDao {
 
 	List<BillReportFile> findByTransactionIdAndType(Long transactionId, String reportType);
 
-	public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId);
+
+	void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId, String userId);
+
+	List<ChecklistItemDTO> fetchChecklistByTransactionId(String wcTransId);
+
+	public String approveRejectBill(ApproveRejectBillDto dto);
+
+	public boolean updateBillStatusByTransactionId(String transactionId, String status);
+
+	public int getWorkFlowTYpeByTransactionId(String transactionId);
+
+	boolean isLastApproverForParallel(String transactionId, String roleId);
+
+	boolean isLastApprover(String roleName);
 }
 

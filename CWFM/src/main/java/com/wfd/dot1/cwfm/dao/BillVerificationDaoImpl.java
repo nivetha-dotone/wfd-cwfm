@@ -13,9 +13,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
-import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.BillReportFile;
 import com.wfd.dot1.cwfm.pojo.BillStatusLogDto;
@@ -89,6 +90,17 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 				d.setEndDate(rs.getString("EndDate"));
 				d.setStatus(rs.getInt("Status"));
 				d.setServices(rs.getString("Services"));
+				
+				String status =String.valueOf(rs.getInt("Status"));
+				if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+					d.setStatusValue("Approval Pending");
+				}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+					d.setStatusValue("Approved");
+				}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+					d.setStatusValue("Rejected");
+				}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+					d.setStatusValue("Draft");
+				}
 				listDto.add(d);
 			}
 			return listDto;
@@ -239,7 +251,7 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 		@Override
 		public List<CMSWageCostDTO> getBillVerificationListForApprovers(String roleId, int workFlowType, String deptId,
 				String principalEmployerId) {
-			String actionId=this.getActionIdForBill();
+			//String actionId=this.getActionIdForBill();
 			
 			List<CMSWageCostDTO> listDto= new ArrayList<CMSWageCostDTO>();
 			SqlRowSet rs =null;
@@ -248,11 +260,11 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 				query=this.getAllBVRForSquential();
 				log.info("Query to getBVRListingForApprovers "+query);
 				
-				 rs = jdbcTemplate.queryForRowSet(query,deptId,principalEmployerId,roleId,actionId);
+				 rs = jdbcTemplate.queryForRowSet(query,deptId,principalEmployerId,roleId);
 			}else {
 				query=this.getAllBVRForParallel();
 				log.info("Query to getBVRListingForApprovers "+query);
-				 rs = jdbcTemplate.queryForRowSet(query,roleId,actionId,roleId,actionId,deptId,principalEmployerId);
+				 rs = jdbcTemplate.queryForRowSet(query,roleId,roleId,deptId,principalEmployerId);
 			}
 			
 			while(rs.next()) {
@@ -266,6 +278,16 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 				d.setEndDate(rs.getString("EndDate"));
 				d.setStatus(rs.getInt("Status"));
 				d.setServices(rs.getString("Services"));
+				String status =String.valueOf(rs.getInt("Status"));
+				if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+					d.setStatusValue("Approval Pending");
+				}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+					d.setStatusValue("Approved");
+				}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+					d.setStatusValue("Rejected");
+				}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+					d.setStatusValue("Draft");
+				}
 				listDto.add(d);
 			}
 			
@@ -359,8 +381,145 @@ public List<BillReportFile> findByTransactionIdAndType(Long transactionId, Strin
     });
 }
 @Override
-public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId) {
+public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId, String userId) {
+    String sql = "INSERT INTO BillChecklist (wcTransId, checklistId, statusValue, licenseNumber, validUpto, createdBy) " +
+                 "VALUES (?, ?, ?, ?, ?, ?)";
+
+    for (ChecklistItemDTO item : checklistItems) {
+        jdbcTemplate.update(sql,
+            wcTransId,
+            item.getId(),
+            item.getStatusValue(),
+            item.getLicenseNumber(),
+            item.getValidUpto() != null && !item.getValidUpto().isEmpty() ? java.sql.Date.valueOf(item.getValidUpto()) : null,
+            userId
+        );
+    }
+}
+@Override
+public List<ChecklistItemDTO> fetchChecklistByTransactionId(String wcTransId) {
+    String query = "SELECT bc.CHECKPOINTNAME, cgm.GMDESCRIPTION as statusValue, bcl.licenseNumber, bcl.validUpto FROM BillChecklist bcl "
+    		+ " join BillConfigHrChecklist bc on bc.ID=bcl.checklistId  join CMSGENERALMASTER cgm on cgm.GMID = bcl.statusValue WHERE wcTransId = ?";
+    SqlRowSet rs = jdbcTemplate.queryForRowSet(query,wcTransId);
+    List<ChecklistItemDTO> list = new ArrayList<ChecklistItemDTO>();
+    try {
+	while(rs.next()) {
+		 ChecklistItemDTO dto = new ChecklistItemDTO();
+		 dto.setId(rs.getString("CHECKPOINTNAME"));
+	        dto.setStatusValue(rs.getString("statusValue"));
+	        dto.setLicenseNumber(rs.getString("licenseNumber"));
+	        dto.setValidUpto(rs.getDate("validUpto") != null ? rs.getDate("validUpto").toString() : null);
+	        list.add(dto);
+	}}
+    catch(Exception e) {
+    	e.printStackTrace();
+    }
+    return list;
+}
+
+public String getSaveBillApprovalStatus() {
+	return QueryFileWatcher.getQuery("SAVE_BILL_APPROVAL_STATUS");
+}
+@Override
+public String approveRejectBill(ApproveRejectBillDto dto) {
+	 String result = null; 
+
+
+	        Object[] parameters = new Object[] {dto.getTransactionId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),1,dto.getRoleId()}; 
+
+	        try {
+	        	String query = getSaveBillApprovalStatus();
+	            int status = jdbcTemplate.update(query, parameters);
+	            if (status > 0) {
+	                result="GatePass approved/rejected successfully";
+	            } else {
+	                log.warn("Failed to approve/reject Bill for transactionId: " +  dto.getTransactionId());
+	            }
+	        } catch (Exception e) {
+	            log.error("Error approving/rejecting Bill for transactionId: " +  dto.getTransactionId(), e);
+	            return null;
+	        }
+	    
+
+	    return result;
+}
+
+public String getUpdateBillStatusByTransactionId() {
+	return QueryFileWatcher.getQuery("UPDATE_BILL_STATUS_BY_TRANSACTION_ID");
+}
+@Override
+public synchronized boolean updateBillStatusByTransactionId(String transactionId, String status) {
+	boolean res=false;
+	Object[] object=new Object[]{status,transactionId};
+	String query= getUpdateBillStatusByTransactionId();
+	int i = jdbcTemplate.update(query,object);
+	if(i>0){
+		res=true;
+	}
+	return res;
+}
+public String getWorkflowTypeByTransactionIdQuery() {
+	return QueryFileWatcher.getQuery("GET_BILL_WORKFLOW_TYPE_BY_TRANSACTION_ID");
+}
+@Override
+public int getWorkFlowTYpeByTransactionId(String transactionId) {
+	log.info("Entering into getWorkFlowTYpe dao method ");
+	int workflowTypeId = 0;
+	String query =getWorkflowTypeByTransactionIdQuery();
+	log.info("Query to getWorkFlowTYpe "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
+	if(rs.next()) {
+		workflowTypeId = rs.getInt("WorkflowType");
+	}
+	log.info("Exiting from getWorkFlowTYpe dao method "+transactionId);
+	return workflowTypeId;
+}
+
+public String getIsLastApproverForParallel() {
+	return QueryFileWatcher.getQuery("LAST_APPROVER_FOR_BILL_PAR");
+}
+
+public String getLastApproverQuery() {
+	return QueryFileWatcher.getQuery("LAST_APPROVER_FOR_BILL_SEQ");
+}
+
+@Override
+public boolean isLastApprover(String roleName) {
+	boolean status=false;
 	
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery());
+	if(rs.next()){
+		if(roleName.equals(rs.getString("Role_Name")))
+			status = true;
+	}
+	log.info("exit from isLastApprover method = "+status);
+	return status; 
+}
+
+@Override
+public boolean isLastApproverForParallel( String transactionId, String roleId) {
+    boolean status = false;
+
+    String query = getIsLastApproverForParallel();
+
+    try {
+        // Ensure proper data type conversion
+       
+        int approverRoleId = Integer.parseInt(roleId);
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, transactionId, approverRoleId);
+        if (rs.next()) {
+            String result = rs.getString("IsLastApprover");
+            status = "YES".equals(result);
+        }
+    } catch (NumberFormatException e) {
+        log.error("Invalid number format: gatePassTypeId={}, roleId={}",  roleId, e);
+    } catch (Exception e) {
+        log.error("Error executing isLastApproverForParallel query", e);
+    }
+
+    log.info("Exit from isLastApproverForParallel method = " + status);
+    return status;
 }
 
 }
