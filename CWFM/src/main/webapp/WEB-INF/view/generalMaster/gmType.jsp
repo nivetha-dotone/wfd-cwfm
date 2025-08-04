@@ -263,7 +263,7 @@
     </div>
 </div> --%>
 <div class="table-container">
-    <table>
+    <table class="no-dt">
         <thead>
             <tr>
                 <th class="checkbox-cell">

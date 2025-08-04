@@ -986,22 +986,22 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setLastName(fields[1]);
                 staging.setRelationName(fields[2]);
                 staging.setDateOfBirth(fields[3]);
-                staging.setTrade(String.valueOf(tradeId));               
-                staging.setSkill(String.valueOf(skillId));
+                staging.setTrade(tradeId!=null?String.valueOf(tradeId):null);               
+                staging.setSkill(skillId!=null?String.valueOf(skillId):null);
                 staging.setNatureOfWork(fields[6]);
                 staging.setHazardousArea(fields[7]);
                 staging.setAadhaarNumber(fields[8]);
-                staging.setVendorCode(String.valueOf(contractorId));
-                staging.setGender(String.valueOf(genderId));
+                staging.setVendorCode(contractorId!=null?String.valueOf(contractorId):null);
+                staging.setGender(genderId!=null?String.valueOf(genderId):null);
                 staging.setDoj(fields[11]);
-                staging.setDepartment(String.valueOf(departmentId));
-                staging.setArea(String.valueOf(areaId));
-                staging.setWorkorderNumber(String.valueOf(workorderId));
+                staging.setDepartment(departmentId!=null?String.valueOf(departmentId):null);
+                staging.setArea(areaId!=null?String.valueOf(areaId):null);
+                staging.setWorkorderNumber(workorderId!=null?String.valueOf(workorderId):null);
                 staging.setPfNumber(fields[15]);
                 staging.setMaritalStatus(fields[16]);
                 staging.setTechnical(fields[17]);
-                staging.setAcademic(String.valueOf(academicId));
-                staging.setBloodGroup(String.valueOf(bloodGroupId));
+                staging.setAcademic(academicId!=null?String.valueOf(academicId):null);
+                staging.setBloodGroup(bloodGroupId!=null?String.valueOf(bloodGroupId):null);
                 staging.setAccommodation(fields[20]);
                 staging.setBankName(fields[21]);
                 staging.setAccountNumber(fields[22]);
@@ -1009,12 +1009,12 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setEmergencyNumber(fields[24]);
                 staging.setPoliceVerificationDate(fields[25]);
                 staging.setHealthCheckDate(fields[26]);
-                staging.setAccessArea(String.valueOf(accessAreaId));
+                staging.setAccessArea(accessAreaId!=null?String.valueOf(accessAreaId):null);
                 staging.setEsicNumber(fields[28]);
-                staging.setUnitCode(String.valueOf(unitId));
+                staging.setUnitCode(unitId!=null?String.valueOf(unitId):null);
                 staging.setOrganizationName(fields[30]);
-                staging.setEICNumber(String.valueOf(ecId));
-                staging.setECnumber(String.valueOf(wageCategoryId));
+                staging.setEICNumber(ecId!=null?String.valueOf(ecId):null);
+                staging.setECnumber(wageCategoryId!=null?String.valueOf(wageCategoryId):null);
                 staging.setUanNumber(fields[33]);
                 staging.setEmergencyName(fields[34]);
                 staging.setPfApplicable(fields[35]);
@@ -1022,7 +1022,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setInsuranceType(fields[37]);
                 staging.setLLnumber(fields[38]);
                 staging.setAddress(fields[39]);
-                staging.setZone(String.valueOf(zoneId));
+                staging.setZone(zoneId!=null?String.valueOf(zoneId):null);
                 staging.setIdMark(fields[41]);
 
                 int transactionId = fileUploadDao.saveWorkmenBulkDraftUploadToStaging(staging); // RETURN the transaction ID

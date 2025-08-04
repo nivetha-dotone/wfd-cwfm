@@ -1080,11 +1080,11 @@ function fetchGmData() {
     xhr.open("GET", "/CWFM/generalController/getGmData/" + gmTypeId, true);
     xhr.onload = function () {
         if (xhr.status === 200) {
-        	   if ($.fn.DataTable.isDataTable('#gmTable')) {
+        	  /*  if ($.fn.DataTable.isDataTable('#gmTable')) {
         			$('#gmTable').DataTable().destroy();
-        		}
+        		} */
             document.getElementById("mainContent").innerHTML = xhr.responseText;
-            initWorkmenTable("gmTable");
+            //initWorkmenTable("gmTable");
         } else {
             alert("Failed to load organization level data. Please try again.");
             document.getElementById("mainContent").innerHTML = "<p>Error loading data. Please try again.</p>";

@@ -224,7 +224,7 @@ function editRow(gmId) {
     </div>
 
     <h3 style="color:gray;">Existing General Masters</h3>
-    <table border="1"  id="gmTable">
+    <table border="1"  id="gmTable" class="no-dt">
         <thead>
             <tr>
             <td>

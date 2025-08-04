@@ -1310,7 +1310,7 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getPoliceVerificationDate()!=null?gatePassMain.getPoliceVerificationDate():" ",
 	        gatePassMain.getDot()!=null?gatePassMain.getDot():" ",
 	        gatePassMain.getUserId(),
-	        "regular"
+	        "regular",gatePassMain.getLlNo()
 	    };
 	}
 public String getContractWorkmenDraftDetails() {

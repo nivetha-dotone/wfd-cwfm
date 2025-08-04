@@ -31,6 +31,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
+import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -690,24 +691,101 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    }
 	    return gatePassId;
 	}
+	
+	public String getSaveContractWorkmen() {
+		 return QueryFileWatcher.getQuery("SAVE_CONTRACT_WORKMEN"); 
+	}
+	public String getNextTransactionId() {
+		String transactionId=null;
+		try {
+			 transactionId = jdbcTemplate.queryForObject("EXEC GetNextGatepassTransactionId", String.class);
+
+
+	}catch(Exception e) {
+		 System.out.println("Failed to fetch transaction ID: " + e.getMessage());
+		e.printStackTrace();
+	}
+	    return transactionId;
+	}
+
+//	@Override
+//	public void saveToGatePassMain(WorkmenBulkUpload data) {
+//		String gatePassId = this.generateGatePassId();
+//		
+//		String sql = this.getSaveContractWorkmen();
+//	   String transId = this.getNextTransactionId();
+//	   
+//	   Object[] parameters = this.prepareGatePassDraftParameters(transId, data); 
+//
+//       try {
+//       	String query = this.getSaveContractWorkmen();
+//           int result = jdbcTemplate.update(query, parameters);
+//           if (result > 0) {
+//              // log.info("GatePass drafted successfully for transId: " + transId);
+//           } else {
+//               //log.warn("Failed to draft GatePass for transId: " + transId);
+//           }
+//       } catch (Exception e) {
+//          // log.error("Error saving GatePass for transId: " + transId, e);
+//          // return null;
+//       }
+//       
+//	    }
+	
 	@Override
 	public void saveToGatePassMain(WorkmenBulkUpload data) {
 		String gatePassId = this.generateGatePassId();
+		String transId = this.getNextTransactionId();
 	    String sql = "INSERT INTO  GATEPASSMAIN (TransactionId, GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName, IdMark, MobileNumber,\r\n"
 	    		+ "MaritalStatus, UnitId, ContractorId, WorkorderId, TradeId, SkillId, DepartmentId, AreaId, EicId, NatureOfJob, WcEsicNo, HazardousArea  \r\n"
 	    		+ ",  AccessAreaId ,  UanNumber,  HealthCheckDate,  BloodGroupId,  Accommodation,  AcademicId ,  Technical ,  IfscCode,  AccountNumber,  EmergencyContactNumber  \r\n"
 	    		+ ",  EmergencyContactName, WorkmenWageCategoryId, BonusPayoutId, ZoneId, Basic, DA, HRA, WashingAllowance, OtherAllowance  \r\n"
 	    		+ ",  UniformAllowance,  PfCap,  AadharDocName ,  PhotoName ,  BankDocName ,  PoliceVerificationDocName,  IdProof2DocName,  MedicalDocName,  EducationDocName,  Form11DocName  \r\n"
 	    		+ ",  TrainingDocName,  OtherDocName,  UpdatedDate,  UpdatedBy,  WorkFlowType,  Comments,  Address,  DOJ,  DOT,  pfnumber,  esicNumber,  policeverificationDate  \r\n"
-	    		+ ",  OnboardingType ,  pfapplicable )\r\n"
-	    		+ "VALUES ( (SELECT CAST(ISNULL(MAX(CAST(TransactionID AS BIGINT)), 0) + 1 AS NVARCHAR(20)) FROM GATEPASSMAIN),?,1,1,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
+	    		+ ",  OnboardingType ,  pfapplicable,LLNo )\r\n"
+	    		+ "VALUES ( ?,?,1,1,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
 	    		+ "?,?,?,?,?,?,?,?,?,?,?,null,null,?,'0.00','0.00','0.00','0.00','0.00','0.00','Yes',null,null,null,null,null,null,null,null,\r\n"
-	    		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?)";
-	    jdbcTemplate.update(sql, gatePassId,
-	    		data.getAadhaarNumber(),  data.getFirstName(),data.getLastName(), data.getDateOfBirth(), data.getGender(), data.getRelationName(),data.getIdMark(),data.getMobileNumber(),
-	            data.getMaritalStatus(), data.getUnitCode(), data.getVendorCode(), data.getWorkorderNumber(),data.getTrade(),data.getSkill(),data.getDepartment(),data.getArea(),data.getEICNumber(),data.getNatureOfWork(),data.getECnumber(),data.getHazardousArea(),
-	            data.getAccessArea(),data.getUanNumber(),data.getHealthCheckDate(),data.getBloodGroup(),data.getAccommodation(),data.getAcademic(),data.getTechnical(),data.getBankName(),data.getAccountNumber(),data.getEmergencyNumber(),
-	            data.getEmergencyName(),data.getZone(),data.getAddress(),data.getDoj(),data.getPfNumber(),data.getEsicNumber(),data.getPoliceVerificationDate(),data.getPfApplicable());
+	    		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?,?)";
+	    jdbcTemplate.update(sql, transId,gatePassId,
+	    		data.getAadhaarNumber()!=null? data.getAadhaarNumber():" ", 
+	    		data.getFirstName()!=null? data.getFirstName():" ",
+	    		data.getLastName()!=null? data.getLastName():" ",
+	    		data.getDateOfBirth()!=null? data.getDateOfBirth():" ",
+	    		data.getGender()!=null? data.getGender():" ",
+	    		data.getRelationName()!=null? data.getRelationName():" ",
+	    		data.getIdMark()!=null? data.getIdMark():" ",
+	    		data.getMobileNumber()!=null? data.getMobileNumber():" ",
+	            data.getMaritalStatus()!=null? data.getMaritalStatus():" ",
+	            data.getUnitCode()!=null && !data.getUnitCode().trim().isEmpty()? data.getUnitCode():" ", 
+	            data.getVendorCode()!=null&& !data.getVendorCode().trim().isEmpty()? data.getVendorCode():" ", 
+	            data.getWorkorderNumber()!=null&& !data.getWorkorderNumber().trim().isEmpty()? data.getWorkorderNumber():" ",
+	            data.getTrade()!=null&& !data.getTrade().trim().isEmpty()? data.getTrade():" ",
+	            data.getSkill()!=null&& !data.getSkill().trim().isEmpty()? data.getSkill():" ",
+	            data.getDepartment()!=null&& !data.getDepartment().trim().isEmpty()? data.getDepartment():" ",
+	            data.getArea()!=null&& !data.getArea().trim().isEmpty()? data.getArea():" ",
+	            data.getEICNumber()!=null&& !data.getEICNumber().trim().isEmpty()? data.getEICNumber():" ",
+	            data.getNatureOfWork()!=null? data.getNatureOfWork():" ",
+	            data.getECnumber()!=null&& !data.getECnumber().trim().isEmpty()? data.getECnumber():" ",
+	            data.getHazardousArea()!=null? data.getHazardousArea():" ",
+	            data.getAccessArea()!=null&& !data.getAccessArea().trim().isEmpty()? data.getAccessArea():" ",
+	            data.getUanNumber()!=null? data.getUanNumber():" ",
+	            data.getHealthCheckDate()!=null? data.getHealthCheckDate():" ",
+	            data.getBloodGroup()!=null&& !data.getBloodGroup().trim().isEmpty()? data.getBloodGroup():" ",
+	            data.getAccommodation()!=null? data.getAccommodation():" ",
+	            data.getAcademic()!=null&& !data.getAcademic().trim().isEmpty()? data.getAcademic():" ",
+	            data.getTechnical()!=null? data.getTechnical():" ",
+	            data.getBankName()!=null? data.getBankName():" ",
+	            data.getAccountNumber()!=null? data.getAccountNumber():" ",
+	            data.getEmergencyNumber()!=null? data.getEmergencyNumber():" ",
+	            data.getEmergencyName()!=null? data.getEmergencyName():" ",
+	            data.getZone()!=null? data.getZone():" ",
+	            data.getAddress()!=null? data.getAddress():" ",
+	            data.getDoj()!=null? data.getDoj():" ",
+	            data.getPfNumber()!=null? data.getPfNumber():" ",
+	            data.getEsicNumber()!=null? data.getEsicNumber():" ",
+	            data.getPoliceVerificationDate()!=null? data.getPoliceVerificationDate():" ",
+	            data.getPfApplicable()!=null? data.getPfApplicable():" ",
+	            data.getLLnumber()!=null? data.getLLnumber():" ");
 	}
 
 	@Override
