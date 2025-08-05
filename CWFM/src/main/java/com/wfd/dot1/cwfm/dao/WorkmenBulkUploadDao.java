@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 
@@ -15,5 +16,7 @@ public interface WorkmenBulkUploadDao {
 	void updateRecordStatusByTransactionId(int txnId, String combinedErrors);
 
 	void updateRecordProcessedByTransactionId(Integer txnId);
+
+	public boolean isAadharExists(String aadharNumber);
 
 }

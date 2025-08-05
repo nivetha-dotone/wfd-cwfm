@@ -90,6 +90,8 @@ public interface FileUploadDao {
 	
 	void updateRecordStatusByTransactionId(int txnId, String combinedErrors);
 
+	Integer getLlNumber(String LLNumber);
+
 	
 
 	

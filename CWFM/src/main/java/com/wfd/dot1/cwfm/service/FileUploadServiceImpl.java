@@ -786,6 +786,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer zoneId = fileUploadDao.getGeneralMasterId(fields[40]);
             Integer genderId = fileUploadDao.getGeneralMasterId(fields[10]);
             Integer ecId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
+            Integer LlNumber = fileUploadDao.getLlNumber(fields[38]);
 
 
             if (tradeId == null) fieldErrors.put("trade", "Invalid or not found");
@@ -798,7 +799,8 @@ public class FileUploadServiceImpl implements FileUploadService {
             if (zoneId == null) fieldErrors.put("zone", "Invalid or not found");
             if (genderId == null) fieldErrors.put("Gender", "Invalid or not found");
             if (ecId == null) fieldErrors.put("EIC", "Invalid or not found");
-
+            if (LlNumber == null) fieldErrors.put("LlNumber", "Invalid or not found");
+            if (wageCategoryId == null) fieldErrors.put("WCESIC", "Invalid or not found");
 
             if (!fieldErrors.isEmpty()) {
                 errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
@@ -845,7 +847,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setPfApplicable(fields[35]);
                 staging.setSpecializationName(fields[36]);
                 staging.setInsuranceType(fields[37]);
-                staging.setLLnumber(fields[38]);
+                staging.setLLnumber(String.valueOf(LlNumber));
                 staging.setAddress(fields[39]);
                 staging.setZone(String.valueOf(zoneId));
                 staging.setIdMark(fields[41]);
@@ -953,6 +955,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer zoneId = fileUploadDao.getGeneralMasterId(fields[40]);
             Integer genderId = fileUploadDao.getGeneralMasterId(fields[10]);
             Integer ecId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
+            Integer LLNumber = fileUploadDao.getLlNumber(fields[38]);
 
 
             Integer trade = !fields[4].isBlank() ? fileUploadDao.getTradeIdByName(fields[4]) : null;
@@ -969,6 +972,9 @@ public class FileUploadServiceImpl implements FileUploadService {
 
             Integer zone = !fields[40].isBlank() ? fileUploadDao.getGeneralMasterId(fields[40]) : null;
             if (!fields[40].isBlank() && zone == null) fieldErrors.put("zone", "Invalid or not found");
+
+            Integer LlNumber = !fields[38].isBlank() ? fileUploadDao.getLlNumber(fields[38]) : null;
+            if (!fields[38].isBlank() && LlNumber == null) fieldErrors.put("LlNumber", "Invalid or not found");
 
             Integer ec = (!fields[31].isBlank() && unitId != null && !fields[12].isBlank())
                 ? fileUploadDao.geteicId(fields[12], unitId, fields[31])
@@ -1020,7 +1026,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setPfApplicable(fields[35]);
                 staging.setSpecializationName(fields[36]);
                 staging.setInsuranceType(fields[37]);
-                staging.setLLnumber(fields[38]);
+                staging.setLLnumber(LLNumber!=null?String.valueOf(LLNumber):null);
                 staging.setAddress(fields[39]);
                 staging.setZone(zoneId!=null?String.valueOf(zoneId):null);
                 staging.setIdMark(fields[41]);

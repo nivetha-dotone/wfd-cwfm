@@ -426,7 +426,7 @@ function validateEmploymentInformation(){
 		$("#error-eic").hide();
 	}
 	 const noj = $("#natureOfJob").val().trim();
-	 const nojRegex = /^[A-Za-z]{2,}$/;
+	const nojRegex = /^(?=.*[A-Za-z]{2,})[A-Za-z\s]+$/;
     if (!nojRegex.test(noj)) {
         $("#error-natureOfJob").show();
         isValid = false;
@@ -3016,6 +3016,7 @@ let streams;
     function goBackToquickonboardingList() {
     	 loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
     }
+
     
 	function initWorkmenTable(tablename) {
 	    const selector = '#' + tablename;
@@ -3030,3 +3031,80 @@ let streams;
 	        ordering: true
 	    });
 	}
+
+   function searchGatePassStatus() {
+    const transactionId = $('#transactionId').val().trim();
+    const gatepassId = $('#gatePassId').val().trim();
+
+    $.ajax({
+        url: '/CWFM/entrypassstatus/statusList',
+        type: 'POST',
+        data: {
+            transactionId: transactionId,
+            gatepassId: gatepassId
+        },
+        success: function (response) {
+            const tableBody = $('#workmenTable tbody');
+            tableBody.empty();
+
+            if (response.length > 0) {
+                response.forEach(function (wo) {
+                    const row = `<tr>
+                        <td><input type="checkbox" name="selectedWOs" value="${wo.transactionId || ''}"></td>
+                        <td>${wo.transactionId || ''}</td>
+                        <td>${wo.firstName || ''} ${wo.lastName || ''}</td>
+                        <td>${wo.lastName || ''}</td>
+                        <td>${wo.aadharNumber || ''}</td>
+                        <td>${wo.approvedBy || ''}</td>
+                        <td>${wo.pendingWith || ''}</td>
+                    </tr>`;
+                    tableBody.append(row);
+                });
+            } else {
+                tableBody.append('<tr><td colspan="8">No data found</td></tr>');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching data:", error);
+        }
+    });
+}
+
+ function searchGatePassHistory() {
+    const aadharNumber = $('#aadharNumber').val().trim();
+
+    $.ajax({
+        url: '/CWFM/entrypassstatus/history',
+        type: 'POST',
+        data: {
+            aadharNumber: aadharNumber
+        },
+        success: function (response) {
+            const tableBody = $('#workmenTable tbody');
+            tableBody.empty();
+
+            if (response.length > 0) {
+                response.forEach(function (wo) {
+                    const row = `<tr>
+                        <td><input type="checkbox" name="selectedWOs" value="${wo.aadharNumber || ''}"></td>
+                        <td>${wo.transactionId || ''}</td>
+                         <td>${wo.gatePassId || ''}</td>
+                        <td>${wo.firstName || ''} ${wo.lastName || ''}</td>
+                        <td>${wo.lastName || ''}</td>
+                         <td>${wo.gatePassType || ''}</td>
+                         <td>${wo.status || ''}</td>
+                        <td>${wo.unitName || ''}</td>
+                       
+                    </tr>`;
+                    tableBody.append(row);
+                });
+            } else {
+                tableBody.append('<tr><td colspan="8">No data found</td></tr>');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching data:", error);
+        }
+    });
+}  
+

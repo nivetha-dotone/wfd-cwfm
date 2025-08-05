@@ -1,3 +1,4 @@
+<%@ page import="com.wfd.dot1.cwfm.pojo.MasterUser" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
@@ -221,7 +222,13 @@ background-color: #DDF3FF; /* Light green for the table header */
 }
  
     </style>
-
+ <%
+    	MasterUser user = (MasterUser) session.getAttribute("loginuser");
+     String userId = user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "";
+        String roleName = user != null ? user.getRoleName() : "";
+        String roleId = user!=null?user.getRoleId():"";
+        String contextPath =  request.getContextPath() ;
+		%>
    
 
 </head>
@@ -281,13 +288,17 @@ background-color: #DDF3FF; /* Light green for the table header */
         <h4 style="color:grey;">Select a template to import data</h2>
         <select id="templateType" name="templateType" onchange="fetchTemplateOptions()" style="width: 100%; height: 45px;color:gray;" >
                 <option value=""style="color:gray;">Template</option>
+                <% if (user != null && !"Contractor".equals(roleName)) { %>
                 <option value="generalMaster"style="color:gray;">Data-General Master</option>
               <!--  <option value="minimumWage"style="color:gray;">Data-Minimum Wage</option> -->
                 <option value="principalEmployer"style="color:gray;">Data-Principal Employer</option>
                 <option value="contractor"style="color:gray;">Data-Contractor</option>
                  <option value="workorder"style="color:gray;">Data-Workorder</option> 
                  <option value="workmenbulkupload"style="color:gray;">Data-Workmen Bulk Upload</option>
+                   <% } %>
+                  <% if (user != null && "Contractor".equals(roleName)) { %>
                  <option value="workmenbulkuploaddraft"style="color:gray;">Data-Workmen Bulk Upload Draft</option>
+                 <% } %>
               </select>
               <a href="#" onclick="fetchTemplateInfo()"id="templateinfo">Template Information</a><br><br>
               <a href="#" onclick="viewTemplateInfo()" id="viewtemplate">View Template</a><br><br>

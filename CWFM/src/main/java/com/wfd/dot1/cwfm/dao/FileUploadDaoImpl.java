@@ -458,7 +458,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	 public Integer getWageCategoryId(String EICNumber) {
 		    if (EICNumber == null || EICNumber.trim().isEmpty()) return null;
 
-		    String sql = "SELECT WCID FROM CMSCONTRACTOR_WC WHERE WC_CODE = ?";
+		    String sql = "SELECT WCID FROM CMSCONTRACTOR_WC WHERE WC_CODE = ? and LICENCE_TYPE='WC'";
 		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, EICNumber.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
@@ -493,6 +493,14 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		    return result.isEmpty() ? null : result.get(0);
 		}
 
+		@Override
+		public Integer getLlNumber(String LLNumber) {
+		    if (LLNumber == null || LLNumber.trim().isEmpty()) return null;
+
+		    String sql = "select WCID from CMSCONTRACTOR_WC where WC_CODE=? and LICENCE_TYPE='LL'";
+		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, LLNumber.trim());
+		    return result.isEmpty() ? null : result.get(0);
+		}
 		
 		@Override
 		public Integer geteicId(String department, Integer unitId, String ECnumber) {
@@ -734,7 +742,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	
 	@Override
 	public void saveToGatePassMain(WorkmenBulkUpload data) {
-		String gatePassId = this.generateGatePassId();
+		//String gatePassId = this.generateGatePassId();
 		String transId = this.getNextTransactionId();
 	    String sql = "INSERT INTO  GATEPASSMAIN (TransactionId, GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName, IdMark, MobileNumber,\r\n"
 	    		+ "MaritalStatus, UnitId, ContractorId, WorkorderId, TradeId, SkillId, DepartmentId, AreaId, EicId, NatureOfJob, WcEsicNo, HazardousArea  \r\n"
@@ -746,7 +754,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    		+ "VALUES ( ?,?,1,1,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
 	    		+ "?,?,?,?,?,?,?,?,?,?,?,null,null,?,'0.00','0.00','0.00','0.00','0.00','0.00','Yes',null,null,null,null,null,null,null,null,\r\n"
 	    		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?,?)";
-	    jdbcTemplate.update(sql, transId,gatePassId,
+	    jdbcTemplate.update(sql, transId,
+	    		data.getGatepassid()!=null? data.getGatepassid():" ",
 	    		data.getAadhaarNumber()!=null? data.getAadhaarNumber():" ", 
 	    		data.getFirstName()!=null? data.getFirstName():" ",
 	    		data.getLastName()!=null? data.getLastName():" ",
@@ -787,6 +796,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	            data.getPfApplicable()!=null? data.getPfApplicable():" ",
 	            data.getLLnumber()!=null? data.getLLnumber():" ");
 	}
+
 
 	@Override
 	public void updateRecordStatusByTransactionId(int txnId, String combinedErrors) {

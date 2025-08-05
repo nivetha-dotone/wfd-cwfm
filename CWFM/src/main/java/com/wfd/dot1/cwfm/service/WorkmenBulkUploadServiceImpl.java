@@ -56,8 +56,14 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (isBlank(record.getRelationName())) fieldErrors.put("relationName", "Missing");
 	        if (isBlank(record.getAadhaarNumber())) fieldErrors.put("aadhaarNumber", "Missing");
 	        if (isBlank(record.getIdMark())) fieldErrors.put("IdMark", "Missing");
-	        if (!isBlank(record.getAadhaarNumber()) && !record.getAadhaarNumber().matches("\\d{12}")) {
-	            fieldErrors.put("aadhaarNumber", "Must be 12 digits");
+	        String aadhaar = record.getAadhaarNumber();
+
+	        if (!isBlank(aadhaar)) {
+	            if (!aadhaar.matches("\\d{12}")) {
+	                fieldErrors.put("aadhaarNumber", "Must be 12 digits");
+	            } else if (workmenUploadDao.isAadharExists(aadhaar)) {
+	                fieldErrors.put("aadhaarNumber", "Duplicate Aadhaar number");
+	            }
 	        }
 	        if (!isBlank(record.getFirstName()) && !record.getFirstName().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("firstName", "Only alphabets allowed");
@@ -181,7 +187,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		            record.setGender(String.valueOf(fileUploadDao.getGeneralMasterId(record.getGender())));
 		            record.setEICNumber(String.valueOf(fileUploadDao.geteicId(record.getDepartment(),Integer.parseInt(record.getUnitCode()),record.getEICNumber())));
 		            record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
-		            
+		           // record.setLLnumber(String.valueOf(fileUploadDao.getLlNumber(record.getLLnumber())));
 		        } catch (Exception e) {
 		            fieldErrors.put("IDMapping", "Failed to resolve IDs: " + e.getMessage());
 		        }

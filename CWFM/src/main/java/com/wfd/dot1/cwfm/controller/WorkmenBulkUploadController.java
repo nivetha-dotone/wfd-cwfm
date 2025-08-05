@@ -100,13 +100,13 @@ public class WorkmenBulkUploadController {
 		    
 		    if (!errorData.isEmpty() && successData.isEmpty()) {
 		    	responses.put("status", "error");
-		    	responses.put("message", "All selected records have errors.");
+		    	responses.put("message", "Selected records have errors.");
 		    } else if (!errorData.isEmpty()) {
 		    	responses.put("status", "partial");
 		    	responses.put("message", "Some records were saved successfully. Some had errors.");
 		    } else {
 		    	responses.put("status", "success");
-		    	responses.put("message", "All records saved successfully.");
+		    	responses.put("message", "Selected records saved successfully.");
 		    }
 
 		    responses.put("successData", successData);
