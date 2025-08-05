@@ -25,7 +25,9 @@
 <!-- DataTables CSS and JS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
+
+
+ <link rel="stylesheet" type="text/css" href="resources/css/cms/dashboard.css" />    
 
      <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/cms/contractor.js"></script>
@@ -1712,6 +1714,8 @@ function changeRole(selectedRoleId, selectedRoleName) {
     	        // Hide the "SystemAdmin" menu or show a different menu
     	        showOtherMenus();
     	    }
+    	// Show loader
+         document.getElementById("loader").style.display = "flex"; // Show
         fetch('/CWFM/updateRole', {
             method: 'POST',
             headers: {
@@ -1731,9 +1735,21 @@ function changeRole(selectedRoleId, selectedRoleName) {
         	 console.log('Sidebar update data:', data); 
             updateSidebar(data,selectedRoleName); // Update the sidebar with the fetched pages
           
+         // Fetch the role-based dashboard
+            return fetch('/CWFM/dashboard/view', {
+                method: 'GET'
+            });
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("mainContent").innerHTML = html;
         })
         .catch(error => {
             console.error("Error:", error);
+        })
+        .finally(() => {
+            // Hide loader
+            document.getElementById("loader").style.display = "none";  // Hide
         });
     }
 }
@@ -2423,6 +2439,10 @@ function convertToCSV(json) {
 }
     </script>
     <style>
+    
+    
+
+    
     /* Fix DataTable full width to match the control row */
 div.dataTables_wrapper {
     display: flex;
@@ -3206,6 +3226,7 @@ table th {
         </span>
 
         <div class="dropdown-content">
+        
             <a href="#" onclick="loadChangePassword()">Change Password</a>
             <a href="#" onclick="loadLogout()">Logout</a>
         </div>
@@ -3437,7 +3458,10 @@ table th {
     
 
     <!-- Main Content Area -->
-    <div id="mainContent" class="form-content"></div>
+    <div id="mainContent" class="form-content">
+    
+    
+    </div>
 
     <script>
    
@@ -3952,6 +3976,8 @@ table th {
             }
         });
     }
+    
+
     function loadChangePassword() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -5319,6 +5345,11 @@ table th {
 	}
 
     </script>
+    <!-- Add this anywhere, preferably just before closing </body> -->
+<div id="loader" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
     
 </body>
 
