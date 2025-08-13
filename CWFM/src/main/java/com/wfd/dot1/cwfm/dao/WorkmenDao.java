@@ -37,7 +37,7 @@ public interface WorkmenDao {
 	
 	public List<MasterUser> getAllEicManager(String unitId,String deptId);
 	
-	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId);
+	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId,String workorderId);
 
 	public List<CmsGeneralMaster> getAllGenders();
 

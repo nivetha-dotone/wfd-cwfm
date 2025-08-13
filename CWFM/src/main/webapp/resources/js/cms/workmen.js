@@ -117,7 +117,7 @@ function getWorkordersAndWC() {
 
     getWorkorders(unitId, contractorId);
 
-    getWC(unitId, contractorId);
+    //getWC(unitId, contractorId);
 }
 
 function getWorkorders(unitId,contractorId) {
@@ -157,10 +157,16 @@ function getWorkorders(unitId,contractorId) {
     xhr.send();
 }
 
-function getWC(unitId,contractorId) {
+function getWC() {
+	var principalEmployerSelect = document.getElementById("principalEmployer");
+    var unitId = principalEmployerSelect.value; // Get the selected principal employer value
+    var contractorSelect = document.getElementById("contractor");
+    var contractorId = contractorSelect.value; 
+     var workorderSelect =document.getElementById("workorder");
+     var workorderId = workorderSelect.value; 
     var xhr = new XMLHttpRequest();
-    var url = contextPath + "/contractworkmen/getAllWC?unitId=" + unitId + "&contractorId=" + contractorId;
-    //alert("URL: " + url+" "+unitId+" "+contractorId);
+    var url = contextPath + "/contractworkmen/getAllWC?unitId=" + unitId + "&contractorId=" + contractorId +"&workorderId=" + workorderId;
+    //alert("URL: " + url+" "+unitId+" "+contractorId+" "+workorderId);
     xhr.open("GET", url, true);
 
     xhr.onload = function() {
@@ -178,7 +184,7 @@ function getWC(unitId,contractorId) {
                 option.text = wc.wcCode;
 				if (wc.licenceType === "LL") {
 				                    llSelect.appendChild(option);
-				                } else if (wc.licenceType === "WC") {
+				                } else if (wc.licenceType === "WC" || wc.licenceType === "ESIC") {
 				                    wcSelect.appendChild(option);
 				                }
             });
@@ -3036,6 +3042,11 @@ let streams;
     const transactionId = $('#transactionId').val().trim();
     const gatepassId = $('#gatePassId').val().trim();
 
+   if (!transactionId && !gatepassId) {
+    alert("Please enter Transaction ID or Gate Pass ID");
+    return;
+   }
+
     $.ajax({
         url: '/CWFM/entrypassstatus/statusList',
         type: 'POST',
@@ -3054,7 +3065,7 @@ let streams;
                         <td>${wo.transactionId || ''}</td>
                         <td>${wo.firstName || ''} ${wo.lastName || ''}</td>
                         <td>${wo.lastName || ''}</td>
-                        <td>${wo.aadharNumber || ''}</td>
+                        <td>${wo.aadhaarNumber || ''}</td>
                         <td>${wo.approvedBy || ''}</td>
                         <td>${wo.pendingWith || ''}</td>
                     </tr>`;
@@ -3086,7 +3097,7 @@ let streams;
             if (response.length > 0) {
                 response.forEach(function (wo) {
                     const row = `<tr>
-                        <td><input type="checkbox" name="selectedWOs" value="${wo.aadharNumber || ''}"></td>
+                        <td> <input type="checkbox" name="selectedWOs" value="${wo.transactionId}"></td>
                         <td>${wo.transactionId || ''}</td>
                          <td>${wo.gatePassId || ''}</td>
                         <td>${wo.firstName || ''} ${wo.lastName || ''}</td>

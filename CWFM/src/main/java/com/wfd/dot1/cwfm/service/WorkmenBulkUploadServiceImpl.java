@@ -1,7 +1,9 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -65,6 +67,15 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	                fieldErrors.put("aadhaarNumber", "Duplicate Aadhaar number");
 	            }
 	        }
+	        String workorderNumber = record.getWorkorderNumber();
+	        LocalDate validTillDate = workmenUploadDao.workorderValidityCheck(workorderNumber);
+
+	        if (validTillDate == null) {
+	            fieldErrors.put("workOrderValidFrom", "Work order not found");
+	        } else if (validTillDate.isBefore(LocalDate.now())) {
+	            fieldErrors.put("workOrderValidFrom", "Work order expired");
+	        }
+
 	        if (!isBlank(record.getFirstName()) && !record.getFirstName().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("firstName", "Only alphabets allowed");
 	        }
@@ -77,6 +88,9 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        
 	        if (record.getFirstName().equalsIgnoreCase(record.getLastName())) {
 	            fieldErrors.put("nameValidation", "First and Last name cannot be the same");
+	        }
+	        if (!isBlank(record.getRelationName()) && !record.getRelationName().matches("[A-Za-z ]+")) {
+	            fieldErrors.put("RelationName", "Only alphabets allowed");
 	        }
 	        if (!isBlank(record.getEmergencyName()) && !record.getEmergencyName().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("EmergencyName", "Only alphabets allowed");
@@ -136,24 +150,38 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		    	        fieldErrors.put("policeVerificationDate", "Invalid date format (expected yyyy-MM-dd)");
 		    	    }
 		    	}
+		     
+		     if (!isBlank(record.getHealthCheckDate())) {
+		    	    try {
+		    	        LocalDate healthDate = LocalDate.parse(record.getHealthCheckDate()); // Format: yyyy-MM-dd
+		    	        LocalDate sixmonAgo = LocalDate.now().minusMonths(6);
 
+		    	        if (healthDate.isBefore(sixmonAgo)) {
+		    	            fieldErrors.put("HealthCheckDate", "getHealthCheckDate Date must be within the last 6 Months");
+		    	        }
+		    	    } catch (DateTimeParseException e) {
+		    	        fieldErrors.put("HealthCheckDate", "Invalid date format (expected yyyy-MM-dd)");
+		    	    }
+		    	}
 		  // --- 7. Bank Name: Must be "New Joinee" or alphanumeric ---
 		     if (!isBlank(record.getBankName()) && 
-		         !(record.getBankName().equalsIgnoreCase("New Joinee") || record.getBankName().matches("^[A-Za-z0-9 ]+$"))) {
-		         fieldErrors.put("bankName", "Must be 'New Joinee' or alphanumeric");
+		    		 !(record.getBankName().matches("(?i)new\\s?joinee") || record.getBankName().matches("^[A-Za-z0-9]+$"))) {
+		             fieldErrors.put("bankName", "Must be 'New Joinee' or alphanumeric");
 		     }
 
 		     // --- 8. Account Number: Must be "New Joinee" or alphanumeric ---
 		     if (!isBlank(record.getAccountNumber()) &&
-		         !(record.getAccountNumber().equalsIgnoreCase("New Joinee") || record.getAccountNumber().matches("^[A-Za-z0-9]+$"))) {
-		         fieldErrors.put("accountNumber", "Must be 'New Joinee' or alphanumeric");
-		     }
+		    		    !(record.getAccountNumber().matches("(?i)new\\s?joinee") || record.getAccountNumber().matches("\\d+"))) {
+		    		    fieldErrors.put("accountNumber", "Must be 'New Joinee' or Numeric");
+		    		}
+
 
 		     // --- 9. PF Number: Must be "New Joinee" or alphanumeric ---
 		     if (!isBlank(record.getPfNumber()) &&
-		         !(record.getPfNumber().equalsIgnoreCase("New Joinee") || record.getPfNumber().matches("^[A-Za-z0-9]+$"))) {
-		         fieldErrors.put("pfNumber", "Must be 'New Joinee' or alphanumeric");
-		     }
+		    		    !(record.getPfNumber().matches("(?i)new\\s?joinee") || record.getPfNumber().matches("^[A-Za-z0-9]+$"))) {
+		    		    fieldErrors.put("pfNumber", "Must be 'New Joinee' or alphanumeric");
+		    		}
+
 
 		     // --- 10. DOJ: Must be within 15 days from current date ---
 		     if (!isBlank(record.getDoj())) {

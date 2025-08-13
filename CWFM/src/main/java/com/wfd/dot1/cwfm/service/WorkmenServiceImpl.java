@@ -78,8 +78,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.getAllEicManager(unitId,deptId);
 	}
 	@Override
-	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId) {
-		return workmenDao.getAllWCBasedOnPEAndCont(unitId, contractorId);
+	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId,String workorderId) {
+		return workmenDao.getAllWCBasedOnPEAndCont(unitId, contractorId,workorderId);
 	}
 	@Override
 	public List<CmsGeneralMaster> getAllGenders() {

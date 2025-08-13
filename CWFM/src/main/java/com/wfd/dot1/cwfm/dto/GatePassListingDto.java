@@ -1,5 +1,7 @@
 package com.wfd.dot1.cwfm.dto;
 
+import java.util.List;
+
 public class GatePassListingDto {
 	private String transactionId;
 	public String getTransactionId() {
@@ -19,6 +21,21 @@ public class GatePassListingDto {
 	private String unitName;
 	private String gatePassType;
 	private String status;
+	private List<String> approvedBy;
+	private List<String> pendingWith;
+	
+	public List<String> getApprovedBy() {
+		return approvedBy;
+	}
+	public void setApprovedBy(List<String> approvedBy) {
+		this.approvedBy = approvedBy;
+	}
+	public List<String> getPendingWith() {
+		return pendingWith;
+	}
+	public void setPendingWith(List<String> pendingWith) {
+		this.pendingWith = pendingWith;
+	}
 	public String getGatePassType() {
 		return gatePassType;
 	}

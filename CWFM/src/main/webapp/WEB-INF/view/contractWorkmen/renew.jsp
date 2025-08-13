@@ -612,7 +612,7 @@ label {
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workorder"/></label></th>
-                            <td><select class="custom-select" id="workorder" name="workorderId" >
+                            <td><select class="custom-select" id="workorder" name="workorderId" onchange="getWC()">
                                 <option value="">Please select Workorder</option>
 								<c:forEach var="wo" items="${Workorders}">
 								

@@ -199,10 +199,11 @@ public class WorkmenController {
     @GetMapping("/getAllWC")
     public ResponseEntity<List<CmsContractorWC>> getAllWC(
     		@RequestParam("unitId") String unitId, 
-            @RequestParam("contractorId") String contractorId){
-    	 log.info("Entering into getAllWCs for: " + unitId + " and contractorId: " + contractorId);
+            @RequestParam("contractorId") String contractorId,
+            @RequestParam("workorderId") String workorderId){
+    	 log.info("Entering into getAllWCs for: " + unitId + " contractorId: " + contractorId+" and workorderId: " + workorderId);
     	 try {
-    		 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(unitId,contractorId);
+    		 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(unitId,contractorId,workorderId);
     		 if(wcs.isEmpty()) {
     			 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     		 }
@@ -1329,7 +1330,7 @@ public class WorkmenController {
 	 request.setAttribute("Trades", trades);
 	 List<MasterUser> eicList = workmenService.getAllEicManager(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
 	 request.setAttribute("Eic", eicList);
-	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor());
+	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor(),gatePassMainObj.getWorkorder());
 	 request.setAttribute("Wcs", wcs);
 	 
     return "contractWorkmen/quickOBAdd";
@@ -1443,7 +1444,7 @@ public class WorkmenController {
 	 request.setAttribute("Trades", trades);
 	 List<MasterUser> eicList = workmenService.getAllEicManager(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
 	 request.setAttribute("Eic", eicList);
-	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor());
+	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor(),gatePassMainObj.getWorkorder());
 	 request.setAttribute("Wcs", wcs);
 	 
     return "contractWorkmen/renew";

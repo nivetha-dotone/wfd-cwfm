@@ -279,12 +279,12 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId) {
+	public List<CmsContractorWC> getAllWCBasedOnPEAndCont(String unitId, String contractorId,String workorderId) {
 		log.info("Entering into getAllWCBasedOnPEAndCont dao method ");
 		List<CmsContractorWC> wcList= new ArrayList<CmsContractorWC>();
 		String query = getAllWc();
 		log.info("Query to getAllWCBasedOnPEAndCont "+query);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId);
 		while(rs.next()) {
 			CmsContractorWC wc = new CmsContractorWC();
 			wc.setWcId(rs.getString("WCID"));

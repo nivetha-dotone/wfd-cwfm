@@ -1,10 +1,13 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.sql.Date;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -181,7 +184,7 @@ public class WorkmenBulkUploadDaoImpl implements WorkmenBulkUploadDao{
 
 	@Override
 	public boolean isAadharExists(String aadharNumber) {
-	    String sql1 = "SELECT COUNT(*) FROM CMSRequestItemBulkUpload WHERE AadharNumber = ?";
+	    String sql1 = "SELECT COUNT(*) FROM CMSRequestItemBulkUpload WHERE AadharNumber = ? and RecordProcessed !='N'";
 	    String sql2 = "SELECT COUNT(*) FROM GatePassMain WHERE AadharNumber = ?";
 
 	    Integer count1 = jdbcTemplate.queryForObject(sql1, new Object[]{aadharNumber}, Integer.class);
@@ -189,5 +192,24 @@ public class WorkmenBulkUploadDaoImpl implements WorkmenBulkUploadDao{
 
 	    return (count1 != null && count1 > 0) || (count2 != null && count2 > 0);
 	}
+	
+	@Override
+	public LocalDate workorderValidityCheck(String workorderNumber) {
+	    String sql = "SELECT VALIDDT FROM CMSWORKORDER WHERE NAME = ?";
+
+	    try {
+	        // Query and return the date directly
+	        Date validityDate = jdbcTemplate.queryForObject(sql, new Object[]{workorderNumber}, Date.class);
+
+	        if (validityDate != null) {
+	            return validityDate.toLocalDate(); // Convert java.sql.Date to LocalDate
+	        }
+	    } catch (EmptyResultDataAccessException e) {
+	        // No workorder found for this number
+	        return null;
+	    }
+	    return null;
+	}
+
 
 }

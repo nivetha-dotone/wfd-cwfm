@@ -185,7 +185,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 	 String gmName = fields[0];
                      String gmDescription = fields[1];
                      
-                	// Duplicate check for code (contractorCode)
+                	// Duplicate check for isGmNameGmDescriptionExists
                      if (fileUploadDao.isGmNameGmDescriptionExists(gmName,gmDescription)) {
                          errorData.add(Map.of(
                              "row", rowNum,

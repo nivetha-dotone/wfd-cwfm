@@ -1,5 +1,7 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -18,5 +20,7 @@ public interface WorkmenBulkUploadDao {
 	void updateRecordProcessedByTransactionId(Integer txnId);
 
 	public boolean isAadharExists(String aadharNumber);
+	
+	public LocalDate workorderValidityCheck(String workorderNumber);
 
 }
