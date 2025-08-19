@@ -521,7 +521,7 @@ function showFileNameBill(input, id) {
 					        console.log("Data saved successfully:", xhr.responseText);
 							sessionStorage.setItem("successMessage", "Bill approved/rejected successfully!");
 					      
-					                loadCommonList('/billVerification/listingFilter', 'Quick Onboarding List');
+					                loadCommonList('/billVerification/listingFilter', 'Bill Verification');
 					            
 					    } else {
 					        // Handle error response

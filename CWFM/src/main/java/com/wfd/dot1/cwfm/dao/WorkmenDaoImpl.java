@@ -493,7 +493,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		String query =getAllGatePassForContractor();
 		log.info("Query to getGatePassListingDetails "+query);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,deptId,unitId,type,userId,gatePassTypeId,type);
+		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,deptId,unitId,type,userId,gatePassTypeId,type);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,type,gatePassTypeId,type);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -928,7 +929,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		String query = getGatePassActionListingDetailsQuery();
 		log.info("Query to getGatePassListingDetails "+query);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -2148,5 +2150,60 @@ public void createDraftGatepass(String transactionId, String userId) {
     String sql = "INSERT INTO GATEPASSMAIN (TransactionId, GatePassStatus, UpdatedDate, UpdatedBy) VALUES (?, ?, GETDATE(), ?)";
     jdbcTemplate.update(sql, transactionId,status, userId);
 }
-
+public String getGatePassActionListingDetailsQueryNav() {
+	 return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_ACTION_NAV_FOR_CREATOR");
+}
+@Override
+public List<GatePassListingDto> getGatePassActionListingDetailsDashboardNav(String unitId,String deptId,String userId, String gatePassTypeId) {
+	log.info("Entering into getGatePassListingDetails dao method ");
+	List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
+	String query = getGatePassActionListingDetailsQueryNav();
+	log.info("Query to getGatePassListingDetails "+query);
+	//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,gatePassTypeId);
+	while(rs.next()) {
+		GatePassListingDto dto = new GatePassListingDto();
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId((rs.getString("GatePassId")));
+		dto.setFirstName(rs.getString("firstName"));
+		dto.setLastName(rs.getString("lastName"));
+		dto.setGender(rs.getString("GMNAME"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setContractorName(rs.getString("ContractorName"));
+		dto.setVendorCode(rs.getString("VendorCode"));
+		dto.setUnitName(rs.getString("UnitName"));
+		String gatePassType = rs.getString("GatePassTypeId");
+		if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+			dto.setGatePassType("Create");
+		}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+			dto.setGatePassType("Block");
+		}
+		else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+			dto.setGatePassType("Unblock");
+		}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+			dto.setGatePassType("Blacklist");
+		}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+			dto.setGatePassType("Deblacklist");
+		}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+			dto.setGatePassType("Cancel");
+		}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+			dto.setGatePassType("Lost/Damage");
+		}
+		String status =rs.getString("GatePassStatus");
+		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+			dto.setStatus("Approval Pending");
+		}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+			dto.setStatus("Approved");
+		}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+			dto.setStatus("Rejected");
+		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+			dto.setStatus("Draft");
+		}
+		dto.setOnboardingType(rs.getString("OnboardingType"));
+		listDto.add(dto);
+	}
+	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
+	return listDto;
+}
 }

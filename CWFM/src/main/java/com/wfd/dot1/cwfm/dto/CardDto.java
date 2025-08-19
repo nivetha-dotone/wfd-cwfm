@@ -10,7 +10,16 @@ public class CardDto {
     private String iconUrl;
     private String link;
 
-    public CardDto() {
+    private String heading;
+    public String getHeading() {
+		return heading;
+	}
+
+	public void setHeading(String heading) {
+		this.heading = heading;
+	}
+
+	public CardDto() {
         // Default constructor
     }
 
@@ -25,7 +34,20 @@ public class CardDto {
         this.link = link;
     }
 
-    // Getters and Setters
+    public CardDto(String title, String description, String count, String borderClass, String iconClass, String iconUrl,
+			String link, String heading) {
+		super();
+		this.title = title;
+		this.description = description;
+		this.count = count;
+		this.borderClass = borderClass;
+		this.iconClass = iconClass;
+		this.iconUrl = iconUrl;
+		this.link = link;
+		this.heading = heading;
+	}
+
+	// Getters and Setters
     public String getTitle() {
         return title;
     }

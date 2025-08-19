@@ -585,7 +585,7 @@ label {
                 <td>
                 	<select class="custom-select" name="maritalStatus" id="maritalStatus">
                         <option value="">Please select Marital Status</option>
-                        	<option value="Single" ${GatePassObj.maritalStatus eq 'Unmarried' ? 'selected="selected"' : ''}>Unmarried</option>
+                        	<option value="Unmarried" ${GatePassObj.maritalStatus eq 'Unmarried' ? 'selected="selected"' : ''}>Unmarried</option>
     						<option value="Married" ${GatePassObj.maritalStatus eq 'Married' ? 'selected="selected"' : ''}>Married</option>
                     </select>
                 	<label id="error-maritalStatus"style="color: red;display: none;">Marital Status is required</label>
@@ -626,7 +626,7 @@ label {
                                 
 								<c:forEach var="pe" items="${PrincipalEmployer}">
 								
-                					<option value="${pe.id}"
+                					<option value="${pe.id}" ${GatePassObj.principalEmployer eq pe.id ? 'selected="selected"' : ''}
 									>
 									${pe.description}</option>
             					</c:forEach>
@@ -641,7 +641,7 @@ label {
             						<option value="">Please select Contractor</option>
 									<c:forEach var="contr" items="${Contractors}">
 										
-                					<option value="${contr.contractorId}" <c:if test="${Contractors.size() == 1}">selected</c:if>>
+                					<option value="${contr.contractorId}" ${GatePassObj.contractor eq contr.contractorId ? 'selected="selected"' : ''}>
 									${contr.contractorName}</option>
             					</c:forEach>
         						</select>
@@ -656,7 +656,7 @@ label {
 								<c:forEach var="wo" items="${Workorders}">
 								
                 					<option value="${wo.workorderId}"
-									<c:if test="${Workorders.size() == 1}">selected</c:if>>
+									${GatePassObj.workorder eq wo.workorderId ? 'selected="selected"' : ''}>
 									${wo.name}</option>
             					</c:forEach>
                                 </select>
@@ -668,7 +668,7 @@ label {
 								<c:forEach var="pe" items="${Trades}">
 								
                 					<option value="${pe.tradeId}"
-									<c:if test="${Trades.size() == 1}">selected</c:if>>
+									${GatePassObj.trade eq pe.tradeId ? 'selected="selected"' : ''}>
 									${pe.tradeName}</option>
             					</c:forEach>
 								
@@ -683,7 +683,7 @@ label {
 									
                                 	 <c:forEach var="s" items="${Skills}">
 									 
-                						<option value="${s.skillId}"	<c:if test="${Skills.size() == 1}">selected</c:if>>
+                						<option value="${s.skillId}"	${GatePassObj.skill eq s.skillId ? 'selected="selected"' : ''}>
 										${s.skillName}</option>
             						</c:forEach>
             						
@@ -695,7 +695,7 @@ label {
                                 <option value="">Please select Department</option>
 								
                                  <c:forEach var="dept" items="${Dept}">
-                						<option value="${dept.id}" >
+                						<option value="${dept.id}" ${GatePassObj.department eq dept.id ? 'selected="selected"' : ''}>
 										${dept.description}</option>
             						</c:forEach>
 								
@@ -709,7 +709,7 @@ label {
                                 <option value="">Please select Area</option>
 								
                                  <c:forEach var="dept" items="${Subdept}">
-                						<option value="${dept.id}" <c:if test="${Subdept.size() == 1}">selected</c:if>>
+                						<option value="${dept.id}" ${GatePassObj.subdepartment eq dept.id ? 'selected="selected"' : ''}>
 										${dept.description}</option>
             						</c:forEach>
 									
@@ -722,9 +722,11 @@ label {
                                 <select class="custom-select" id="eic" name="eicId" >
             						<option value="">Please select EIC</option>
 									<c:forEach var="pe" items="${Eic}">
-									<option value="${pe.userId}"
-									<c:if test="${Eic.size() == 1}">selected</c:if>>
-									${pe.fullName}</option>
+									<option value="${pe.userId}" 
+									${not empty GatePassObj.eic and GatePassObj.eic.toString() == pe.userId.toString() ? 'selected="selected"' : ''}>
+ 										 ${pe.fullName}
+									</option>
+									
             					</c:forEach>
         						</select>
                                 <label id="error-eic"style="color: red;display: none;">EIC is required</label>
@@ -740,8 +742,8 @@ label {
                             <td><select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
-								<c:if test="${pe.licenceType eq 'WC'}">
-                					<option value="${pe.wcId}">
+								<c:if test="${pe.licenceType eq 'WC' || pe.licenceType eq 'ESIC'}">
+                					<option value="${pe.wcId}"  ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
 									${pe.wcCode}</option>
 									</c:if>
             					</c:forEach>
@@ -776,7 +778,7 @@ label {
        								 <option value="">Please select Access Area</option>
 									
         							<c:forEach var="option" items="${AccessArea}">
-										<option value="${option.gmId}" <c:if test="${AccessArea.size() == 1}">selected</c:if>>
+										<option value="${option.gmId}" ${GatePassObj.accessArea eq option.gmId ? 'selected="selected"' : ''}>
 										${option.gmName}</option>
                         			</c:forEach>
 									
@@ -879,7 +881,7 @@ label {
 						<option value="" >Select Blood Group</option>
 						
 						<c:forEach var="option" items="${BloodGroup}">
-                            <option value="${option.gmId}" <c:if test="${BloodGroup.size() == 1}">selected</c:if>>
+                            <option value="${option.gmId}" ${GatePassObj.bloodGroup eq option.gmId ? 'selected="selected"' : ''}>
 							${option.gmName}</option>
                         </c:forEach>
 						
@@ -906,7 +908,7 @@ label {
 					<option value="" >Select Educational Qualification</option>
 					
 							<c:forEach var="option" items="${Academics}">
-                            <option value="${option.gmId}" <c:if test="${Academics.size() == 1}">selected</c:if>>
+                            <option value="${option.gmId}" ${GatePassObj.academic eq option.gmId ? 'selected="selected"' : ''}>
 							${option.gmName}</option>
                         </c:forEach>
 						
@@ -995,7 +997,7 @@ label {
 						<option value=""> Select Workmen Wage Category</option>
 						
 						<c:forEach var="option" items="${WageCategory}">
-                            <option value="${option.gmId}" <c:if test="${WageCategory.size() == 1}">selected</c:if>>
+                            <option value="${option.gmId}" ${GatePassObj.wageCategory eq option.gmId ? 'selected="selected"' : ''}>
 							${option.gmName}</option>
                         </c:forEach>
 						
@@ -1009,7 +1011,7 @@ label {
 						<option value=""> Select Bonus Payout</option>
 						
 						<c:forEach var="option" items="${BonusPayout}">
-                            <option value="${option.gmId}" <c:if test="${BonusPayout.size() == 1}">selected</c:if>>
+                            <option value="${option.gmId}" ${GatePassObj.bonusPayout eq option.gmId ? 'selected="selected"' : ''}>
 							${option.gmName}</option>
                         </c:forEach>
 						
@@ -1023,7 +1025,7 @@ label {
 					<select class="custom-select" id="zone"    name="zoneId"  >
 						<option value=""> Select Zone</option>
 						<c:forEach var="option" items="${Zone}">
-                            <option value="${option.gmId}" <c:if test="${Zone.size() == 1}">selected</c:if>>${option.gmName}</option>
+                            <option value="${option.gmId}" ${GatePassObj.zone eq option.gmId ? 'selected="selected"' : ''}>${option.gmName}</option>
                         </c:forEach>
 					</select>
 					<label id="error-zone"style="color: red;display: none;">Zone is required</label>

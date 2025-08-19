@@ -631,5 +631,10 @@ public class WorkmenServiceImpl implements WorkmenService{
 		// TODO Auto-generated method stub
 		workmenDao.createDraftGatepass(transactionId, userId);
 	}
+	
+	@Override
+	public List<GatePassListingDto> getGatePassActionListingDetailsForDashboardNav(String unitId,String deptId,String userId, String gatePassTypeId) {
+		return workmenDao.getGatePassActionListingDetailsDashboardNav(unitId,deptId,userId,gatePassTypeId);
+	}
 
 }

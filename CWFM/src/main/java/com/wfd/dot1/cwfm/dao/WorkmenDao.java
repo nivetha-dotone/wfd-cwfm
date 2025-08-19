@@ -137,4 +137,7 @@ public interface WorkmenDao {
 	String getNextTransactionId();
 
 	void createDraftGatepass(String transactionId, String userId);
+
+	List<GatePassListingDto> getGatePassActionListingDetailsDashboardNav(String unitId, String deptId, String userId,
+			String gatePassTypeId);
 }

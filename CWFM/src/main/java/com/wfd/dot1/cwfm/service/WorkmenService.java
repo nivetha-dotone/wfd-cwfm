@@ -103,4 +103,7 @@ public interface WorkmenService {
 
 	public void createDraftGatepass(String transactionId, String userId);
 
+	List<GatePassListingDto> getGatePassActionListingDetailsForDashboardNav(String unitId, String deptId, String userId,
+			String gatePassTypeId);
+
 }	

@@ -1676,6 +1676,7 @@ public class WorkmenController {
     	  
 		return "contractWorkmen/quickOnboardingList";
 	}
+  //quickOnboardingList
     
    
     @GetMapping("/quickOnboardingCreation")
@@ -1759,5 +1760,166 @@ public class WorkmenController {
 
         return response;
     }
+    
+    @GetMapping("/quickOnboardingListDashboardNav")
+    public String quickOnboardingListDashboardNav(HttpServletRequest request, HttpServletResponse response
+    		,@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
+    		@RequestParam(value = "deptId", required = false) String deptId
+    		) {
+    	String type="quick";
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/quickOnboardingList");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	request.setAttribute("Dept", departments);
+    	request.setAttribute("selectedPE", principalEmployerId);
+    	request.setAttribute("selectedDept", deptId);
+    	  
+    	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
+		}else {	
+			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
+		}
+		request.setAttribute("GatePassListingDto", gplistDto);
+		return "contractWorkmen/quickOnboardingList";
+	}
+    
+    @GetMapping("/regOnboardingListDashboardNav")
+    public String regOnboardingListDashboardNav(HttpServletRequest request, HttpServletResponse response
+    		,@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
+    		@RequestParam(value = "deptId", required = false) String deptId) {
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		String type="regular";
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/list");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	request.setAttribute("Dept", departments);
+    	request.setAttribute("selectedPE", principalEmployerId);
+    	request.setAttribute("selectedDept", deptId);
+    	  
+    	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
+		}else {	
+			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
+		}
+		request.setAttribute("GatePassListingDto", gplistDto);
+		return "contractWorkmen/approverList";
+	}
+    
+    @GetMapping("/gatepassActionListDashboardNav")
+    public String gatepassActionListDashboardNav(HttpServletRequest request, HttpServletResponse response
+    		,@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
+    		@RequestParam(value = "deptId", required = false) String deptId,@RequestParam(value = "action", required = false) String action) {
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		String result=null;
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
+        if(action.equals(GatePassType.BLOCK.getStatus())) {
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/blockListFilter");
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus());
+    		
+		}else {	
+			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLOCK.getStatus());
+		}
+		result ="contractWorkmen/blockListing";
+        }else if(action.equals(GatePassType.UNBLOCK.getStatus())) {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/unblockListFilter");
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus());
+        		
+    		}else {	
+    			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
+    		}
+    		result ="contractWorkmen/unblockListing";
+        }else if(action.equals(GatePassType.BLACKLIST.getStatus())) {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/blackListFilter");
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus());
+        		
+    		}else {	
+    			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLACKLIST.getStatus());
+    		}
+    		result ="contractWorkmen/blackListing";
+        }else if(action.equals(GatePassType.DEBLACKLIST.getStatus())) {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/deblackListFilter");
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus());
+        		
+    		}else {	
+    			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
+    		}
+    		result ="contractWorkmen/deblackListing";
+        }else if(action.equals(GatePassType.CANCEL.getStatus())) {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/cancelFilter");
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CANCEL.getStatus());
+        		
+    		}else {	
+    			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.CANCEL.getStatus());
+    		}
+    		result ="contractWorkmen/cancelListing";
+        }else if(action.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/lostordamageFilter");
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus());
+        		
+    		}else {	
+    			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.LOSTORDAMAGE.getStatus());
+    		}
+    		result ="contractWorkmen/lostListing";
+        }else if(action.equals(GatePassType.RENEW.getStatus())) {
+        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/renewFilter");
+        	if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+        		//write union for renewal pending and renewed
+    				gplistDto= workmenService.getRenewListingDetails( String.valueOf(user.getUserId()), GatePassType.CREATE.getStatus(), GatePassStatus.APPROVED.getStatus(), deptId, principalEmployerId) ;
+        		}else {	
+        			gplistDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.RENEW.getStatus());
+        		}	
+    		result ="contractWorkmen/renewListing";
+        }
+		 listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+	   	    request.setAttribute("UserPermission", rr);
+	    	request.setAttribute("principalEmployers", peList);
+	    	request.setAttribute("Dept", departments);
+	    	request.setAttribute("selectedPE", principalEmployerId);
+	    	request.setAttribute("selectedDept", deptId);
+		request.setAttribute("GatePassListingDto", gplistDto);
+		return result;
+	}
 
 }

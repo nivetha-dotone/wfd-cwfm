@@ -261,9 +261,31 @@
 					
             </tr>
         </thead>
+        <c:if test="${GatePassListingDto.size()>0 }">
         <tbody>
-            
+            <c:forEach items="${GatePassListingDto}" var="wo" >
+            <tr>
+            <td  ><input type="checkbox" name="selectedWOs" value="${wo.transactionId}"></td>
+												<td  > ${ wo.transactionId } </td> 
+												 <td  > ${ wo.gatePassId } </td> 
+					                              <td  > ${ wo.firstName } ${ wo.lastName}  </td> 
+												 
+												  
+												  
+												  <td  >${  wo.aadhaarNumber}  </td> 	
+												  <td  > ${ wo.contractorName}  </td> 	
+												 
+												  <td  >${ wo.unitName } </td> 	
+												  <td  >${  wo.gatePassType } </td> 
+												  <td  >${  wo.onboardingType}  </td> 
+												  <td  >${  wo.status } </td> 
+            </tr>
+           </c:forEach>
         </tbody>
+         </c:if>
+         <c:if test="${GatePassListingDto.size() == 0 }">
+         <tbody></tbody>
+         </c:if>
     </table>
     
                         </form>

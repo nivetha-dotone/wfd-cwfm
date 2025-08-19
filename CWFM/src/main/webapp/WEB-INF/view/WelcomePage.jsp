@@ -44,6 +44,7 @@
 
       <script src="resources/js/cms/export.js"></script>
        <script src="resources/js/cms/contRenewal.js"></script>
+       <script src="resources/js/cms/dashboard.js"></script>
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   
@@ -223,6 +224,79 @@ function loadCommonList(path, heading) {
     xhttp.open("GET", url, true);
     xhttp.send();
 }
+
+function loadCommonListDashboard(path,heading) {
+    updateHeading(heading);
+    var url =  path;
+    console.log("Constructed URL in load:", url);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const mainContent = document.getElementById("mainContent");
+            mainContent.innerHTML = this.responseText;
+
+              
+                    const tables = mainContent.querySelectorAll("table");
+                    tables.forEach(table => {
+                    	if (!table.classList.contains("no-dt")) {  // ✅ Skip tables with class 'no-dt'
+                        $(table).DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            lengthChange: true,
+                            info: true,
+                            dom: '<"top"f>rt<"bottom"lip><"clear">'
+                        });
+                    	}
+                    });
+                
+          
+
+
+           // ✅ Run inline scripts
+            const scripts = mainContent.querySelectorAll("script");
+            scripts.forEach(script => {
+                const newScript = document.createElement("script");
+                if (script.src) {
+                    newScript.src = script.src;
+                    newScript.async = false;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript);
+                script.remove();
+            }); 
+
+            // ✅ Show messages if any
+            const successMessage = sessionStorage.getItem("successMessage");
+            const errorMessage = sessionStorage.getItem("errorMessage");
+            const messageDiv = document.getElementById("messageDiv");
+
+            if (messageDiv) {
+                if (successMessage) {
+                    messageDiv.innerHTML = successMessage;
+                    messageDiv.style.color = "green";
+                } else if (errorMessage) {
+                    messageDiv.innerHTML = errorMessage;
+                    messageDiv.style.color = "red";
+                }
+                sessionStorage.removeItem("successMessage");
+                sessionStorage.removeItem("errorMessage");
+
+                setTimeout(() => {
+                    messageDiv.style.display = "none";
+                }, 5000);
+            }
+
+            setDateRange();
+            resetSessionTimer();
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+
 function loadQobAdd(path,heading,userId) {
 	//alert("loadQobAdd"+userId);
 	 updateHeading(heading);
@@ -1734,11 +1808,13 @@ function changeRole(selectedRoleId, selectedRoleName) {
         .then(data => {
         	 console.log('Sidebar update data:', data); 
             updateSidebar(data,selectedRoleName); // Update the sidebar with the fetched pages
-          
-         // Fetch the role-based dashboard
-            return fetch('/CWFM/dashboard/view', {
+          if(selectedRoleName === 'System Admin'){
+        	  
+          }else{
+         // Fetch the role-based dashboard 
+            return fetch('/CWFM/dashboard/getOrgDetails', {
                 method: 'GET'
-            });
+            });}
         })
         .then(response => response.text())
         .then(html => {
