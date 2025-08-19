@@ -109,4 +109,71 @@ public class Workorder {
 	public void setEicNumber(String eicNumber) {
 		this.eicNumber = eicNumber;
 	}
+	
+	private String job;
+	private String serviceCode;
+	private String trade;
+	private String skill;
+	private String itemQuantity;
+	private String rate;
+	private String serviceEntryQty;
+	private String wbsCode;
+	private String uom;
+
+	public String getJob() {
+		return job;
+	}
+	public void setJob(String job) {
+		this.job = job;
+	}
+	public String getServiceCode() {
+		return serviceCode;
+	}
+	public void setServiceCode(String serviceCode) {
+		this.serviceCode = serviceCode;
+	}
+	public String getTrade() {
+		return trade;
+	}
+	public void setTrade(String trade) {
+		this.trade = trade;
+	}
+	public String getSkill() {
+		return skill;
+	}
+	public void setSkill(String skill) {
+		this.skill = skill;
+	}
+	public String getItemQuantity() {
+		return itemQuantity;
+	}
+	public void setItemQuantity(String itemQuantity) {
+		this.itemQuantity = itemQuantity;
+	}
+	public String getRate() {
+		return rate;
+	}
+	public void setRate(String rate) {
+		this.rate = rate;
+	}
+	public String getServiceEntryQty() {
+		return serviceEntryQty;
+	}
+	public void setServiceEntryQty(String serviceEntryQty) {
+		this.serviceEntryQty = serviceEntryQty;
+	}
+	public String getWbsCode() {
+		return wbsCode;
+	}
+	public void setWbsCode(String wbsCode) {
+		this.wbsCode = wbsCode;
+	}
+	public String getUom() {
+		return uom;
+	}
+	public void setUom(String uom) {
+		this.uom = uom;
+	}
+	
+	
 }

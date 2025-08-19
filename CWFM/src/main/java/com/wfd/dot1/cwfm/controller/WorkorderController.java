@@ -108,7 +108,9 @@ public class WorkorderController {
 	        	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 	            MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 	        
-	            List<Workorder> woList = contrService.getWorkOrdersByContractorIdAndUnitId(contractorId,principalEmployerId);
+	           // List<Workorder> woList = contrService.getWorkOrdersByContractorIdAndUnitId(contractorId,principalEmployerId);
+	            
+	            List<Workorder> woList = woService.getWorkOrdersByContractorIdAndUnitId(contractorId,principalEmployerId);
 	            
 	            PrincipalEmployer principalEmployer = peService.getIndividualPEDetailByUnitId(principalEmployerId);
 	            
@@ -138,6 +140,10 @@ public class WorkorderController {
 	       
 	        Contractor contractor =contrService.getContractorById(contractorId);
 	       request.setAttribute("contractor", contractor);
+	       
+	       List<Workorder> workOrders =woService.getWorkorderLicenseInfo(id);
+	       request.setAttribute("workOrders", workOrders);
+	       
 	        return "workorder/view";
 	    } 
 

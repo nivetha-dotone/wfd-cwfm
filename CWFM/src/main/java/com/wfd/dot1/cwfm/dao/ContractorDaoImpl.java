@@ -98,6 +98,9 @@ public class ContractorDaoImpl implements ContractorDao{
                     contractor.setContractorName(rs.getString("NAME"));
                     contractor.setContractorAddress(rs.getString("ADDRESS"));
                     contractor.setContractorCode(rs.getString("CODE"));
+                    contractor.setMobileNumber(rs.getLong("mobilenumber"));
+                    contractor.setEmailaddress(rs.getString("EMAILADDRESS"));
+                    contractor.setManagerAddress(rs.getString("MANAGERADDRESS"));
                     contractor.setBlocked(rs.getInt("ISBLOCKED") == 1);
                     return contractor;
                 }

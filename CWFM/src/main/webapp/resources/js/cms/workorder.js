@@ -141,6 +141,7 @@ function searchWithPEContractorInWO(contextPath) {
 								                       '<td ><input type="checkbox" name="selectedWorkorderIds" value="' + wo.workorderId + '"></td>' +
 													   '<td >' + wo.workorderId + '</td>' +
 													   '<td >' + wo.sapWorkorderNumber + '</td>' +
+								                       '<td >' + wo.job + '</td>' +
 								                       '<td >' + wo.typeId + '</td>' +
 								                       '<td >' + wo.secId + '</td>' +
 								                       '<td >' + wo.validFrom + '</td>' +

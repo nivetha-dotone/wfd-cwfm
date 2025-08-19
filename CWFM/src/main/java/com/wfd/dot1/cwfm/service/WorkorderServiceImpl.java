@@ -1,5 +1,7 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,16 @@ public class WorkorderServiceImpl implements WorkorderService{
 	public Workorder getWorkorderById(String id) {
 		// TODO Auto-generated method stub
 		return woDao.getWorkorderById(id);
+	}
+	@Override
+	public List<Workorder> getWorkorderLicenseInfo(String id) {
+		// TODO Auto-generated method stub
+		return woDao.getWorkorderLicenseInfo(id);
+	}
+	@Override
+	public List<Workorder> getWorkOrdersByContractorIdAndUnitId(String contractorId, String principalEmployerId) {
+		// TODO Auto-generated method stub
+		return woDao.getWorkOrdersByContractorIdAndUnitId( contractorId,  principalEmployerId);
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
@@ -28,6 +30,10 @@ public class WorkorderDaoImpl implements WorkorderDao{
 	 public String getWOById() {
 		    return QueryFileWatcher.getQuery("GET_WO_BY_ID");
 		}
+	 
+	 public String getWOLicenseInfo() {
+		    return QueryFileWatcher.getQuery("GET_WO_LICENSE_INFO");
+		}
 	@Override
 	public Workorder getWorkorderById(String id) {
 		String query=getWOById();
@@ -42,9 +48,9 @@ public class WorkorderDaoImpl implements WorkorderDao{
             wo.setValidFrom(rs.getString("VALIDFROM"));
             wo.setValidTo(rs.getString("VALIDDT"));
             wo.setUnitId(rs.getString("UNITID"));
-            wo.setTypeId(String.valueOf(rs.getInt("TYPEID")));
-            wo.setDepId(String.valueOf(rs.getInt("DEPID")));
-            wo.setSecId(String.valueOf(rs.getInt("SECID")));
+            wo.setTypeId(rs.getString("SAP_TYPE"));
+            wo.setDepId(rs.getString("DESCRIPTION"));
+            wo.setSecId(rs.getString("SECID"));
             wo.setStatus(String.valueOf(rs.getInt("STATUS")));
             wo.setEicNumber(rs.getString("EICNUMBER"));
             wo.setGlCode(rs.getString("GLCODE"));
@@ -73,5 +79,45 @@ return null;
 
         return list.stream().collect(Collectors.toMap(Workorder::getSapWorkorderNumber, wo -> wo));
     }
+	
+
+	@Override
+	public List<Workorder> getWorkorderLicenseInfo(String workorderId) {
+	    String sql = "select cwln.JOB,cmssm.SERVICECODE,cmsgm1.gmname as TRADE,cmsgm2.gmname as SKILL,cwln.QTY,cwln.RATE,"
+	    		+ "cwln.SERVICE_LN_ITEM_NUM,cwln.WBS_ELEMENT,cwln.UOM from CMSWORKORDERLN cwln "
+	    		+ "join CMSSERVICEMASTER cmssm on cmssm.SERVICEID=cwln.SERVICEID "
+	    		+ "join CMSGENERALMASTER cmsgm1 on cmsgm1.GMID=cmssm.TRADEID "
+	    		+ "join CMSGENERALMASTER cmsgm2 on cmsgm2.GMID=cmssm.SKILLID where cwln.WORKORDERID=?";
+	    return jdbcTemplate.query(sql, new Object[]{workorderId}, new BeanPropertyRowMapper<>(Workorder.class));
+	}
+
+	@Override
+	public List<Workorder> getWorkOrdersByContractorIdAndUnitId(String contractorId, String unitId) {
+		log.info("Entering into getAllWorkordersBasedOnPEAndContractor dao method "+unitId+" "+contractorId);
+		List<Workorder> woList= new ArrayList<Workorder>();
+		String query="select cmwo.WORKORDERID, SAP_WORKORDER_NUM as WORKORDERNUMBER,cwln.JOB as JOB,cwty.SAP_TYPE as WORKORDERTYPE,SECID,VALIDFROM,VALIDDT,UNITID,cmwo.STATUS  from CMSWORKORDER cmwo\r\n"
+				+ "	join CMSWORKORDERLN cwln on cwln.WORKORDERID=cmwo.WORKORDERID\r\n"
+				+ "	join CMSWORKORDERTYP cwty on cwty.TYPEID = cmwo.TYPEID WHERE cmwo.CONTRACTORID=? and cmwo.UNITID=?";
+		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId);
+		while(rs.next()) {
+			Workorder wo = new Workorder();
+			wo.setWorkorderId(rs.getString("WORKORDERID"));
+            wo.setSapWorkorderNumber(rs.getString("WORKORDERNUMBER"));
+            wo.setJob(rs.getString("JOB"));
+            wo.setTypeId(rs.getString("WORKORDERTYPE"));;
+            wo.setSecId(rs.getString("SECID"));
+            wo.setValidFrom(rs.getString("VALIDFROM"));
+            wo.setValidTo(rs.getString("VALIDDT"));
+            wo.setUnitId(rs.getString("UNITID"));
+            wo.setStatus(String.valueOf(rs.getInt("STATUS")));
+			woList.add(wo);
+		}
+		log.info("Exiting from getAllWorkordersBasedOnPEAndContractor dao method "+woList.size());
+		return woList;
+	}
+
+	
+	
 
 }

@@ -21,7 +21,28 @@ public class Contractor {
 	private String reference;
 	   
 	private long mobileNumber;
+	
+	private String emailaddress;
+	
+	private String managerAddress;
 	   
+	
+	public String getEmailaddress() {
+		return emailaddress;
+	}
+
+	public void setEmailaddress(String emailaddress) {
+		this.emailaddress = emailaddress;
+	}
+
+	public String getManagerAddress() {
+		return managerAddress;
+	}
+
+	public void setManagerAddress(String managerAddress) {
+		this.managerAddress = managerAddress;
+	}
+
 	public String getCity() {
 		return city;
 	}

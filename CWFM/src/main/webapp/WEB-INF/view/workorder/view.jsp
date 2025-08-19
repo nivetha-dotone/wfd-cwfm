@@ -283,14 +283,14 @@ table.ControlLayout td {
                         
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workOrderType"/></label></th>
-                            <td><input type="text" name="typeId" value="BSR" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="typeId" value="${workorder.typeId}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.departmentName"/></label></th>
-                            <td><input type="text" name="depId" value="Mechanical" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="depId" value="${workorder.depId}"  style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.areaName"/></label></th>
-                            <td><input type="text" name="secId" value="Mechanical" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="secId" value="${workorder.secId}"  style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.costCentre"/></label></th>
                             <td><input type="text" name="costCenter" value="${workorder.costCenter}" style="height: 20px;"  size="30" maxlength="30" readonly/></td>
                         
@@ -330,42 +330,21 @@ table.ControlLayout td {
 		</tr>
 	</thead>
 	<tbody>
-	<tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
-            <td style="color:black ;text-align:left">ENGG - BLR</td>
-            <td style="color:black ;text-align:left">5000001</td>
-            <td style="color:black ;text-align:left">Helper</td>
-            <td style="color:black ;text-align:left">Skilled</td>
-            <td style="color:black ;text-align:left">1</td>
-            <td style="color:black ;text-align:left">990</td>
-            <td style="color:black ;text-align:left">20</td>
-            <td style="color:black ;text-align:left">350</td>
-            <td style="color:black ;text-align:left">EA</td>
-        </tr>
-        <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
-            <td style="color:black ;text-align:left">HR - BLR</td>
-            <td style="color:black ;text-align:left">5000002</td>
-            <td style="color:black ;text-align:left">Fitter</td>
-            <td style="color:black ;text-align:left">Unskilled</td>
-            <td style="color:black ;text-align:left">20</td>
-            <td style="color:black ;text-align:left">18</td>
-            <td style="color:black ;text-align:left">20</td>
-            <td style="color:black ;text-align:left">270</td>
-            <td style="color:black ;text-align:left">M3</td>
-        </tr>
-        <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
-            <td style="color:black ;text-align:left">QA - BLR</td>
-            <td style="color:black ;text-align:left">5000003</td>
-            <td style="color:black ;text-align:left">Welder</td>
-            <td style="color:black ;text-align:left">Semi Skilled</td>
-            <td style="color:black ;text-align:left">10</td>
-            <td style="color:black ;text-align:left">456</td>
-            <td style="color:black ;text-align:left">10</td>
-            <td style="color:black ;text-align:left">310</td>
-               <td style="color:black ;text-align:left">NOS</td>
-        </tr>
-				
+         <c:forEach var="wo" items="${workOrders}">
+		   <tr style=" border: 1px solid #ddd;background-color: #f9f9f9 ;">
+			<td style="color:black ;text-align:left">${wo.job}</td>
+			<td style="color:black ;text-align:left">${wo.serviceCode}</td>
+			<td style="color:black ;text-align:left">${wo.trade}</td>
+			<td style="color:black ;text-align:left">${wo.skill}</td>
+			<td style="color:black ;text-align:left">${wo.itemQuantity}</td>
+			<td style="color:black ;text-align:left">${wo.rate}</td>
+			<td style="color:black ;text-align:left">${wo.serviceEntryQty}</td>
+			<td style="color:black ;text-align:left">${wo.wbsCode}</td>
+			<td style="color:black ;text-align:left">${wo.uom}</td>
+		 </tr>
+	  </c:forEach>
 	</tbody>
-                </table>
+   </table>
             </div>
         
     </div>

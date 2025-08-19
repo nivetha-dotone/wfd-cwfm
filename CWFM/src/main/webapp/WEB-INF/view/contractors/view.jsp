@@ -242,15 +242,15 @@ table.ControlLayout td {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                             <td><input type="text" name="managerNm" value="${contractorPEMM.managerName}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerAddress"/></label></th>
-                            <td><input type="text" name="pfNum" value="${contractorPEMM.pfNum}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="pfNum" value="${contractor.managerAddress}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                        
                         </tr>
                         
                         <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
-                            <td><input type="text" name="managerEmail" value="ramco@gmail.com" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="managerEmail" value="${contractor.emailaddress}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
-                            <td><input type="text" name="managerMobile" value="9876543212" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="managerMobile" value="${contractor.mobileNumber}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
                         <tr>
