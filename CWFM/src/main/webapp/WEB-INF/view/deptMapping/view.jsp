@@ -1,20 +1,16 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@ page isELIgnored="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<title>Org Levels Mapping</title>
- <!-- <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <script src="resources/js/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
-    <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
+    <title>Workmen Onboarding List</title>
+    <script src="resources/js/cms/workmen.js"></script>
+
+
  <style>
  
  
@@ -169,43 +165,99 @@
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
 </style>
+<script>
+function toggleSelectAllGMTYPE() {
+    const checkboxes = document.querySelectorAll('input[name="selectedWOs"]');
+    checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllCheckbox').checked);
+}
+</script>
 </head>
 <body>
 <div class="page-header">
-    <%-- <form id="searchForm" autocomplete="off">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="shortNameSearch" name="searchQuery" autocomplete="off" placeholder="Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchUserByShortName()">Search</button>
-    </form>
-    <div> --%>
-   <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapAdd()">New</button>
-    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapEdit()">Edit</button>
-     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgLevelMappingView()">View</button>
-    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportOrgLevelMapCSV()">Export</button>
+   <!--  <form id="searchForm">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
+    </form> -->
+   <!--  <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectAdd()">Save</button> -->  
+    
+    <div>
+    <%-- <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','regular')">Save</button> --%>
+    
+    <c:if test="${UserPermission.addRights eq 1 }">
+          <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToMappingAdd()">Add</button> 
+     </c:if> 
+    <c:if test="${UserPermission.editRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectEdit()">Edit</button> 
+     </c:if>
+     <c:if test="${UserPermission.viewRights eq 1 }">
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectView()">View</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
+    	</c:if>
+
+    </div>
 </div>
-<!-- </div> -->
-<!-- <div class="page-header">
-    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToOrgMapAdd()">New</button>
-    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="editMapping()">Edit</button>
-</div> -->
-<div class="table-container">
-    <table id="OrgLevelTable" border="1">
-                <thead>
-                    <tr>
-                    <td><input type="checkbox" id="selectAllOrgMapCheckbox" onchange="toggleSelectAllOrgMap()"></td>
-                        <th>Short Name</th>
-                        <th>Long Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="map" items="${mappings}">
-                        <tr>
-                         <td ><input type="checkbox" name="selectedOrgMap" value="${map.orgAcctSetId}"></td>
-                            <td>${map.shortName}</td>
-                            <td>${map.longDescription}</td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-</div>
+
+     <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
+     <div id="messageDiv" style="font-weight: bold; margin-top: 10px;"></div>
+    
+     
+                         <div class="table-container">
+              <!-- Success Message -->
+<div id="successMessage" style="color: green; font-weight: bold; display: none;"></div>
+
+<!-- Error Message -->
+<div id="errorMessage" style="color: red; font-weight: bold; display: none;"></div>
+                        
+    <table id="workmenTable"  cellspacing="0" cellpadding="0" >
+        <thead>
+<tr >
+                    <td >
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllGMTYPE()">
+                    </td> 
+                    <!-- Add more table headers for each column -->
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.principalEmployer"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <%-- <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
+					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.department"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.subDepartment"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+				 
+            </tr>
+        </thead>
+        <tbody>
+				<c:forEach items="${wbudata}" var="wo">
+					<tr>
+						<td ><input type="checkbox"
+							name="selectedWOs" value="${wo.principalEmployer}"></td>
+						<td  >${wo.principalEmployer}</td>
+						<%-- <td  >${wo.principalEmployer}</td> --%>
+						<%-- <td  >${wo.gatepassid}</td> --%>
+						<td  >${wo.department}</td>
+						<td  >${wo.subDepartment}</td>
+						<%-- <td  >${wo.gender}</td>
+						<td  >${wo.dateOfBirth}</td>
+						<td  >${wo.aadhaarNumber}</td>
+						<td  >${wo.vendorCode}</td>
+						<td  >${wo.unitCode}</td>
+						 <td  >${wo.recordstatus}</td> --%>
+						<%-- <td  >${wo.gatepassstatus}</td> --%> 
+						<%--<td  >${principalEmployer.NAME}</td>
+                    <td  >${${wo.requestType}}</td> --%>
+					</tr>
+				</c:forEach>
+			</tbody>
+
+    </table>
+    
+                        </form>
+                         
+                          <%-- <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+    <script>
+        setTimeout(function () {
+            searchGatePassBasedOnPE('regular');
+        }, 10); // Delay ensures DOM is rendered after innerHTML
+    </script>
+    </c:if> --%>
 </body>
 </html>

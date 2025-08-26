@@ -202,7 +202,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		     try {
 		            record.setUnitCode(String.valueOf(fileUploadDao.getUnitIdByName(record.getUnitCode())));
 		            record.setVendorCode(String.valueOf(fileUploadDao.getContractorIdByName(record.getVendorCode())));
-		            record.setWorkorderNumber(String.valueOf(fileUploadDao.getWorkorderId(record.getWorkorderNumber())));
+		            record.setWorkorderNumber(String.valueOf(fileUploadDao.getWorkorderId(record.getWorkorderNumber(),Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getVendorCode()))));
 		            record.setTrade(String.valueOf(fileUploadDao.getTradeIdByName(record.getTrade())));
 		            record.setSkill(String.valueOf(fileUploadDao.getSkillIdByName(record.getSkill())));
 		           // record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
@@ -210,7 +210,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		            record.setAccessArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAccessArea())));
 		            record.setBloodGroup(String.valueOf(fileUploadDao.getGeneralMasterId(record.getBloodGroup())));
 		            record.setAcademic(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAcademic())));
-		            record.setECnumber(String.valueOf(fileUploadDao.getWageCategoryId(record.getECnumber())));
+		            record.setECnumber(String.valueOf(fileUploadDao.getWCECId(record.getECnumber(),Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getVendorCode()))));
 		            record.setZone(String.valueOf(fileUploadDao.getGeneralMasterId(record.getZone())));
 		            record.setGender(String.valueOf(fileUploadDao.getGeneralMasterId(record.getGender())));
 		            record.setEICNumber(String.valueOf(fileUploadDao.geteicId(record.getDepartment(),Integer.parseInt(record.getUnitCode()),record.getEICNumber())));

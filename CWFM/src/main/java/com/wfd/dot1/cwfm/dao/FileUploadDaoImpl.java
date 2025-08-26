@@ -43,7 +43,97 @@ import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 public class FileUploadDaoImpl implements FileUploadDao {
 	@Autowired
     private JdbcTemplate jdbcTemplate;
-   
+	
+	 public String saveGeneralMasterTemplate() {
+		    return QueryFileWatcher.getQuery("SAVE_GENERAL_MASTER_TEMPLATE");
+		}
+	 public String isGmNameGmDescriptionExists() {
+		    return QueryFileWatcher.getQuery("GMNAME_GMDESCRIPION_EXISTS");
+		}
+	 public String savePrincipalEmployer() {
+		    return QueryFileWatcher.getQuery("SAVE_PRINCIPALEMPLOYER_TEMPLATE");
+		}
+	 public String saveContractorTemplate() {
+		    return QueryFileWatcher.getQuery("SAVE_CONTRACTOR_TEMPLATE");
+		}
+	 public String getUnitIdByPlantCodeAndOrg() {
+		    return QueryFileWatcher.getQuery("GET_UNITID_BY_PLANTCODE_ORG");
+		}
+	 public String savePemmForContTemplate() {
+		    return QueryFileWatcher.getQuery("SAVE_PEMM_FOR_CONT_TEMPLATE");
+		}
+	 public String saveWCForContTemplate() {
+		    return QueryFileWatcher.getQuery("SAVE_WC_FOR_CONT_TEMPLATE");
+		}
+	 public String saveCMSSUBCONTForContTemplate() {
+		    return QueryFileWatcher.getQuery("SAVE_CMSSUBCONT_FOR_CONT_TEMPLATE");
+		}
+	 public String getContractorIdbyUnitId() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTORID_BY_UNITID");
+		}
+	 public String isPrincipalEmployerCodeExists() {
+		    return QueryFileWatcher.getQuery("IS_PRINCIPALEMPLOYER_EXISTS");
+		}
+	 public String isContractorCodeExists() {
+		    return QueryFileWatcher.getQuery("IS_CONTRACTORCODE_EXISTS");
+		}
+	 public String getStateIdByName() {
+		    return QueryFileWatcher.getQuery("GET_STATEID_BY_NAME");
+		}
+	 public String savePEState() {
+		    return QueryFileWatcher.getQuery("SAVE_PE_STATE");
+		}
+	 public String saveWorkorderToStaging() {
+		    return QueryFileWatcher.getQuery("SAVE_WORKORDER_TO_STAGGING");
+		}
+	 public String getTradeIdByName() {
+		    return QueryFileWatcher.getQuery("GET_TRADEID_BY_NAME");
+		}
+	 public String getGeneralMasterId() {
+		    return QueryFileWatcher.getQuery("GET_GENERALMASTER_ID");
+		}
+	 public String getWCECId() {
+		    return QueryFileWatcher.getQuery("GET_WCECID");
+		}
+	 public String getUnitIdByName() {
+		    return QueryFileWatcher.getQuery("GET_UNITID_BY_NAME");
+		}
+	 public String getContractorIdByName() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTORID_BY_NAME");
+		}
+	 public String getSkillIdByName() {
+		    return QueryFileWatcher.getQuery("GET_SKILLID_BY_NAME");
+		}
+	 public String getLlNumber() {
+		    return QueryFileWatcher.getQuery("GET_LLNUMBER");
+		}
+	 public String geteicId() {
+		    return QueryFileWatcher.getQuery("GET_EICID");
+		}
+	 public String getWorkorderId() {
+		    return QueryFileWatcher.getQuery("GET_WORKORDER_ID");
+		}
+	 public String saveWorkmenBulkDraftUploadToStaging() {
+		    return QueryFileWatcher.getQuery("SAVE_WORKMEN_BULK_DRAFT_UPLOAD_STAGGING");
+		}
+	 public String saveWorkmenBulkUploadToStaging() {
+		    return QueryFileWatcher.getQuery("SAVE_WORKMEN_BULK_UPLOAD_STAGGING");
+		}
+	 public String getTransactionIdOfDraft() {
+		    return QueryFileWatcher.getQuery("GET_TRANSACTIONID_OF_WORKMENDRAFT");
+		}
+	 public String saveToGatePassMain() {
+		    return QueryFileWatcher.getQuery("SAVE_WORKMEN_DRAFT_BULK_IN_GATEPASS");
+		}
+	 public String updateRecordStatusByTransactionId() {
+		    return QueryFileWatcher.getQuery("UPDATE_RECORDSTATUS_BY_TRANSACTIONID");
+		}
+	 public String isAadharNumberExistsInWorkmenDraft() {
+		    return QueryFileWatcher.getQuery("IS_AADAHAR_EXISTS_IN_WORKMEN_DRAFT");
+		}
+	 public String isAadharNumberExistsInGatepass() {
+		    return QueryFileWatcher.getQuery("IS_AADAHAR_EXISTS_IN_GATEPASS");
+		}
     @Override
     public void saveData(String[] data) {
     	 String rowData = String.join(",", data); // Convert array to CSV format
@@ -53,8 +143,6 @@ public class FileUploadDaoImpl implements FileUploadDao {
         System.out.println("Saving data to the database: " + String.join(",", data));
     }
     
-    
-
     @Override
     public void saveGeneralMaster(CmsGeneralMaster gm) {
         java.sql.Date createdDate = null;
@@ -82,14 +170,15 @@ public class FileUploadDaoImpl implements FileUploadDao {
         } catch (DateTimeParseException e) {
             throw new RuntimeException("Date format error: " + e.getParsedString() + " — " + e.getMessage());
         }
-
-        String sql = "INSERT INTO CMSGENERALMASTER (GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    	String sql=saveGeneralMasterTemplate();
+         //String sql = "INSERT INTO CMSGENERALMASTER (GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY) VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId(), gm.isActive(), createdDate, updatedDate, gm.getUpdatedBy());
     }
 
     @Override
 	public boolean isGmNameGmDescriptionExists(String gmName, String gmDescription) {
-		 String sql = "select count (*) from CMSGENERALMASTER where GMNAME=? and GMDESCRIPTION =?";
+    	String sql=isGmNameGmDescriptionExists();
+		// String sql = "select count (*) from CMSGENERALMASTER where GMNAME=? and GMDESCRIPTION =?";
 		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, gmName,gmDescription);
 		    return count != null && count > 0;
 	}
@@ -114,8 +203,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
     @Override
     public Long savePrincipalEmployer(PrincipalEmployer p) {
     	 KeyHolder keyHolder = new GeneratedKeyHolder();
-    	 
-        String sql = "INSERT INTO CMSPRINCIPALEMPLOYER (ORGANIZATION,CODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAXCNTRWORKMEN,BOCWAPPLICABILITY,ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,WCNUMBER,FACTORYLICENCENUMBER) VALUES (?,?, ?, ?, ?,?,?, ?, ?, ?,?,?, ?, ?, ?)";
+    	 String sql=savePrincipalEmployer();
+        //String sql = "INSERT INTO CMSPRINCIPALEMPLOYER (ORGANIZATION,CODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAXCNTRWORKMEN,BOCWAPPLICABILITY,ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,WCNUMBER,FACTORYLICENCENUMBER) VALUES (?,?, ?, ?, ?,?,?, ?, ?, ?,?,?, ?, ?, ?)";
         jdbcTemplate.update(connection -> {
 	        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 	        ps.setString(1, p.getOrganization());
@@ -139,8 +228,6 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    return keyHolder.getKey().longValue();  // This is your auto-generated unitId
 	}
 
-
-
 	@Override
 	public void saveMinimumWage(MimumWageMasterTemplate mw) {
 		// TODO Auto-generated method stub
@@ -150,8 +237,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	@Override
 	public Long saveContractor(Contractor contractor) {
 	    KeyHolder keyHolder = new GeneratedKeyHolder();
-
-	    String sql = "INSERT INTO CMSCONTRACTOR(name, ADDRESS, city, reference, mobilenumber, CODE) VALUES (?, ?, ?, ?, ?, ?)";
+	    String sql=saveContractorTemplate();
+	    //String sql = "INSERT INTO CMSCONTRACTOR(name, ADDRESS, city, reference, mobilenumber, CODE) VALUES (?, ?, ?, ?, ?, ?)";
 
 	    jdbcTemplate.update(connection -> {
 	        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -169,19 +256,20 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
 	@Override
 	public Long getUnitIdByPlantCodeAndOrg(String plantCode, String organization) {
-	    String sql = "select unitid from CMSPRINCIPALEMPLOYER where code = ? and ORGANIZATION =? ";
+		String sql=getUnitIdByPlantCodeAndOrg();
+	   // String sql = "select unitid from CMSPRINCIPALEMPLOYER where code = ? and ORGANIZATION =? ";
 	    try {
 	        return jdbcTemplate.queryForObject(sql, new Object[]{plantCode, organization}, Long.class);
 	    } catch (EmptyResultDataAccessException e) {
 	        return null;
 	    }
 	}
-
 	
 	@Override
 	public void savePemm(CMSContrPemm pemm) {
-	    String sql = "INSERT INTO CMSCONTRPEMM (CONTRACTORID, UNITID, MANAGERNM, LICENSENUM, VALIDFROMDT, VALIDTODT, COVERAGE, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PERIODSTARTDT, PERIODENDDT, PFCODE, PFNUM, PFAPPLYDT, ESIWC, ESIVALIDFROM, ESIVALIDTO) " +
-	                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql=savePemmForContTemplate();
+	   // String sql = "INSERT INTO CMSCONTRPEMM (CONTRACTORID, UNITID, MANAGERNM, LICENSENUM, VALIDFROMDT, VALIDTODT, COVERAGE, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PERIODSTARTDT, PERIODENDDT, PFCODE, PFNUM, PFAPPLYDT, ESIWC, ESIVALIDFROM, ESIVALIDTO) " +
+	    //             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	    jdbcTemplate.update(connection -> {
 	        PreparedStatement ps = connection.prepareStatement(sql);
@@ -210,11 +298,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	   // explicitly returning 0 as unitId since it's hardcoded in the insert
 	}
 
-
-	
 	@Override
 	public void savewc(CmsContractorWC wc) {
-	    String sql = "INSERT INTO CMSCONTRACTOR_WC(CONTRACTORID, UNITID, WC_CODE, WC_FROM_DTM, WC_TO_DTM, WC_TOTAL, LICENCE_TYPE) VALUES (?, ?, ?, ?, ?, ?,'wc')";
+		String sql=saveWCForContTemplate();
+	    //String sql = "INSERT INTO CMSCONTRACTOR_WC(CONTRACTORID, UNITID, WC_CODE, WC_FROM_DTM, WC_TO_DTM, WC_TOTAL, LICENCE_TYPE) VALUES (?, ?, ?, ?, ?, ?,'wc')";
 	    jdbcTemplate.update(sql,
 	        wc.getContractorId(),
 	        wc.getUnitId(),
@@ -228,20 +315,21 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
     @Override
     public void savecsc(CMSSubContractor csc) {
-        String sql = "insert into CMSSUBCONTRACTOR(CONTRACTOR_ID,WORKORDER_NO,UNITID)values(?,?,?)";
+    	String sql=saveCMSSUBCONTForContTemplate();
+       // String sql = "insert into CMSSUBCONTRACTOR(CONTRACTOR_ID,WORKORDER_NO,UNITID)values(?,?,?)";
         jdbcTemplate.update(sql,csc.getContractorId(),csc.getWorkOrderNumber(),csc.getUnitId());
     }
 
     @Override
 	public Long getContractorIdbyUnitId(Long unitId ) {
-	    String sql = "select unitid from CMSPRINCIPALEMPLOYER where code = ? and ORGANIZATION =? ";
+    	String sql=getContractorIdbyUnitId();
+	    //String sql = "select unitid from CMSPRINCIPALEMPLOYER where code = ? and ORGANIZATION =? ";
 	    try {
 	        return jdbcTemplate.queryForObject(sql, new Object[]{unitId}, Long.class);
 	    } catch (EmptyResultDataAccessException e) {
 	        return null;
 	    }
 	}
-
 
 	@Override
 	public Long saveWorkorder(Workorder workorder) {
@@ -265,8 +353,6 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		
 	}
 
-
-
 	@Override
 	public void saveWorkorderLN(CMSWorkorderLN woln) {
 		 String sql = "insert into CMSWORKORDERLN(WORKORDERID,ITEM_NUM,DELIVERY_COMPLETED_SW,CHANGED_ON,JOB,RATE,QTY,PM_ORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,SE_ENTRY_CREATED_ON,SE_ENTRY_UPDATED_ON)values(?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -288,8 +374,6 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		    );
 		
 	}
-
-
 
 	@Override
 	public void saveWorkorderTyp(ContractorWorkorderTYP wotyp) {
@@ -350,21 +434,24 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	
 	@Override
 	public boolean isPrincipalEmployerCodeExists(String code) {
-	    String sql = "SELECT COUNT(*) FROM CMSPRINCIPALEMPLOYER WHERE code = ?";
+		String sql=isPrincipalEmployerCodeExists();
+	   // String sql = "SELECT COUNT(*) FROM CMSPRINCIPALEMPLOYER WHERE code = ?";
 	    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, code);
 	    return count != null && count > 0;
 	}
 
 	@Override
 	public boolean isContractorCodeExists(String contractorCode) {
-		 String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR WHERE code = ?";
+		String sql=isContractorCodeExists();
+		 //String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR WHERE code = ?";
 		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, contractorCode);
 		    return count != null && count > 0;
 	}
 
 	 @Override
 	    public Long getStateIdByName(String stateName) {
-	        String sql = "select STATEID from CMSSTATE WHERE STATENM = ?";
+			String sql=getStateIdByName();
+	        //String sql = "select STATEID from CMSSTATE WHERE STATENM = ?";
 	        try {
 	            return jdbcTemplate.queryForObject(sql, Long.class, stateName);
 	        } catch (EmptyResultDataAccessException e) {
@@ -374,9 +461,11 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
 	 @Override
 	    public void savePEState(Long unitId, Long stateId) {
-	        String sql = "INSERT INTO CMSPESTATE (UNITID,STATEID ) VALUES (?, ?)";
+		 String sql=savePEState();
+	        //String sql = "INSERT INTO CMSPESTATE (UNITID,STATEID ) VALUES (?, ?)";
 	        jdbcTemplate.update(sql, unitId, stateId);
 	    }
+	 
 	 private Date parseSqlDate(String input) {
 		    try {
 		        // Adjust to match your CSV date format
@@ -390,11 +479,12 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
 	 @Override
 	 public void saveWorkorderToStaging(KTCWorkorderStaging workorder) {
-	     String sql = "insert into KTC_WORKORDER_STAGING_ON_REQ(WORKORDER_NUM,ITEM_NUM,SVC_LN_ITEM_DEL,SVC_LN_ITEM_NUM,SVC_NUM,SVC_LN_ITEM_NAME,DELV_COMPLETION_SW,ITEM_CHANGED_ON_DATE,\r\n"
-	     		+ "VENDOR_CODE,VENDOR_NAME,VENDOR_ADDRESS,BLOCKED_PO,WORKORDER_VALID_FROM,WORKORDER_VALID_TO,SAP_WORKORDER_TYPE,UNIT_CODE,SEC_NAME,DEPT_NAME,\r\n"
-	     		+ "GL_CODE,COST_CENTRE_CODE,JOB_NAME,RATE,QTY,UOM,WORKORDER_RELEASED_SW,PM_WORKORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,WORKORDER_RELEASED_DATE,\r\n"
-	     		+ "SERVICE_ENTRY_CREATE_DATE,SERVICE_ENTRY_UPDATED_DATE,PURCHASE_ORG_LEVEL,COMPANY_CODE,EIC_NUM,RECORD_CREATED_ON,RECORD_UPDATED_ON,\r\n"
-	     		+ "RECORD_PROCESSED,RECORD_STATUS,NATURE_OF_JOB)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?,?,?,?,?,null,null,null,null,null,null)\r\n";
+		 String sql=saveWorkorderToStaging();
+	     //String sql = "insert into KTC_WORKORDER_STAGING_ON_REQ(WORKORDER_NUM,ITEM_NUM,SVC_LN_ITEM_DEL,SVC_LN_ITEM_NUM,SVC_NUM,SVC_LN_ITEM_NAME,DELV_COMPLETION_SW,ITEM_CHANGED_ON_DATE,\r\n"
+	     //		+ "VENDOR_CODE,VENDOR_NAME,VENDOR_ADDRESS,BLOCKED_PO,WORKORDER_VALID_FROM,WORKORDER_VALID_TO,SAP_WORKORDER_TYPE,UNIT_CODE,SEC_NAME,DEPT_NAME,\r\n"
+	     //		+ "GL_CODE,COST_CENTRE_CODE,JOB_NAME,RATE,QTY,UOM,WORKORDER_RELEASED_SW,PM_WORKORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,WORKORDER_RELEASED_DATE,\r\n"
+	     //		+ "SERVICE_ENTRY_CREATE_DATE,SERVICE_ENTRY_UPDATED_DATE,PURCHASE_ORG_LEVEL,COMPANY_CODE,EIC_NUM,RECORD_CREATED_ON,RECORD_UPDATED_ON,\r\n"
+	     //		+ "RECORD_PROCESSED,RECORD_STATUS,NATURE_OF_JOB)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?,?,?,?,?,null,null,null,null,null,null)\r\n";
 	     jdbcTemplate.update(sql,
 	         workorder.getWorkOrderNumber(),
 	         workorder.getItem(),
@@ -435,11 +525,12 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	 public void callWorkorderProcessingSP() {
 	     jdbcTemplate.execute("EXEC CMS_PROCESS_WORKORDERS_ON_REQ");
 	 }
+	 
 	 @Override
 	 public Integer getTradeIdByName(String name) {
 		    if (name == null || name.trim().isEmpty()) return null;
-
-		    String sql = "SELECT TRADEID FROM CMSTRADE WHERE NAME = ?";
+		    String sql=getTradeIdByName();
+		   // String sql = "SELECT TRADEID FROM CMSTRADE WHERE NAME = ?";
 		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, name.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
@@ -447,58 +538,55 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	 @Override
 	 public Integer getGeneralMasterId(String gmName) {
 		    if (gmName == null || gmName.trim().isEmpty()) return null;
-
-		    String sql = "SELECT GMID FROM CMSGENERALMASTER WHERE GMNAME = ?";
+		    String sql=getGeneralMasterId();
+		    //String sql = "SELECT GMID FROM CMSGENERALMASTER WHERE GMNAME = ?";
 		    List<Integer> result = jdbcTemplate.query(sql, new Object[]{gmName.trim()},
 		        (rs, rowNum) -> rs.getInt("GMID"));
 		    return result.isEmpty() ? null : result.get(0);
 		}
 
 	 @Override
-	 public Integer getWageCategoryId(String EICNumber) {
-		    if (EICNumber == null || EICNumber.trim().isEmpty()) return null;
-
-		    String sql = "SELECT WCID FROM CMSCONTRACTOR_WC WHERE WC_CODE = ? and LICENCE_TYPE='WC'";
-		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, EICNumber.trim());
+	 public Integer getWCECId(String ECNumber, Integer unitId, Integer contractorId) {
+		    if (ECNumber == null || ECNumber.trim().isEmpty()) return null;
+		    String sql=getWCECId();
+		    //String sql = "SELECT WCID FROM CMSCONTRACTOR_WC WHERE WC_CODE =? and UNITID=? and CONTRACTORID=?  and (LICENCE_TYPE='WC' or LICENCE_TYPE='ESIC')";
+		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, ECNumber.trim(),unitId,contractorId);
 		    return result.isEmpty() ? null : result.get(0);
 		}
-
 
 		@Override
 		public Integer getUnitIdByName(String unitCode) {
 		    if (unitCode == null || unitCode.trim().isEmpty()) return null;
-
-		    String sql = "SELECT UNITID FROM CMSPRINCIPALEMPLOYER WHERE CODE = ?";
+		    String sql=getUnitIdByName();
+		    //String sql = "SELECT UNITID FROM CMSPRINCIPALEMPLOYER WHERE CODE = ?";
 		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, unitCode.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
 
-
 		@Override
 		public Integer getContractorIdByName(String vendorCode) {
 		    if (vendorCode == null || vendorCode.trim().isEmpty()) return null;
-
-		    String sql = "SELECT CONTRACTORID FROM CMSCONTRACTOR WHERE CODE = ?";
+		    String sql=getContractorIdByName();
+		    //String sql = "SELECT CONTRACTORID FROM CMSCONTRACTOR WHERE CODE = ?";
 		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, vendorCode.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
 
-		
 		@Override
 		public Integer getSkillIdByName(String skill) {
 		    if (skill == null || skill.trim().isEmpty()) return null;
-
-		    String sql = "SELECT SKILLID FROM CMSSKILL WHERE SKILLNM = ?";
+		    String sql=getSkillIdByName();
+		    //String sql = "SELECT SKILLID FROM CMSSKILL WHERE SKILLNM = ?";
 		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, skill.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
 
 		@Override
-		public Integer getLlNumber(String LLNumber) {
+		public Integer getLlNumber(String LLNumber, Integer unitId, Integer contractorId) {
 		    if (LLNumber == null || LLNumber.trim().isEmpty()) return null;
-
-		    String sql = "select WCID from CMSCONTRACTOR_WC where WC_CODE=? and LICENCE_TYPE='LL'";
-		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, LLNumber.trim());
+		    String sql=getLlNumber();
+		    //String sql = "SELECT WCID FROM CMSCONTRACTOR_WC WHERE WC_CODE =? and UNITID=? and CONTRACTORID=?  and LICENCE_TYPE='LL'";
+		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, LLNumber.trim(),unitId,contractorId);
 		    return result.isEmpty() ? null : result.get(0);
 		}
 		
@@ -506,43 +594,51 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		public Integer geteicId(String department, Integer unitId, String ECnumber) {
 		    if (department == null || department.trim().isEmpty() ||
 		        unitId == null || ECnumber == null || ECnumber.trim().isEmpty()) return null;
-
-		    String sql = "SELECT DISTINCT mu.UserId FROM ORGLEVELENTRY ole " +
-		            "JOIN ORGLEVELDEF old ON old.ORGLEVELDEFID = ole.ORGLEVELDEFID " +
-		            "JOIN OLACCTSETMM oasm ON oasm.ORGLEVELENTRYID = ole.ORGLEVELENTRYID " +
-		            "JOIN ORGACCTSET oas ON oas.ORGACCTSETID = oasm.ORGACCTSETID " +
-		            "JOIN MASTERUSER mu ON mu.userAccount = oas.SHORTNM " +
-		            "JOIN UserRoleMapping urm ON urm.UserId = mu.UserId " +
-		            "JOIN CMSGENERALMASTER cgm ON cgm.GMID = urm.RoleId " +
-		            "LEFT JOIN CMSPRINCIPALEMPLOYER cpe ON cpe.CODE = ole.NAME AND old.NAME LIKE 'Principal%' " +
-		            "WHERE cgm.GMNAME IN ('EIC') " +
-		            "AND ((old.NAME LIKE 'Dep%' AND ole.NAME = ?) OR (cpe.UNITID = ?)) " +
-		            "AND mu.userAccount = ?";
-
+		    String sql=geteicId();
+			/*
+			 * String sql = "SELECT DISTINCT mu.UserId FROM ORGLEVELENTRY ole " +
+			 * "JOIN ORGLEVELDEF old ON old.ORGLEVELDEFID = ole.ORGLEVELDEFID " +
+			 * "JOIN OLACCTSETMM oasm ON oasm.ORGLEVELENTRYID = ole.ORGLEVELENTRYID " +
+			 * "JOIN ORGACCTSET oas ON oas.ORGACCTSETID = oasm.ORGACCTSETID " +
+			 * "JOIN MASTERUSER mu ON mu.userAccount = oas.SHORTNM " +
+			 * "JOIN UserRoleMapping urm ON urm.UserId = mu.UserId " +
+			 * "JOIN CMSGENERALMASTER cgm ON cgm.GMID = urm.RoleId " +
+			 * "LEFT JOIN CMSPRINCIPALEMPLOYER cpe ON cpe.CODE = ole.NAME AND old.NAME LIKE 'Principal%' "
+			 * + "WHERE cgm.GMNAME IN ('EIC') " +
+			 * "AND ((old.NAME LIKE 'Dep%' AND ole.NAME = ?) OR (cpe.UNITID = ?)) " +
+			 * "AND mu.userAccount = ?";
+			 */
 		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,
 		            department.trim(), unitId, ECnumber.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
 
-
 		@Override
-		public Integer getWorkorderId(String workorderNumber) {
+		public Integer getWorkorderId(String workorderNumber,Integer unitId, Integer contractorId) {
 		    if (workorderNumber == null || workorderNumber.trim().isEmpty()) return null;
-
-		    String sql = "SELECT WORKORDERID FROM CMSWORKORDER WHERE NAME = ?";
-		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, workorderNumber.trim());
+		    String sql=getWorkorderId();
+		    //String sql = "SELECT WORKORDERID FROM CMSWORKORDER WHERE NAME = ? and UNITID=? and CONTRACTORID=?";
+		    List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class, workorderNumber.trim(),unitId,contractorId);
 		    return result.isEmpty() ? null : result.get(0);
 		}
-
 		
 	@Override
 	public int saveWorkmenBulkDraftUploadToStaging(WorkmenBulkUpload staging) {
-		String sql = "insert into CMSRequestItemDraftBulkUpload(TransactionID,GatePassStatus,AadharNumber,FirstName,LastName,DOB,Gender,RelativeName,IdMark,MobileNumber,\r\n"
-				+ "MaritalStatus,UnitId,ContractorId,WorkorderId,TradeId,SkillId,DepartmentId,AreaId,EicId,NatureOfJob,WcEsicNo,HazardousArea,AccessAreaId,\r\n"
-				+ "UanNumber,HealthCheckDate,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName,\r\n"
-				+ "WorkmenWageCategoryId,PfCap,AadharDocName,PoliceVerificationDocName,UpdatedDate,Address,DOJ,pfnumber,esicNumber,policeverificationDate,specialization,\r\n"
-				+ "LLNumber,pfapplicable,RecordProcessed,RecordStatus,organizationname,insurencetype,gatepasstypeid,Gatepassid,zoneid)values((SELECT ISNULL(MAX(TransactionID),0)+1 FROM CMSRequestItemDraftBulkUpload),1,?,?,?,?,?,?,?,?,?,?,\r\n"
-				+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,'Yes',null,null,getdate(),?,?,?,?,?,?,?,?,'N',null,?,?,1,null,?)\r\n";
+		String sql=saveWorkmenBulkDraftUploadToStaging();
+		/*
+		 * String sql =
+		 * "insert into CMSRequestItemDraftBulkUpload(TransactionID,GatePassStatus,AadharNumber,FirstName,LastName,DOB,Gender,RelativeName,IdMark,MobileNumber,\r\n"
+		 * +
+		 * "MaritalStatus,UnitId,ContractorId,WorkorderId,TradeId,SkillId,DepartmentId,AreaId,EicId,NatureOfJob,WcEsicNo,HazardousArea,AccessAreaId,\r\n"
+		 * +
+		 * "UanNumber,HealthCheckDate,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName,\r\n"
+		 * +
+		 * "WorkmenWageCategoryId,PfCap,AadharDocName,PoliceVerificationDocName,UpdatedDate,Address,DOJ,pfnumber,esicNumber,policeverificationDate,specialization,\r\n"
+		 * +
+		 * "LLNumber,pfapplicable,RecordProcessed,RecordStatus,organizationname,insurencetype,gatepasstypeid,Gatepassid,zoneid)values((SELECT ISNULL(MAX(TransactionID),0)+1 FROM CMSRequestItemDraftBulkUpload),1,?,?,?,?,?,?,?,?,?,?,\r\n"
+		 * +
+		 * "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,'Yes',null,null,getdate(),?,?,?,?,?,?,?,?,'N',null,?,?,1,null,?)\r\n";
+		 */
 				 jdbcTemplate.update(sql,
 						 staging.getAadhaarNumber(),
 						 staging.getFirstName(),
@@ -592,12 +688,13 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
 	@Override
 	public void saveWorkmenBulkUploadToStaging(WorkmenBulkUpload staging) {
-		String sql = "insert into CMSRequestItemBulkUpload(TransactionID,GatePassStatus,AadharNumber,FirstName,LastName,DOB,Gender,RelativeName,IdMark,MobileNumber,\r\n"
-				+ "MaritalStatus,UnitId,ContractorId,WorkorderId,TradeId,SkillId,DepartmentId,AreaId,EicId,NatureOfJob,WcEsicNo,HazardousArea,AccessAreaId,\r\n"
-				+ "UanNumber,HealthCheckDate,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName,\r\n"
-				+ "WorkmenWageCategoryId,PfCap,AadharDocName,PoliceVerificationDocName,UpdatedDate,Address,DOJ,pfnumber,esicNumber,policeverificationDate,specialization,\r\n"
-				+ "LLNumber,pfapplicable,RecordProcessed,RecordStatus,organizationname,insurencetype,gatepasstypeid,Gatepassid,zoneid)values((SELECT ISNULL(MAX(TransactionID),0)+1 FROM CMSRequestItemBulkUpload),1,?,?,?,?,?,?,?,?,?,?,\r\n"
-				+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,'Yes',null,null,getdate(),?,?,?,?,?,?,?,?,'N',null,?,?,1,null,?)\r\n";
+		String sql=saveWorkmenBulkUploadToStaging();
+		//String sql = "insert into CMSRequestItemBulkUpload(TransactionID,GatePassStatus,AadharNumber,FirstName,LastName,DOB,Gender,RelativeName,IdMark,MobileNumber,\r\n"
+		//		+ "MaritalStatus,UnitId,ContractorId,WorkorderId,TradeId,SkillId,DepartmentId,AreaId,EicId,NatureOfJob,WcEsicNo,HazardousArea,AccessAreaId,\r\n"
+		//		+ "UanNumber,HealthCheckDate,BloodGroupId,Accommodation,AcademicId,Technical,IfscCode,AccountNumber,EmergencyContactNumber,EmergencyContactName,\r\n"
+		//		+ "WorkmenWageCategoryId,PfCap,AadharDocName,PoliceVerificationDocName,UpdatedDate,Address,DOJ,pfnumber,esicNumber,policeverificationDate,specialization,\r\n"
+		//		+ "LLNumber,pfapplicable,RecordProcessed,RecordStatus,organizationname,insurencetype,gatepasstypeid,Gatepassid,zoneid)values((SELECT ISNULL(MAX(TransactionID),0)+1 FROM CMSRequestItemBulkUpload),1,?,?,?,?,?,?,?,?,?,?,\r\n"
+		//		+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,'Yes',null,null,getdate(),?,?,?,?,?,?,?,?,'N',null,?,?,1,null,?)\r\n";
 				 jdbcTemplate.update(sql,
 						 staging.getAadhaarNumber(),
 						 staging.getFirstName(),
@@ -649,23 +746,23 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		jdbcTemplate.execute("EXEC KTC_ENTRYPASS_BULK_UPLOAD");
 	 }
 
-
 	@Override
 	public WorkmenBulkUpload getByTransactionId(int transactionId) {
-	    String sql = "select cribu.AadharNumber as aadhaarNumber,cribu.FirstName as firstName,cribu.LastName as lastName,cribu.DOB as dateOfBirth,cgmg.GMNAME as gender,\r\n"
-	    		+ "cribu.RelativeName as relationName,cribu.IdMark as idMark,cribu.MobileNumber as mobileNumber,   \r\n"
-	    		+ "cribu.MaritalStatus as maritalStatus,cpe.CODE as unitCode,cmsc.CODE as vendorCode,cmswo.NAME as workorderNumber,   \r\n"
-	    		+ "cmst.NAME as trade,cmss.SKILLNM as skill,cmsgmdep.GMNAME as department,cmsgma.GMNAME as area,mu.userAccount  AS EICNumber,cribu.NatureOfJob as natureOfWork,   \r\n"
-	    		+ "ccwc.WC_CODE as ECnumber,cribu.HazardousArea as hazardousArea,cmsgmaa.GMNAME as accessArea,   \r\n"
-	    		+ "cribu.uanNumber,cribu.healthCheckDate,cmsgmb.GMNAME as bloodGroup,cribu.Accommodation as accommodation,cmsgmac.GMNAME as academic,cribu.Technical as technical,   \r\n"
-	    		+ "cribu.IfscCode as bankName,cribu.AccountNumber as accountNumber,cribu.EmergencyContactNumber as emergencyNumber,cribu.EmergencyContactName  as emergencyName   \r\n"
-	    		+ ",cribu.doj,cribu.pfNumber,cribu.esicNumber,cribu.policeVerificationDate,cribu.pfApplicable,cmsgmz.GMNAME as zone,cribu.Address as address from CMSRequestItemDraftBulkUpload cribu   \r\n"
-	    		+ "left join CMSPRINCIPALEMPLOYER cpe on cpe.unitid=cribu.UnitId left join CMSCONTRACTOR cmsc on cmsc.CONTRACTORID=cribu.ContractorId left join CMSWORKORDER cmswo on cmswo.WORKORDERID=cribu.WorkorderId \r\n"
-	    		+ "left join CMSTRADE cmst on cmst.TRADEID = cribu.TradeId   left join CMSSKILL cmss on cmss.skillid=cribu.SkillId \r\n"
-	    		+ "left join CMSGENERALMASTER cmsgmdep on cmsgmdep.GMID=cribu.DepartmentId left join CMSGENERALMASTER cmsgma on cmsgma.GMID=cribu.AreaId \r\n"
-	    		+ "left join CMSGENERALMASTER cmsgmaa on cmsgmaa.GMID=cribu.AccessAreaId left join CMSGENERALMASTER cmsgmb on cmsgmb.GMID=cribu.BloodGroupId \r\n"
-	    		+ "left join CMSGENERALMASTER cmsgmac on cmsgmac.GMID=cribu.AcademicId left join CMSGENERALMASTER cmsgmz on cmsgmz.GMID=cribu.zoneid LEFT JOIN CMSGENERALMASTER cgmg ON cgmg.GMID = cribu.gender  \r\n"
-	    		+ "LEFT JOIN MASTERUSER mu ON mu.UserId = cribu.EicId left join CMSCONTRACTOR_WC ccwc on ccwc.WCID=cribu.WcEsicNo where TransactionID=?";
+		String sql=getTransactionIdOfDraft();
+	    //String sql = "select cribu.AadharNumber as aadhaarNumber,cribu.FirstName as firstName,cribu.LastName as lastName,cribu.DOB as dateOfBirth,cgmg.GMNAME as gender,\r\n"
+	    //		+ "cribu.RelativeName as relationName,cribu.IdMark as idMark,cribu.MobileNumber as mobileNumber,   \r\n"
+	    //		+ "cribu.MaritalStatus as maritalStatus,cpe.CODE as unitCode,cmsc.CODE as vendorCode,cmswo.NAME as workorderNumber,   \r\n"
+	   // 		+ "cmst.NAME as trade,cmss.SKILLNM as skill,cmsgmdep.GMNAME as department,cmsgma.GMNAME as area,mu.userAccount  AS EICNumber,cribu.NatureOfJob as natureOfWork,   \r\n"
+	  //  		+ "ccwc.WC_CODE as ECnumber,cribu.HazardousArea as hazardousArea,cmsgmaa.GMNAME as accessArea,   \r\n"
+	  //  		+ "cribu.uanNumber,cribu.healthCheckDate,cmsgmb.GMNAME as bloodGroup,cribu.Accommodation as accommodation,cmsgmac.GMNAME as academic,cribu.Technical as technical,   \r\n"
+	 //   		+ "cribu.IfscCode as bankName,cribu.AccountNumber as accountNumber,cribu.EmergencyContactNumber as emergencyNumber,cribu.EmergencyContactName  as emergencyName   \r\n"
+	 //   		+ ",cribu.doj,cribu.pfNumber,cribu.esicNumber,cribu.policeVerificationDate,cribu.pfApplicable,cmsgmz.GMNAME as zone,cribu.Address as address from CMSRequestItemDraftBulkUpload cribu   \r\n"
+	  //  		+ "left join CMSPRINCIPALEMPLOYER cpe on cpe.unitid=cribu.UnitId left join CMSCONTRACTOR cmsc on cmsc.CONTRACTORID=cribu.ContractorId left join CMSWORKORDER cmswo on cmswo.WORKORDERID=cribu.WorkorderId \r\n"
+	  //  		+ "left join CMSTRADE cmst on cmst.TRADEID = cribu.TradeId   left join CMSSKILL cmss on cmss.skillid=cribu.SkillId \r\n"
+	  //  		+ "left join CMSGENERALMASTER cmsgmdep on cmsgmdep.GMID=cribu.DepartmentId left join CMSGENERALMASTER cmsgma on cmsgma.GMID=cribu.AreaId \r\n"
+	   // 		+ "left join CMSGENERALMASTER cmsgmaa on cmsgmaa.GMID=cribu.AccessAreaId left join CMSGENERALMASTER cmsgmb on cmsgmb.GMID=cribu.BloodGroupId \r\n"
+	   // 		+ "left join CMSGENERALMASTER cmsgmac on cmsgmac.GMID=cribu.AcademicId left join CMSGENERALMASTER cmsgmz on cmsgmz.GMID=cribu.zoneid LEFT JOIN CMSGENERALMASTER cgmg ON cgmg.GMID = cribu.gender  \r\n"
+	   // 		+ "LEFT JOIN MASTERUSER mu ON mu.UserId = cribu.EicId left join CMSCONTRACTOR_WC ccwc on ccwc.WCID=cribu.WcEsicNo where TransactionID=?";
 	    return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(WorkmenBulkUpload.class), transactionId);
 	}
 	 
@@ -743,17 +840,18 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	@Override
 	public void saveToGatePassMain(WorkmenBulkUpload data) {
 		//String gatePassId = this.generateGatePassId();
+		String sql=saveToGatePassMain();
 		String transId = this.getNextTransactionId();
-	    String sql = "INSERT INTO  GATEPASSMAIN (TransactionId, GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName, IdMark, MobileNumber,\r\n"
-	    		+ "MaritalStatus, UnitId, ContractorId, WorkorderId, TradeId, SkillId, DepartmentId, AreaId, EicId, NatureOfJob, WcEsicNo, HazardousArea  \r\n"
-	    		+ ",  AccessAreaId ,  UanNumber,  HealthCheckDate,  BloodGroupId,  Accommodation,  AcademicId ,  Technical ,  IfscCode,  AccountNumber,  EmergencyContactNumber  \r\n"
-	    		+ ",  EmergencyContactName, WorkmenWageCategoryId, BonusPayoutId, ZoneId, Basic, DA, HRA, WashingAllowance, OtherAllowance  \r\n"
-	    		+ ",  UniformAllowance,  PfCap,  AadharDocName ,  PhotoName ,  BankDocName ,  PoliceVerificationDocName,  IdProof2DocName,  MedicalDocName,  EducationDocName,  Form11DocName  \r\n"
-	    		+ ",  TrainingDocName,  OtherDocName,  UpdatedDate,  UpdatedBy,  WorkFlowType,  Comments,  Address,  DOJ,  DOT,  pfnumber,  esicNumber,  policeverificationDate  \r\n"
-	    		+ ",  OnboardingType ,  pfapplicable,LLNo )\r\n"
-	    		+ "VALUES ( ?,?,1,1,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
-	    		+ "?,?,?,?,?,?,?,?,?,?,?,null,null,?,'0.00','0.00','0.00','0.00','0.00','0.00','Yes',null,null,null,null,null,null,null,null,\r\n"
-	    		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?,?)";
+	    //String sql = "INSERT INTO  GATEPASSMAIN (TransactionId, GatePassId, GatePassTypeId, GatePassStatus, AadharNumber, FirstName, LastName, DOB, Gender, RelativeName, IdMark, MobileNumber,\r\n"
+	    //		+ "MaritalStatus, UnitId, ContractorId, WorkorderId, TradeId, SkillId, DepartmentId, AreaId, EicId, NatureOfJob, WcEsicNo, HazardousArea  \r\n"
+	    //		+ ",  AccessAreaId ,  UanNumber,  HealthCheckDate,  BloodGroupId,  Accommodation,  AcademicId ,  Technical ,  IfscCode,  AccountNumber,  EmergencyContactNumber  \r\n"
+	    //		+ ",  EmergencyContactName, WorkmenWageCategoryId, BonusPayoutId, ZoneId, Basic, DA, HRA, WashingAllowance, OtherAllowance  \r\n"
+	    //		+ ",  UniformAllowance,  PfCap,  AadharDocName ,  PhotoName ,  BankDocName ,  PoliceVerificationDocName,  IdProof2DocName,  MedicalDocName,  EducationDocName,  Form11DocName  \r\n"
+	    //		+ ",  TrainingDocName,  OtherDocName,  UpdatedDate,  UpdatedBy,  WorkFlowType,  Comments,  Address,  DOJ,  DOT,  pfnumber,  esicNumber,  policeverificationDate  \r\n"
+	    //		+ ",  OnboardingType ,  pfapplicable,LLNo )\r\n"
+	    //		+ "VALUES ( ?,?,1,1,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,\r\n"
+	    //		+ "?,?,?,?,?,?,?,?,?,?,?,null,null,?,'0.00','0.00','0.00','0.00','0.00','0.00','Yes',null,null,null,null,null,null,null,null,\r\n"
+	    //		+ "null,null,getdate(),7,null,null,?,?,null,?,?,?,'regular',?,?)";
 	    jdbcTemplate.update(sql, transId,
 	    		data.getGatepassid()!=null? data.getGatepassid():" ",
 	    		data.getAadhaarNumber()!=null? data.getAadhaarNumber():" ", 
@@ -797,24 +895,30 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	            data.getLLnumber()!=null? data.getLLnumber():" ");
 	}
 
-
 	@Override
 	public void updateRecordStatusByTransactionId(int txnId, String combinedErrors) {
-	    String sql = "UPDATE CMSRequestItemDraftBulkUpload SET RecordStatus = ? WHERE TransactionID = ?";
+		String sql=updateRecordStatusByTransactionId();
+	   // String sql = "UPDATE CMSRequestItemDraftBulkUpload SET RecordStatus = ? WHERE TransactionID = ?";
 	    jdbcTemplate.update(sql, combinedErrors, txnId);
 	}
+	@Override
+	public boolean isAadharNumberExists(String aadharNumber) {
+		String sql1=isAadharNumberExistsInWorkmenDraft();
+		String sql2=isAadharNumberExistsInGatepass();
+		 //String sql1 = "SELECT COUNT(*) FROM CMSRequestItemDraftBulkUpload WHERE AadharNumber = ?";
+		   // String sql2 = "SELECT COUNT(*) FROM GatePassMain WHERE AadharNumber = ?";
 
+		    Integer count1 = jdbcTemplate.queryForObject(sql1, new Object[]{aadharNumber}, Integer.class);
+		    Integer count2 = jdbcTemplate.queryForObject(sql2, new Object[]{aadharNumber}, Integer.class);
+
+		    return (count1 != null && count1 > 0) || (count2 != null && count2 > 0);
+	}
 	//@Override
 	//public void updateRecordProcessedByTransactionId(Integer txnId) {
 	///    String sql = "UPDATE CMSRequestItemBulkUpload SET RecordProcessed = 'Y' WHERE TransactionID = ?";
 	//    jdbcTemplate.update(sql, txnId);
 	//}
-
 	
-	
-
-	
-		
 	}
 
 

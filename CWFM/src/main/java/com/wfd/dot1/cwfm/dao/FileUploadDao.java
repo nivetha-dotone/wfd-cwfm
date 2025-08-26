@@ -70,12 +70,12 @@ public interface FileUploadDao {
 	Integer getTradeIdByName(String tradeName);
 
     // Get Workmen Wage Category ID by name
-    Integer getWageCategoryId(String EICNumber);
+    Integer getWCECId(String ECNumber, Integer unitId, Integer contractorId);
 
     // Get GMID (Generic Master ID) by GMNAME and master type (like skill, dept, access area, etc.)
     Integer getGeneralMasterId(String gmName);
 
-	Integer getWorkorderId(String workorderNumber);
+	Integer getWorkorderId(String workorderNumber,Integer unitId, Integer contractorId);
 
 	Integer getSkillIdByName(String skill);
 
@@ -90,7 +90,9 @@ public interface FileUploadDao {
 	
 	void updateRecordStatusByTransactionId(int txnId, String combinedErrors);
 
-	Integer getLlNumber(String LLNumber);
+	Integer getLlNumber(String LLNumber, Integer unitId, Integer contractorId);
+
+	boolean isAadharNumberExists(String aadharNumber);
 
 	
 

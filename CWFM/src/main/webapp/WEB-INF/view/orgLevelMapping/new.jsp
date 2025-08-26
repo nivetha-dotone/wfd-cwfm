@@ -42,17 +42,15 @@
             align-items: center;
             padding: 1rem;
             background-color: #f8f8f8;
-            margin-bottom: 1rem;
+           /* margin-bottom: 1rem; */
         }
         .action-buttons {
             display: flex;
             gap: 10px;
         }
-        .action-buttons button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+         .action-buttons button {
+        margin-left: 10px; /* Space between buttons */
+    }
         #searchForm {
             display: flex;
             align-items: center;
@@ -91,15 +89,14 @@
             font-size: 0.75rem;
             padding: 4px; /* Reduced padding */
         }
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-            padding: 8px;
-            background-color: #FFFFFF;
-            border-bottom: 1px solid #ccc;
-        }
+         .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Distribute space between search and buttons */
+        padding: 8px; /* Adjust padding */
+        background-color: #FFFFFF; /* White background */
+        /* border-bottom: 1px solid #ccc; /* Subtle border for separation */ */
+    }
         select, input[type="text"] {
             width: 20%; /* Full width */
             padding: 6px; /* Reduced padding */
@@ -129,25 +126,27 @@
     </style> 
 </head>
 <body>
-    <h1 style=" color: darkcyan;">Org Level Mapping</h1>
-    
+<div  class="page-header">
+    <h1 style=" color: darkcyan;padding:4px;">Org Level Mapping</h1>
+   <div  class="action-buttons">
+              <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgLevelMapping()">Save</button>
+              <button type="submit"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/org-level-mapping/list', 'New')">Cancel</button>
+    </div>
+    </div>
      <!-- Form to enter Name and Description -->
      <div class="form-group">
-        <label for="name" style=" color: darkcyan;">Name:</label>
+        <label for="name" style=" color: darkcyan;padding:10px;">Name:</label>
         <input type="text" id="name" name="name" style="text-transform: capitalize;" required autocomplete="off">
         <span id="nameError" class="error-message"></span>
     </div>
-
     <div class="form-group">
-        <label for="description" style=" color: darkcyan;">Description:</label>
+        <label for="description" style=" color: darkcyan;padding:10px;">Description:</label>
         <input type="text" id="description" name="description" style="text-transform: capitalize;"  required autocomplete="off">
         <span id="descriptionError" class="error-message"></span>
     </div>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgLevelMapping()">Save</button>
-
-<div id="orgMappingContainer">
+    <div id="orgMappingContainer">
     <div id="tabs">
-        <ul>
+        <ul style="padding:10px;">
             <c:forEach var="orgLevel" items="${orgLevels}">
                 <li><a href="#tab-${orgLevel.orgLevelDefId}">${orgLevel.name}</a></li>
             </c:forEach>

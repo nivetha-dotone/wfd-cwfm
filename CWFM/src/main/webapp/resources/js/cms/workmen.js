@@ -446,6 +446,13 @@ function validateEmploymentInformation(){
     }else{
 		$("#error-wc").hide();
 	}
+	const ll = $("#ll").val();
+     if (ll === "") {
+        $("#error-ll").show();
+        isValid = false;
+    }else{
+		$("#error-ll").hide();
+	}
 	const ha = $("#hazardousArea").val();
      if (ha === "") {
         $("#error-hazardous").show();

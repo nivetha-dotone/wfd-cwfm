@@ -1471,6 +1471,7 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 		dto.setPfApplicable(rs.getString("pfapplicable"));
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
+		dto.setLlNo(rs.getString("LLNo"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDraftDetails dao method "+transactionId);
 	return dto;
