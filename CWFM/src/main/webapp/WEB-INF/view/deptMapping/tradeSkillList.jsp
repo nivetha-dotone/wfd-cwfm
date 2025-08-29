@@ -1,23 +1,17 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<%@ page isELIgnored="false" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
- <title>Users List</title>
-  <script src="resources/js/cms/users.js"></script>
- 
-  <!--   <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Role Rights List</title>
-    <script src="resources/js/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
-    <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/commonjs.js"></script>
-    <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">  -->
-  <style>
+    <title>Workmen Onboarding List</title>
+    <script src="resources/js/cms/workmen.js"></script>
+
+
+ <style>
  
  
     body {
@@ -111,7 +105,7 @@
     .page-header {
         display: flex;
         align-items: center;
-        justify-content: flex-end;  /* Distribute space between search and buttons */
+        justify-content: flex-end; /* Distribute space between search and buttons */
         padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
         border-bottom: 1px solid #ccc; /* Subtle border for separation */
@@ -170,115 +164,100 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
 </style>
 <script>
-function searchUserWithUserAccount(){
-	 var userAccount = $('#userAccount').val();
-console.log(userAccount);
-	 $.ajax({
-	     url: '/CWFM/usersController/getUserWithUserAccount',
-	     type: 'POST',
-	     data: {
-	    	 userAccount: userAccount
-	     },
-	     success: function(response) {
-	         var tableBody = $('#UserTable tbody');
-	         tableBody.empty();
-				if (response.length > 0) {
-	             $.each(response, function(index, wo) {
-	                 var row = '<tr  >' +
-		'<td  ><input type="checkbox" name="selectedUserIds" value="' + wo.userId + '"></td>'+
-	                           '<td  >' + wo.userAccount + '</td>' +
-	                           '<td  >' + wo.emailId + '</td>' +
-		  '<td  >'+ wo.firstName + +wo.lastName  '</td>' +	
-		  '<td  >' + wo.contactNumber + '</td>' +	
-		  '<td  >' + wo.status + '</td>' +	
-	                           '</tr>';
-	                 tableBody.append(row);
-	             });
-	         } else {
-	             tableBody.append('<tr><td colspan="3">No resources found</td></tr>');
-	         }
-	     },
-	     error: function(xhr, status, error) {
-	         console.error("Error fetching data:", error);
-	     }
-	 });
-	}	
+function toggleSelectAllGMTYPE() {
+    const checkboxes = document.querySelectorAll('input[name="selectedWOs"]');
+    checkboxes.forEach(checkbox => checkbox.checked = document.getElementById('selectAllCheckbox').checked);
+}
 </script>
 </head>
 <body>
 <div class="page-header">
-   <%--  <form id="searchForm">
-        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="userAccount" name="searchQuery"  autocomplete="off" placeholder="Search...">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchUserWithUserAccount()">Search</button>
-    </form>
-    <div> --%>
+   <!--  <form id="searchForm">
+        <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
+    </form> -->
+   <!--  <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectAdd()">Save</button> -->  
+    
+    <div>
+    <%-- <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','regular')">Save</button> --%>
+    
     <c:if test="${UserPermission.addRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUserAdd()">Add</button> 
-    </c:if>
+          <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToTradeSkillMappingAdd()">Add</button> 
+     </c:if> 
     <c:if test="${UserPermission.editRights eq 1 }">
-         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersEdit()">Edit</button> 
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectEdit()">Edit</button> 
      </c:if>
      <c:if test="${UserPermission.viewRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersView()">View</button>
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectView()">View</button>
 
      </c:if>
        <c:if test="${UserPermission.exportRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="usersExportToCSV()">Export</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
     	</c:if>
-    	<c:if test="${UserPermission.deleteRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Deactive</button>
-    	</c:if>
+
     </div>
-    <!-- <div>
-    <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUserAdd()">Add</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedUsers()">Delete</button>
-     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersEdit()">Edit</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="usersExportToCSV()">Export</button>
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToUsersView()">View</button>
-        
-</div> -->
 </div>
-<form  >
-    <div class="table-container">
-        <table id="UserTable" border="1">
+
+     <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
+     <div id="messageDiv" style="font-weight: bold; margin-top: 10px;"></div>
+    
+     
+                         <div class="table-container">
+              <!-- Success Message -->
+<div id="successMessage" style="color: green; font-weight: bold; display: none;"></div>
+
+<!-- Error Message -->
+<div id="errorMessage" style="color: red; font-weight: bold; display: none;"></div>
+                        
+    <table id="workmenTable"  cellspacing="0" cellpadding="0" >
         <thead>
-             <tr>
-                <!-- <th>User ID</th> -->
-                <th class="checkbox-cell">
-                    <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers()">
-                </th>
-                <th id="userAccount">User Account</th>
-                <th>Email</th>
-                <th>Full Name</th>
-                <th>Contact Number</th>
-                <th>Status</th>
-                <!-- <th>Actions</th> -->
+<tr >
+                    <td >
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllGMTYPE()">
+                    </td> 
+                    <!-- Add more table headers for each column -->
+                    <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.principalEmployer"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <%-- <th class="header-text"  onclick="sortTable(1)"><spring:message code="label.gatePassId"/><span id="sortIndicatorName" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
+					<th class="header-text"  onclick="sortTable(2)"><spring:message code="label.trade"/><span id="sortIndicatorAddress" class="sort-indicator sort-asc">&#x25B2;</span></th>
+					<th class="header-text"  onclick="sortTable(3)"><spring:message code="label.skill"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
+				 
             </tr>
         </thead>
-        <tbody id="UserTable">
-            <c:forEach var="user" items="${users}">
-                <tr>
-                 <%--    <td>${user.userId}</td> --%>
-                  <td class="checkbox-cell">
-                        <input type="checkbox" name="selectedUserIds" value="${user.userId}">
-                    </td>
-                    <td id="userAccount" style="text-transform: capitalize;">${user.userAccount}</td>
-                    <td>${user.emailId}</td>
-                    <td style="text-transform: capitalize;">${user.firstName} ${user.lastName}</td>
-                    <td>${user.contactNumber}</td>
-                    <td>${user.status}</td>
-                    <%-- <td>
-                        <a href="editUser?userId=${user.userId}">Edit</a> |
-                        <a href="deleteUser?userId=${user.userId}" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-                    </td> --%>
-                </tr>
-            </c:forEach>
-        </tbody>
+        <tbody>
+				<c:forEach items="${wbudata}" var="wo">
+					<tr>
+						<td ><input type="checkbox"
+							name="selectedWOs" value="${wo.principalEmployer}"></td>
+						<td  >${wo.principalEmployer}</td>
+						<%-- <td  >${wo.principalEmployer}</td> --%>
+						<%-- <td  >${wo.gatepassid}</td> --%>
+						<td  >${wo.trade}</td>
+						<td  >${wo.skill}</td>
+						<%-- <td  >${wo.gender}</td>
+						<td  >${wo.dateOfBirth}</td>
+						<td  >${wo.aadhaarNumber}</td>
+						<td  >${wo.vendorCode}</td>
+						<td  >${wo.unitCode}</td>
+						 <td  >${wo.recordstatus}</td> --%>
+						<%-- <td  >${wo.gatepassstatus}</td> --%> 
+						<%--<td  >${principalEmployer.NAME}</td>
+                    <td  >${${wo.requestType}}</td> --%>
+					</tr>
+				</c:forEach>
+			</tbody>
+
     </table>
-    </div>
-</form>
+    
+                        </form>
+                         
+                          <%-- <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+    <script>
+        setTimeout(function () {
+            searchGatePassBasedOnPE('regular');
+        }, 10); // Delay ensures DOM is rendered after innerHTML
+    </script>
+    </c:if> --%>
 </body>
 </html>

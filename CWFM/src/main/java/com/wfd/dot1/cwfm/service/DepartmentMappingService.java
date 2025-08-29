@@ -9,6 +9,10 @@ public interface DepartmentMappingService {
 	void saveMappings(List<DeptMapping> mappings);
 	
 	List<DeptMapping> getAllMappings();
+
+	List<DeptMapping> getAllTradeSkillMappings();
+
+	void saveTradeSkillMappings(List<DeptMapping> mappings);
 	
 
 }

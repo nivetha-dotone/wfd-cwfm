@@ -176,7 +176,7 @@ table.ControlLayout td {
         </td>
         
             <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
-            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
+            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="10" autocomplete="off"/>
             <span id="contactNumberError" class="error-message"></span>
             </td>
              

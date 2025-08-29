@@ -109,10 +109,11 @@
     .page-header {
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Distribute space between search and buttons */
+        justify-content: flex-end;  /* Distribute space between search and buttons */
         padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
         border-bottom: 1px solid #ccc; /* Subtle border for separation */
+         gap: 10px;
     }
 
     .page-header > div {
@@ -175,18 +176,18 @@
 </head>
 <body>
 <div class="page-header">
-    <form id="searchForm">
+    <%-- <form id="searchForm">
         <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="Search..." autocomplete="off">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
-    </form>
-    <div>
+    </form> --%>
+   <!--  <div> -->
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToRRAdd()">Add</button>
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" id="editButton" onclick="redirectToRREdit()">Edit</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedRoleRights()">Deactive</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToRoleCSV()">Export</button>
 <button type="submit" id="saveButton" class="btn btn-default" style="display: none;" onclick="saveUpdatedRoleRights()">Save</button>
 
-</div>
+<!-- </div> -->
 </div>
 <form id="updateForm" action="/CWFM/roleRights/update" method="POST">
    <!--  <button type="button" id="editButton">Edit</button>  

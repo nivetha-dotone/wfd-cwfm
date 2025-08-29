@@ -16,7 +16,7 @@
     <script src="resources/js/cms/workorder.js"></script>
     <script src="resources/js/cms/workmen.js"></script>
      <script src="resources/js/cms/unitDeptMapping.js"></script>
-     <style>
+   <style>
         .success {
             color: green;
             font-weight: bold;
@@ -242,9 +242,9 @@
 <div class="page-header">
      
          <div class="action-buttons" >
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" id="addRow" onclick="addRow()">Add</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveData()">Save</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToDeptMappingList()">Cancel</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" id="addRow" onclick="addTradeSkillRow()">Add</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveTradeSkillData()">Save</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToTradeMappingList()">Cancel</button>
         </div> 
    </div>
 <f:form id="addAadharOBForm" action="/CWFM/contractworkmen/addAadharOB" modelAttribute="workmenbyAadhar" method="post" autocomplete="off">
@@ -257,27 +257,29 @@
         <select class="custom-select" id="principalEmployer" name="principalEmployerId" required>
             <option value="">Please select Principal Employer</option>
             <c:forEach var="pe" items="${PrincipalEmployer}">
-                <option value="${pe.id}">${pe.description}</option>
-            </c:forEach>
+								
+                					<option value="${pe.id}" ->
+									${pe.description}</option>
+            					</c:forEach>
         </select>
 
         <!-- <label style="color: darkcyan;">Department:</label> -->
-        <select class="custom-select" id="department" name="departmentId">
-            <option value="">Please select Department</option>
-            <c:forEach var="dept" items="${Department}">
-                <option value="${dept.gmId}">${dept.gmName}</option>
+        <select class="custom-select" id="trade" name="tradeId">
+            <option value="">Please select Trade</option>
+            <c:forEach var="trade" items="${TradeOptions}">
+                <option value="${trade.gmId}">${trade.gmName}</option>
             </c:forEach>
         </select>
 
         <!-- <label style="color: darkcyan;">Sub Department:</label> -->
-        <select class="custom-select" id="subDepartment" name="subDepartmentId">
-            <option value="">Please select Sub Department</option>
-            <c:forEach var="sub" items="${AreaOptions}">
-                <option value="${sub.gmId}">${sub.gmName}</option>
+        <select class="custom-select" id="skill" name="skillId">
+            <option value="">Please select Skill</option>
+            <c:forEach var="skill" items="${SkillOptions}">
+                <option value="${skill.gmId}">${skill.gmName}</option>
             </c:forEach>
         </select>
-        <button class="remove-btn" onclick="deleteRow(this)">Delete</button>
-<!-- <button type="button" class="remove-row" onclick="deleteRow()" >Delete</button> -->
+        <button class="btn btn-danger btn-sm remove-row" onclick="deleteRow(this)">Delete</button>
+<!-- <button type="button" class="remove-btn" onclick="deleteRow()" >Delete</button> -->
         <!-- <button type="button" class="btn btn-danger btn-sm remove-row">Delete</button> -->
     </div>
     

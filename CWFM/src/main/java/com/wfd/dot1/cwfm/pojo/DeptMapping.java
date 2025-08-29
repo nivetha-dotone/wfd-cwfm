@@ -9,7 +9,35 @@ public class DeptMapping {
     private String principalEmployer;
     private String department;
     private String subDepartment;
+    private int tradeId;
+    private int skillId;
+    private String trade;
+    private String skill;
     
+	public int getTradeId() {
+		return tradeId;
+	}
+	public void setTradeId(int tradeId) {
+		this.tradeId = tradeId;
+	}
+	public int getSkillId() {
+		return skillId;
+	}
+	public void setSkillId(int skillId) {
+		this.skillId = skillId;
+	}
+	public String getTrade() {
+		return trade;
+	}
+	public void setTrade(String trade) {
+		this.trade = trade;
+	}
+	public String getSkill() {
+		return skill;
+	}
+	public void setSkill(String skill) {
+		this.skill = skill;
+	}
 	public String getPrincipalEmployer() {
 		return principalEmployer;
 	}

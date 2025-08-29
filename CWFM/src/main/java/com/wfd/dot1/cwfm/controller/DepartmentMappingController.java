@@ -23,6 +23,7 @@ import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.DepartmentMappingService;
@@ -56,14 +57,14 @@ public class DepartmentMappingController {
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 		
 		
-		/*List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
     	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
     	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
     	request.setAttribute("PrincipalEmployer", peList);
-    	 // request.setAttribute("Dept", departments);
+    	/* // request.setAttribute("Dept", departments);
          // request.setAttribute("Subdept", subdepartments);
           
     	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
@@ -72,8 +73,8 @@ public class DepartmentMappingController {
    	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
    	    request.setAttribute("UserPermission", rr);*/
 		
-		List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
-		request.setAttribute("PrincipalEmployer", listDto);
+		//List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
+		//request.setAttribute("PrincipalEmployer", listDto);
     	
    	 List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
 
@@ -127,7 +128,7 @@ public class DepartmentMappingController {
 			        rr.setViewRights(1);
 	        	 listDto = peService.getAllPrincipalEmployerForAdmin();
 	         }else {
-	        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/workmenBulkUpload/list");
+	        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/departmentMapping/existinglist");
 	        	 //listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
 	         }
 	         }
@@ -137,5 +138,94 @@ public class DepartmentMappingController {
 	    		List<DeptMapping> wbu = deptMapService.getAllMappings();
 	    	   	 model.addAttribute("wbudata", wbu);
 	    	return "deptMapping/view";
+	    }
+	 
+	 @GetMapping("/existingTradeSkilllist")
+	    public String getAllTradeSkillMappings(HttpServletRequest request,HttpServletResponse response,Model model) {
+	    	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+	         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+	         List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+	         CMSRoleRights rr =new CMSRoleRights();
+	         if(user!=null) {
+	         if(user.getRoleName().equals("System Admin")) {
+	        	 rr.setAddRights(1);  // Changed getInt() to getBoolean()
+			        rr.setEditRights(1);
+			        rr.setDeleteRights(1);
+			        rr.setImportRights(1);
+			        rr.setExportRights(1);
+			        rr.setViewRights(1);
+	        	 listDto = peService.getAllPrincipalEmployerForAdmin();
+	         }else {
+	        	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/departmentMapping/existingTradeSkilllist");
+	        	 //listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+	         }
+	         }
+	    		//request.setAttribute("cmSPRINCIPALEMPLOYERs", listDto);
+	    		request.setAttribute("UserPermission", rr);
+	    		
+	    		List<DeptMapping> wbu = deptMapService.getAllTradeSkillMappings();
+	    	   	 model.addAttribute("wbudata", wbu);
+	    	return "deptMapping/tradeSkillList";
+	    }
+	 
+	 @GetMapping("/addTradeSkill")
+		public String addTradeSkill(HttpServletRequest request, HttpServletResponse response) {
+			
+			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+			
+			
+			List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+	    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+	    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+	    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+	    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+	    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+	    	request.setAttribute("PrincipalEmployer", peList);
+	    	/* // request.setAttribute("Dept", departments);
+	         // request.setAttribute("Subdept", subdepartments);
+	          
+	    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+	        CMSRoleRights rr =new CMSRoleRights();
+	        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/departmentMapping/list");
+	   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+	   	    request.setAttribute("UserPermission", rr);*/
+			
+			//List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
+			//request.setAttribute("PrincipalEmployer", listDto);
+	    	
+			 List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
+
+				// Grouping the CmsGeneralMaster objects by gmType
+				Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
+				        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+				// Define the types and their corresponding request attribute names
+				Map<String, String> attributeMapping = Map.of(
+				        "TRADE", "TradeOptions",
+				        "SKILL", "SkillOptions"
+				        
+				);
+
+				// Iterate over the attribute mappings and set the request attributes dynamically
+				attributeMapping.forEach((type, attributeName) -> {
+				    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+				    request.setAttribute(attributeName, gmList1);
+				});
+					
+			return "deptMapping/tradeSkillMapping";
+		}
+	 
+	 @PostMapping("/saveTradeSkill")
+	    @ResponseBody
+	    public ResponseEntity<String> saveTradeSkillMappings(@RequestBody List<DeptMapping> mappings) {
+	        try {
+	        	deptMapService.saveTradeSkillMappings(mappings);
+	            return ResponseEntity.ok("All mappings saved successfully!");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                    .body("Error saving mappings: " + e.getMessage());
+	        }
 	    }
 }

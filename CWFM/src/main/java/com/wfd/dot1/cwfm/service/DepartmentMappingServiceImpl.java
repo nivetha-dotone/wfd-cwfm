@@ -35,4 +35,26 @@ public class DepartmentMappingServiceImpl implements DepartmentMappingService {
 	    public List<DeptMapping> getAllMappings() {
 	        return deptMapDao.findAll();
 	    }
+	 
+	 @Override
+	    public List<DeptMapping> getAllTradeSkillMappings() {
+	        return deptMapDao.findAllTradeSkillMappings();
+	    }
+	 @Override
+	    public void saveTradeSkillMappings(List<DeptMapping> mappings) {
+	        for (DeptMapping mapping : mappings) {
+	            boolean exists = deptMapDao.existsTradeSkillMapping(mapping.getPrincipalEmployerId(), mapping.getTradeId(),mapping.getSkillId());
+	            if (exists) {
+	            	 // fetch names from DAO
+	                String principalEmployerName = deptMapDao.getPrincipalEmployerNameById(mapping.getPrincipalEmployerId());
+	                String tradeName = deptMapDao.getTradeNameById(mapping.getTradeId());
+	                String skillName = deptMapDao.getTradeNameById(mapping.getSkillId());
+	                
+	                throw new RuntimeException("Mapping already exists for Principal Employer: " 
+	                        + principalEmployerName + " , Trade: " + tradeName+ " and Skill: "+skillName);
+	             }
+	        }
+	        // If no duplicates, save all
+	        deptMapDao.saveTradeSkillMappings(mappings);
+	    }
 }
