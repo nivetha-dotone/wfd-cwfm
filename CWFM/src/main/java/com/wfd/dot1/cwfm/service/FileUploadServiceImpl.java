@@ -65,7 +65,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	 */
 
     @Override
-    public Map<String, Object> processTemplateFile(MultipartFile file, String templateType) throws Exception {
+    public Map<String, Object> processTemplateFile(MultipartFile file, String templateType,String createdBy) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
         String headerLine = reader.readLine();
 
@@ -774,12 +774,12 @@ public class FileUploadServiceImpl implements FileUploadService {
             // Lookups
             Integer unitId = fileUploadDao.getUnitIdByName(fields[29]);
             Integer contractorId = fileUploadDao.getContractorIdByName( fields[9]);
-            Integer tradeId = fileUploadDao.getTradeIdByName(fields[4]);
-            Integer skillId = fileUploadDao.getSkillIdByName(fields[5]);
-            Integer departmentId = fileUploadDao.getGeneralMasterId(fields[12]);
+            Integer tradeId = fileUploadDao.getTradeIdByUnitId(unitId,fields[4]);
+            Integer skillId = fileUploadDao.getSkillIdByTradeId(unitId,tradeId,fields[5]);
+            Integer departmentId = fileUploadDao.getdepartmentIdByUnitId(unitId,fields[12]);
             Integer accessAreaId = fileUploadDao.getGeneralMasterId(fields[27]);
             Integer bloodGroupId = fileUploadDao.getGeneralMasterId(fields[19]);
-            Integer areaId = fileUploadDao.getGeneralMasterId(fields[13]);
+            Integer areaId = fileUploadDao.getAreaByDeptID(unitId,departmentId,fields[13]);
             Integer academicId = fileUploadDao.getGeneralMasterId(fields[18]);
             Integer wcecId = fileUploadDao.getWCECId(fields[32],unitId,contractorId);
             Integer workorderId = fileUploadDao.getWorkorderId(fields[14],unitId,contractorId);
@@ -789,12 +789,12 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer LlNumber = fileUploadDao.getLlNumber(fields[38],unitId,contractorId);
 
 
-            if (tradeId == null) fieldErrors.put("trade", "Invalid or not found");
-            if (skillId == null) fieldErrors.put("skill", "Invalid or not found");
-            if (departmentId == null) fieldErrors.put("department", "Invalid or not found");
+            if (tradeId == null) fieldErrors.put("trade", "There is no mapping found for Trade and Principal Employee");
+            if (skillId == null) fieldErrors.put("skill", "There is no mapping found for Skill and Principal Employee");
+            if (departmentId == null) fieldErrors.put("department", "There is no mapping found for Department and Principal Employee");
             if (accessAreaId == null) fieldErrors.put("accessArea", "Invalid or not found");
             if (bloodGroupId == null) fieldErrors.put("bloodGroup", "Invalid or not found");
-            if (areaId == null) fieldErrors.put("area", "Invalid or not found");
+            if (areaId == null) fieldErrors.put("area", "There is no mapping found for Area and Principal Employee");
             if (academicId == null) fieldErrors.put("academic", "Invalid or not found");
             if (zoneId == null) fieldErrors.put("zone", "Invalid or not found");
             if (genderId == null) fieldErrors.put("Gender", "Invalid or not found");
@@ -943,12 +943,12 @@ public class FileUploadServiceImpl implements FileUploadService {
             // Lookups
             Integer unitId = fileUploadDao.getUnitIdByName(fields[29]);
             Integer contractorId = fileUploadDao.getContractorIdByName( fields[9]);
-            Integer tradeId = fileUploadDao.getTradeIdByName(fields[4]);
-            Integer skillId = fileUploadDao.getSkillIdByName(fields[5]);
-            Integer departmentId = fileUploadDao.getGeneralMasterId(fields[12]);
+            Integer tradeId = fileUploadDao.getTradeIdByUnitId(unitId,fields[4]);
+            Integer skillId = fileUploadDao.getSkillIdByTradeId(unitId,tradeId,fields[5]);
+            Integer departmentId = fileUploadDao.getdepartmentIdByUnitId(unitId,fields[12]);
             Integer accessAreaId = fileUploadDao.getGeneralMasterId(fields[27]);
             Integer bloodGroupId = fileUploadDao.getGeneralMasterId(fields[19]);
-            Integer areaId = fileUploadDao.getGeneralMasterId(fields[13]);
+            Integer areaId = fileUploadDao.getAreaByDeptID(unitId,departmentId,fields[13]);
             Integer academicId = fileUploadDao.getGeneralMasterId(fields[18]);
             Integer wcecId = fileUploadDao.getWCECId(fields[32],unitId,contractorId);
             Integer workorderId = fileUploadDao.getWorkorderId(fields[14],unitId,contractorId);
@@ -958,17 +958,17 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer LLNumber = fileUploadDao.getLlNumber(fields[38],unitId,contractorId);
 
 
-            Integer trade = !fields[4].isBlank() ? fileUploadDao.getTradeIdByName(fields[4]) : null;
-            if (!fields[4].isBlank() && trade == null) fieldErrors.put("trade", "Invalid or not found");
+            Integer trade = !fields[4].isBlank()&& unitId != null ? fileUploadDao.getTradeIdByUnitId(unitId,fields[4]) : null;
+            if (!fields[4].isBlank() && trade == null) fieldErrors.put("trade", "Mapping not Found for Trade with Principal Employee");
 
-            Integer skill = !fields[5].isBlank() ? fileUploadDao.getSkillIdByName(fields[5]) : null;
-            if (!fields[5].isBlank() && skill == null) fieldErrors.put("skill", "Invalid or not found");
+            Integer skill = !fields[5].isBlank() && unitId != null && tradeId != null? fileUploadDao.getSkillIdByTradeId(unitId,tradeId,fields[5]) : null;
+            if (!fields[5].isBlank() && skill == null) fieldErrors.put("skill", "Mapping not Found for Skill with Principal Employee");
 
-            Integer department = !fields[12].isBlank() ? fileUploadDao.getGeneralMasterId(fields[12]) : null;
-            if (!fields[12].isBlank() && department == null) fieldErrors.put("department", "Invalid or not found");
+            Integer department = !fields[12].isBlank()&& unitId != null ? fileUploadDao.getdepartmentIdByUnitId(unitId,fields[12]) : null;
+            if (!fields[12].isBlank() && department == null) fieldErrors.put("department", "Mapping not Found for Department with Principal Employee");
             
-            Integer area = !fields[13].isBlank() ? fileUploadDao.getGeneralMasterId(fields[13]) : null;
-            if (!fields[13].isBlank() && area == null) fieldErrors.put("area", "Invalid or not found");
+            Integer area = !fields[13].isBlank()&& unitId != null&& departmentId != null ? fileUploadDao.getAreaByDeptID(unitId,departmentId,fields[13]) : null;
+            if (!fields[13].isBlank() && area == null) fieldErrors.put("area", "Mapping not Found for Area with Principal Employee");
 
             Integer academic = !fields[18].isBlank() ? fileUploadDao.getGeneralMasterId(fields[18]) : null;
             if (!fields[18].isBlank() && academic == null) fieldErrors.put("academic", "Invalid or not found");

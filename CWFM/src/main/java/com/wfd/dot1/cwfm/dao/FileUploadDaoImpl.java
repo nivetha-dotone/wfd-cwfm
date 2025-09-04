@@ -918,6 +918,36 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	///    String sql = "UPDATE CMSRequestItemBulkUpload SET RecordProcessed = 'Y' WHERE TransactionID = ?";
 	//    jdbcTemplate.update(sql, txnId);
 	//}
+	@Override
+	public Integer getdepartmentIdByUnitId(Integer unitId, String department) {
+		
+		String sql=" select udm.departmentid from UnitDepartmentMapping udm\r\n"
+				+ "join CMSGENERALMASTER cgm on  cgm.GMID = udm.departmentId where udm.principalEmployerId=? and cgm.GMNAME=?";
+		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, department.trim());
+		    return result.isEmpty() ? null : result.get(0);
+		}
+	@Override
+	public Integer getAreaByDeptID(Integer unitId, Integer departmentId, String area) {
+		String sql = "select udm.subDepartmentId from UnitDepartmentMapping udm\r\n"
+				+ "join CMSGENERALMASTER cgm on  cgm.GMID = udm.subDepartmentId where udm.principalEmployerId=? and udm.departmentId=? and cgm.GMNAME=?";
+	
+		List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, departmentId,area.trim());
+	    return result.isEmpty() ? null : result.get(0);
+	}
+	@Override
+	public Integer getTradeIdByUnitId(Integer unitId, String trade) {
+		String sql="select utm.TradeId from UnitTradeSkillMapping utm\r\n"
+				+ "join CMSGENERALMASTER cgm on  cgm.GMID = utm.TradeId where utm.principalEmployerId=? and cgm.GMNAME=?";
+		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, trade.trim());
+		    return result.isEmpty() ? null : result.get(0);
+		}
+	@Override
+	public Integer getSkillIdByTradeId(Integer unitId, Integer tradeId, String skill) {
+		String sql="select utm.SkillId from UnitTradeSkillMapping utm\r\n"
+				+ "join CMSGENERALMASTER cgm on  cgm.GMID = utm.SkillId where utm.principalEmployerId=? and TradeId=? and cgm.GMNAME=?";
+		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, tradeId,skill.trim());
+		    return result.isEmpty() ? null : result.get(0);
+		}
 	
 	}
 

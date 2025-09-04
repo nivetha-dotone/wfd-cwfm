@@ -33,6 +33,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -636,5 +637,16 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public List<GatePassListingDto> getGatePassActionListingDetailsForDashboardNav(String unitId,String deptId,String userId, String gatePassTypeId) {
 		return workmenDao.getGatePassActionListingDetailsDashboardNav(unitId,deptId,userId,gatePassTypeId);
 	}
-
+	@Override
+	public  List<DeptMapping> getAllSkills(String unitId, String tradeId){
+		return workmenDao.getAllSkills(unitId,tradeId);
+	}
+	@Override
+	public List<DeptMapping> getAllDepartmentsOnPE(String unitId) {
+		return workmenDao.getAllDepartmentsOnPE(unitId);
+	}
+	@Override
+	public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId) {
+		return workmenDao.getAllSubDepartments(unitId,departmentId);
+	}
 }

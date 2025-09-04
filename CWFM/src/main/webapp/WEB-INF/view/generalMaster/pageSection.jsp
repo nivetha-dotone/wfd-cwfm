@@ -188,8 +188,8 @@
             <%-- <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}"> --%>
     </div>
 
-    <h3 style="color:gray;"><spring:message code="label.existingGeneralMasters"/></h3>
-     <div style="display: flex; margin-top: 20px;">
+    <h3 style="color:gray;margin:4px;"><spring:message code="label.existingGeneralMasters"/></h3>
+     <div style="display: flex; margin-top: 20px;margin-left:18px;">
         <!-- Available Pages -->
         <div>
             <h3 style=" color: darkcyan;list-style-type:none;"><spring:message code="label.availablePages"/></h3>
@@ -202,7 +202,7 @@
         </div>
 
         <div>
-            <h3 style=" color: darkcyan;padding-left:80px;"><spring:message code="label.selectedPages"/></h3>
+            <h3 style=" color: darkcyan;padding-right:80px;"><spring:message code="label.selectedPages"/></h3>
             <select id="selectedBox" multiple style="width: 200px; height: 200px;color:gray;"></select>
         </div>
     </div>

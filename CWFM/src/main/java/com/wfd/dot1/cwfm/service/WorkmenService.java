@@ -11,6 +11,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -105,5 +106,11 @@ public interface WorkmenService {
 
 	List<GatePassListingDto> getGatePassActionListingDetailsForDashboardNav(String unitId, String deptId, String userId,
 			String gatePassTypeId);
+
+	public List<DeptMapping> getAllSkills(String unitId, String tradeId);
+
+	public List<DeptMapping> getAllDepartmentsOnPE(String unitId);
+
+	public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId);
 
 }	

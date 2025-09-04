@@ -36,6 +36,7 @@ import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -154,6 +155,16 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 public String getWageMasterExportData() {
 		    return QueryFileWatcher.getQuery("GET_WAGE_DETAILS_EXPORT_DATA");
 		}
+	 public String getAllSkillsByPeandTrade() {
+		    return QueryFileWatcher.getQuery("GET_ALL_SKILLS_BY_PEID_AND_TRADEID");
+		}
+	 public String getAllDepartmentsOnPE() {
+		    return QueryFileWatcher.getQuery("GET_ALL_DEPARTMENT_BY_PEID");
+		}
+	 public String getAllSubDepartments() {
+		    return QueryFileWatcher.getQuery("GET_ALL_SUBDEPARTMENT_BY_PEID_DEPID");
+		}
+	 
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method "+userAccount);
@@ -702,7 +713,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 								gpm.getAcademic()!=null?gpm.getAcademic():' ',
 										gpm.getZone()!=null?gpm.getZone():' ',
 												gpm.getWageCategory()!=null?gpm.getWageCategory():' ',gpm.getBonusPayout()!=null?gpm.getBonusPayout():' ',
-														gpm.getDepartment()!=null?gpm.getDepartment():' ',gpm.getSubdepartment()!=null?gpm.getSubdepartment():' '};
+														gpm.getDepartment()!=null?gpm.getDepartment():' ',gpm.getSubdepartment()!=null?gpm.getSubdepartment():' ',
+															gpm.getTrade()!=null?gpm.getTrade():' ',gpm.getSkill()!=null?gpm.getSkill():' '};
 		log.info("Query to getAllGeneralMastersForGatePass "+query);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,obj);
 		while(rs.next()) {
@@ -2206,5 +2218,58 @@ public List<GatePassListingDto> getGatePassActionListingDetailsDashboardNav(Stri
 	}
 	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
 	return listDto;
+}
+
+@Override
+public List<DeptMapping> getAllSkills(String unitId, String tradeId) {
+	log.info("Entering into getAllSkillsBasedOnPE dao method "+unitId);
+	List<DeptMapping> skillList= new ArrayList<DeptMapping>();
+	String query = getAllSkillsByPeandTrade();
+	log.info("Query to getAllSkillsBasedOnPE "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,tradeId);
+	while(rs.next()) {
+		DeptMapping skill = new DeptMapping();
+		skill.setSkillId(Integer.parseInt(rs.getString("SKILLID")));
+		skill.setSkill(rs.getString("SKILLNM"));
+		skillList.add(skill);
+	}
+	log.info("Exiting from getAllSkillsBasedOnPE dao method "+skillList.size());
+	return skillList;
+}
+
+@Override
+public List<DeptMapping> getAllDepartmentsOnPE(String unitId) {
+	log.info("Entering into getAllDepartmentsOnPE dao method "+unitId);
+	List<DeptMapping> departmentList= new ArrayList<DeptMapping>();
+	String query = getAllDepartmentsOnPE();
+	log.info("Query to getAllDepartmentsOnPE "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+	while(rs.next()) {
+		DeptMapping dept = new DeptMapping();
+		dept.setDepartmentId(Integer.parseInt(rs.getString("DEPARTMENTID")));
+		dept.setDepartment(rs.getString("DEPARTMENT"));
+		departmentList.add(dept);
+	}
+	log.info("Exiting from getAllDepartmentsOnPE dao method "+departmentList.size());
+	return departmentList;
+
+
+}
+
+@Override
+public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId) {
+	log.info("Entering into getAllSubDepartments dao method "+unitId);
+	List<DeptMapping> areaList= new ArrayList<DeptMapping>();
+	String query = getAllSubDepartments();
+	log.info("Query to getAllSubDepartmentsBasedOnPE "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,departmentId);
+	while(rs.next()) {
+		DeptMapping area = new DeptMapping();
+		area.setSubDepartmentId(Integer.parseInt(rs.getString("SUBDEPARTMENTID")));
+		area.setSubDepartment(rs.getString("SUBDEPARTMENT"));
+		areaList.add(area);
+	}
+	log.info("Exiting from getAllSkillsBasedOnPE dao method "+areaList.size());
+	return areaList;
 }
 }

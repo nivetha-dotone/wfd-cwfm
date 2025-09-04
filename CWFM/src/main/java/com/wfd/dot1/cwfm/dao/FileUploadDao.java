@@ -94,6 +94,14 @@ public interface FileUploadDao {
 
 	boolean isAadharNumberExists(String aadharNumber);
 
+	Integer getdepartmentIdByUnitId(Integer unitId, String department);
+
+	Integer getAreaByDeptID(Integer unitId, Integer departmentId, String area);
+
+	Integer getTradeIdByUnitId(Integer unitId, String trade);
+
+	Integer getSkillIdByTradeId(Integer unitId, Integer tradeId, String skill);
+
 	
 
 	

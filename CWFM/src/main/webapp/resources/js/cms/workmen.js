@@ -59,6 +59,8 @@ function getContractorsAndTrades(unitId, userAccount) {
 
     // Fetch trades
     getTrades(unitId);
+    
+    getDepartments(unitId);
 }
 
 
@@ -230,6 +232,115 @@ function getTrades(unitId) {
 
     xhr.onerror = function () {
         console.error("Request failed while fetching trades");
+    };
+
+    xhr.send();
+}
+function getSkills(unitId,tradeId) {
+	var principalEmployerSelect = document.getElementById("principalEmployer");
+    var unitId = principalEmployerSelect.value; // Get the selected principal employer value
+    var tradeSelect = document.getElementById("trade");
+    var tradeId = tradeSelect.value; 
+    var xhr = new XMLHttpRequest();
+    var url = contextPath + "/contractworkmen/getAllSkills?unitId=" + unitId + "&tradeId=" + tradeId;
+    console.log("Fetching trades from URL:", url);
+    xhr.open("GET", url, true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var skills = JSON.parse(xhr.responseText);
+            console.log("Skills:", skills);
+            var skillSelect = document.getElementById("skill");
+
+            // Clear existing options
+            skillSelect.innerHTML = '<option value="">Please select Skill</option>';
+
+            // Populate the trade dropdown
+            skills.forEach(function (skill) {
+                var option = document.createElement("option");
+                option.value = skill.skillId;
+                option.text = skill.skill;
+                skillSelect.appendChild(option);
+            });
+        } else {
+            console.error("Error fetching skills:", xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed while fetching skill");
+    };
+
+    xhr.send();
+}
+
+function getDepartments(unitId) {
+    var xhr = new XMLHttpRequest();
+    var url = contextPath + "/contractworkmen/getAllDepartments?unitId=" + unitId;
+    console.log("Fetching departments from URL:", url);
+    xhr.open("GET", url, true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var departments = JSON.parse(xhr.responseText);
+            console.log("Departments:", departments);
+            var departmentSelect = document.getElementById("department");
+
+            // Clear existing options
+            departmentSelect.innerHTML = '<option value="">Please select Department</option>';
+
+            // Populate the trade dropdown
+            departments.forEach(function (department) {
+                var option = document.createElement("option");
+                option.value = department.departmentId;
+                option.text = department.department;
+                departmentSelect.appendChild(option);
+            });
+        } else {
+            console.error("Error fetching departments:", xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed while fetching departments");
+    };
+
+    xhr.send();
+}
+
+function getAreabyDept(unitId,departmentId) {
+	var principalEmployerSelect = document.getElementById("principalEmployer");
+    var unitId = principalEmployerSelect.value; // Get the selected principal employer value
+    var departmentSelect = document.getElementById("department");
+    var departmentId = departmentSelect.value; 
+    var xhr = new XMLHttpRequest();
+    var url = contextPath + "/contractworkmen/getAllSubDepartments?unitId=" + unitId + "&departmentId=" + departmentId;
+    console.log("Fetching subdepartment from URL:", url);
+    xhr.open("GET", url, true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var subdepartment = JSON.parse(xhr.responseText);
+            console.log("Areas:", subdepartment);
+            var subdepartmentSelect = document.getElementById("subdepartment");
+
+            // Clear existing options
+            subdepartmentSelect.innerHTML = '<option value="">Please select Area</option>';
+
+            // Populate the trade dropdown
+            subdepartment.forEach(function (subdepartment) {
+                var option = document.createElement("option");
+                option.value = subdepartment.subDepartmentId;
+                option.text = subdepartment.subDepartment;
+                subdepartmentSelect.appendChild(option);
+            });
+        } else {
+            console.error("Error fetching subdepartments:", xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed while fetching subdepartment");
     };
 
     xhr.send();
@@ -3126,3 +3237,28 @@ let streams;
     });
 }  
 
+function loadDepartments(unitId) {
+    if (!unitId) {
+        $("#deptId").html("<option value=''>Select Department</option>");
+        return;
+    }
+
+    $.ajax({
+        url: "/CWFM/contractworkmen/getAllDepartments",
+        type: "GET",
+        data: { unitId: unitId },
+        success: function (departments) {
+            var deptSelect = $("#deptId");
+            deptSelect.empty();
+            deptSelect.append("<option value=''>Select Department</option>");
+            $.each(departments, function (i, dept) {
+                deptSelect.append(
+                    "<option value='" + dept.departmentId + "'>" + dept.department + "</option>"
+                );
+            });
+        },
+        error: function () {
+            alert("Error loading departments!");
+        }
+    });
+}

@@ -554,7 +554,7 @@ label {
                 <td>
                 	<select class="custom-select" name="maritalStatus" id="maritalStatus">
                         <option value="">Please select Marital Status</option>
-                        	<option value="Single" ${GatePassObj.maritalStatus eq 'Single' ? 'selected="selected"' : ''}>Single</option>
+                        	<option value="Unmarried" ${GatePassObj.maritalStatus eq 'Unmarried' ? 'selected="selected"' : ''}>Unmarried</option>
     						<option value="Married" ${GatePassObj.maritalStatus eq 'Married' ? 'selected="selected"' : ''}>Married</option>
                     </select>
                 	<label id="error-maritalStatus"style="color: red;display: none;">Marital Status is required</label>
@@ -624,12 +624,12 @@ label {
                                 <label id="error-workorder" style="color: red;display: none;">Workorder is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.trade"/></label></th>
-                            <td><select class="custom-select" id="trade" name="tradeId" >
+                            <td><select class="custom-select" id="trade" name="tradeId" onchange="getSkills()" >
                                 <option value="">Please select Trade</option>
 								<c:forEach var="pe" items="${Trades}">
 								
                 					<option value="${pe.tradeId}"
-									${GatePassObj.principalEmployer eq pe.tradeId ? 'selected="selected"':''}>
+									${GatePassObj.trade eq pe.tradeId ? 'selected="selected"' : ''}>
 									${pe.tradeName}</option>
             					</c:forEach>
 								
@@ -645,19 +645,19 @@ label {
                                 	 <c:forEach var="s" items="${Skills}">
 									 
                 						<option value="${s.skillId}"	${GatePassObj.skill eq s.skillId ? 'selected="selected"':''}>
-										${s.skillName}</option>
+										${s.skill}</option>
             						</c:forEach>
             						
                                 </select>
                                 <label id="error-skill" style="color: red;display: none;">Skill is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.department"/></label></th>
-                            <td><select class="custom-select" id="department" name="departmentId" onchange="getEic()">
+                            <td><select class="custom-select" id="department" name="departmentId" onchange="getAreabyDept(); getEic();">
                                 <option value="">Please select Department</option>
 								
-                                 <c:forEach var="dept" items="${Dept}">
-                						<option value="${dept.id}" ${GatePassObj.department eq dept.id ? 'selected="selected"':''}>
-										${dept.description}</option>
+                                 <c:forEach var="dept" items="${Departments}">
+                						<option value="${dept.departmentId}" ${GatePassObj.department eq dept.departmentId ? 'selected="selected"':''}>
+										${dept.department}</option>
             						</c:forEach>
 								
                                 </select>
@@ -670,8 +670,8 @@ label {
                                 <option value="">Please select Area</option>
 								
                                  <c:forEach var="dept" items="${Subdept}">
-                						<option value="${dept.id}" ${GatePassObj.subdepartment eq dept.id ? 'selected="selected"':''}>
-										${dept.description}</option>
+                						<option value="${dept.subDepartmentId}" ${GatePassObj.subdepartment eq dept.subDepartmentId ? 'selected="selected"':''}>
+										${dept.subDepartment}</option>
             						</c:forEach>
 									
                                 </select>
@@ -701,9 +701,8 @@ label {
                             <td><select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
-								<c:if test="${pe.licenceType eq 'WC'}">
-                					<option value="${pe.wcId}"
-									${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"':''}>
+								<c:if test="${pe.licenceType eq 'WC' || pe.licenceType eq 'ESIC'}">
+                					<option value="${pe.wcId}"  ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
 									${pe.wcCode}</option>
 									</c:if>
             					</c:forEach>

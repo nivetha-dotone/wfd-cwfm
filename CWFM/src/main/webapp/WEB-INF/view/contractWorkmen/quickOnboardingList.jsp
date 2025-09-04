@@ -190,32 +190,18 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
     </form> -->
         <div>
-   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
-         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
-         <option value="">Select Principal Employer</option>
-   
-    
-    <c:forEach items="${principalEmployers}" var="pe" varStatus="status">
-        <option value="${pe.id}" 
-            <c:if test="${principalEmployers.size() == 1}">selected</c:if>>
-            ${pe.description}
-        </option>
-    </c:forEach>
-    
-</select>
-<input type="hidden" id="principalEmployerId" name="principalEmployerId">
-
-<label for="departmentId" style=" color: darkcyan;"   >Department:</label>
-         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
-         <option value="">Select Department</option>
-    <c:forEach items="${Dept}" var="dept">
-      
-        <option value="${dept.id}"  <c:if test="${Dept.size() == 1}">selected</c:if>>${dept.description}</option>
+    <label for="principalEmployerId" style="color: darkcyan;">Principal Employer:</label>
+<select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;" onchange="loadDepartments(this.value)">
+    <option value="">Select Principal Employer</option>
+    <c:forEach items="${principalEmployers}" var="pe">
+        <option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
     </c:forEach>
 </select>
 
-
-<input type="hidden" id="deptId" name="deptId">
+<label for="deptId" style="color: darkcyan;">Department:</label>
+<select id="deptId" name="deptId" style="color:gray;padding:3px;">
+    <option value="">Select Department</option>
+</select>
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE('quick')">Search</button>
 
   </div>

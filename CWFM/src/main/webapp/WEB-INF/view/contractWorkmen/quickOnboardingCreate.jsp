@@ -635,7 +635,7 @@ label {
                                 <label id="error-workorder" style="color: red;display: none;">Workorder is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.trade"/></label></th>
-                            <td><select class="custom-select" id="trade" name="tradeId" >
+                            <td><select class="custom-select" id="trade" name="tradeId" onchange="getSkills()" >
                                 <option value="">Please select Trade</option>
 								<c:forEach var="pe" items="${Trades}">
 								
@@ -656,19 +656,19 @@ label {
                                 	 <c:forEach var="s" items="${Skills}">
 									 
                 						<option value="${s.skillId}"	<c:if test="${Skills.size() == 1}">selected</c:if>>
-										${s.skillName}</option>
+										${s.skill}</option>
             						</c:forEach>
             						
                                 </select>
                                 <label id="error-skill" style="color: red;display: none;">Skill is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.department"/></label></th>
-                            <td><select class="custom-select" id="department" name="departmentId" onchange="getEic()">
+                            <td><select class="custom-select" id="department" name="departmentId" onchange="getAreabyDept(); getEic();">
                                 <option value="">Please select Department</option>
 								
-                                 <c:forEach var="dept" items="${Dept}">
-                						<option value="${dept.id}" >
-										${dept.description}</option>
+                                 <c:forEach var="dept" items="${Departments}">
+                						<option value="${dept.departmentId}" >
+										${dept.department}</option>
             						</c:forEach>
 								
                                 </select>
@@ -681,8 +681,8 @@ label {
                                 <option value="">Please select Area</option>
 								
                                  <c:forEach var="dept" items="${Subdept}">
-                						<option value="${dept.id}" <c:if test="${Subdept.size() == 1}">selected</c:if>>
-										${dept.description}</option>
+                						<option value="${dept.subDepartmentId}" <c:if test="${Subdept.size() == 1}">selected</c:if>>
+										${dept.subDepartment}</option>
             						</c:forEach>
 									
                                 </select>

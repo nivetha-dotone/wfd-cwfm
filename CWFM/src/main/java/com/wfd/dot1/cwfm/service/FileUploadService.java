@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 public interface FileUploadService {
     void uploadFiles(List<MultipartFile> files);
    
-    Map<String, Object> processTemplateFile(MultipartFile file, String templateType) throws Exception;
+    Map<String, Object> processTemplateFile(MultipartFile file, String templateType ,String createdBy) throws Exception;
+    
     static void saveMinimumWageTemplate(MinimumWageDTO dto) {
 		// TODO Auto-generated method stub		
 	}
 
 	String getTemplateCSV(String templateType);
-    
     
     }
 

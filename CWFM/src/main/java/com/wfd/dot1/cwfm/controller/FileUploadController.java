@@ -1,10 +1,12 @@
 package com.wfd.dot1.cwfm.controller;
 
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.service.FileUploadService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -343,11 +345,17 @@ public class FileUploadController {
     @PostMapping("/uploadTemplate")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> uploadTemplate(@RequestParam("file") MultipartFile file,
-                                                              @RequestParam("templateType") String templateType) {
+                                                              @RequestParam("templateType") String templateType,
+                                                              HttpServletRequest request, HttpServletResponse response) {
         try {
-            Map<String, Object> result = fileUploadService.processTemplateFile(file, templateType);
+        	 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+ 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+ 			String createdBy = String.valueOf(user.getUserId()); 
+ 			
+            Map<String, Object> result = fileUploadService.processTemplateFile(file, templateType,createdBy);
             Map<String, Object> data = (Map<String, Object>) result.get("data");
-           System.out.println(data);
+            
+                      System.out.println(data);
             List<Map<String, Object>> successData = (List<Map<String, Object>>) data.get("successData");
             List<Map<String, Object>> errorData = (List<Map<String, Object>>) data.get("errorData");
 

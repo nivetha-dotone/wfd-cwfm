@@ -203,10 +203,10 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		            record.setUnitCode(String.valueOf(fileUploadDao.getUnitIdByName(record.getUnitCode())));
 		            record.setVendorCode(String.valueOf(fileUploadDao.getContractorIdByName(record.getVendorCode())));
 		            record.setWorkorderNumber(String.valueOf(fileUploadDao.getWorkorderId(record.getWorkorderNumber(),Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getVendorCode()))));
-		            record.setTrade(String.valueOf(fileUploadDao.getTradeIdByName(record.getTrade())));
-		            record.setSkill(String.valueOf(fileUploadDao.getSkillIdByName(record.getSkill())));
+		            record.setTrade(String.valueOf(fileUploadDao.getTradeIdByUnitId(Integer.parseInt(record.getUnitCode()),record.getTrade())));
+		            record.setSkill(String.valueOf(fileUploadDao.getSkillIdByTradeId(Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getTrade()),record.getSkill())));
 		           // record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
-		            record.setArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getArea())));
+		            //record.setArea(String.valueOf(fileUploadDao.getAreaByDeptID(Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getDepartment()),record.getArea())));
 		            record.setAccessArea(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAccessArea())));
 		            record.setBloodGroup(String.valueOf(fileUploadDao.getGeneralMasterId(record.getBloodGroup())));
 		            record.setAcademic(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAcademic())));
@@ -214,8 +214,9 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		            record.setZone(String.valueOf(fileUploadDao.getGeneralMasterId(record.getZone())));
 		            record.setGender(String.valueOf(fileUploadDao.getGeneralMasterId(record.getGender())));
 		            record.setEICNumber(String.valueOf(fileUploadDao.geteicId(record.getDepartment(),Integer.parseInt(record.getUnitCode()),record.getEICNumber())));
-		            record.setDepartment(String.valueOf(fileUploadDao.getGeneralMasterId(record.getDepartment())));
+		            record.setDepartment(String.valueOf(fileUploadDao.getdepartmentIdByUnitId(Integer.parseInt(record.getUnitCode()),record.getDepartment())));
 		           // record.setLLnumber(String.valueOf(fileUploadDao.getLlNumber(record.getLLnumber())));
+		            record.setArea(String.valueOf(fileUploadDao.getAreaByDeptID(Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getDepartment()),record.getArea())));
 		        } catch (Exception e) {
 		            fieldErrors.put("IDMapping", "Failed to resolve IDs: " + e.getMessage());
 		        }

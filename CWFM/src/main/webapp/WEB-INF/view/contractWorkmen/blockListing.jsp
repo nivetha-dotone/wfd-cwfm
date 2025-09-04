@@ -193,29 +193,18 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchPrincipalEmployers('<%= request.getContextPath() %>')">Search</button>
     </form> --%>
      <div>
-   <label for="principalEmployerId" style=" color: darkcyan;"   >Principal Employer:</label>
-         <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;">
-         <option value="">Select Principal Employer</option>
+   <label for="principalEmployerId" style="color: darkcyan;">Principal Employer:</label>
+<select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;" onchange="loadDepartments(this.value)">
+    <option value="">Select Principal Employer</option>
     <c:forEach items="${principalEmployers}" var="pe">
-       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.name}
-        </option> --%>
         <option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
     </c:forEach>
 </select>
-<input type="hidden" id="principalEmployerId" name="principalEmployerId">
 
-<label for="departmentId" style=" color: darkcyan;"   >Department:</label>
-         <select id="deptId" name="deptId" style="color:gray;padding:3px;">
-         <option value="">Select Department</option>
-    <c:forEach items="${Dept}" var="dept">
-       <%--  <option value="${principalEmployer.unitId}" ${principalEmployer.unitId == selectedPrincipalEmployerId ? 'selected' : ''}>
-            ${principalEmployer.name}
-        </option> --%>
-        <option value="${dept.id}" <c:if test="${Dept.size() == 1}">selected</c:if>>${dept.description}</option>
-    </c:forEach>
+<label for="deptId" style="color: darkcyan;">Department:</label>
+<select id="deptId" name="deptId" style="color:gray;padding:3px;">
+    <option value="">Select Department</option>
 </select>
-<input type="hidden" id="deptId" name="deptId">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchBlockList()">Search</button>
   </div>
    <div>

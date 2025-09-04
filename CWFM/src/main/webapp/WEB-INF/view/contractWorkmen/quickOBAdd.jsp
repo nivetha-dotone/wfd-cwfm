@@ -663,7 +663,7 @@ label {
                                 <label id="error-workorder" style="color: red;display: none;">Workorder is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.trade"/></label></th>
-                            <td><select class="custom-select" id="trade" name="tradeId" >
+                            <td><select class="custom-select" id="trade" name="tradeId" onchange="getSkills()" >
                                 <option value="">Please select Trade</option>
 								<c:forEach var="pe" items="${Trades}">
 								
@@ -684,19 +684,19 @@ label {
                                 	 <c:forEach var="s" items="${Skills}">
 									 
                 						<option value="${s.skillId}"	${GatePassObj.skill eq s.skillId ? 'selected="selected"' : ''}>
-										${s.skillName}</option>
+										${s.skill}</option>
             						</c:forEach>
             						
                                 </select>
                                 <label id="error-skill" style="color: red;display: none;">Skill is required</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.department"/></label></th>
-                            <td><select class="custom-select" id="department" name="departmentId" onchange="getEic()">
+                            <td><select class="custom-select" id="department" name="departmentId" onchange="getAreabyDept(); getEic();">
                                 <option value="">Please select Department</option>
 								
-                                 <c:forEach var="dept" items="${Dept}">
-                						<option value="${dept.id}" ${GatePassObj.department eq dept.id ? 'selected="selected"' : ''}>
-										${dept.description}</option>
+                                 <c:forEach var="dept" items="${Departments}">
+                						<option value="${dept.departmentId}" ${GatePassObj.department eq dept.departmentId ? 'selected="selected"' : ''}>
+										${dept.department}</option>
             						</c:forEach>
 								
                                 </select>
@@ -709,8 +709,8 @@ label {
                                 <option value="">Please select Area</option>
 								
                                  <c:forEach var="dept" items="${Subdept}">
-                						<option value="${dept.id}" ${GatePassObj.subdepartment eq dept.id ? 'selected="selected"' : ''}>
-										${dept.description}</option>
+                						<option value="${dept.subDepartmentId}" ${GatePassObj.subdepartment eq dept.subDepartmentId.toString() ? 'selected="selected"' : ''}>
+										${dept.subDepartment}</option>
             						</c:forEach>
 									
                                 </select>

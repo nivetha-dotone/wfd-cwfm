@@ -47,6 +47,7 @@ import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
@@ -92,15 +93,15 @@ public class WorkmenController {
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
-    	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
     	request.setAttribute("PrincipalEmployer", peList);
-    	  request.setAttribute("Dept", departments);
-          request.setAttribute("Subdept", subdepartments);
+    	 // request.setAttribute("Dept", departments);
+         // request.setAttribute("Subdept", subdepartments);
           
         //Skills
-		List<Skill> skillList = workmenService.getAllSkill();
-		request.setAttribute("Skills", skillList);
+		//List<Skill> skillList = workmenService.getAllSkill();
+		//request.setAttribute("Skills", skillList);
 		//Eic 
 		//List<MasterUser> eicList = workmenService.getAllEicManager(user.getUserAccount());
 		//request.setAttribute("EIC", eicList);
@@ -216,6 +217,25 @@ public class WorkmenController {
     	
     }
     
+    @GetMapping("/getAllSkills")
+    public ResponseEntity<List<DeptMapping>> getAllSkills(
+    		@RequestParam("unitId") String unitId, 
+            @RequestParam("tradeId") String tradeId){
+    	 log.info("Entering into getAllSkills for: " + unitId + " tradeId: " + tradeId);
+    	 try {
+    		 List<DeptMapping> skills = workmenService.getAllSkills(unitId,tradeId);
+    		 if(skills.isEmpty()) {
+    			 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    		 }
+    		 return new ResponseEntity<>(skills,HttpStatus.OK);
+    	 }catch(Exception e) {
+    		 log.error("Error fetching getAllSkills: ", e);
+             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    	 }
+    
+    	
+    }
+    
     @GetMapping("/getAllTrades")
     public ResponseEntity<List<Trade>> getAllTrades(@RequestParam("unitId")String unitId){
     	log.info("Entered into getAllTrades for unitId:"+unitId);
@@ -230,6 +250,41 @@ public class WorkmenController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     
+    }
+    
+    @GetMapping("/getAllDepartments")
+    public ResponseEntity<List<DeptMapping>> getAllDepartments(@RequestParam("unitId")String unitId){
+    	log.info("Entered into getAllDepartments for unitId:"+unitId);
+    	try {
+    		List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(unitId);
+    		if(departments.isEmpty()) {
+    			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    		}
+    		return new ResponseEntity<>(departments,HttpStatus.OK);
+    	}catch(Exception e) {
+    		log.error("Error fetching Departments: ", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    
+    }
+    
+    @GetMapping("/getAllSubDepartments")
+    public ResponseEntity<List<DeptMapping>> getAllSubDepartments(
+    		@RequestParam("unitId") String unitId, 
+            @RequestParam("departmentId") String departmentId){
+    	 log.info("Entering into getAllSubDepartments for: " + unitId + " departmentId: " + departmentId);
+    	 try {
+    		 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(unitId,departmentId);
+    		 if(Subdept.isEmpty()) {
+    			 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    		 }
+    		 return new ResponseEntity<>(Subdept,HttpStatus.OK);
+    	 }catch(Exception e) {
+    		 log.error("Error fetching SubDepartments: ", e);
+             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    	 }
+    
+    	
     }
     
     private static final String ROOT_DIRECTORY = "D:/wfd_cwfm/ep_docs/";
@@ -363,7 +418,7 @@ public class WorkmenController {
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
     	List<PersonOrgLevel> businessType = groupedByLevelDef.getOrDefault("Business Type", new ArrayList<>());
     	
     	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
@@ -372,7 +427,7 @@ public class WorkmenController {
    	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
    	    request.setAttribute("UserPermission", rr);
     	request.setAttribute("principalEmployers", peList);
-    	  request.setAttribute("Dept", departments);
+    	 // request.setAttribute("Dept", departments);
     	request.setAttribute("BusinessType", businessType) ;
     	  
 		return "contractWorkmen/approverList";
@@ -449,7 +504,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -457,13 +512,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		List<ApproverStatusDTO> approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId());
     		 request.setAttribute("approvers", approvers);
@@ -638,9 +697,9 @@ public class WorkmenController {
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       //	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
-       	  request.setAttribute("Dept", departments);
+       	  //request.setAttribute("Dept", departments);
    		return "contractWorkmen/blockListing";
    	}
     
@@ -684,9 +743,9 @@ public class WorkmenController {
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
-       	  request.setAttribute("Dept", departments);
+       	  //request.setAttribute("Dept", departments);
    		return "contractWorkmen/unblockListing";
    	}
    
@@ -735,9 +794,9 @@ public class WorkmenController {
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       //	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
-       	  request.setAttribute("Dept", departments);
+       	  //request.setAttribute("Dept", departments);
    		return "contractWorkmen/blackListing";
    	}
     @PostMapping("/blackList")
@@ -781,9 +840,9 @@ public class WorkmenController {
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
-       	  request.setAttribute("Dept", departments);
+       	 // request.setAttribute("Dept", departments);
    		return "contractWorkmen/deblackListing";
    	}
     @PostMapping("/deblackList")
@@ -826,9 +885,9 @@ public class WorkmenController {
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       //	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
-       	  request.setAttribute("Dept", departments);
+       	  //request.setAttribute("Dept", departments);
    		return "contractWorkmen/cancelListing";
    	}
     @PostMapping("/cancel")
@@ -871,9 +930,9 @@ public class WorkmenController {
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-       	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+       	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
        	request.setAttribute("principalEmployers", peList);
-       	  request.setAttribute("Dept", departments);
+       	  //request.setAttribute("Dept", departments);
    		return "contractWorkmen/lostListing";
    	}
     
@@ -925,7 +984,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -933,13 +992,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -968,7 +1031,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -976,13 +1039,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -1012,7 +1079,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -1020,13 +1087,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -1056,7 +1127,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -1064,13 +1135,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -1102,7 +1177,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -1110,13 +1185,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -1147,7 +1226,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -1155,13 +1234,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -1285,15 +1368,15 @@ public class WorkmenController {
 	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
 			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
 	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
-	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
 	request.setAttribute("PrincipalEmployer", peList);
-	  request.setAttribute("Dept", departments);
-      request.setAttribute("Subdept", subdepartments);
+	 // request.setAttribute("Dept", departments);
+     // request.setAttribute("Subdept", subdepartments);
       
     //Skills
-	List<Skill> skillList = workmenService.getAllSkill();
-	request.setAttribute("Skills", skillList);
+	//List<Skill> skillList = workmenService.getAllSkill();
+	//request.setAttribute("Skills", skillList);
 	
 	List<CmsGeneralMaster> gmList2 = workmenService.getAllGeneralMaster();
 
@@ -1332,6 +1415,13 @@ public class WorkmenController {
 	 request.setAttribute("Eic", eicList);
 	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor(),gatePassMainObj.getWorkorder());
 	 request.setAttribute("Wcs", wcs);
+	 
+	 List<DeptMapping> skills = workmenService.getAllSkills(gatePassMainObj.getUnitId(),gatePassMainObj.getTrade());
+	 request.setAttribute("Skills", skills);
+	 List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
+	 request.setAttribute("Departments", departments);
+	 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
+	 request.setAttribute("Subdept", Subdept);
 	 
     return "contractWorkmen/quickOBAdd";
 }
@@ -1399,15 +1489,15 @@ public class WorkmenController {
 	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
 			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
 	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
-	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
 	request.setAttribute("PrincipalEmployer", peList);
-	  request.setAttribute("Dept", departments);
-      request.setAttribute("Subdept", subdepartments);
+	 // request.setAttribute("Dept", departments);
+     // request.setAttribute("Subdept", subdepartments);
       
     //Skills
-	List<Skill> skillList = workmenService.getAllSkill();
-	request.setAttribute("Skills", skillList);
+	//List<Skill> skillList = workmenService.getAllSkill();
+	//request.setAttribute("Skills", skillList);
 	
 	List<CmsGeneralMaster> gmList2 = workmenService.getAllGeneralMaster();
 
@@ -1446,6 +1536,13 @@ public class WorkmenController {
 	 request.setAttribute("Eic", eicList);
 	 List<CmsContractorWC> wcs = workmenService.getAllWCBasedOnPEAndCont(gatePassMainObj.getUnitId(),gatePassMainObj.getContractor(),gatePassMainObj.getWorkorder());
 	 request.setAttribute("Wcs", wcs);
+	 
+	 List<DeptMapping> skills = workmenService.getAllSkills(gatePassMainObj.getUnitId(),gatePassMainObj.getTrade());
+	 request.setAttribute("Skills", skills);
+	 List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
+	 request.setAttribute("Departments", departments);
+	 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
+	 request.setAttribute("Subdept", Subdept);
 	 
     return "contractWorkmen/renew";
 }
@@ -1535,7 +1632,7 @@ public class WorkmenController {
     	        gatePassMainObj.setGender(generalMaster.getGmName()); 
     	    } else if ("BLOODGROUP".equals(gmType)) {
     	        gatePassMainObj.setBloodGroup(generalMaster.getGmName()); 
-    	    } else if ("ACADEMIC".equals(gmType)) {
+    	    } else if ("ACADEMICS".equals(gmType)) {
     	        gatePassMainObj.setAcademic(generalMaster.getGmName()); 
     	    } else if ("ZONE".equals(gmType)) {
     	        gatePassMainObj.setZone(generalMaster.getGmName()); 
@@ -1543,13 +1640,17 @@ public class WorkmenController {
     	        gatePassMainObj.setAccessArea(generalMaster.getGmName()); 
     	    } else if ("WAGECATEGORY".equals(gmType)) {
     	        gatePassMainObj.setWageCategory(generalMaster.getGmName()); 
-    	    } else if ("BONUSPOUT".equals(gmType)) {
+    	    } else if ("BONUSPAYOUT".equals(gmType)) {
     	        gatePassMainObj.setBonusPayout(generalMaster.getGmName()); 
     	    } else if("DEPARTMENT".equals(gmType)){
     	    	gatePassMainObj.setDepartment(generalMaster.getGmName());
     	    } else if("AREA".equals(gmType)) {
     	    	gatePassMainObj.setSubdepartment(generalMaster.getGmName());
-    	    }
+    	    }else if("TRADE".equals(gmType)){
+    	    	gatePassMainObj.setTrade(generalMaster.getGmName());
+    	    } else if("SKILL".equals(gmType)) {
+    	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}
     		}
     		
     		 
@@ -1664,7 +1765,7 @@ public class WorkmenController {
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
     	
     	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
         CMSRoleRights rr =new CMSRoleRights();
@@ -1672,7 +1773,7 @@ public class WorkmenController {
    	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
    	    request.setAttribute("UserPermission", rr);
     	request.setAttribute("principalEmployers", peList);
-    	  request.setAttribute("Dept", departments);
+    	  //request.setAttribute("Dept", departments);
     	  
 		return "contractWorkmen/quickOnboardingList";
 	}
@@ -1693,15 +1794,15 @@ public class WorkmenController {
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
     	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
-    	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
     	request.setAttribute("PrincipalEmployer", peList);
-    	  request.setAttribute("Dept", departments);
-          request.setAttribute("Subdept", subdepartments);
+    	  //request.setAttribute("Dept", departments);
+         // request.setAttribute("Subdept", subdepartments);
           
         //Skills
-		List<Skill> skillList = workmenService.getAllSkill();
-		request.setAttribute("Skills", skillList);
+		//List<Skill> skillList = workmenService.getAllSkill();
+		//request.setAttribute("Skills", skillList);
 		
 		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
 
