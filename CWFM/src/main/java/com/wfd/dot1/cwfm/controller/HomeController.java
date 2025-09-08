@@ -3,6 +3,7 @@ package com.wfd.dot1.cwfm.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.PageDto;
 import com.wfd.dot1.cwfm.dto.SectionDto;
+import com.wfd.dot1.cwfm.enums.GatePassType;
+import com.wfd.dot1.cwfm.enums.UserRole;
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.MasterUserService;
+import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
+import com.wfd.dot1.cwfm.service.WorkmenService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -37,6 +48,13 @@ public class HomeController {
 	 private CommonService commonService;
 	 @Autowired
 	    private BCryptPasswordEncoder passwordEncoder;
+	 
+	 @Autowired
+		WorkmenService workmenService;
+
+		
+		@Autowired
+		PrincipalEmployerService peService;
 	@SuppressWarnings("null")
 	@RequestMapping(path = "/userlogin", method = RequestMethod.POST)
 	public String login(@RequestParam("email") String em, @RequestParam("password") String pwd, HttpSession session) {
@@ -422,5 +440,84 @@ public class HomeController {
 	    return "WelcomePage";
 	}
 
+	@RequestMapping(path = "/userlogin1", method = RequestMethod.POST)
+	public String login1(@RequestParam("email") String em, @RequestParam("password") String pwd,
+			HttpSession session,HttpServletRequest request, HttpServletResponse response) {
+		String encoded = passwordEncoder.encode("nivetha");
+		 MasterUser user = masterUserService.findMasterUserDetailsByUserName(em);
+			
+		   if (user != null) {
+		        String storedPassword = user.getPassword();
 
+		        if (storedPassword != null && !storedPassword.isEmpty() && BCrypt.checkpw(pwd, storedPassword)) {
+		            String initials = Stream.of(user.getFirstName(), user.getLastName())
+		                                    .map(name -> String.valueOf(name.charAt(0)))  
+		                                    .reduce("", (a, b) -> a + b);
+
+		            session.setAttribute("userInitials", initials);
+		            session.setAttribute("loginuser", user);
+		            List<CmsGeneralMaster> roles = commonService.getRolesByUserId(user.getUserId());
+		            session.setAttribute("roles", roles);
+		            session.setAttribute("selectedRole", "");
+		            
+		           
+			        
+		            if (roles==null) {
+		                session.setAttribute("msg", "No roles assigned to the user.");
+		                return "redirect:/UserLogin1.jsp"; 
+		            } else if (roles.size() == 1) {
+		            	CmsGeneralMaster role = roles.get(0); 
+		                List<CmsGeneralMaster> pages;
+		                MasterUser user1 = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+		                
+		    	        user1.setRoleId(role.getGmId());
+		    	        user1.setRoleName(role.getGmName());
+		    	        session.setAttribute("loginuser", user1);
+		    	        
+//		                if ("System Admin".equals(role.getGmName())) {  
+//		                    pages = commonService.getAllPages();  
+//		                } else {
+//		                    pages = commonService.getPagesByRoleId(role.getGmId());
+//		                }
+//		                session.setAttribute("pages", pages);
+		                session.setAttribute("selectedRole", role.getGmName());
+		                session.setAttribute("roles", roles);
+
+		        		String type="regular";
+		        		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user1.getUserAccount());
+		            	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+		            			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+		            	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+		            	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+		            	String principalEmployerId = peList.get(0).getId();
+		            	String deptId  = departments.get(0).getId();
+		            	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+		                CMSRoleRights rr =new CMSRoleRights();
+		                rr = commonService.hasPageActionPermissionForRole(user1.getRoleId(), "/contractworkmen/list");
+		           	    listDto = peService.getAllPrincipalEmployer(user1.getUserAccount());
+		           	    request.setAttribute("UserPermission", rr);
+		            	request.setAttribute("principalEmployers", peList);
+		            	request.setAttribute("Dept", departments);
+		            	request.setAttribute("selectedPE", principalEmployerId);
+		            	request.setAttribute("selectedDept", deptId);
+		            	  
+		            	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
+		        		if(user1.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+		        			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user1.getUserId()),GatePassType.CREATE.getStatus(),type);
+		        		}else {	
+		        			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user1,GatePassType.CREATE.getStatus(),type);
+		        		}
+		        		request.setAttribute("GatePassListingDto", gplistDto);
+		        		return  "WelcomePageNew";
+		            } else {
+		                session.setAttribute("roles", roles);
+		                return "WelcomePageNew"; 
+		            }
+		        }
+		    } 
+		   session.setAttribute("msg", "invalid email and password");
+		    return "redirect:/UserLogin1.jsp";
+
+
+	}
 }

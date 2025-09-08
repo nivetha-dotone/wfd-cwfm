@@ -40,6 +40,7 @@ import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
+import com.wfd.dot1.cwfm.dto.RequestPayload;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.UserRole;
@@ -493,8 +494,10 @@ public class WorkmenController {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
-    		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
-    		 request.setAttribute("imagePath", profilePicFilePath);
+    		if(null != gatePassMainObj.getPhotoName()) {
+       		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+       		 request.setAttribute("imagePath", profilePicFilePath);
+       		}
     		 
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -1664,11 +1667,11 @@ public class WorkmenController {
     }
 
     public String getSurePassURL() {
-	    return QueryFileWatcher.getQuery("SUREPASS_URL");
+	    return QueryFileWatcher.getQuery("INITIALIZE_URL");
 	}
     
     public String getToken() {
-	    return QueryFileWatcher.getQuery("TOKEN");
+	    return QueryFileWatcher.getQuery("INITIALIZE_TOKEN");
 	}
     
     
@@ -2022,5 +2025,176 @@ public class WorkmenController {
 		request.setAttribute("GatePassListingDto", gplistDto);
 		return result;
 	}
+    
+    @GetMapping("/demo")
+    public String demo(HttpServletRequest request, HttpServletResponse response	) {
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user1 = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		String type="regular";
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user1.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	String principalEmployerId = peList.get(0).getId();
+    	String deptId  = departments.get(0).getId();
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user1.getRoleId(), "/contractworkmen/list");
+   	    listDto = peService.getAllPrincipalEmployer(user1.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	request.setAttribute("Dept", departments);
+    	request.setAttribute("selectedPE", principalEmployerId);
+    	request.setAttribute("selectedDept", deptId);
+    	  
+    	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
+		if(user1.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user1.getUserId()),GatePassType.CREATE.getStatus(),type);
+		}else {	
+			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user1,GatePassType.CREATE.getStatus(),type);
+		}
+		request.setAttribute("GatePassListingDto", gplistDto);
+		return "contractWorkmen/approverList";
+	}
+    
+    @PostMapping("/generateToken")
+    @ResponseBody
+    public Map<String, Object> generateToken(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        String aadhaarNumber = requestBody.get("aadhaarNumber");
+        String surepassUrl = getSurePassURL();
+        String token = getToken();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+
+        // Create outer payload object
+        RequestPayload payload = new RequestPayload();
+
+        // Create inner data object
+        RequestPayload.Data data = new RequestPayload.Data();
+        data.setSignup_flow(false);
+        data.setLogo_url("https://dot1.in/img/dot1.png");
+        data.setSkip_main_screen(false);
+        data.setExpiry_minutes(10);
+        // Set inner object to outer
+        payload.setData(data);
+
+        HttpEntity<RequestPayload> entity = new HttpEntity<>(payload, headers);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            ResponseEntity<Map> responseEntity = restTemplate.exchange(surepassUrl, HttpMethod.POST, entity, Map.class);
+            Map<String, Object> responseBody = responseEntity.getBody();
+
+            Map<String, Object> dataMap = (Map<String, Object>) responseBody.get("data");
+
+            // Store client_id in session for later use in verify OTP
+            if (dataMap != null && dataMap.containsKey("client_id")) {
+                session.setAttribute("aadhaarClientId", dataMap.get("client_id"));
+                String newtoken = String.valueOf(dataMap.get("token"));
+                String newUrl = String.valueOf(dataMap.get("url"));
+                responseMap.put("token", newtoken);
+                responseMap.put("url", newUrl);
+            }
+
+            responseMap.put("success", responseBody.get("success"));
+            responseMap.put("message", responseBody.get("message"));
+            responseMap.put("status_code", responseBody.get("status_code"));
+            responseMap.put("status", dataMap != null ? dataMap.get("status") : null);
+
+        } catch (HttpClientErrorException ex) {
+            try {
+                Map<String, Object> errorBody = new ObjectMapper().readValue(ex.getResponseBodyAsString(), Map.class);
+                Map<String, Object> dataMap = (Map<String, Object>) errorBody.get("data");
+
+                // Store client_id even in error case (if available)
+                if (dataMap != null && dataMap.containsKey("client_id")) {
+                    session.setAttribute("aadhaarClientId", dataMap.get("client_id"));
+                }
+
+                responseMap.put("success", false);
+                responseMap.put("message", errorBody.get("message"));
+                responseMap.put("status_code", errorBody.get("status_code"));
+                responseMap.put("status", dataMap != null ? dataMap.get("status") : null);
+
+            } catch (Exception e) {
+                responseMap.put("success", false);
+                responseMap.put("message", "Unable to parse error response.");
+                responseMap.put("status_code", 500);
+            }
+        } catch (Exception e) {
+            responseMap.put("success", false);
+            responseMap.put("message", "Internal server error occurred.");
+            responseMap.put("status_code", 500);
+        }
+
+        return responseMap;
+    }
+    
+//    @GetMapping("/digi")
+//    public String digi(@RequestParam(value = "token", required = false) String redirectUrl,
+//                               HttpServletRequest request) {
+//        request.setAttribute("token", redirectUrl);
+//        // This resolves to /WEB-INF/view/contractWorkmen/digi.jsp
+//        return "contractWorkmen/digi";
+//    }
+    
+//    @GetMapping("/digilocker")
+//    public String loadDigiPage1(@RequestParam(value = "url", required = false) String redirectUrl,
+//                               HttpServletRequest request) {
+//        request.setAttribute("redirectUrl", redirectUrl);
+//        // This resolves to /WEB-INF/view/contractWorkmen/digi.jsp
+//        return "contractWorkmen/digilocker";
+//    }
+    
+    public String getDownloadURL() {
+	    return QueryFileWatcher.getQuery("DOWNLOAD_URL");
+	}
+    
+    @GetMapping("/digiClientId")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> digiClientId(
+            @RequestParam(value = "id", required = false) String id) {
+
+        String surepassUrl = getDownloadURL() + "/" + id;
+        System.out.println("URL is:"+surepassUrl);
+        String token = getToken();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            ResponseEntity<Map> responseEntity =
+                    restTemplate.exchange(surepassUrl, HttpMethod.GET, entity, Map.class);
+
+            Map<String, Object> responseBody = responseEntity.getBody();
+            Map<String, Object> dataMap = (Map<String, Object>) responseBody.get("data");
+
+            responseMap.put("success", true);
+            responseMap.put("data", dataMap);
+            responseMap.put("firstName", dataMap.get(token));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseMap.put("success", false);
+            responseMap.put("error", e.getMessage());
+        }
+
+        return ResponseEntity.ok(responseMap);
+    }
+
+    
+  
 
 }

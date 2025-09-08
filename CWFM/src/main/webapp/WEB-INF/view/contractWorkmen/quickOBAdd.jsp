@@ -485,7 +485,7 @@ label {
     <td>
     	<input id="otp" name="otp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" placeholder="Enter otp here" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </td>
-     <td> <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="verifyOtp()">Verify OTP</button></td>
+     <td> <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="verifyOtpDemo()">Verify OTP</button></td>
     <!--  <td rowspan="6" class="image-container">
         <img id="imageId" width="150" height="150" onclick="openFilePicker();">
         <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileSelect(event)">

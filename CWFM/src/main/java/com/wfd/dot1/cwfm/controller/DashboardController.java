@@ -75,14 +75,21 @@ public class DashboardController {
 			@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
 			@RequestParam(value = "deptId", required = false) String deptId,Model model) { 
 		HttpSession session = request.getSession(false);
-		String pe = (session != null) ?(String)session.getAttribute("principalEmployerId") : null;
-		String de = (session != null) ?(String)session.getAttribute("deptId") : null;
-		if(pe == null && de == null) {
+		if(principalEmployerId!=null && deptId!=null ) {
+		//user selected from pop up
 			session.setAttribute("principalEmployerId", principalEmployerId);
 	        session.setAttribute("deptId", deptId);
 		}else {
-			principalEmployerId=pe;deptId=de;
+			String pe = (session != null) ?(String)session.getAttribute("principalEmployerId") : null;
+			String de = (session != null) ?(String)session.getAttribute("deptId") : null;
+			if(pe == null && de == null) {
+				session.setAttribute("principalEmployerId", principalEmployerId);
+		        session.setAttribute("deptId", deptId);
+			}else {
+				principalEmployerId=pe;deptId=de;
+			}
 		}
+		
 		
 		MasterUser user = (session != null) ? (MasterUser) session.getAttribute("loginuser") : null; 
 		String role = user.getRoleName().toUpperCase();

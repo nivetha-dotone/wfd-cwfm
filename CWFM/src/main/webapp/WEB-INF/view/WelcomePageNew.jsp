@@ -26,9 +26,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-<!-- Include Digiboost Web SDK digilocker-->
-    <script src="https://cdn.jsdelivr.net/gh/surepassio/surepass-digiboost-web-sdk@latest/index.min.js"></script>
-    
+
  <link rel="stylesheet" type="text/css" href="resources/css/cms/dashboard.css" />    
 
      <script src="resources/js/cms/principalEmployer.js"></script>
@@ -569,79 +567,6 @@ function deleteSelectedOrgLevel() {
         }
     });
 }
-//digilocker load
-function loadCommonListDigi(path, heading, extradata) {
-    updateHeading(heading);
-    var url = contextPath + path;
-    console.log("Constructed URL in load:", url);
-
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            const mainContent = document.getElementById("mainContent");
-            mainContent.innerHTML = this.responseText;
-
-            // ✅ Initialize DataTables
-            const tables = mainContent.querySelectorAll("table");
-            tables.forEach(table => {
-                if (!table.classList.contains("no-dt")) {
-                    $(table).DataTable({
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        lengthChange: true,
-                        info: true,
-                        dom: '<"top"f>rt<"bottom"lip><"clear">'
-                    });
-                }
-            });
-
-            // ✅ Run inline scripts
-            const scripts = mainContent.querySelectorAll("script");
-            scripts.forEach(script => {
-                const newScript = document.createElement("script");
-                if (script.src) {
-                    newScript.src = script.src;
-                    newScript.async = false;
-                } else {
-                    newScript.textContent = script.textContent;
-                }
-                document.body.appendChild(newScript);
-                script.remove();
-            });
-
-            // ✅ Show messages if any
-            const successMessage = sessionStorage.getItem("successMessage");
-            const errorMessage = sessionStorage.getItem("errorMessage");
-            const messageDiv = document.getElementById("messageDiv");
-
-            if (messageDiv) {
-                if (successMessage) {
-                    messageDiv.innerHTML = successMessage;
-                    messageDiv.style.color = "green";
-                } else if (errorMessage) {
-                    messageDiv.innerHTML = errorMessage;
-                    messageDiv.style.color = "red";
-                }
-                sessionStorage.removeItem("successMessage");
-                sessionStorage.removeItem("errorMessage");
-
-                setTimeout(() => {
-                    messageDiv.style.display = "none";
-                }, 5000);
-            }
-
-            setDateRange();
-            resetSessionTimer();
-        }
-    };
-
-    // 🔴 Use POST instead of GET
-    xhttp.open("POST", url, true);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send(JSON.stringify(extradata || {}));
-}
-
 /* function submitOrgLevel() {
     const orgLevelRows = document.querySelectorAll('#orgLevelTable tbody tr'); // Select all rows in the table
     let orgLevelsData = [];
@@ -1854,17 +1779,9 @@ window.onload = function() {
 
 function changeRole(selectedRoleId, selectedRoleName) {
     if (selectedRoleId) {
-    	 localStorage.setItem("selectedRoleId", selectedRoleId);
-         localStorage.setItem("selectedRoleName", selectedRoleName);
-    	 if (selectedRoleName === 'System Admin') {
-    	        // Show the "Admin" menu or take other actions
-    	        showAdminMenu();
-    	    } else {
-    	        // Hide the "SystemAdmin" menu or show a different menu
-    	        showOtherMenus();
-    	    }
-    	// Show loader
-         document.getElementById("loader").style.display = "flex"; // Show
+        // Show loader
+        document.getElementById("loader").style.display = "flex"; // Show
+
         fetch('/CWFM/updateRole', {
             method: 'POST',
             headers: {
@@ -1872,28 +1789,47 @@ function changeRole(selectedRoleId, selectedRoleName) {
             },
             body: JSON.stringify({ roleId: selectedRoleId, roleName: selectedRoleName }) // Sending roleId and roleName
         })
-         .then(response => {
+        .then(response => {
             if (response.ok) {
-            	 // loadCommonList('/generalMaster/menu.jsp', 'CONTRACT WORKFORCE MANAGEMENT SYSTEM');
                 return response.json(); // Parse the JSON response
             } else {
                 throw new Error('Failed to update role. Please try again.');
             }
         })
         .then(data => {
-        	 console.log('Sidebar update data:', data); 
-            updateSidebar(data,selectedRoleName); // Update the sidebar with the fetched pages
-          if(selectedRoleName === 'System Admin'){
-        	  
-          }else{
-         // Fetch the role-based dashboard 
-            return fetch('/CWFM/dashboard/getOrgDetails', {
-                method: 'GET'
-            });}
+            console.log('Sidebar update data:', data);
+
+            if (selectedRoleName === 'System Admin') {
+                // maybe system admin dashboard load
+            } else {
+                // Fetch the role-based dashboard
+                console.log("inside change role");
+                return fetch('/CWFM/contractworkmen/demo', {
+                    method: 'GET'
+                });
+            }
         })
-        .then(response => response.text())
+        .then(response => response ? response.text() : null)
         .then(html => {
-            document.getElementById("mainContent").innerHTML = html;
+            if (html) {
+                const mainContent = document.getElementById("mainContent");
+                mainContent.innerHTML = html;
+
+                // ✅ Initialize DataTables for all tables inside mainContent (except those with class 'no-dt')
+                const tables = mainContent.querySelectorAll("table");
+                tables.forEach(table => {
+                    if (!table.classList.contains("no-dt")) {  
+                        $(table).DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            lengthChange: true,
+                            info: true,
+                            dom: '<"top"f>rt<"bottom"lip><"clear">'
+                        });
+                    }
+                });
+            }
         })
         .catch(error => {
             console.error("Error:", error);
@@ -3387,231 +3323,18 @@ table th {
 </div>
 
    
+  
     <!-- Side Navigation Bar -->
    <nav class="main-menu">
-    <ul id="dynamic-menu" class="sidebar-menu">
-        <!-- Admin menu rendering -->
-        <c:if test="${sessionScope.isAdmin}">
-            <c:forEach var="section" items="${sessionScope.sections}">
-    <li>
-        <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
-            <i class="${section.sectionIcon} nav-icon"></i>
-            <span class="nav-text">${section.sectionName}</span>
-            <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
-            <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
-        </a>
-        <!-- Ensure submenu is correctly set with unique ID -->
-        <ul class="sub-menu" id="sub-menu-${section.sectionId}" style="display: none;">
-            <c:forEach var="page" items="${section.pages}">
-                <a href="#" onclick="loadCommonList('${page.pageUrl}', '${page.pageName}')">${page.pageName}</a>
-                            
-            </c:forEach>
-        </ul>
-    </li>
-</c:forEach>
-
-        </c:if>
-
-        <!-- Non-Admin menu rendering -->
-        <c:if test="${not sessionScope.isAdmin}">
-            <c:forEach var="section" items="${sessionScope.sections}">
-                <li>
-                    <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
-                        <i class="${section.sectionIcon} nav-icon"></i>
-                        <span class="nav-text">${section.sectionName}</span>
-                        <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
-            <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
-        </a>
-                    <ul class="sub-menu" id="sub-menu-${section.sectionId}" style="display: none;">
-                        <c:forEach var="page" items="${section.pages}">
-                            <c:if test="${page.accessibleForRole}">
-                                <a href="#" onclick="loadCommonList('${page.pageUrl}', '${page.pageName}')">${page.pageName}</a>
-                            </c:if>
-                        </c:forEach>
-                    </ul>
-                </li>
-            </c:forEach>
-        </c:if>
-    </ul>
+    
 
 
-        <ul id="adminMenu" style="display:none;">
-         <li>
-            <a href="#" class="nav-link" onclick="toggleGeneralManagementSubMenu(this)">
-                <i class="fa fa-user nav-icon"></i> <!-- Icon for General Management -->
-                <span class="nav-text">Administrator Setup</span>
-                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-            </a>
-            <ul class="sub-menu" id="general-management-sub-menu">
-              <li><a href="#" onclick="loadCommonList('/generalController/gmType', 'General Type')">General Type</a></li>
-<li><a href="#" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">General Master</a></li>
-<li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
-<li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
-<li><a href="#" onclick="loadCommonList('/generalController/addSection', 'Sections')">Sections</a></li>
-<li><a href="#" onclick="loadCommonList('/usersController/loadResetPwdPage', 'Reset Password')">Reset Password</a></li>
-<!-- <li><a href="#" onclick="loadCommonList('/api/data/integration', 'Integrations')">Integrations</a></li> -->
-
-            </ul>
-        </li>
-    </ul>
 </nav>
-
-   <%--  <ul id="dynamic-menu" class="sidebar-menu">
-   <c:if test="${sessionScope.roleName eq 'Admin'}">
-    <c:forEach var="section" items="${sections}">
-        <div class="section">
-            <h3>${section.sectionName}</h3>
-            <c:forEach var="page" items="${section.pages}">
-                <div class="page">
-                    <a href="${page.pageUrl}">${page.pageName}</a>
-                </div>
-            </c:forEach>
-        </div>
-    </c:forEach>
-</c:if>
-
-<c:if test="${sessionScope.roleName ne 'Admin'}">
-    <c:forEach var="section" items="${sections}">
-        <div class="section">
-            <h3>${section.sectionName}</h3>
-            <c:forEach var="page" items="${section.pages}">
-                <c:if test="${page.accessibleForRole}">
-                    <div class="page">
-                        <a href="${page.pageUrl}">${page.pageName}</a>
-                    </div>
-                </c:if>
-            </c:forEach>
-        </div>
-    </c:forEach>
-</c:if>
-
-
-
-   
-        </ul> --%>
-    <%-- <nav class="main-menu">
-     <li>
-    <a href="#" class="nav-link" onclick="toggleSubMenu('dynamic-menu')">
-        <i class="fa fa-database nav-icon"></i>
-        <span class="nav-text">Dynamic Menu</span>
-        <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
-        <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
-    </a>
-    <ul class="menu">
-    <c:forEach var="page" items="${rolePages}">
-        <li>
-            <a href="${page.url}" onclick="loadCommonList('${page.url}', '${page.name}')">${page.name}</a>
-        </li>
-    </c:forEach>
-</ul>
-</li>
-        <ul>
-         <!-- New Section for General Management -->
-        <li>
-            <a href="#" class="nav-link" onclick="toggleSubMenu('general-management-sub-menu')">
-                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
-                <span class="nav-text">General Management</span>
-                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-            </a>
-            <ul class="sub-menu" id="general-management-sub-menu">
-              <li><a href="#" onclick="loadCommonList('/generalController/gmType', 'General Type')">General Type</a></li>
-<li><a href="#" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">General Master</a></li>
-<li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
-<li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
-            </ul>
-        </li>
-        
-        <li>
-            <a href="#" class="nav-link" onclick="toggleSubMenu('admin-sub-menu')">
-                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
-                <span class="nav-text">Admin</span>
-                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-            </a>
-            <ul class="sub-menu" id="admin-sub-menu">
-              <li><a href="#" onclick="loadCommonList('/org-level/list', 'Org Levels')">Org Levels</a></li>
-<li><a href="#" onclick="loadCommonList('/org-level-entryController/org-level-entry', 'Org Level Entries')">Org Level Entries</a></li>
-<li><a href="#" onclick="loadCommonList('/org-level-mapping/list', 'Org Level Mappings')">Org Level Mappings</a></li>
-            </ul>
-        </li>
-       
-            <li class="main-menu-item" style="margin-top: 20px;">
-    <a href="#" onclick="toggleSubMenu('clms-sub-menu'); return false;" class="mainmenu-link">
-        <i class="fa fa-dashboard nav-icon"></i>
-        <span class="nav-text">CLMS</span>
-         <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
-         <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
-    </a>
-    <ul class="sub-menu" id="clms-sub-menu" style="display: none;">
-        <li><a href="#" onclick="loadCommonList('/principalEmployer/list','Principal Employer')">Principal Employer</a></li>
-        <li><a href="#" onclick="loadCommonList('/contractor/list','Contractor')">Contractor</a></li>
-        <li><a href="#" onclick="loadCommonList('/workOrder/list', 'Work Order')">Work Order</a></li>
-       <!--  <li><a href="#" onclick="loadCommonList('/minimumWage/list', 'Minimum Wage Master')">Minimum Wage Master</a></li> -->
-        <li><a href="#" onclick="loadCommonList('/workmenDetail.jsp', 'Contract Workmen')">Contract Workmen</a></li>
-        <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->
-    </ul>
-</li>
-    
-  <li>
-                <a href="#" class="nav-link" onclick="toggleSubMenu('contractor-sub-menu')">
-                    <i class="fa fa-users nav-icon"></i>
-                    <span class="nav-text">Contractor</span>
-                    <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                    <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-                </a>
-                <ul class="sub-menu" id="contractor-sub-menu">
-                    <li><a href="#" onclick="loadCommonList('/contractor/contReg','Contractor Registration')">Contractor Registration</a></li>
-                    <li><a href="#" onclick="loadContractorRenewal()">Renewal</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="#" class="nav-link" onclick="toggleSubMenu('workmen-onboarding-sub-menu')">
-                    <i class="fa fa-briefcase nav-icon"></i>
-                    <span class="nav-text">Workmen Onboarding</span>
-                    <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                    <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-                </a>
-                <ul class="sub-menu" id="workmen-onboarding-sub-menu">
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'On-Bording List')">List</a></li>
-                    <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
-                    <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li>
-                    <li><a href="#" onclick="loadWorkmenBlock()">Block</a></li>
-                    <li><a href="#" onclick="loadWorkmenUnblock()">Unblock</a></li>
-                    <li><a href="#" onclick="loadWorkmenBlacklist()">Blacklist</a></li>
-                    <li><a href="#" onclick="loadWorkmenDeBlacklist()">De-blacklist</a></li>
-                    <li><a href="#" onclick="loadWorkmenCancel()">Cancel</a></li>
-                    <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li>
-                    <li><a href="#" onclick="loadWorkmenLostDamage()">Lost or Damage</a></li>
-                </ul>
-            </li>
-             <li>
-            <a href="#" onclick="loadCommonList('/billVerification/list', 'Bill Verification')">
-                <i class="fa fa-credit-card nav-icon"></i> <!-- Updated icon for Bill Verification -->
-                <span class="nav-text">Bill Verification</span>
-            </a>
-        </li>
-        <!-- <li>
-            <a href="#" onclick="loadCommonList('/contractor/contReg', 'Contractor Registration')">
-                <i class="fa fa-users nav-icon"></i> Updated icon for Contractor Registration
-                <span class="nav-text">Contractor Registration</span>
-            </a>
-        </li> -->
-        <li>
-            <a href="#" onclick="loadCommonList('/reports/list', 'Reports')">
-                <i class="fa fa-bar-chart nav-icon"></i> <!-- Updated icon for Reports -->
-                <span class="nav-text">Reports</span>
-            </a>
-        </li>
-        </ul>
-    </nav> --%>
-    
 
     <!-- Main Content Area -->
     <div id="mainContent" class="form-content">
     
-    
+     <jsp:include page="/WEB-INF/view/contractWorkmen/approverList.jsp"></jsp:include>
     </div>
 
     <script>
@@ -4002,7 +3725,7 @@ table th {
         localStorage.clear();
         
         // Redirect to the login page or a logout API endpoint
-        window.location.href = 'UserLogin.jsp';
+        window.location.href = 'UserLogin1.jsp';
     }
 
     function resetSessionTimer() {
@@ -5500,40 +5223,6 @@ table th {
 <div id="loader" style="display: none;">
   <div class="spinner"></div>
 </div>
-<script>
-(function(){
-  // ensure functions are global so inline onclick="closeModal()" works
-  window.closeModal = function() {
-    const modal = document.getElementById("digiModal");
-    if (modal) modal.style.display = "none";
-  };
-
-  window.openModal = function() {
-    const modal = document.getElementById("digiModal");
-    if (modal) modal.style.display = "block";
-  };
-
-  // Close when clicking outside the modal-content (delegated)
-  document.addEventListener('click', function(event) {
-    const modal = document.getElementById("digiModal");
-    if (!modal) return;                     // nothing injected yet
-    if (modal.style.display === '' || modal.style.display === 'none') return; // hidden
-    // If click was inside modal but NOT inside .modal-content => close
-    if (modal.contains(event.target) && !event.target.closest('.modal-content')) {
-      closeModal();
-    }
-  });
-
-  // Close on ESC
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
-      const modal = document.getElementById("digiModal");
-      if (modal && modal.style.display === 'block') closeModal();
-    }
-  });
-
-})();
-</script>
 
     
 </body>

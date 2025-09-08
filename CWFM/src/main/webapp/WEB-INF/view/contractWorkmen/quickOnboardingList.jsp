@@ -279,7 +279,7 @@
     
                         </form>
                          </div>
-                         <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+                        <%--  <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
     <script>
         setTimeout(function () {
             searchGatePassBasedOnPE('quick');
@@ -287,6 +287,6 @@
     </script>
     
 </c:if>
-                         
+                          --%>
 </body>
 </html>

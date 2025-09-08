@@ -3262,3 +3262,213 @@ function loadDepartments(unitId) {
         }
     });
 }
+function verifyOtpDemo() {
+	    const aadharNo = document.getElementById("aadharNumber").value;
+
+
+	    
+	    
+	        if (aadharNo === '992158496671') {
+	           
+	            document.getElementById("firstName").value =  "Shashikant";
+	            document.getElementById("lastName").value = "Shukla";
+	            document.getElementById("dateOfBirth").value = "2002-07-07";
+	            document.getElementById("gender").value = "11";
+	            document.getElementById("address").value =  "Anakapalli rebaka";
+				document.getElementById("mobileNumber").value =  "9876543210";
+	        } else if(aadharNo === '550188039490'){
+								document.getElementById("firstName").value =  "Nivetha";
+					            document.getElementById("lastName").value = "Mohansingh";
+					            document.getElementById("dateOfBirth").value = "1991-07-07";
+					            document.getElementById("gender").value = "12";
+					            document.getElementById("address").value =  "SVA anada nilaya,ist cross immadihalli road, nagondanahalli,Bengaluru-560066";
+								document.getElementById("mobileNumber").value =  "9876543111";
+	          }							else if(aadharNo === '880188039490'){
+															document.getElementById("firstName").value =  "Hemalatha";
+												            document.getElementById("lastName").value = "Karanam";
+												            document.getElementById("dateOfBirth").value = "1991-08-07";
+												            document.getElementById("gender").value = "12";
+												            document.getElementById("address").value =  "Ardente Office One, nagondanahalli,Bengaluru-560066";
+															document.getElementById("mobileNumber").value =  "8876543111";
+								          }
+	   
+
+	  
+	}
+	
+	function generateToken(){
+		const aadhaarNumber = document.getElementById("aadharNumber").value;
+
+			    // Simple validation
+			    if (!aadhaarNumber || aadhaarNumber.length !== 12 || !/^\d{12}$/.test(aadhaarNumber)) {
+			        document.getElementById("otpError").innerText = "Please enter a valid 12-digit Aadhaar number.";
+			        document.getElementById("otpMessage").innerText = "";
+			        return;
+			    }
+
+			    var xhr = new XMLHttpRequest();
+			    var url = "/CWFM/contractworkmen/generateToken"; // Your mapped Spring Controller URL
+
+			    xhr.open("POST", url, true);
+			    xhr.setRequestHeader("Content-Type", "application/json");
+
+			    xhr.onload = function () {
+			        var response;
+			        try {
+			            response = JSON.parse(xhr.responseText);
+			        } catch (e) {
+			            document.getElementById("otpError").innerText = "Invalid response from server.";
+			            document.getElementById("otpMessage").innerText = "";
+			            return;
+			        }
+
+			        if (xhr.status === 200 || xhr.status === 422) {
+						if (response.url) {
+							    openDigiModal(response.token);
+
+						}
+
+			           
+						 else {
+			                document.getElementById("otpError").innerText = response.message +" "+response.status;
+			                document.getElementById("otpMessage").innerText = "";
+			            }
+			        } else {
+			            document.getElementById("otpError").innerText = "Error: " + (response.message || xhr.statusText);
+			            document.getElementById("otpMessage").innerText = "";
+			        }
+			    };
+
+			    xhr.onerror = function () {
+			        document.getElementById("otpError").innerText = "Request failed.";
+			        document.getElementById("otpMessage").innerText = "";
+			    };
+
+			    var data = JSON.stringify({ aadhaarNumber: aadhaarNumber });
+			    xhr.send(data);
+	}
+	
+	function openDigiModal(token) {
+	    const modal = document.getElementById("digiModal");
+	    const container = document.getElementById("digilocker-sdk-button");
+
+	    if (modal) {
+	        modal.style.display = "block";
+	    }
+
+	    // 🔑 Clear old buttons before SDK re-renders
+	    if (container) {
+	        container.innerHTML = "";
+	        container.style.display = "block"; // reset if hidden on success
+	    }
+
+	    // Initialize Digi SDK inside modal with token
+	    window.DigiboostSdk({
+	        gateway: "production", // sandbox or production
+	        token: token, // directly from response
+	        onSuccess: handleSuccess,
+	        onFailure: handleFailure,
+	        selector: "#digilocker-sdk-button",
+	        style: {
+	            width: "100%",
+	            margin: "0px"
+	        }
+	    });
+	}
+
+	function closeModal() {
+	    const modal = document.getElementById("digiModal");
+	    const container = document.getElementById("digilocker-sdk-button");
+
+	    if (modal) {
+	        modal.style.display = "none";
+	    }
+
+	    // 🔑 Reset container on close too
+	    if (container) {
+	        container.innerHTML = "";
+	        container.style.display = "block";
+	    }
+	}
+
+
+	function handleSuccess(data) {
+			//Do something here for success case
+			console.log("Verification successful:", data);
+	        document.getElementById("status").innerHTML = 
+	            '<div class="success"> Verification completed successfully!</div>';
+	            document.getElementById("digilocker-sdk-button").style.display = "none";
+	        
+	        //window.location.href = "/CWFM/contractworkmen/digiClientId?id=" + encodeURIComponent(data.client_id);
+			
+			var xhr = new XMLHttpRequest();
+					    var url = "/CWFM/contractworkmen/digiClientId?id=" + encodeURIComponent(data.client_id);
+
+					    xhr.open("GET", url, true);
+					    xhr.setRequestHeader("Content-Type", "application/json");
+
+					    xhr.onload = function () {
+					        var response;
+					        try {
+					            response = JSON.parse(xhr.responseText);
+					        } catch (e) {
+					            document.getElementById("otpError").innerText = "Invalid response from server.";
+					            document.getElementById("otpMessage").innerText = "";
+					            return;
+					        }
+
+					        if (xhr.status === 200 || xhr.status === 422) {
+								if (response.data) {
+									  console.log(response.data.aadhaar_xml_data);
+									  closeModal();
+									  let firstname = response.data.aadhaar_xml_data.full_name ?.split(" ")[0] || "";
+									  let lastname = response.data.aadhaar_xml_data.full_name?.split(" ").slice(1).join(" ") || "";
+									  let dob = response.data.aadhaar_xml_data.dob|| "";
+									  let fathername = response.data.aadhaar_xml_data.care_of|| "";
+									  let g = response.data.aadhaar_xml_data.gender|| "";
+									  let gender;
+									  if(g === "F"){
+										gender = "12";
+									  }else{
+										gender = "11";
+									  }
+									  let address= response.data.aadhaar_xml_data.full_address|| ""+" "+response.data.aadhaar_xml_data.zip|| "";
+									  document.getElementById("firstName").value = firstname;
+									   document.getElementById("lastName").value =lastname;
+									  document.getElementById("dateOfBirth").value =dob;
+									  	document.getElementById("gender").value = gender
+									  document.getElementById("address").value =  address;
+									  document.getElementById("relationName").value =  fathername;
+								}
+
+					           
+								 else {
+					                document.getElementById("otpError").innerText = response.message +" "+response.status;
+					                document.getElementById("otpMessage").innerText = "";
+					            }
+					        } else {
+					            document.getElementById("otpError").innerText = "Error: " + (response.message || xhr.statusText);
+					            document.getElementById("otpMessage").innerText = "";
+					        }
+					    };
+
+					    xhr.onerror = function () {
+					        document.getElementById("otpError").innerText = "Request failed.";
+					        document.getElementById("otpMessage").innerText = "";
+					    };
+
+					   
+					    xhr.send();	
+			
+		}
+
+		function handleFailure() {
+			//Do something here for failure case
+			console.log("Verification failed:", error);
+	        document.getElementById("status").innerHTML = 
+	            '<div class="error"> Verification failed or was cancelled</div>';
+		}
+		
+
+		
+>>>>>>> Stashed changes

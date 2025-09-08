@@ -31,7 +31,7 @@ public class DashboardDaoImpl implements DashboardDao{
 			) {
 		String query =getDashboardCreationQueryForContractor();
 		int count=0;
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,type,gatePassTypeId,type);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,type,gatePassTypeId,type,deptId,unitId);
 		while (rs.next()) {
 			count = rs.getInt("count");
 		}
