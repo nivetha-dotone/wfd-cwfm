@@ -476,17 +476,21 @@ label {
     	
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
-    
-    <td>
-     <button type="button" onclick="generateOtp()" class="btn btn-default process-footer-button-cancel ng-binding">Generate OTP</button>
+     <td>
+     <button type="button" onclick="generateToken()" class="btn btn-default process-footer-button-cancel ng-binding">Validate</button>
      
      </td>
     
-    <td>
+    <!-- <td>
+     <button type="button" onclick="generateOtp()" class="btn btn-default process-footer-button-cancel ng-binding">Generate OTP</button>
+     
+     </td> -->
+    
+   <!--  <td>
     	<input id="otp" name="otp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" placeholder="Enter otp here" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </td>
      <td> <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="verifyOtpDemo()">Verify OTP</button></td>
-    <!--  <td rowspan="6" class="image-container">
+    --> <!--  <td rowspan="6" class="image-container">
         <img id="imageId" width="150" height="150" onclick="openFilePicker();">
         <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleFileSelect(event)">
     </td> -->
@@ -1204,7 +1208,226 @@ label {
             </div>
         </f:form>
     </div>
+    <!-- Modal -->
+<div id="digiModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <!-- <span id="closeModal" style="float:right; cursor:pointer;">&times;</span> -->
+    	<button type="button"  class="close" data-dismiss="modal" onclick="closeModal();">&times;</button> 
+    	 
+    <div id="digiContent">
     
+    <script src="https://cdn.jsdelivr.net/gh/surepassio/surepass-digiboost-web-sdk@latest/index.min.js"></script>
+    <title>DigiBoost Verification</title>
+    
+
+<%
+String token = (String) request.getAttribute("token");
+
+%>
+
+<div class="container">
+    <div id="initial-screen">
+        <div class="icon-circle">
+            <!-- Shield SVG -->
+            <svg class="svg-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3l7 4v5c0 5.25-3.75 10-7 11-3.25-1-7-5.75-7-11V7l7-4z" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="title">Document Verification</div>
+        <div class="description">Securely access your documents through DigiLocker</div>
+
+        <div class="info-list">
+            <div class="info-item">
+                <!-- FileText SVG -->
+                <svg fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                    <path d="M14 2v6h6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                    <p class="info-text">Instant Access</p>
+                    <p class="info-subtext">Get immediate access to your verified documents</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <!-- Shield SVG again -->
+                <svg fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3l7 4v5c0 5.25-3.75 10-7 11-3.25-1-7-5.75-7-11V7l7-4z" stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                </svg>
+                <div>
+                    <p class="info-text">Secure & Trusted</p>
+                    <p class="info-subtext">Government-backed digital document platform</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <p>Ready to proceed?</p>
+            <p>Click the button below to securely connect with DigiLocker and access your documents</p>
+        </div>
+
+   <div id="status"></div>
+        <div id="digilocker-sdk-button"></div>
+
+        <p class="disclaimer">
+            By clicking above, you will be redirected to the official DigiLocker platform to authenticate and authorize
+            document access
+        </p>
+    </div>
+</div>
+
+
+    </div>
+  </div>
+
+
+<style>
+        p {
+            margin: 0
+        }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom right, #ebf4ff, #c3dafe);
+            font-family: sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 16px;
+            box-sizing: border-box;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle {
+            width: 64px;
+            height: 64px;
+            background-color: #dbeafe; /* blue-100 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .svg-icon {
+            width: 32px;
+            height: 32px;
+            color: #2563eb; /* blue-600 */
+        }
+
+        .title {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937; /* gray-900 */
+        }
+
+        .description {
+            text-align: center;
+            color: #4b5563; /* gray-600 */
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .info-list {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .info-item svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .info-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .info-subtext {
+            font-size: 0.75rem;
+            color: #4b5563;
+        }
+
+        .highlight-box {
+            background-color: #eff6ff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box p:first-child {
+            color: #1e40af;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .highlight-box p:last-child {
+            font-size: 0.75rem;
+            color: #2563eb;
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 1rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
+        }
+.modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow:auto;
+  background-color: rgba(0,0,0,0.6);
+}
+.modal-content {
+  background:#fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-height: 80%;
+  overflow-y: auto;
+}
+</style>
+</div>
    
 </body>
  

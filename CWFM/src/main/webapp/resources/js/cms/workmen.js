@@ -3424,7 +3424,15 @@ function verifyOtpDemo() {
 									  let firstname = response.data.aadhaar_xml_data.full_name ?.split(" ")[0] || "";
 									  let lastname = response.data.aadhaar_xml_data.full_name?.split(" ").slice(1).join(" ") || "";
 									  let dob = response.data.aadhaar_xml_data.dob|| "";
-									  let fathername = response.data.aadhaar_xml_data.care_of|| "";
+									 // let fathername = response.data.aadhaar_xml_data.care_of|| "";
+									 let careOf = response.data.aadhaar_xml_data.care_of || "";
+									 let match = careOf.match(/^\s*([A-Za-z]\/O:)?\s*(.*)$/i);
+									 let relation = "";
+									 let fathername = "";
+									 if (match) {
+									     relation = (match[1] || "").trim();  // e.g. "S/O:" or ""
+									     fathername = (match[2] || "").trim(); // e.g. "Sankar Singh"
+									 }
 									  let g = response.data.aadhaar_xml_data.gender|| "";
 									  let gender;
 									  if(g === "F"){
@@ -3439,6 +3447,16 @@ function verifyOtpDemo() {
 									  	document.getElementById("gender").value = gender
 									  document.getElementById("address").value =  address;
 									  document.getElementById("relationName").value =  fathername;
+									  
+									  document.getElementById("aadharNumber").readOnly = true;
+									  document.getElementById("firstName").readOnly = true;
+									         document.getElementById("lastName").readOnly = true;
+											 document.getElementById("dateOfBirth").disabled = true;
+
+									         document.getElementById("gender").disabled = true;   // if it's a <select>
+									         document.getElementById("address").readOnly = true;
+									         document.getElementById("relationName").readOnly = true;
+											 document.querySelector('button[onclick="generateToken()"]').disabled = true;
 								}
 
 					           
@@ -3471,4 +3489,4 @@ function verifyOtpDemo() {
 		
 
 		
->>>>>>> Stashed changes
+

@@ -2076,7 +2076,7 @@ public class WorkmenController {
 
         // Create inner data object
         RequestPayload.Data data = new RequestPayload.Data();
-        data.setSignup_flow(false);
+        data.setSignup_flow(true);
         data.setLogo_url("https://dot1.in/img/dot1.png");
         data.setSkip_main_screen(false);
         data.setExpiry_minutes(10);
