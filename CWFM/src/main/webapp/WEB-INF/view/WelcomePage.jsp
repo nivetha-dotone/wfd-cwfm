@@ -53,9 +53,23 @@
     var contextPath = '<%= request.getContextPath() %>';
   
     const today = new Date();
-    const currentYear = today.getFullYear();
-    const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
-    const minDate = new Date(currentYear - 70, 0, 1);
+   
+	const currentYear = today.getFullYear();
+	// Person must be between 18 and 70 years old
+	const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()); // youngest allowed DOB
+	const minDate = new Date(today.getFullYear() - 70, today.getMonth(), today.getDate()); // oldest allowed DOB
+
+	$(".datetimepickerformat").datepicker({
+	    dateFormat: 'yy-mm-dd',
+	    changeMonth: true,
+	    changeYear: true,
+	    yearRange: `${minDate.getFullYear()}:${maxDate.getFullYear()}`, // dynamic range
+	    minDate: minDate,
+	    maxDate: maxDate,
+	    defaultDate: maxDate // 👈 ensures calendar opens at the 18-year-old boundary
+	});
+
+
     const dojmaxDate = new Date();
     dojmaxDate.setDate(today.getDate() + 15);
        $(".datetimepickerformat").datepicker({//dob

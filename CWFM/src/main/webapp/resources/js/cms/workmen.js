@@ -361,7 +361,8 @@ function initializeDatePicker() {
 	        changeMonth: true,      // Allow changing month via dropdown
 	        changeYear: true,       // Allow changing year via dropdown
 	        yearRange: "0:+100", 
-	        minDate: 0              // Prevent selecting future dates
+	        minDate: 0,
+			maxDate: +15               // Prevent selecting future dates
 	    });
 	} 
     function validateBasicData() {
@@ -2988,24 +2989,28 @@ function redirectToWorkmenAdd(){
 }
 function setDateRange() {
 	const today = new Date();
-	const currentYear = today.getFullYear();
-	const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
-	const minDate = new Date(currentYear - 70, 0, 1);
 
-    $(".datetimepickerformat").datepicker({//dob
-    	dateFormat: 'yy-mm-dd',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: `${currentYear - 70}:${currentYear - 18}`, // only show valid years
-        minDate: minDate,
-        maxDate: maxDate
-    });
+	// Person must be between 18 and 70 years old
+	const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()); // youngest allowed DOB
+	const minDate = new Date(today.getFullYear() - 70, today.getMonth(), today.getDate()); // oldest allowed DOB
+
+	$(".datetimepickerformat").datepicker({
+	    dateFormat: 'yy-mm-dd',
+	    changeMonth: true,
+	    changeYear: true,
+	    yearRange: `${minDate.getFullYear()}:${maxDate.getFullYear()}`, // dynamic range
+	    minDate: minDate,
+	    maxDate: maxDate,
+	    defaultDate: maxDate // 👈 ensures calendar opens at the 18-year-old boundary
+	});
+
     $('.datetimepickerformat1').datepicker({//date of joiing
         dateFormat: 'yy-mm-dd', // Set the date format
         changeMonth: true,      // Allow changing month via dropdown
         changeYear: true,       // Allow changing year via dropdown
         yearRange: "0:+100", 
-        minDate: 0              // Prevent selecting future dates
+        minDate: 0 ,
+		maxDate: +15             // Prevent selecting future dates
     });
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(today.getMonth() - 6);
