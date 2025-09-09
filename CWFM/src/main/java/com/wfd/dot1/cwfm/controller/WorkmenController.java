@@ -7,8 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -53,7 +55,6 @@ import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
-import com.wfd.dot1.cwfm.pojo.Skill;
 import com.wfd.dot1.cwfm.pojo.Trade;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.service.CommonService;
@@ -238,14 +239,15 @@ public class WorkmenController {
     }
     
     @GetMapping("/getAllTrades")
-    public ResponseEntity<List<Trade>> getAllTrades(@RequestParam("unitId")String unitId){
+    public ResponseEntity<Set<Trade>> getAllTrades(@RequestParam("unitId")String unitId){
     	log.info("Entered into getAllTrades for unitId:"+unitId);
     	try {
     		List<Trade> trades = workmenService.getAllTradesBasedOnPE(unitId);
+    		Set<Trade> tradeSet = new HashSet<>(trades);
     		if(trades.isEmpty()) {
     			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     		}
-    		return new ResponseEntity<>(trades,HttpStatus.OK);
+    		return new ResponseEntity<>(tradeSet,HttpStatus.OK);
     	}catch(Exception e) {
     		log.error("Error fetching trades: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -254,14 +256,50 @@ public class WorkmenController {
     }
     
     @GetMapping("/getAllDepartments")
-    public ResponseEntity<List<DeptMapping>> getAllDepartments(@RequestParam("unitId")String unitId){
+    public ResponseEntity<Set<DeptMapping>> getAllDepartments(HttpServletRequest request,HttpServletResponse response,@RequestParam("unitId")String unitId){
     	log.info("Entered into getAllDepartments for unitId:"+unitId);
     	try {
+    		
+    		
+    		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+            MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    		
+    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+        	
+        	List<PersonOrgLevel> dept = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+        	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+        	
+        	
     		List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(unitId);
-    		if(departments.isEmpty()) {
+    		
+    		
+    		List<DeptMapping> loggedDept = new ArrayList<>();
+    		for(PersonOrgLevel p : dept) {
+    			DeptMapping d = new DeptMapping();
+    			d.setDepartment(p.getDescription());
+    			d.setDepartmentId(Integer.parseInt(p.getId()));
+    			loggedDept.add(d);
+    		}
+
+    		
+
+    		// Build Set<String> of logged dept IDs
+    		Set<String> loggedDeptIds = dept.stream()
+    		        .map(PersonOrgLevel::getId) // keep as String
+    		        .collect(Collectors.toSet());
+
+    		// Filter departments
+    		Set<DeptMapping> depSet = departments.stream()
+    		        .filter(d -> loggedDeptIds.contains(String.valueOf(d.getDepartmentId())))
+    		        .collect(Collectors.toSet());
+
+    		
+    		if(depSet.isEmpty()) {
     			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     		}
-    		return new ResponseEntity<>(departments,HttpStatus.OK);
+    		return new ResponseEntity<>(depSet,HttpStatus.OK);
     	}catch(Exception e) {
     		log.error("Error fetching Departments: ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -270,16 +308,45 @@ public class WorkmenController {
     }
     
     @GetMapping("/getAllSubDepartments")
-    public ResponseEntity<List<DeptMapping>> getAllSubDepartments(
+    public ResponseEntity<Set<DeptMapping>> getAllSubDepartments(HttpServletRequest request,HttpServletResponse response,
     		@RequestParam("unitId") String unitId, 
             @RequestParam("departmentId") String departmentId){
     	 log.info("Entering into getAllSubDepartments for: " + unitId + " departmentId: " + departmentId);
     	 try {
+    		 HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+             MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+     		
+     		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+         	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+         			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+         	
+         	List<PersonOrgLevel> dept = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+         	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+         	
+         	List<DeptMapping> loggedDept = new ArrayList<>();
+         	for(PersonOrgLevel p : subdepartments) {
+    			DeptMapping d = new DeptMapping();
+    			d.setDepartment(p.getDescription());
+    			d.setDepartmentId(Integer.parseInt(p.getId()));
+    			loggedDept.add(d);
+    		}
     		 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(unitId,departmentId);
-    		 if(Subdept.isEmpty()) {
+    		 
+    		// Build Set<String> of logged dept IDs
+     		Set<String> loggedDeptIds = subdepartments.stream()
+     		        .map(PersonOrgLevel::getId) // keep as String
+     		        .collect(Collectors.toSet());
+
+     		// Filter departments
+     		Set<DeptMapping> depSet = Subdept.stream()
+     		        .filter(d -> loggedDeptIds.contains(String.valueOf(d.getSubDepartmentId())))
+     		        .collect(Collectors.toSet());
+
+    		 
+    		 if(depSet.isEmpty()) {
     			 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     		 }
-    		 return new ResponseEntity<>(Subdept,HttpStatus.OK);
+    		 return new ResponseEntity<>(depSet,HttpStatus.OK);
     	 }catch(Exception e) {
     		 log.error("Error fetching SubDepartments: ", e);
              return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

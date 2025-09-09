@@ -60,21 +60,22 @@ public class DepartmentMappingController {
 		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
     	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
     			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
-    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
-    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	List<PersonOrgLevel> peList =new ArrayList<>();
+    	
+    	if(user.getRoleName().equals("System Admin")) {
+        	
+    		List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
+    		for(PrincipalEmployer pe :listDto) {
+    			PersonOrgLevel org = new PersonOrgLevel();
+    			org.setId(String.valueOf(pe.getUnitId()));
+    			org.setDescription(pe.getName());
+    			peList.add(org);
+    		}
+    		
+         }else {
+        	 peList =  groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+         }
     	request.setAttribute("PrincipalEmployer", peList);
-    	/* // request.setAttribute("Dept", departments);
-         // request.setAttribute("Subdept", subdepartments);
-          
-    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
-        CMSRoleRights rr =new CMSRoleRights();
-        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/departmentMapping/list");
-   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
-   	    request.setAttribute("UserPermission", rr);*/
-		
-		//List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
-		//request.setAttribute("PrincipalEmployer", listDto);
     	
    	 List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
 
@@ -174,26 +175,27 @@ public class DepartmentMappingController {
 			HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			
-			
+		
+			List<PersonOrgLevel> peList = new ArrayList<>();
 			List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
 	    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
 	    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
-	    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
-	    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
-	    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
-	    	request.setAttribute("PrincipalEmployer", peList);
-	    	/* // request.setAttribute("Dept", departments);
-	         // request.setAttribute("Subdept", subdepartments);
-	          
-	    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
-	        CMSRoleRights rr =new CMSRoleRights();
-	        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/departmentMapping/list");
-	   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
-	   	    request.setAttribute("UserPermission", rr);*/
-			
-			//List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
-			//request.setAttribute("PrincipalEmployer", listDto);
 	    	
+	    	
+	    	if(user.getRoleName().equals("System Admin")) {
+	        	
+	    		List<PrincipalEmployer> listDto = peService.getAllPrincipalEmployerForAdmin();
+	    		for(PrincipalEmployer pe :listDto) {
+	    			PersonOrgLevel org = new PersonOrgLevel();
+	    			org.setId(String.valueOf(pe.getUnitId()));
+	    			org.setDescription(pe.getName());
+	    			peList.add(org);
+	    		}
+	    		
+	         }else {
+	        	 peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>()); 
+	         }
+	    	request.setAttribute("PrincipalEmployer", peList);
 			 List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
 
 				// Grouping the CmsGeneralMaster objects by gmType
