@@ -23,4 +23,6 @@ public interface DepartmentMappingDao {
 		void saveTradeSkillMappings(List<DeptMapping> mappings);
 
 		boolean existsTradeSkillMapping(int principalEmployerId, int tradeId, int skillId);
+
+		String getSubDepartmentNameById(int subDepartmentId);
 }

@@ -22,9 +22,9 @@ public class DepartmentMappingServiceImpl implements DepartmentMappingService {
 	            	 // fetch names from DAO
 	                String principalEmployerName = deptMapDao.getPrincipalEmployerNameById(mapping.getPrincipalEmployerId());
 	                String departmentName = deptMapDao.getDepartmentNameById(mapping.getDepartmentId());
-
+	                String subdepartmentName = deptMapDao.getSubDepartmentNameById(mapping.getSubDepartmentId());
 	                throw new RuntimeException("Mapping already exists for Principal Employer: " 
-	                        + principalEmployerName + " and Department: " + departmentName);
+	                        + principalEmployerName + "Department " + departmentName+ "and Subdepartment "+subdepartmentName);
 	             }
 	        }
 	        // If no duplicates, save all

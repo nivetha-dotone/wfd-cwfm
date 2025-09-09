@@ -139,4 +139,10 @@ public class DepartmentMappingDaoImpl implements DepartmentMappingDao{
 	        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, principalEmployerId, tradeId,skillId);
 	        return count != null && count > 0;
 	    }
+	@Override
+	public String getSubDepartmentNameById(int subDepartmentId) {
+		//String sql=getPrincipalEmployerNameById();
+		 String sql = "SELECT GMNAME FROM CMSGENERALMASTER WHERE GMID = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, subDepartmentId);
+    }
 }
