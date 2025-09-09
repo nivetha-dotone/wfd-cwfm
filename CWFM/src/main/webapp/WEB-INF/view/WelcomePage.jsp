@@ -56,6 +56,8 @@
     const currentYear = today.getFullYear();
     const maxDate = new Date(currentYear - 18, 11, 31); // Person must be at least 18 years old
     const minDate = new Date(currentYear - 70, 0, 1);
+    const dojmaxDate = new Date();
+    dojmaxDate.setDate(today.getDate() + 15);
        $(".datetimepickerformat").datepicker({//dob
        	dateFormat: 'yy-mm-dd',
            changeMonth: true,
@@ -67,9 +69,10 @@
        $('.datetimepickerformat1').datepicker({//date of joiing
            dateFormat: 'yy-mm-dd', // Set the date format
            changeMonth: true,      // Allow changing month via dropdown
-           changeYear: true,       // Allow changing year via dropdown
-           yearRange: "0:+100", 
-           minDate: 0              // Prevent selecting future dates
+           changeYear: false,       // Allow changing year via dropdown
+           yearRange: currentYear, 
+           minDate: 0 ,
+           maxDate: dojmaxDate   // Prevent selecting future dates
        });
        const sixMonthsAgo = new Date();
        sixMonthsAgo.setMonth(today.getMonth() - 6);

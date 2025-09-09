@@ -1489,9 +1489,51 @@ public class WorkmenController {
 	 List<DeptMapping> skills = workmenService.getAllSkills(gatePassMainObj.getUnitId(),gatePassMainObj.getTrade());
 	 request.setAttribute("Skills", skills);
 	 List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
-	 request.setAttribute("Departments", departments);
+	 
+	 List<PersonOrgLevel> dept = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+ 	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+ 	List<DeptMapping> loggedDept = new ArrayList<>();
+	for(PersonOrgLevel p : dept) {
+		DeptMapping d = new DeptMapping();
+		d.setDepartment(p.getDescription());
+		d.setDepartmentId(Integer.parseInt(p.getId()));
+		loggedDept.add(d);
+	}
+
+	
+
+	// Build Set<String> of logged dept IDs
+	Set<String> loggedDeptIds = dept.stream()
+	        .map(PersonOrgLevel::getId) // keep as String
+	        .collect(Collectors.toSet());
+
+	// Filter departments
+	Set<DeptMapping> depSet = departments.stream()
+	        .filter(d -> loggedDeptIds.contains(String.valueOf(d.getDepartmentId())))
+	        .collect(Collectors.toSet());
+
+	 request.setAttribute("Departments", depSet);
 	 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
-	 request.setAttribute("Subdept", Subdept);
+	 
+	 List<DeptMapping> loggedSubDept = new ArrayList<>();
+  	for(PersonOrgLevel p : subdepartments) {
+			DeptMapping d = new DeptMapping();
+			d.setDepartment(p.getDescription());
+			d.setDepartmentId(Integer.parseInt(p.getId()));
+			loggedSubDept.add(d);
+		}
+  	
+ // Build Set<String> of logged dept IDs
+		Set<String> loggedSubDeptIds = subdepartments.stream()
+		        .map(PersonOrgLevel::getId) // keep as String
+		        .collect(Collectors.toSet());
+
+		// Filter departments
+		Set<DeptMapping> subdepSet = Subdept.stream()
+		        .filter(d -> loggedSubDeptIds.contains(String.valueOf(d.getSubDepartmentId())))
+		        .collect(Collectors.toSet());
+
+	 request.setAttribute("Subdept", subdepSet);
 	 
     return "contractWorkmen/quickOBAdd";
 }
@@ -1609,10 +1651,57 @@ public class WorkmenController {
 	 
 	 List<DeptMapping> skills = workmenService.getAllSkills(gatePassMainObj.getUnitId(),gatePassMainObj.getTrade());
 	 request.setAttribute("Skills", skills);
-	 List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
-	 request.setAttribute("Departments", departments);
+//	 List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
+//	 request.setAttribute("Departments", departments);
+//	 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
+//	 request.setAttribute("Subdept", Subdept);
+	 
+List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
+	 
+	 List<PersonOrgLevel> dept = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+ 	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+ 	List<DeptMapping> loggedDept = new ArrayList<>();
+	for(PersonOrgLevel p : dept) {
+		DeptMapping d = new DeptMapping();
+		d.setDepartment(p.getDescription());
+		d.setDepartmentId(Integer.parseInt(p.getId()));
+		loggedDept.add(d);
+	}
+
+	
+
+	// Build Set<String> of logged dept IDs
+	Set<String> loggedDeptIds = dept.stream()
+	        .map(PersonOrgLevel::getId) // keep as String
+	        .collect(Collectors.toSet());
+
+	// Filter departments
+	Set<DeptMapping> depSet = departments.stream()
+	        .filter(d -> loggedDeptIds.contains(String.valueOf(d.getDepartmentId())))
+	        .collect(Collectors.toSet());
+
+	 request.setAttribute("Departments", depSet);
 	 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
-	 request.setAttribute("Subdept", Subdept);
+	 
+	 List<DeptMapping> loggedSubDept = new ArrayList<>();
+  	for(PersonOrgLevel p : subdepartments) {
+			DeptMapping d = new DeptMapping();
+			d.setDepartment(p.getDescription());
+			d.setDepartmentId(Integer.parseInt(p.getId()));
+			loggedSubDept.add(d);
+		}
+  	
+ // Build Set<String> of logged dept IDs
+		Set<String> loggedSubDeptIds = subdepartments.stream()
+		        .map(PersonOrgLevel::getId) // keep as String
+		        .collect(Collectors.toSet());
+
+		// Filter departments
+		Set<DeptMapping> subdepSet = Subdept.stream()
+		        .filter(d -> loggedSubDeptIds.contains(String.valueOf(d.getSubDepartmentId())))
+		        .collect(Collectors.toSet());
+
+	 request.setAttribute("Subdept", subdepSet);
 	 
     return "contractWorkmen/renew";
 }

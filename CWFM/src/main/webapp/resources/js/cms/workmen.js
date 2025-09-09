@@ -3298,14 +3298,17 @@ function verifyOtpDemo() {
 	
 	function generateToken(){
 		const aadhaarNumber = document.getElementById("aadharNumber").value;
-
+		const transactionId= document.getElementById("transactionId").value;
+		let valid=false;
 			    // Simple validation
 			    if (!aadhaarNumber || aadhaarNumber.length !== 12 || !/^\d{12}$/.test(aadhaarNumber)) {
 			        document.getElementById("otpError").innerText = "Please enter a valid 12-digit Aadhaar number.";
 			        document.getElementById("otpMessage").innerText = "";
 			        return;
-			    }
-
+			    }else{
+					valid = aadharDuplicateDBCheck(aadhaarNumber,transactionId);
+				}				
+if(valid){
 			    var xhr = new XMLHttpRequest();
 			    var url = "/CWFM/contractworkmen/generateToken"; // Your mapped Spring Controller URL
 
@@ -3346,6 +3349,7 @@ function verifyOtpDemo() {
 
 			    var data = JSON.stringify({ aadhaarNumber: aadhaarNumber });
 			    xhr.send(data);
+				}
 	}
 	
 	function openDigiModal(token) {
@@ -3450,12 +3454,12 @@ function verifyOtpDemo() {
 									  
 									  document.getElementById("aadharNumber").readOnly = true;
 									  document.getElementById("firstName").readOnly = true;
-									         document.getElementById("lastName").readOnly = true;
+									         
 											 document.getElementById("dateOfBirth").disabled = true;
 
 									         document.getElementById("gender").disabled = true;   // if it's a <select>
 									         document.getElementById("address").readOnly = true;
-									         document.getElementById("relationName").readOnly = true;
+									        
 											 document.querySelector('button[onclick="generateToken()"]').disabled = true;
 								}
 
@@ -3489,4 +3493,28 @@ function verifyOtpDemo() {
 		
 
 		
+		function aadharDuplicateDBCheck(aadharNumber, transactionId) {
+		    let result = false;
 
+		    $.ajax({
+		        url: "/CWFM/contractworkmen/checkAadharExists",
+		        type: "GET",
+		        data: { aadharNumber: aadharNumber, transactionId: transactionId },
+		        async: false, 
+		        success: function (response) {
+		            if (response.exists) {
+		                $("#error-aadhar").text("Aadhar number already exists").show();
+		                result = false;
+		            } else {
+		                $("#error-aadhar").hide();
+		                result = true;
+		            }
+		        },
+		        error: function () {
+		            $("#error-aadhar").text("Error checking Aadhar").show();
+		            result = false;
+		        }
+		    });
+
+		    return result;  // ✅ return after ajax finishes
+		}

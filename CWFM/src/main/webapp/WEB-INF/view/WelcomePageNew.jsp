@@ -1,4 +1,4 @@
-<%@ page import="com.wfd.dot1.cwfm.pojo.MasterUser" %>
+<%-- <%@ page import="com.wfd.dot1.cwfm.pojo.MasterUser" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
@@ -3288,7 +3288,7 @@ table th {
     </c:when>
 </c:choose>
 
-  <%-- <c:if test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
+  <c:if test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
     <label for="roleSelect" class="role-label">Role:</label>
     <div class="role-dropdown">
         <select id="roleSelect" name="roleId" onchange="changeRole(this.value, this.options[this.selectedIndex].text)" class="role-select">
@@ -3301,7 +3301,7 @@ table th {
             </c:forEach>
         </select>
     </div>
-</c:if> --%>
+</c:if>
 
     <div class="dropdown">
         <span class="initials-icon">
@@ -5227,4 +5227,4 @@ table th {
     
 </body>
 
-</html>
+</html> --%>
