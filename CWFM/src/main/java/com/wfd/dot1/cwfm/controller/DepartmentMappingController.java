@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,20 +12,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
-import com.wfd.dot1.cwfm.pojo.Skill;
-import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.DepartmentMappingService;
 import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
@@ -220,7 +219,7 @@ public class DepartmentMappingController {
 	 
 	 @PostMapping("/saveTradeSkill")
 	    @ResponseBody
-	    public ResponseEntity<String> saveTradeSkillMappings(@RequestBody List<DeptMapping> mappings) {
+	    public ResponseEntity<String> saveTradeSkill(@RequestBody List<DeptMapping> mappings) {
 	        try {
 	        	deptMapService.saveTradeSkillMappings(mappings);
 	            return ResponseEntity.ok("All mappings saved successfully!");
@@ -230,4 +229,87 @@ public class DepartmentMappingController {
 	                    .body("Error saving mappings: " + e.getMessage());
 	        }
 	    }
+	 @PostMapping("/deleteDepartmentMapping")
+	 @ResponseBody
+	 public ResponseEntity<Map<String, Object>> deleteDepartmentMapping(@RequestBody List<DeptMapping> mappings) {
+		 Map<String, Object> response = new HashMap<>();
+		 try {
+	    	 if (mappings == null || mappings.isEmpty()) {
+	             response.put("status", "error");
+	             response.put("message", "No mappings received.");
+	             return ResponseEntity.badRequest().body(response);
+	         }
+	         // Debug logs
+	         mappings.forEach(m -> System.out.println(
+	             "PE=" + m.getPrincipalEmployerId() +
+	             ", Dept=" + m.getDepartmentId() +
+	             ", SubDept=" + m.getSubDepartmentId()
+	         ));
+	         
+	         Map<String, List<DeptMapping>> result  = deptMapService.deleteDeptMappingIfExistsInGatePass(mappings);
+
+	         List<DeptMapping> deleted = result.get("deleted");
+	         List<DeptMapping> skipped = result.get("skipped");
+
+	         if (!skipped.isEmpty() && !deleted.isEmpty()) {
+	             response.put("status", "partial");
+	             response.put("message", "Some mappings deleted, some skipped due to dependency.");
+	         } else if (!deleted.isEmpty()) {
+	             response.put("status", "success");
+	             response.put("message", "All selected mappings deleted successfully.");
+	         } else {
+	             response.put("status", "error");
+	             response.put("message", "No mappings deleted, dependencies exist.");
+	         }
+
+	         response.put("deleted", deleted);
+	         response.put("skipped", skipped);
+	         return ResponseEntity.ok(response);
+
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	         response.put("status", "error");
+	         response.put("message", "Error deleting mappings: " + e.getMessage());
+	         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	     }
+	 }
+	 
+	 @PostMapping("/deleteTradeMapping")
+	 @ResponseBody
+	 public ResponseEntity<Map<String, Object>> deleteTradeMapping(@RequestBody List<DeptMapping> mappings) {
+	     Map<String, Object> response = new HashMap<>();
+	     try {
+	         if (mappings == null || mappings.isEmpty()) {
+	             response.put("status", "error");
+	             response.put("message", "No mappings received.");
+	             return ResponseEntity.badRequest().body(response);
+	         }
+
+	         Map<String, List<DeptMapping>> result = deptMapService.deleteTradeMappingIfExistsInGatePass(mappings);
+
+	         List<DeptMapping> deleted = result.get("deleted");
+	         List<DeptMapping> skipped = result.get("skipped");
+
+	         if (!skipped.isEmpty() && !deleted.isEmpty()) {
+	             response.put("status", "partial");
+	             response.put("message", "Some mappings deleted, some skipped due to dependency.");
+	         } else if (!deleted.isEmpty()) {
+	             response.put("status", "success");
+	             response.put("message", "All selected mappings deleted successfully.");
+	         } else {
+	             response.put("status", "error");
+	             response.put("message", "No mappings deleted, dependencies exist.");
+	         }
+
+	         response.put("deleted", deleted);
+	         response.put("skipped", skipped);
+	         return ResponseEntity.ok(response);
+
+	     } catch (Exception e) {
+	         e.printStackTrace();
+	         response.put("status", "error");
+	         response.put("message", "Error deleting mappings: " + e.getMessage());
+	         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	     }
+	 }
 }

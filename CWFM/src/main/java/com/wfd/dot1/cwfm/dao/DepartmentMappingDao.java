@@ -25,4 +25,20 @@ public interface DepartmentMappingDao {
 		boolean existsTradeSkillMapping(int principalEmployerId, int tradeId, int skillId);
 
 		String getSubDepartmentNameById(int subDepartmentId);
+		
+		boolean trioexistsMapping(int principalEmployerId, int departmentId, int subDepartmentId);
+
+		boolean checkDependency(int principalEmployerId);
+		
+	    int deleteMappings(int principalEmployerId);
+
+		void delete(int principalEmployerId, int departmentId, int subDepartmentId);
+		
+		 boolean DeptexistsInGatePass(DeptMapping mapping);
+		 
+		    void deleteDeptMapping(DeptMapping mapping);
+
+			boolean TradeexistsInGatePass(DeptMapping mapping);
+
+			void deleteTradeMapping(DeptMapping mapping);
 }

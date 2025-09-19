@@ -243,7 +243,7 @@
      
          <div class="action-buttons" >
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" id="addRow" onclick="addRow()">Add</button>
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveData()">Save</button>
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveDepartmentAreaData()">Save</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToDeptMappingList()">Cancel</button>
         </div> 
    </div>

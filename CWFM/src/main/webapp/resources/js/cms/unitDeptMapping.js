@@ -39,7 +39,7 @@ function deleteRow(button) {
 
 
     
-    function saveData() {
+    function saveDepartmentAreaData() {
     const rows = document.querySelectorAll("#rowsContainer .row-block");
 
     if (rows.length === 0) {
@@ -52,41 +52,58 @@ function deleteRow(button) {
     let seen = new Set();
 
     rows.forEach((row, index) => {
-        const principalEmployerId = row.querySelector("select[name='principalEmployerId']").value;
-        const departmentId = row.querySelector("select[name='departmentId']").value;
-        const subDepartmentId = row.querySelector("select[name='subDepartmentId']").value;
+        const principalEmployerId = row.querySelector("select[name='principalEmployerId']").value?.trim();
+        const departmentId = row.querySelector("select[name='departmentId']").value?.trim();
+        const subDepartmentId = row.querySelector("select[name='subDepartmentId']").value?.trim();
 
         row.style.backgroundColor = "";
 
-        if (!principalEmployerId && departmentId) {
-            alert("Please select Principal Employer and Department in row " + (index + 1));
+         if (!principalEmployerId) {
+            alert("Please select Principal Employer in row " + (index + 1));
             isValid = false;
             return;
         }
 
-        if (!principalEmployerId && !departmentId && !subDepartmentId) {
-            alert("Please select Principal Employer, Department and Subdepartment in row " + (index + 1));
+        if (!departmentId) {
+            alert("Please select Department in row " + (index + 1));
             isValid = false;
             return;
         }
 
+        // 🔹 If SubDepartment is selected without Department (should not happen now, but safe check)
         if (!departmentId && subDepartmentId) {
             alert("Please select Department in row " + (index + 1) + " before selecting Sub Department");
             isValid = false;
             return;
         }
 
-       // ✅ Duplicate check (PE + Dept combination must be unique)
-        let key = principalEmployerId + "-" + departmentId;
-        if (seen.has(key)) {
-            alert("Duplicate found in row " + (index + 1) + ": Principal Employer + Department must be unique.");
-            isValid = false;
-            row.style.backgroundColor = "lightcoral"; // highlight duplicate row
-            return;
+
+        // 🔹 Duplicate Check
+        let key;
+        if (!subDepartmentId || subDepartmentId === "0") {
+            // Case 1: No SubDepartment → check PE + Dept
+            key = principalEmployerId + "-" + departmentId;
+            if (seen.has(key)) {
+                alert("Duplicate found in row " + (index + 1) +
+                      ": Principal Employer + Department must be unique when SubDepartment is not provided.");
+                isValid = false;
+                row.style.backgroundColor = "lightcoral";
+                return;
+            }
+        } else {
+            // Case 2: With SubDepartment → check PE + Dept + SubDept
+            key = principalEmployerId + "-" + departmentId + "-" + subDepartmentId;
+            if (seen.has(key)) {
+                alert("Duplicate found in row " + (index + 1) +
+                      ": Principal Employer + Department + SubDepartment must be unique.");
+                isValid = false;
+                row.style.backgroundColor = "lightcoral";
+                return;
+            }
         }
         seen.add(key);
 
-        // ✅ Push valid row to data array
+        // 🔹 Push valid row
         data.push({
             principalEmployerId,
             departmentId,
@@ -107,19 +124,20 @@ function deleteRow(button) {
     })
     .then(resp => resp.text().then(msg => {
         if (!resp.ok) {
-            throw new Error(msg); // ❌ server error → pass message to catch
+            throw new Error(msg);
         }
-        return msg; // ✅ success → return msg
+        return msg;
     }))
     .then(msg => {
         alert("Saved successfully: " + msg);
-        loadCommonList('/departmentMapping/list', 'Department Mapping');
+       loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
     })
     .catch(err => {
         console.error("Error saving:", err);
-        alert(err.message); // show server error directly
+        alert(err.message);
     });
 }
+
 
 
     function refreshTable() {
@@ -210,6 +228,21 @@ function deleteRow(button) {
             isValid = false;
             return;
         }
+         if (!principalEmployerId && tradeId && skillId) {
+            alert("Please select Principal Employer " + (index + 1));
+            isValid = false;
+            return;
+        }
+     if (principalEmployerId && !tradeId && !skillId) {
+            alert("Please select Trade and Skill in row " + (index + 1));
+            isValid = false;
+            return;
+        }
+        if (principalEmployerId && tradeId && !skillId) {
+            alert("Please select Skill in row " + (index + 1));
+            isValid = false;
+            return;
+        }
 
         if (!tradeId && skillId) {
             alert("Please select Trade in row " + (index + 1) + " before selecting Skill");
@@ -265,3 +298,99 @@ function deleteRow(button) {
 function goBackToTradeMappingList() {
     	 loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
     }
+    
+function deleteSelectedDeptMappings() {
+    let mappings = [];
+    document.querySelectorAll("input[name='selectedWOs']:checked").forEach(checkbox => {
+        const row = checkbox.closest("tr");
+        const principalEmployerId = row.querySelector(".principalEmployerId").value;
+        const departmentId = row.querySelector(".departmentId").value;
+        const subDepartmentId = row.querySelector(".subDepartmentId").value;
+        mappings.push({
+            principalEmployerId: principalEmployerId,
+            departmentId: departmentId,
+            subDepartmentId: subDepartmentId
+        });
+    });
+
+    if (mappings.length === 0) {
+        alert("Please select at least one mapping to delete.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete the selected mappings?")) {
+        return;
+    }
+
+   $.ajax({
+    url: '/CWFM/departmentMapping/deleteDepartmentMapping',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(mappings),
+    success: function(response) {
+        if (response.status === "success") {
+            alert(response.message);
+            loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+        } else if (response.status === "partial") {
+            alert(response.message + "\nDeleted: " + response.deleted.length + ", Skipped: " + response.skipped.length);
+            loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+        } else {
+            alert(response.message);
+            loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+        }
+        // reload table or refresh UI here
+    },
+    error: function(xhr) {
+        alert("Error: " + xhr.responseText);
+    }
+});
+}
+
+function deleteSelectedTradeMappings() {
+    let mappings = [];
+
+    document.querySelectorAll("input[name='selectedWOs']:checked").forEach(checkbox => {
+        const row = checkbox.closest("tr");
+        const principalEmployerId = row.querySelector(".principalEmployerId").value;
+        const tradeId = row.querySelector(".tradeId").value;
+        const skillId = row.querySelector(".skillId").value;
+
+        mappings.push({
+            principalEmployerId: principalEmployerId,
+            tradeId: tradeId,
+            skillId: skillId
+        });
+    });
+
+    if (mappings.length === 0) {
+        alert("Please select at least one mapping to delete.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete the selected mappings?")) {
+        return;
+    }
+$.ajax({
+    url: '/CWFM/departmentMapping/deleteTradeMapping',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(mappings),
+    success: function(response) {
+        if (response.status === "success") {
+            alert(response.message);
+             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+        } else if (response.status === "partial") {
+            alert(response.message + "\nDeleted: " + response.deleted.length + ", Skipped: " + response.skipped.length);
+             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+        } else {
+            alert(response.message);
+             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+        }
+        // reload table or refresh UI here
+    },
+    error: function(xhr) {
+        alert("Error: " + xhr.responseText);
+    }
+});
+
+}

@@ -102,7 +102,16 @@ public interface FileUploadDao {
 
 	Integer getSkillIdByTradeId(Integer unitId, Integer tradeId, String skill);
 
-	
+
+    Integer getGeneralMasterId(String gmType, String gmName);
+
+    Integer insertGeneralMaster(String gmType, String gmName);
+
+    boolean existsUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId);
+
+    void insertUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId);
+
+	void insertUnitDepartmentSubDepartmentMapping(Integer unitId, Integer departmentId, Integer subDepartmentId);	
 
 	
 

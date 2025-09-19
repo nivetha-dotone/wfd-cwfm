@@ -312,6 +312,26 @@ public class FileUploadController {
             fields.add(Map.of("name", "IdMark", "type", "Text", "example", "A Mole on Right Jaw"));
             
             templateInfo.put("fields", fields);
+        }else if("tradeskillunitmapping".equals(templateType)){
+        	templateInfo.put("title", "Data - Trade Skill Event");
+            templateInfo.put("description", "Imports Trade Skill events.");
+
+            List<Map<String, String>> fields = new ArrayList<>();
+            fields.add(Map.of("name", "Plant Code", "type", "Text", "example", "CODE001"));
+            fields.add(Map.of("name", "Trade", "type", "Text", "example", "Operator"));
+            fields.add(Map.of("name", "Skill", "type", "Text", "example", "Skilled"));
+            
+            templateInfo.put("fields", fields);
+        }else if("departmentareaunitmapping".equals(templateType)){
+        	templateInfo.put("title", "Data - Department SubDepartment Event");
+            templateInfo.put("description", "Imports Department SubDepartment events.");
+
+            List<Map<String, String>> fields = new ArrayList<>();
+            fields.add(Map.of("name", "Plant Code", "type", "Text", "example", "CODE001"));
+            fields.add(Map.of("name", "Department", "type", "Text", "example", "Electrical"));
+            fields.add(Map.of("name", "SubDepartment", "type", "Text", "example", "Tester"));
+            
+            templateInfo.put("fields", fields);
         }
         else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

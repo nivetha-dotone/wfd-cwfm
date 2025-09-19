@@ -171,7 +171,7 @@
     }
 
     .btn-danger {
-        background: red;
+         background: white; 
         color: white;
         border: none;
         border-radius: 5px;
@@ -278,7 +278,7 @@
                 <option value="${skill.gmId}">${skill.gmName}</option>
             </c:forEach>
         </select>
-        <button class="btn btn-danger btn-sm remove-row" onclick="deleteRow(this)">Delete</button>
+        <button class="remove-btn" onclick="deleteRow(this)">Delete</button>
 <!-- <button type="button" class="remove-btn" onclick="deleteRow()" >Delete</button> -->
         <!-- <button type="button" class="btn btn-danger btn-sm remove-row">Delete</button> -->
     </div>

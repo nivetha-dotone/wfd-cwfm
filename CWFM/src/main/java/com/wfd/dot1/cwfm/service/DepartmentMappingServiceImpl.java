@@ -1,6 +1,9 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,22 +17,49 @@ public class DepartmentMappingServiceImpl implements DepartmentMappingService {
 	@Autowired
 	DepartmentMappingDao deptMapDao;
 
-	  @Override
-	    public void saveMappings(List<DeptMapping> mappings) {
-	        for (DeptMapping mapping : mappings) {
-	            boolean exists = deptMapDao.existsMapping(mapping.getPrincipalEmployerId(), mapping.getDepartmentId());
+	@Override
+	public void saveMappings(List<DeptMapping> mappings) {
+	    for (DeptMapping mapping : mappings) {
+
+	    	 int subDeptId = mapping.getSubDepartmentId(); // primitive int
+
+	         // Case 1: Principal Employer + Department (no sub-department)
+	         if (subDeptId == 0) {
+	            boolean exists = deptMapDao.existsMapping(
+	                    mapping.getPrincipalEmployerId(),
+	                    mapping.getDepartmentId()
+	            );
 	            if (exists) {
-	            	 // fetch names from DAO
 	                String principalEmployerName = deptMapDao.getPrincipalEmployerNameById(mapping.getPrincipalEmployerId());
 	                String departmentName = deptMapDao.getDepartmentNameById(mapping.getDepartmentId());
-	                String subdepartmentName = deptMapDao.getSubDepartmentNameById(mapping.getSubDepartmentId());
-	                throw new RuntimeException("Mapping already exists for Principal Employer: " 
-	                        + principalEmployerName + "Department " + departmentName+ "and Subdepartment "+subdepartmentName);
-	             }
+
+	                throw new RuntimeException("Mapping already exists for Principal Employer: "
+	                        + principalEmployerName + " and Department: " + departmentName);
+	            }
 	        }
-	        // If no duplicates, save all
-	        deptMapDao.save(mappings);
+
+	        // Case 2: Principal Employer + Department + SubDepartment
+	        else {
+	            boolean trioExists = deptMapDao.trioexistsMapping(
+	                    mapping.getPrincipalEmployerId(),
+	                    mapping.getDepartmentId(),
+	                    mapping.getSubDepartmentId()
+	            );
+	            if (trioExists) {
+	                String principalEmployerName = deptMapDao.getPrincipalEmployerNameById(mapping.getPrincipalEmployerId());
+	                String departmentName = deptMapDao.getDepartmentNameById(mapping.getDepartmentId());
+	                String subDepartmentName = deptMapDao.getSubDepartmentNameById(mapping.getSubDepartmentId());
+
+	                throw new RuntimeException("Mapping already exists for Principal Employer: "
+	                        + principalEmployerName + ", Department: " + departmentName
+	                        + " and SubDepartment: " + subDepartmentName);
+	            }
+	        }
 	    }
+
+	    // ✅ Save only if no duplicates were found
+	    deptMapDao.save(mappings);
+	}
 	
 	 @Override
 	    public List<DeptMapping> getAllMappings() {
@@ -56,5 +86,54 @@ public class DepartmentMappingServiceImpl implements DepartmentMappingService {
 	        }
 	        // If no duplicates, save all
 	        deptMapDao.saveTradeSkillMappings(mappings);
+	    }
+
+	    @Override
+	    public Map<String, List<DeptMapping>> deleteDeptMappingIfExistsInGatePass(List<DeptMapping> mappings) {
+	        
+	        List<DeptMapping> deleted = new ArrayList<>();
+	        List<DeptMapping> skipped = new ArrayList<>();
+
+	        for (DeptMapping mapping : mappings) {
+	            boolean dependencyExists = deptMapDao.DeptexistsInGatePass(mapping);
+
+	            if (!dependencyExists) {
+	                // ✅ Safe to delete if no dependency exists
+	                deptMapDao.deleteDeptMapping(mapping);
+	                deleted.add(mapping);
+	            } else {
+	                // ❌ Dependency found → skip deletion
+	            	 skipped.add(mapping);
+	            }
+	        }
+	        Map<String, List<DeptMapping>> result = new HashMap<>();
+	        result.put("deleted", deleted);
+	        result.put("skipped", skipped);
+	        return result;
+	    }
+	    
+	    @Override
+	    public  Map<String, List<DeptMapping>>  deleteTradeMappingIfExistsInGatePass(List<DeptMapping> mappings) {
+	       
+	        List<DeptMapping> deleted = new ArrayList<>();
+	        List<DeptMapping> skipped = new ArrayList<>();
+
+	        for (DeptMapping mapping : mappings) {
+	            boolean dependencyExists = deptMapDao.TradeexistsInGatePass(mapping);
+
+	            if (!dependencyExists) {
+	                // ✅ Safe to delete if no dependency exists
+	                deptMapDao.deleteTradeMapping(mapping);
+	                deleted.add(mapping);
+	            } else {
+	                // ❌ Dependency found → skip deletion
+	            	 skipped.add(mapping);
+	            }
+	        }
+
+	        Map<String, List<DeptMapping>> result = new HashMap<>();
+	        result.put("deleted", deleted);
+	        result.put("skipped", skipped);
+	        return result;
 	    }
 }

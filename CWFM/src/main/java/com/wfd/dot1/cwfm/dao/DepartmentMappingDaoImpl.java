@@ -86,7 +86,18 @@ public class DepartmentMappingDaoImpl implements DepartmentMappingDao{
 	 @Override
 	    public List<DeptMapping> findAll() {
 		 List<DeptMapping> peList= new ArrayList<DeptMapping>();
-		 String sql=FindAllPeDeptMapping();
+		// String sql=FindAllPeDeptMapping();
+		 String sql="SELECT \r\n"
+		 		+ "   pe.UNITID AS principalEmployerId,\r\n"
+		 		+ "   pe.name AS principalEmployerName,\r\n"
+		 		+ "   d.GMID AS departmentId,\r\n"
+		 		+ "   d.GMNAME AS departmentName,\r\n"
+		 		+ "   sd.GMID AS subDepartmentId,\r\n"
+		 		+ "   sd.GMNAME AS subDepartmentName\r\n"
+		 		+ "FROM UnitDepartmentMapping udm\r\n"
+		 		+ "JOIN CMSPRINCIPALEMPLOYER pe ON pe.UNITID = udm.principalEmployerId\r\n"
+		 		+ "JOIN CMSGENERALMASTER d ON d.GMID = udm.departmentId\r\n"
+		 		+ "LEFT JOIN CMSGENERALMASTER sd ON sd.GMID = udm.subDepartmentId;";
 	        /*String sql = "SELECT  pe.name AS principalEmployerName,cmsg.GMNAME AS departmentName,  cmsg1.GMNAME AS subDepartmentName  FROM UnitDepartmentMapping udm \r\n"
 	        		+ "JOIN CMSPRINCIPALEMPLOYER pe ON udm.principalEmployerId = pe.UNITID \r\n"
 	        		+ "JOIN CMSGENERALMASTER cmsg ON udm.departmentId = cmsg.GMID \r\n"
@@ -98,6 +109,9 @@ public class DepartmentMappingDaoImpl implements DepartmentMappingDao{
 	            mapping.setPrincipalEmployer(rs.getString("principalEmployerName"));
 	            mapping.setDepartment(rs.getString("departmentName"));
 	            mapping.setSubDepartment(rs.getString("subDepartmentName"));
+	            mapping.setPrincipalEmployerId(rs.getInt("principalEmployerId"));
+	            mapping.setDepartmentId(rs.getInt("departmentId"));
+	            mapping.setSubDepartmentId(rs.getInt("subDepartmentId"));
 	            peList.add(mapping);
 	    	}
 	    	return peList;
@@ -106,11 +120,11 @@ public class DepartmentMappingDaoImpl implements DepartmentMappingDao{
 	 @Override
 	    public List<DeptMapping> findAllTradeSkillMappings() {
 		 List<DeptMapping> peList= new ArrayList<DeptMapping>();
-		 String sql=GetAllTradeSkillMappings();
-	        /*String sql = "SELECT  pe.name AS principalEmployerName,cmsg.GMNAME AS Trade,  cmsg1.GMNAME AS Skill  FROM UnitTradeSkillMapping utsm \r\n"
-	        		+ "	        		JOIN CMSPRINCIPALEMPLOYER pe ON utsm.PrincipalEmployerId = pe.UNITID \r\n"
-	        		+ "	        		JOIN CMSGENERALMASTER cmsg ON utsm.TradeId = cmsg.GMID \r\n"
-	        		+ "	        		JOIN CMSGENERALMASTER cmsg1 ON utsm.SkillId = cmsg1.GMID";*/
+		 //String sql=GetAllTradeSkillMappings();
+	        String sql = "  SELECT  pe.name AS principalEmployerName,pe.unitid as principalEmployerId,cmsg.GMNAME AS Trade, cmsg.GMID as tradeId, cmsg1.GMNAME AS Skill,cmsg1.GMID as skillId  FROM UnitTradeSkillMapping utsm \r\n"
+	        		+ "	        		        		JOIN CMSPRINCIPALEMPLOYER pe ON utsm.PrincipalEmployerId = pe.UNITID \r\n"
+	        		+ "	        			        		JOIN CMSGENERALMASTER cmsg ON utsm.TradeId = cmsg.GMID \r\n"
+	        		+ "	        		       		JOIN CMSGENERALMASTER cmsg1 ON utsm.SkillId = cmsg1.GMID";
 	        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 	    	while(rs.next()) {
 	        	DeptMapping mapping = new DeptMapping();
@@ -118,6 +132,9 @@ public class DepartmentMappingDaoImpl implements DepartmentMappingDao{
 	            mapping.setPrincipalEmployer(rs.getString("PrincipalEmployerName"));
 	            mapping.setTrade(rs.getString("Trade"));
 	            mapping.setSkill(rs.getString("Skill"));
+	            mapping.setPrincipalEmployerId(rs.getInt("principalEmployerId"));
+	            mapping.setTradeId(rs.getInt("tradeId"));
+	            mapping.setSkillId(rs.getInt("skillId"));
 	            peList.add(mapping);
 	    	}
 	    	return peList;
@@ -145,4 +162,68 @@ public class DepartmentMappingDaoImpl implements DepartmentMappingDao{
 		 String sql = "SELECT GMNAME FROM CMSGENERALMASTER WHERE GMID = ?";
         return jdbcTemplate.queryForObject(sql, String.class, subDepartmentId);
     }
-}
+	@Override
+	public boolean trioexistsMapping(int principalEmployerId, int departmentId, int subDepartmentId) {
+		String sql = "SELECT COUNT(*) FROM UnitDepartmentMapping WHERE principalEmployerId = ? AND departmentId = ? and subDepartmentId=?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, principalEmployerId, departmentId,subDepartmentId);
+        return count != null && count > 0;
+	}
+	@Override
+    public boolean checkDependency(int principalEmployerId) {
+        String sql = "SELECT COUNT(*) FROM UnitDepartmentMapping udm JOIN GATEPASSMAIN g ON g.UnitId=udm.principalEmployerId and g.departmentId = udm.departmentId AND (g.AreaId = udm.subDepartmentId OR udm.subDepartmentId IS NULL) WHERE udm.principalEmployerId = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, principalEmployerId);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public int deleteMappings(int principalEmployerId) {
+        String sql = "DELETE FROM UnitDepartmentMapping WHERE principalEmployerId = ?";
+        return jdbcTemplate.update(sql, principalEmployerId);
+    }
+	@Override
+	public void delete(int principalEmployerId, int departmentId, int subDepartmentId) {
+		// TODO Auto-generated method stub
+		
+	}
+	 @Override
+	    public boolean DeptexistsInGatePass(DeptMapping mapping) {
+	        String sql = "SELECT COUNT(*) FROM GATEPASSMAIN g WHERE g.UnitId = ? AND g.DepartmentId = ? AND (g.AreaId = ? OR (g.AreaId IS NULL AND ? = 0))";
+	        Integer count = jdbcTemplate.queryForObject(sql, Integer.class,
+	                mapping.getPrincipalEmployerId(),
+	                mapping.getDepartmentId(),
+	                mapping.getSubDepartmentId(),
+	                mapping.getSubDepartmentId());
+	        return count != null && count > 0;
+	    }
+
+	    @Override
+	    public void deleteDeptMapping(DeptMapping mapping) {
+	        String sql = "DELETE FROM UnitDepartmentMapping " +
+	                     "WHERE PRINCIPALEMPLOYERID = ? AND DEPARTMENTID = ? AND SUBDEPARTMENTID = ?";
+	        jdbcTemplate.update(sql,
+	                mapping.getPrincipalEmployerId(),
+	                mapping.getDepartmentId(),
+	                mapping.getSubDepartmentId());
+	    }
+	    @Override
+	    public boolean TradeexistsInGatePass(DeptMapping mapping) {
+	        String sql = "SELECT COUNT(*) FROM GATEPASSMAIN g WHERE g.UnitId = ? AND g.TRADEID = ? AND g.SKILLID = ?";
+	        Integer count = jdbcTemplate.queryForObject(sql, Integer.class,
+	                mapping.getPrincipalEmployerId(),
+	                mapping.getTradeId(),
+	                mapping.getSkillId());
+	        return count != null && count > 0;
+	    }
+
+	    @Override
+	    public void deleteTradeMapping(DeptMapping mapping) {
+	        String sql = "DELETE FROM UnitTradeSkillMapping " +
+	                     "WHERE PRINCIPALEMPLOYERID = ? AND TRADEID = ? AND SKILLID = ?";
+	        jdbcTemplate.update(sql,
+	                mapping.getPrincipalEmployerId(),
+	                mapping.getTradeId(),
+	                mapping.getSkillId());
+	    }
+	}
+	
+	

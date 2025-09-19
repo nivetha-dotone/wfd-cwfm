@@ -1018,7 +1018,10 @@ function saveOrgEntries() {
         if (xhr.status === 200) {
             var response = JSON.parse(xhr.responseText); 
             if (response.success) {
-                updateTable(); 
+            	document.getElementById("orgLevelDefId").value = "";
+                //document.getElementById("entryName").innerHTML = "<option value=''>Select Entry Name</option>";
+                //document.getElementById("description").value = "";
+            	loadOrgLevelEntries(); 
             } else {
                 errorBox.innerHTML = response.message;
                 errorBox.style.display = "block";
@@ -4965,7 +4968,7 @@ table th {
         xhr.send();
     }
 
-    function closeModal() {
+    function closeTemplateModal() {
         document.getElementById("templateModal").style.display = "none"; // Hide modal
     }
     function viewTemplateInfo() {
@@ -5032,6 +5035,10 @@ table th {
             	"Blood Group","Accommodation","Bank Name","Account Number","Mobile Number","Emergency Contact Number","Police verification Date Valid To","Health chekup Date",
             	"Access Levels","ESIC Number","UNIT CODE","Organization name" ,"EIC Number","EC number","UAN Number","Emergency Contact Person",
             	"Is eligible for PF","SpecializationName","Insurance type","LL number","Address","Zone","IdMark"];
+        }else if (selectedTemplate === "tradeskillunitmapping") {
+            headers = ["Plant Code","Trade", "Skill"];
+        }else if (selectedTemplate === "departmentareaunitmapping") {
+            headers = ["Plant Code","Department", "SubDepartment"];
         }
         // Populate table headers
         headers.forEach(function(header) {
@@ -5193,25 +5200,38 @@ table th {
         if (templateType === "generalMaster") {
             headers = ["GM Name", "GM Description", "GM TypeID", "IS Active", "Created Time", "Updated Time", "Updated By"];
             fieldMap = ["gmName", "gmDescription", "gmTypeId", "isActive", "createdTM", "updatedTM", "updatedBy"];
-        } else if (templateType === "minimumWage") {
+        }
+        else if (templateType === "minimumWage") {
             headers = ["Trade", "Skill", "Basic", "Da", "Allowance", "From Date", "Unit Code", "Organization"];
             fieldMap = ["trade", "skill", "basic", "da", "allowamce", "fromDate", "unitCode", "organization"];
-        } else if (templateType === "workorder") {
+        }
+        else if (templateType === "workorder") {
             headers = ["Work Order Number","Item","Line","Line Number","Service Code","Short Text","Delivery Completion","Item Changed ON","Vendor Code","Vendor Name","Vendor Address","Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code","G/L Code","Cost Center","Nature of Job","Rate / Unit","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Qty Completed","Work Order Release Date","Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Company_code"];
             fieldMap = ["workOrderNumber", "item", "line", "lineNumber", "serviceCode", "shortText", "deliveryCompletion","itemChangedON", "vendorCode", "vendorName", "vendorAddress", "blockedVendor","workOrderValiditiyFrom", "workOrderValiditiyTo", "workOrderType", "plantcode", "sectionCode","departmentCode", "GLCode", "costCenter", "natureofJob", "rateUnit", "quantity", "baseUnitofMeasure","workOrderReleased", "PMOrderNo", "WBSElement", "qtyCompleted", "workOrderReleaseDate","serviceEntryCreatedDate", "serviceEntryUpdatedDate", "purchaseOrgLevel",  "companycode"];
-        } else if (templateType === "contractor") {
+        } 
+        else if (templateType === "contractor") {
             headers = ["CONTRACTOR NAME", "CONTRACTOR ADDRESS", "City", "Contractor MANAGER NAME", "LICENSE NUM", "LICENCSE VALID FROM", "LICENCSE VALID TO", "LICENCSE COVERAGE", "TOTAL STRENGTH", "MAXIMUM NUMBER OF WORKMEN", "NATURE OF WORK", "LOCATION OF WORK", "CONTRACTOR VALIDITY START DATE", "CONTRACTOR VALIDITY END DATE", "CONTRACTOR ID", "PF CODE", "EC/WC number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF NUMBER", "PF APPLY DATE", "Reference", "Mobile Number", "ESI NUMBER", "ESI VALID FROM", "ESI VALID TO", "Main Contractor Code", "Work Order Number"];
             fieldMap = ["contractorName", "contractorAddress", "city", "managerNm", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "totalStrength", "maxNoEmp", "natureofWork", "locationofWork", "periodStartDt", "periodEndDt", "contractorId", "pfCode", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "pfNum", "pfApplyDt", "reference", "mobileNumber", "esiwc", "esiValidFrom", "esiValidTo", "contractorCode", "workOrderNumber"];
-        } else if (templateType === "principalEmployer") {
+        } 
+        else if (templateType === "principalEmployer") {
             headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number","State"];
             fieldMap = ["organization", "code", "name", "address", "managerName", "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen", "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode", "wcNumber", "factoryLicenseNumber","stateNM"];
-        }else if (templateType === "workmenbulkupload") {
+        }
+        else if (templateType === "workmenbulkupload") {
             headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
             fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
         }
         else if (templateType === "workmenbulkuploaddraft") {
             headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
             fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
+        } 
+        else if (templateType === "tradeskillunitmapping") {
+            headers = ["Plant Code","Trade", "Skill"];
+            fieldMap = ["plantCode","trade","skill"];
+        }
+        else if (templateType === "departmentareaunitmapping") {
+            headers = ["Plant Code","Trade", "Skill"];
+            fieldMap = ["plantCode","department","subDepartment"];
         }
 
         headers.forEach(header => {
@@ -5552,6 +5572,80 @@ table th {
   });
 
 })();
+
+function loadOrgLevelEntries() {
+    const $entry = $("#entryName");
+    const $desc  = $("#description"); // make sure your input has id="description"
+    const orgLevelDefId = $("#orgLevelDefId").val();
+
+    // Bind entry change handler once
+    if (!$entry.data("handler-bound")) {
+        $entry.on("change", function () {
+            const text = $(this).find(":selected").data("description") || "";
+            $desc.val(text);
+        });
+        $entry.data("handler-bound", true);
+    }
+
+    // If nothing selected → clear both and stop
+    if (!orgLevelDefId) {
+        $entry.html("<option value=''>Select Entry Name</option>")
+              .val("")
+              .trigger("change"); // clears description via the handler
+        return;
+    }
+
+    $.ajax({
+        url: "/CWFM/org-level-entryController/org-level-entry-dropdowns", // <-- correct endpoint
+        type: "GET",
+        data: { orgLevelDefId: orgLevelDefId },
+        success: function (entries) {
+            // reset both before filling
+            $entry.empty().append("<option value=''>Select Entry Name</option>");
+            $desc.val("");
+
+            // fill options with description in data-attribute
+            $.each(entries, function (i, entry) {
+                $("<option>")
+                    .val(entry.entryName)
+                    .text(entry.entryName)
+                    .attr("data-description", entry.description || "")
+                    .appendTo($entry);
+            });
+
+            // keep dropdown blank & ensure description cleared
+            $entry.val("").trigger("change");
+        },
+        error: function () {
+            alert("Error loading entries!");
+            // also clear UI on error
+            $entry.html("<option value=''>Select Entry Name</option>").val("").trigger("change");
+        }
+    });
+}
+
+function fetchOrgLevelSavedEntries() {
+    var orgLevelDefId = document.getElementById("orgLevelDefId").value;
+    
+    // If no org level is selected, clear the entries
+    if (orgLevelDefId === "") {
+        document.getElementById("orgLevelEntries").innerHTML = "<p>No entries available for the selected org level.</p>";
+        return;
+    }
+    
+    // Perform an AJAX request to fetch entries for the selected org level
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/CWFM/org-level-entryController/org-level-entrys?orgLevelDefId=" + orgLevelDefId, true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            document.getElementById("orgLevelEntries").innerHTML = xhr.responseText;
+            loadCommonList('/org-level-entryController/org-level-entrys', 'Org Levels View');
+        } else {
+            alert("Failed to load org level entries.");
+        }
+    };
+    xhr.send();
+}
 </script>
 
     

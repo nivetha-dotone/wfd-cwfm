@@ -229,7 +229,11 @@ background-color: #DDF3FF; /* Light green for the table header */
         String roleId = user!=null?user.getRoleId():"";
         String contextPath =  request.getContextPath() ;
 		%>
-   
+   <script>
+   function closeTemplateModal() {
+       document.getElementById("templateModal").style.display = "none"; // Hide modal
+   }
+   </script>
 
 </head>
 <body>
@@ -295,6 +299,8 @@ background-color: #DDF3FF; /* Light green for the table header */
                 <option value="contractor"style="color:gray;">Data-Contractor</option>
                  <option value="workorder"style="color:gray;">Data-Workorder</option> 
                  <option value="workmenbulkupload"style="color:gray;">Data-Workmen Bulk Upload</option>
+                 <option value="tradeskillunitmapping"style="color:gray;">Data-Trade Skill Mapping</option>
+                 <option value="departmentareaunitmapping"style="color:gray;">Data-Department Area Mapping</option>
                    <% } %>
                   <% if (user != null && "Contractor".equals(roleName)) { %>
                  <option value="workmenbulkuploaddraft"style="color:gray;">Data-Workmen Bulk Upload Draft</option>
@@ -310,7 +316,7 @@ background-color: #DDF3FF; /* Light green for the table header */
     </div>
     <div id="templateModal" class="modal" style="display:none;">
     <div class="modal-content">
-        <span onclick="closeModal()" class="close-modal">&times;</span>
+        <span onclick="closeTemplateModal()" class="close-modal">&times;</span>
         <h2 id="modalTitle"></h2>
         <p id="modalDescription"></p>
         <div id="modalTable"></div>

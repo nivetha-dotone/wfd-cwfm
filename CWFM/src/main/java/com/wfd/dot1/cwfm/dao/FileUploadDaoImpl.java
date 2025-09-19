@@ -425,7 +425,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
                 		+ "Technical Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Name Branch,Account Number,"
                 		+ "Mobile Number,Emergency Contact Number,Police verification Date Valid To,Health chekup Date,Access Levels,ESIC Number,UNIT CODE,Organization name,"
                 		+ "EIC Number,EC number,UAN Number,Emergency Contact Person,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark\n";
-                   
+            case "tradeskillunitmapping":
+            	return "PLANT CODE,TRADE,SKILL";
+            case "departmentareaunitmapping":
+            	return "PLANT CODE,DEPARTMENT,SUBDEPARTMENT";
             default:
                 // fallback/default template
                 return "Template is Not Found to Download";
@@ -948,6 +951,50 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, tradeId,skill.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
+	
+	    @Override
+	    public Integer getGeneralMasterId(String gmType, String gmName) {
+	        try {
+	            String sql = "SELECT GM.GMID  FROM CMSGENERALMASTER GM  JOIN CMSGMTYPE GT ON GT.GMTYPEID = GM.GMTYPEID  WHERE GT.GMTYPE = ? AND GM.GMNAME = ? and ISACTIVE=1";
+	            return jdbcTemplate.queryForObject(sql, Integer.class, gmType, gmName);
+	        } catch (EmptyResultDataAccessException e) {
+	            return null;
+	        }
+	    }
+
+	    @Override
+	    public Integer insertGeneralMaster(String gmType, String gmName) {
+	        // First get the GMTYPEID
+	        String getTypeIdSql = "SELECT GMTYPEID FROM CMSGMTYPE WHERE GMTYPE = ?";
+	        Integer gmTypeId = jdbcTemplate.queryForObject(getTypeIdSql, Integer.class, gmType);
+
+	        String insertSql = "INSERT INTO CMSGENERALMASTER ( GMNAME,GMDESCRIPTION,GMTYPEID,UPDATEDBY) VALUES (?, ?, ?,'Admin')";
+	        jdbcTemplate.update(insertSql, gmName,gmName,gmTypeId);
+
+	        // Return newly inserted GMID
+	        String fetchIdSql = " SELECT GMID FROM CMSGENERALMASTER \r\n"
+	        		+ "	            WHERE GMNAME = ? AND GMTYPEID = ? and ISACTIVE=1 ORDER BY GMID DESC ";
+	        return jdbcTemplate.queryForObject(fetchIdSql, Integer.class, gmName, gmTypeId);
+	    }
+
+	    @Override
+	    public boolean existsUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId) {
+	        String sql = "SELECT COUNT(*) FROM UnitTradeSkillMapping  WHERE PrincipalEmployerId = ? AND TRADEID = ? AND SKILLID =?";
+	        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, unitId, tradeId, skillId);
+	        return count != null && count > 0;
+	    }
+
+	    @Override
+	    public void insertUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId) {
+	        String sql = "INSERT INTO UnitTradeSkillMapping (PrincipalEmployerId, TRADEID, SKILLID) VALUES (?, ?, ?)";
+	        jdbcTemplate.update(sql, unitId, tradeId, skillId);
+	    }
+	    
+	    @Override
+	    public void insertUnitDepartmentSubDepartmentMapping(Integer unitId, Integer departmentId, Integer subDepartmentId) {
+	        String sql = "INSERT INTO UnitDepartmentMapping (principalEmployerId, departmentId, subDepartmentId) VALUES (?, ?, ?)";
+	        jdbcTemplate.update(sql, unitId, departmentId, subDepartmentId);
+	    }
 	
 	}
 

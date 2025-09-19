@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wfd.dot1.cwfm.dao.DepartmentMappingDao;
 import com.wfd.dot1.cwfm.dao.FileUploadDao;
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
@@ -33,6 +34,7 @@ import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
@@ -43,6 +45,9 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Autowired
     private FileUploadDao fileUploadDao;
 
+    @Autowired
+	DepartmentMappingDao deptMapDao;
+    
     @Override
     public void uploadFiles(List<MultipartFile> files) {
         for (MultipartFile file : files) {
@@ -78,6 +83,21 @@ public class FileUploadServiceImpl implements FileUploadService {
                 }
                 savedData = processGeneralMaster(reader);
                 break;
+                
+            case "tradeskillunitmapping":
+                if (!headerLine.equalsIgnoreCase("PLANT CODE,TRADE,SKILL")) {
+                    throw new Exception("File can not upload due to incorrect format.");
+                }
+                savedData = processTradeSkillUnitMapping(reader);
+                break;
+                
+            case "departmentareaunitmapping":
+                if (!headerLine.equalsIgnoreCase("PLANT CODE,DEPARTMENT,SUBDEPARTMENT")) {
+                    throw new Exception("File can not upload due to incorrect format.");
+                }
+                savedData = processDepartmentSubDepartmentUnitMapping(reader);
+                break;
+                
             case "contractor":
                 if (!headerLine.equalsIgnoreCase("CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,"
                         + "LICENCSE COVERAGE,TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
@@ -138,6 +158,208 @@ public class FileUploadServiceImpl implements FileUploadService {
         return result;
     }
 
+    private Map<String, Object> processTradeSkillUnitMapping(BufferedReader reader) throws IOException {
+        List<Map<String, Object>> successData = new ArrayList<>();
+        List<Map<String, Object>> errorData = new ArrayList<>();
+
+        String line;
+        int rowNum = 0;
+
+        String[] fieldNames = {"principalEmployer", "trade", "skill"};
+        Set<String> mandatoryFields = Set.of("principalEmployer", "trade", "skill");
+
+        while ((line = reader.readLine()) != null) {
+            rowNum++;
+            line = line.replaceAll("[\\x00-\\x1F\\x7F]", ""); // Clean control characters
+
+            if (line.trim().isEmpty()) continue;
+
+            String[] rawFields = line.split(",", -1);
+            String[] fields = new String[rawFields.length];
+            for (int i = 0; i < rawFields.length; i++) {
+                fields[i] = rawFields[i].trim().replaceAll("\"", "");
+            }
+
+            Map<String, String> fieldErrors = new LinkedHashMap<>();
+
+            if (fields.length < 3) {
+                errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
+                continue;
+            }
+
+            for (int i = 0; i < fieldNames.length; i++) {
+                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
+                    fieldErrors.put(fieldNames[i], "is mandatory");
+                }
+            }
+
+            if (!fieldErrors.isEmpty()) {
+                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
+                continue;
+            }
+
+            try {
+                String principalEmployer = fields[0];
+                String trade = fields[1];
+                String skill = fields[2];
+
+                // Get unitId from plant code
+                Integer unitId = fileUploadDao.getUnitIdByName(principalEmployer);
+                if (unitId == null) {
+                    errorData.add(Map.of("row", rowNum, "error", "PlantCode '" + principalEmployer + "' not found"));
+                    continue;
+                }
+
+                // Check or insert Trade
+                Integer tradeId = fileUploadDao.getGeneralMasterId("Trade", trade);
+                if (tradeId == null || tradeId == 0) {
+                    tradeId = fileUploadDao.insertGeneralMaster("Trade", trade);
+                }
+
+                // Check or insert Skill
+                Integer skillId = fileUploadDao.getGeneralMasterId("Skill", skill);
+                if (skillId == null || skillId == 0) {
+                    skillId = fileUploadDao.insertGeneralMaster("Skill", skill);
+                }
+
+                // Check if mapping exists
+                boolean mappingExists = fileUploadDao.existsUnitTradeSkillMapping(unitId, tradeId, skillId);
+                if (mappingExists) {
+                    errorData.add(Map.of("row", rowNum, "error", "Mapping already exists for '"+trade+"' and '"+skill+"' with "+principalEmployer));
+                    continue;
+                }
+
+                // Insert mapping
+                fileUploadDao.insertUnitTradeSkillMapping(unitId, tradeId, skillId);
+
+                // ✅ Add success record (like PrincipalEmployer)
+                Map<String, Object> success = new LinkedHashMap<>();
+                success.put("row", rowNum);
+                success.put("plantCode", principalEmployer);
+                success.put("trade", trade);
+                success.put("skill", skill);
+                //success.put("message", "Mapping inserted successfully");
+
+                successData.add(success);
+
+            } catch (Exception e) {
+                errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("successData", successData);
+        result.put("errorData", errorData);
+        return result;
+    }
+
+    private Map<String, Object> processDepartmentSubDepartmentUnitMapping(BufferedReader reader) throws IOException {
+        List<Map<String, Object>> successData = new ArrayList<>();
+        List<Map<String, Object>> errorData = new ArrayList<>();
+
+        String line;
+        int rowNum = 0;
+
+        String[] fieldNames = {"principalEmployer", "department", "subDepartment"};
+        Set<String> mandatoryFields = Set.of("principalEmployer", "department");
+
+        while ((line = reader.readLine()) != null) {
+            rowNum++;
+            line = line.replaceAll("[\\x00-\\x1F\\x7F]", ""); // Clean control characters
+
+            if (line.trim().isEmpty()) continue;
+
+            String[] rawFields = line.split(",", -1);
+            String[] fields = new String[rawFields.length];
+            for (int i = 0; i < rawFields.length; i++) {
+                fields[i] = rawFields[i].trim().replaceAll("\"", "");
+            }
+
+            Map<String, String> fieldErrors = new LinkedHashMap<>();
+
+            if (fields.length < 3) {
+                errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
+                continue;
+            }
+
+            for (int i = 0; i < fieldNames.length; i++) {
+                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
+                    fieldErrors.put(fieldNames[i], "is mandatory");
+                }
+            }
+
+            if (!fieldErrors.isEmpty()) {
+                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
+                continue;
+            }
+
+            try {
+                String principalEmployer = fields[0];
+                String department = fields[1];
+                String subDepartment = (fields.length > 2 && !fields[2].isBlank()) ? fields[2] : null;
+
+                // Get unitId from plant code
+                Integer unitId = fileUploadDao.getUnitIdByName(principalEmployer);
+                if (unitId == null) {
+                    errorData.add(Map.of("row", rowNum, "error", "PlantCode '" + principalEmployer + "' not found"));
+                    continue;
+                }
+
+                // Check or insert department
+                Integer departmentId = fileUploadDao.getGeneralMasterId("Department", department);
+                if (departmentId == null || departmentId == 0) {
+                	departmentId = fileUploadDao.insertGeneralMaster("Department", department);
+                }
+
+                // Check or insert subDepartment
+                Integer subDepartmentId = 0; // default
+                if (subDepartment != null) {
+                    subDepartmentId = fileUploadDao.getGeneralMasterId("Area", subDepartment);
+                    if (subDepartmentId == null || subDepartmentId == 0) {
+                        subDepartmentId = fileUploadDao.insertGeneralMaster("Area", subDepartment);
+                    }
+                }
+
+                // Check if mapping exists
+                boolean mappingExists = deptMapDao.trioexistsMapping(unitId, departmentId,subDepartmentId);
+                if (mappingExists) {
+                    errorData.add(Map.of("row", rowNum, "error", "Mapping already exists for '" +department+"' and '"+subDepartment+"' with "+principalEmployer));
+                    continue;
+                }
+
+             // ✅ Additional check: Only PlantCode + Department (ignore subDepartment)
+                boolean deptOnlyExists = deptMapDao.existsMapping(unitId, departmentId);
+                if (deptOnlyExists && subDepartment == null) {
+                    errorData.add(Map.of("row", rowNum, "error",
+                            "Mapping already exists for PlantCode '" + principalEmployer + "' and Department '" + department + "' (without SubDepartment)"));
+                    continue;
+                }
+                
+                // Insert mapping
+                fileUploadDao.insertUnitDepartmentSubDepartmentMapping(unitId, departmentId, subDepartmentId);
+
+                // ✅ Add success record (like PrincipalEmployer)
+                Map<String, Object> success = new LinkedHashMap<>();
+                success.put("row", rowNum);
+                success.put("plantCode", principalEmployer);
+                success.put("department", department);
+                success.put("subDepartment", subDepartment);
+                //success.put("message", "Mapping inserted successfully");
+
+                successData.add(success);
+
+            } catch (Exception e) {
+                errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("successData", successData);
+        result.put("errorData", errorData);
+        return result;
+    }
 
 
     private Map<String, Object> processGeneralMaster(BufferedReader reader) throws IOException {
@@ -957,54 +1179,74 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer eicId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
             Integer LLNumber = fileUploadDao.getLlNumber(fields[38],unitId,contractorId);
 
+          
+            	Integer trade = !fields[4].isBlank()&& unitId != null ? fileUploadDao.getTradeIdByUnitId(unitId,fields[4]) : null;
+                if (!fields[4].isBlank() && trade == null) fieldErrors.put("trade", "Mapping not Found for Trade with Principal Employeer");
 
-            Integer trade = !fields[4].isBlank()&& unitId != null ? fileUploadDao.getTradeIdByUnitId(unitId,fields[4]) : null;
-            if (!fields[4].isBlank() && trade == null) fieldErrors.put("trade", "Mapping not Found for Trade with Principal Employee");
+                Integer skill = !fields[5].isBlank() && unitId != null && tradeId != null? fileUploadDao.getSkillIdByTradeId(unitId,tradeId,fields[5]) : null;
+                if (!fields[5].isBlank() && skill == null) fieldErrors.put("trade", "Mapping not Found for trade with Principal Employeer");
 
-            Integer skill = !fields[5].isBlank() && unitId != null && tradeId != null? fileUploadDao.getSkillIdByTradeId(unitId,tradeId,fields[5]) : null;
-            if (!fields[5].isBlank() && skill == null) fieldErrors.put("skill", "Mapping not Found for Skill with Principal Employee");
+                Integer department = !fields[12].isBlank()&& unitId != null ? fileUploadDao.getdepartmentIdByUnitId(unitId,fields[12]) : null;
+                if (!fields[12].isBlank() && department == null) fieldErrors.put("department", "Mapping not Found for Department with Principal Employeer");
+                
+                Integer area = !fields[13].isBlank()&& unitId != null&& departmentId != null ? fileUploadDao.getAreaByDeptID(unitId,departmentId,fields[13]) : null;
+                if (!fields[13].isBlank() && area == null) fieldErrors.put("department", "Mapping not Found for Department with Principal Employeer");
+             
+                Integer ll = (!fields[38].isBlank() && unitId != null && contractorId != null)
+                        ? fileUploadDao.getLlNumber(fields[38], unitId, contractorId)
+                        : null;
+                    if (!fields[38].isBlank() && ll == null) fieldErrors.put("LL", "Invalid or not found");
 
-            Integer department = !fields[12].isBlank()&& unitId != null ? fileUploadDao.getdepartmentIdByUnitId(unitId,fields[12]) : null;
-            if (!fields[12].isBlank() && department == null) fieldErrors.put("department", "Mapping not Found for Department with Principal Employee");
+                Integer eic = (!fields[12].isBlank() && unitId != null && !fields[31].isBlank())
+                    ? fileUploadDao.geteicId(fields[12], unitId, fields[31])
+                    : null;
+                if (!fields[31].isBlank() && eic == null) fieldErrors.put("EIC", "Invalid or not found");
+
+                Integer workorder = (!fields[14].isBlank() && unitId != null && contractorId != null)
+                        ? fileUploadDao.getWorkorderId(fields[14], unitId, contractorId)
+                        : null;
+                    if (!fields[14].isBlank() && workorder == null) fieldErrors.put("workorder", "Invalid or not found");
+
+                Integer wcec = (!fields[32].isBlank() && unitId != null && contractorId != null)
+                        ? fileUploadDao.getWCECId(fields[32], unitId, contractorId)
+                        : null;
+                    if (!fields[32].isBlank() && wcec == null) fieldErrors.put("WCEC", "Invalid or not found");
+
+                    Integer academic = !fields[18].isBlank() ? fileUploadDao.getGeneralMasterId(fields[18]) : null;
+                    if (!fields[18].isBlank() && academic == null) fieldErrors.put("academic", "Invalid or not found");
+                    
+                    Integer bloodgroup = !fields[19].isBlank() ? fileUploadDao.getGeneralMasterId(fields[19]) : null;
+                    if (!fields[19].isBlank() && bloodgroup == null) fieldErrors.put("bloodgroup", "Invalid or not found");
+
+                    Integer gender = !fields[10].isBlank() ? fileUploadDao.getGeneralMasterId(fields[10]) : null;
+                    if (!fields[10].isBlank() && gender == null) fieldErrors.put("gender", "Invalid or not found");
+
+                    Integer accessArea = !fields[27].isBlank() ? fileUploadDao.getGeneralMasterId(fields[27]) : null;
+                    if (!fields[27].isBlank() && accessArea == null) fieldErrors.put("accessArea", "Invalid or not found");
+
+                    Integer zone = !fields[40].isBlank() ? fileUploadDao.getGeneralMasterId(fields[40]) : null;
+                    if (!fields[40].isBlank() && zone == null) fieldErrors.put("zone", "Invalid or not found");
+        
+
+           
             
-            Integer area = !fields[13].isBlank()&& unitId != null&& departmentId != null ? fileUploadDao.getAreaByDeptID(unitId,departmentId,fields[13]) : null;
-            if (!fields[13].isBlank() && area == null) fieldErrors.put("area", "Mapping not Found for Area with Principal Employee");
+            /*	Integer academic = !fields[18].isBlank() ? fileUploadDao.getGeneralMasterId(fields[18]) : null;
+                if (!fields[18].isBlank() && academic == null) fieldErrors.put("academic", "Invalid or not found");
+                
+                Integer bloodgroup = !fields[19].isBlank() ? fileUploadDao.getGeneralMasterId(fields[19]) : null;
+                if (!fields[19].isBlank() && bloodgroup == null) fieldErrors.put("bloodgroup", "Invalid or not found");
 
-            Integer academic = !fields[18].isBlank() ? fileUploadDao.getGeneralMasterId(fields[18]) : null;
-            if (!fields[18].isBlank() && academic == null) fieldErrors.put("academic", "Invalid or not found");
+                Integer gender = !fields[10].isBlank() ? fileUploadDao.getGeneralMasterId(fields[10]) : null;
+                if (!fields[10].isBlank() && gender == null) fieldErrors.put("gender", "Invalid or not found");
+
+                Integer accessArea = !fields[27].isBlank() ? fileUploadDao.getGeneralMasterId(fields[27]) : null;
+                if (!fields[27].isBlank() && accessArea == null) fieldErrors.put("accessArea", "Invalid or not found");
+
+                Integer zone = !fields[40].isBlank() ? fileUploadDao.getGeneralMasterId(fields[40]) : null;
+                if (!fields[40].isBlank() && zone == null) fieldErrors.put("zone", "Invalid or not found");
+   
+            */
             
-            Integer bloodgroup = !fields[19].isBlank() ? fileUploadDao.getGeneralMasterId(fields[19]) : null;
-            if (!fields[19].isBlank() && bloodgroup == null) fieldErrors.put("bloodgroup", "Invalid or not found");
-
-            Integer gender = !fields[10].isBlank() ? fileUploadDao.getGeneralMasterId(fields[10]) : null;
-            if (!fields[10].isBlank() && gender == null) fieldErrors.put("gender", "Invalid or not found");
-
-            Integer accessArea = !fields[27].isBlank() ? fileUploadDao.getGeneralMasterId(fields[27]) : null;
-            if (!fields[27].isBlank() && accessArea == null) fieldErrors.put("accessArea", "Invalid or not found");
-
-            Integer zone = !fields[40].isBlank() ? fileUploadDao.getGeneralMasterId(fields[40]) : null;
-            if (!fields[40].isBlank() && zone == null) fieldErrors.put("zone", "Invalid or not found");
-
-            Integer ll = (!fields[38].isBlank() && unitId != null && contractorId != null)
-                    ? fileUploadDao.getLlNumber(fields[38], unitId, contractorId)
-                    : null;
-                if (!fields[38].isBlank() && ll == null) fieldErrors.put("EIC", "Invalid or not found");
-
-            Integer eic = (!fields[12].isBlank() && unitId != null && !fields[31].isBlank())
-                ? fileUploadDao.geteicId(fields[12], unitId, fields[31])
-                : null;
-            if (!fields[31].isBlank() && eic == null) fieldErrors.put("EIC", "Invalid or not found");
-
-            Integer workorder = (!fields[14].isBlank() && unitId != null && contractorId != null)
-                    ? fileUploadDao.getWorkorderId(fields[14], unitId, contractorId)
-                    : null;
-                if (!fields[14].isBlank() && workorder == null) fieldErrors.put("workorder", "Invalid or not found");
-
-            Integer wcec = (!fields[32].isBlank() && unitId != null && contractorId != null)
-                    ? fileUploadDao.getWCECId(fields[32], unitId, contractorId)
-                    : null;
-                if (!fields[32].isBlank() && wcec == null) fieldErrors.put("WCEC", "Invalid or not found");
-
             if (!fieldErrors.isEmpty()) {
                 errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;

@@ -196,7 +196,7 @@ function toggleSelectAllGMTYPE() {
        <c:if test="${UserPermission.exportRights eq 1 }">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="ContrExportToCSV()">Export</button>
     	</c:if>
-
+ <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedTradeMappings()">Delete</button>
     </div>
 </div>
 
@@ -227,24 +227,17 @@ function toggleSelectAllGMTYPE() {
         </thead>
         <tbody>
 				<c:forEach items="${wbudata}" var="wo">
-					<tr>
-						<td ><input type="checkbox"
-							name="selectedWOs" value="${wo.principalEmployer}"></td>
+				<tr>
+					<td >
+						<input type="checkbox"name="selectedWOs" >
+					    <input type="hidden" class="principalEmployerId" value="${wo.principalEmployerId}">
+                        <input type="hidden" class="tradeId" value="${wo.tradeId}">
+                        <input type="hidden" class="skillId" value="${wo.skillId}">
+                      </td>
 						<td  >${wo.principalEmployer}</td>
-						<%-- <td  >${wo.principalEmployer}</td> --%>
-						<%-- <td  >${wo.gatepassid}</td> --%>
 						<td  >${wo.trade}</td>
 						<td  >${wo.skill}</td>
-						<%-- <td  >${wo.gender}</td>
-						<td  >${wo.dateOfBirth}</td>
-						<td  >${wo.aadhaarNumber}</td>
-						<td  >${wo.vendorCode}</td>
-						<td  >${wo.unitCode}</td>
-						 <td  >${wo.recordstatus}</td> --%>
-						<%-- <td  >${wo.gatepassstatus}</td> --%> 
-						<%--<td  >${principalEmployer.NAME}</td>
-                    <td  >${${wo.requestType}}</td> --%>
-					</tr>
+				</tr>
 				</c:forEach>
 			</tbody>
 
