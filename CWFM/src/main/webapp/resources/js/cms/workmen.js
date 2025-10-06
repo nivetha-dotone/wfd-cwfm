@@ -1234,52 +1234,95 @@ function downloadDoc(transactionId, userId, docType) {
 
 
 
+//let divIndex = 0;
 
-     function additionalDocUpload(){
-      
-         var currentCount = $(".document-field").length;
-         if (currentCount < 7) {
-           divIndex++;
-        $("#additionalDoc").append(`
-    <div class="document-field" id="document-field-${divIndex}" style="display: flex; align-items: center; margin-bottom: 10px;">
-        <select name="documentType" style="margin-right: 10px;color:black;">
-            <option value="">Select Document Type</option>
-            <option value="Bank">Bank</option>
-            <option value="Id2">Id2</option>
-            <option value="Other">Other</option>
-            <option value="Medical">Medical</option>
-            <option value="Education">Education</option>
-            <option value="Training">Training</option>
-            <option value="Form11">Form11</option>
-        </select>
-        <input type="file" accept="application/pdf" style="margin-right: 10px;" onchange="displayFileName(this, 'fileName-${divIndex}')">
-        <span id="fileName-${divIndex}" style="margin-right: 10px;color:black;"></span>
-        <button type="button" onclick="removeDocument(${divIndex})" style="color:black;">Remove</button>
-    </div>
-`);
-
-    } else {
+function additionalDocUpload() {
+    const currentCount = $(".document-field").length;
+    if (currentCount >= 7) {
         alert("You can add a maximum of 7 additional documents.");
+        return;
     }
-}
-    function removeDocument(index) {
-        // Remove the document field
-        $(`#document-field-${index}`).remove();
-    }
-   
 
+    divIndex++;
+
+    const docOptions = [
+        "Bank", "Id2", "Other", "Medical",
+        "Education", "Training", "Form11"
+    ];
+
+    // Generate options dynamically while avoiding already selected ones
+    const selectedValues = $(".document-field select").map(function () {
+        return $(this).val();
+    }).get();
+
+    let optionsHtml = '<option value="">Select Document Type</option>';
+    docOptions.forEach(function (opt) {
+        if (!selectedValues.includes(opt)) {
+            optionsHtml += '<option value="' + opt + '">' + opt + '</option>';
+        }
+    });
+
+    // Unique IDs for the new row
+    const fileNameId = 'fileName-' + divIndex;
+
+    const newField = `
+        <div class="document-field" id="document-field-${divIndex}" style="display: flex; align-items: center; margin-bottom: 10px;">
+            <select name="documentType" onchange="updateDocTypeDropdowns()" style="margin-right: 10px;color:black;">
+                ${optionsHtml}
+            </select>
+            <input type="file" accept="application/pdf" style="margin-right: 10px;" onchange="displayFileName(this, '${fileNameId}')">
+            <span id="${fileNameId}" style="margin-right: 10px;color:black;"></span>
+            <button type="button" onclick="removeDocument(${divIndex})" style="color:black;">Remove</button>
+        </div>
+    `;
+
+    $("#additionalDoc").append(newField);
+    updateDocTypeDropdowns(); // Refresh all dropdowns to disable already-selected options
+}
+
+function removeDocument(index) {
+    $(`#document-field-${index}`).remove();
+    updateDocTypeDropdowns(); // Update dropdowns after removal
+}
 
 function displayFileName(inputElement, displayId) {
     const displayElement = document.getElementById(displayId);
-
-    // Get the selected file's name
     if (inputElement.files.length > 0) {
-        const fileName = inputElement.files[0].name;
-        displayElement.textContent = fileName; // Display the file name
+        displayElement.textContent = inputElement.files[0].name;
     } else {
-        displayElement.textContent = ''; // Clear the display if no file is selected
+        displayElement.textContent = '';
     }
 }
+
+function updateDocTypeDropdowns() {
+    const allOptions = [
+        "Bank", "Id2", "Other", "Medical",
+        "Education", "Training", "Form11"
+    ];
+
+    const selectedValues = $(".document-field select").map(function () {
+        return $(this).val();
+    }).get();
+
+    $(".document-field select").each(function () {
+        const currentSelect = $(this);
+        const currentValue = currentSelect.val();
+
+        currentSelect.empty().append('<option value="">Select Document Type</option>');
+
+        allOptions.forEach(function (opt) {
+            const isDisabled = selectedValues.includes(opt) && opt !== currentValue;
+            const optionTag = $('<option>', {
+                value: opt,
+                text: opt,
+                disabled: isDisabled,
+                selected: opt === currentValue
+            });
+            currentSelect.append(optionTag);
+        });
+    });
+}
+
 
 function displayFileName1(inputId, displayId) {
     const fileInput = document.getElementById(inputId);
@@ -2961,7 +3004,7 @@ function formatToTwoDecimalPlaces(input) {
   }
 }
 function redirectToWorkmenQuickAdd() {
-
+console.log("redirectToWorkmenQuickAdd called");
     // Fetch the content of add.jsp using AJAX
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {

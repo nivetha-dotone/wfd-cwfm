@@ -316,3 +316,37 @@ function saveWorkflow() {
         }
     });
 }
+
+ function overrideActionsBasedOnModule() {
+	    const moduleDropdown = document.getElementById("module");
+	    const actionDropdown = document.getElementById("actionDropdown");
+
+	    const selectedModuleName = moduleDropdown.options[moduleDropdown.selectedIndex].text.trim();
+
+	    // Define manual override actions
+	    const moduleActionsMap = {
+	        "Workmen Onboarding": [
+	            "CREATE", "BLOCK", "UNBLOCK", "BLACKLIST",
+	            "DEBLACKLIST", "LOST DAMAGE", "RENEW", "CANCEL"
+	        ],
+	        "Contractor": ["Contractor Registration"],
+	        "Bill Verification": ["Bill Creation"]
+	    };
+
+	    // Clear and reset action dropdown in all cases
+	    actionDropdown.innerHTML = '<option value="">Please select Action</option>';
+
+	    // If a valid module is selected and it exists in the map, populate actions
+	    if (selectedModuleName && moduleActionsMap[selectedModuleName]) {
+	        const actions = moduleActionsMap[selectedModuleName];
+
+	        actions.forEach(action => {
+	            const option = document.createElement("option");
+	            option.value = action;
+	            option.text = action;
+	            actionDropdown.appendChild(option);
+	        });
+	    }
+
+	    // If no module is selected, the action dropdown remains empty (just the default option)
+	}

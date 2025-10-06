@@ -235,6 +235,42 @@
     
     </style>
   <script src="resources/js/cms/workflow.js"></script>
+ <!--  <script>
+  function overrideActionsBasedOnModule() {
+	    const moduleDropdown = document.getElementById("module");
+	    const actionDropdown = document.getElementById("actionDropdown");
+
+	    const selectedModuleName = moduleDropdown.options[moduleDropdown.selectedIndex].text.trim();
+
+	    // Define manual override actions
+	    const moduleActionsMap = {
+	        "Workmen Onboarding": [
+	            "CREATE", "BLOCK", "UNBLOCK", "BLACKLIST",
+	            "DEBLACKLIST", "LOST DAMAGE", "RENEW", "CANCEL"
+	        ],
+	        "Contractor": ["Contractor Registration"],
+	        "Bill Verification": ["Bill Creation"]
+	    };
+
+	    // Clear and reset action dropdown in all cases
+	    actionDropdown.innerHTML = '<option value="">Please select Action</option>';
+
+	    // If a valid module is selected and it exists in the map, populate actions
+	    if (selectedModuleName && moduleActionsMap[selectedModuleName]) {
+	        const actions = moduleActionsMap[selectedModuleName];
+
+	        actions.forEach(action => {
+	            const option = document.createElement("option");
+	            option.value = action;
+	            option.text = action;
+	            actionDropdown.appendChild(option);
+	        });
+	    }
+
+	    // If no module is selected, the action dropdown remains empty (just the default option)
+	}
+
+  </script> -->
 </head>
 <body>
 
@@ -261,7 +297,7 @@
        
 
         <label for="masterValue" style="color: darkcyan;">Module:</label>
-         <select class="custom-select" id="module" name="moduleId"  required style="color:gray;padding:3px;">
+         <select class="custom-select" id="module" name="moduleId"  onchange="overrideActionsBasedOnModule()" required style="color:gray;padding:3px;">
                                 <option value="">Please select Module</option>
 								<c:forEach var="pe" items="${Modules}">
                 					<option value="${pe.gmId}">${pe.gmName}</option>
@@ -270,9 +306,9 @@
                                 <label for="masterValue" style="color: darkcyan;">Action:</label>
                                   <select class="custom-select" name="action" id="actionDropdown" onchange="onModuleChange()"  required style="color:gray;padding:3px;">
                         <option value="">Please select Action</option>
-                        <c:forEach var="pe" items="${Actions}">
+                        <%-- <c:forEach var="pe" items="${Actions}">
                             <option value="${pe.gmId}">${pe.gmName}</option>
-                        </c:forEach>
+                        </c:forEach> --%>
                     </select>
 
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Export</button>

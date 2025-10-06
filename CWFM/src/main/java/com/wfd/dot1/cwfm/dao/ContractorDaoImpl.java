@@ -279,6 +279,11 @@ public class ContractorDaoImpl implements ContractorDao{
         		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?)";
 
            status  = jdbcTemplate.update(query, parameters);
+           if (status > 0) {
+               // ✅ Call saveContractorPemm method after successful registration save
+               saveContractorPemm(contreg);
+           }
+
            return contreg.getContractorregId();
         } catch (Exception e) {
         	e.printStackTrace();
@@ -286,6 +291,33 @@ public class ContractorDaoImpl implements ContractorDao{
     return null;
 	}
 	
+	
+	public void saveContractorPemm(ContractorRegistration contreg) {
+	    String sql = "INSERT INTO CMSCONTRPEMM(CONTRACTORID, UNITID, MANAGERNM, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, PERIODSTARTDT, PERIODENDDT,PFAPPLYDT) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	    try {
+	        jdbcTemplate.update(sql,
+	           
+	            contreg.getContractorId(),
+	            contreg.getPrincipalEmployer(),
+	            contreg.getManagerName(),
+	            contreg.getTotalStrength() != null ? Integer.parseInt(contreg.getTotalStrength()) : null,
+	    	    contreg.getRcMaxEmp() != null ? Integer.parseInt(contreg.getRcMaxEmp()) : null,
+	    	    contreg.getNatureOfWork(),
+	    		contreg.getLocofWork(),
+	    	    contreg.getPfNum(),
+	    	    contreg.getRcVerified() != null && 
+                (contreg.getRcVerified().equalsIgnoreCase("Y") || contreg.getRcVerified().equalsIgnoreCase("YES"))
+                ? "Y" : "N",
+	    		//contreg.getContractType(),
+	    	    contreg.getContractFrom() != null ? java.sql.Date.valueOf(contreg.getContractFrom()) : null,
+	    		contreg.getContractTo() != null ? java.sql.Date.valueOf(contreg.getContractTo()) : null,
+	    		contreg.getPfApplyDate() != null ? java.sql.Date.valueOf(contreg.getPfApplyDate()) : null
+	        );
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
 	@Override
 	public List<ContractorRegistration> getContractorRegistrationList(String userId) {
 	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
@@ -687,7 +719,29 @@ public class ContractorDaoImpl implements ContractorDao{
 				return policies.size();
 			}
 		});
+		 saveContractorWC(policies, contreg);
 	}
+	public void saveContractorWC(List<ContractorRegistrationPolicy> policies, ContractorRegistration contreg) {
+	    String sql = "INSERT INTO CMSCONTRACTOR_WC (" +
+	            "[CONTRACTORID],[UNITID],[LICENCE_TYPE],[WC_CODE],[WC_TOTAL]," +
+	            "[WC_FROM_DTM],[WC_TO_DTM],[ATTACHMENTNM],[CREATED_DTM],[DELETE_SW]) " +
+	            "VALUES (?,?,?,?,?,?,?,?,GETDATE(),0)";
+
+	    for (ContractorRegistrationPolicy policy : policies) {
+	        jdbcTemplate.update(sql,
+	            contreg.getContractorId(),              // CONTRACTORID
+	            contreg.getPrincipalEmployer(),         // UNITID
+	            policy.getDocumentType(),               // LICENCE_TYPE
+	            policy.getDocumentNumber(),             // WC_CODE
+	            //policy.getNatureOfJob(),                // [NATURE_OF_ID],
+	            policy.getCoverage(),                   // WC_TOTAL
+	            policy.getValidFrom(),                  // WC_FROM_DTM
+	            policy.getValidTo(),                    // WC_TO_DTM
+	            policy.getFileName()                    // ATTACHMENTNM
+	        );
+	    }
+	}
+
 
 	 public String getAllWoByPeAndCont() {
 		    return QueryFileWatcher.getQuery("GET_WO_FOR_CONTRACTOR_REG");
