@@ -76,29 +76,29 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         Map<String, Object> savedData = new HashMap<>();
 
-        switch (templateType.toLowerCase()) {
-            case "generalmaster":
-                if (!headerLine.equalsIgnoreCase("GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY")) {
+        switch (templateType) {
+            case "Data-General Master":
+                if (!headerLine.equalsIgnoreCase("GMNAME,GMDESCRIPTION,GMTYPEID")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processGeneralMaster(reader);
                 break;
                 
-            case "tradeskillunitmapping":
+            case "Data-Trade Skill":
                 if (!headerLine.equalsIgnoreCase("PLANT CODE,TRADE,SKILL")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processTradeSkillUnitMapping(reader);
                 break;
                 
-            case "departmentareaunitmapping":
+            case "Data-Department Area":
                 if (!headerLine.equalsIgnoreCase("PLANT CODE,DEPARTMENT,SUBDEPARTMENT")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processDepartmentSubDepartmentUnitMapping(reader);
                 break;
                 
-            case "contractor":
+            case "Data-Contractor":
                 if (!headerLine.equalsIgnoreCase("CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,"
                         + "LICENCSE COVERAGE,TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
                         + "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,Mobile Number,ESI NUMBER,"
@@ -107,26 +107,26 @@ public class FileUploadServiceImpl implements FileUploadService {
                 }
                  savedData = processContractor(reader);
                 break;
-            case "workorder":
+            case "Data-Work Order":
                 if (!headerLine.equalsIgnoreCase("Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processWorkorder(reader);
                 break;
-            case "minimumwage":
+            case "Data-minimumwage":
                 if (!headerLine.equalsIgnoreCase("BASIC,DA,ALLOWANCE,FROMDATE")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 // savedData = saveMinimumWage(reader);
                 break;
-            case "principalemployer":
+            case "Data-Principal Employer":
                 if (!headerLine.equalsIgnoreCase("ORGANISATION,PLANTCODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAX CONTRACT WORKMEN,BOCWAPPLICABILITY,"
                         + "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                  savedData = processPrincipalEmployer(reader);
                 break;
-            case "workmenbulkupload":
+            case "Data-Workmen Bulk Upload":
                 if (!headerLine.equalsIgnoreCase("First Name*,Last Name*,Father's Name or Husband's Name*,Date of Birth*,Trade*,Skill*,Nature of Work*,Hazardous Area*,"
                 		+ "Aadhar/Id proof number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
                 		+ "Technical Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Name Branch,Account Number,"
@@ -136,7 +136,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 }
                 savedData = processworkmenbulkupload(reader);
                 break;
-            case "workmenbulkuploaddraft":
+            case "Data-Workmen Bulk Upload Draft":
                 if (!headerLine.equalsIgnoreCase("First Name,Last Name,Father's Name or Husband's Name,Date of Birth,Trade,Skill,Nature of Work,Hazardous Area,"
                 		+ "Aadhar/Id proof number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
                 		+ "Technical Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Name Branch,Account Number,"
@@ -368,8 +368,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
          String line;
          int rowNum = 0;
-         String[] fieldNames = {
-                 "gmName", "gmDescription", "gmTypeId", "isActive", "createdTM","updatedTM","updatedBy"};
+         String[] fieldNames = {"gmName", "gmDescription", "gmTypeId"};
                 
          Set<String> mandatoryFields = Set.of("gmName", "gmDescription", "gmTypeId");
 
@@ -387,7 +386,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
                  Map<String, String> fieldErrors = new LinkedHashMap<>();
 
-                 if (fields.length < 7) {
+                 if (fields.length < 3) {
                      errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
                      continue;
                  }
@@ -420,10 +419,6 @@ public class FileUploadServiceImpl implements FileUploadService {
                 	 gm.setGmName(gmName);
                 	 gm.setGmDescription(gmDescription);
                 	 gm.setGmTypeId(Integer.parseInt((fields[2])));
-                	 boolean isActive = "1".equals(fields[3].trim());
-                	 gm.setCreatedTM(fields[4]);
-                	 gm.setUpdatedTM(fields[5]);
-                	 gm.setUpdatedBy(fields[6]);
                 	 
                     fileUploadDao.saveGeneralMaster(gm);
 
@@ -432,10 +427,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             map.put("gmName", gm.getGmName());
             map.put("gmDescription", gm.getGmDescription());
             map.put("gmTypeId", gm.getGmTypeId());
-            map.put("isActive", gm.isActive());
-            map.put("createdTM", gm.getCreatedTM());
-            map.put("updatedTM", gm.getUpdatedTM());
-            map.put("updatedBy", gm.getUpdatedBy());
             
             successData.add(map);
 

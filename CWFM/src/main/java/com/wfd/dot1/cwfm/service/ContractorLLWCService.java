@@ -9,9 +9,12 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.wfd.dot1.cwfm.dao.BillVerificationDao;
+import com.wfd.dot1.cwfm.dao.ContractorDao;
 import com.wfd.dot1.cwfm.dao.ContractorRegistrationLLWCDAO;
 import com.wfd.dot1.cwfm.dao.WorkorderDao;
 import com.wfd.dot1.cwfm.dto.WorkOrderInfoDTO;
+import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 
@@ -23,6 +26,11 @@ public class ContractorLLWCService {
 
     @Autowired
     private WorkorderDao workOrderDAO;
+    
+    @Autowired
+	 BillVerificationDao billDao;
+    @Autowired
+	ContractorDao contrDao;
 
     public void saveLLWCRecords(WorkOrderInfoDTO dto, String createdBy) {
         List<String> selectedWOsRaw = dto.getSelectedWOs();
@@ -76,6 +84,27 @@ public class ContractorLLWCService {
             llwcDAO.insertLLWCRecords(recordsToInsert);
             //
         }
-    }
+        // ✅ Step 2: Check if this is AUTO workflow → directly insert into CMSWORKORDER_LLWC
+        try {
+            int workFlowTypeId = billDao.getWorkflowType("CONTRACTOR RENEWAL",String.valueOf(dto.getUnitId())); // depends on your DTO field name
+
+            if (workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+                System.out.println("AUTO approver detected → inserting work order into CMSWORKORDER_LLWC");
+
+                contrDao.insertWorkOrderLLWC(
+                		String.valueOf(dto.getContractorRegId()),
+                        dto.getContractorId(),
+                        dto.getUnitId(),
+                        createdBy != null ? createdBy : "SYSTEM"
+                );
+
+                System.out.println("✅ WorkOrder inserted successfully for AUTO approval");
+            }
+        }catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("⚠️ Failed to auto-insert work order LLWC: " + e.getMessage());
+            }
+        }
+    
 }
 

@@ -325,12 +325,12 @@ function saveWorkflow() {
 
 	    // Define manual override actions
 	    const moduleActionsMap = {
-	        "Workmen Onboarding": [
+	        "WORKMEN ONBOARDING": [
 	            "CREATE", "BLOCK", "UNBLOCK", "BLACKLIST",
-	            "DEBLACKLIST", "LOST DAMAGE", "RENEW", "CANCEL"
+	            "DEBLACKLIST", "LOSTORDAMAGE", "RENEW", "CANCEL"
 	        ],
-	        "Contractor": ["Contractor Registration"],
-	        "Bill Verification": ["Bill Creation"]
+	        "CONTRACTOR RENEWAL": ["CONTRACTOR RENEWAL"],
+	        "BILL VERIFICATION": ["Bill Creation"]
 	    };
 
 	    // Clear and reset action dropdown in all cases

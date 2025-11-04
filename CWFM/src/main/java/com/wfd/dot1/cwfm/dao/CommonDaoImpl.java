@@ -850,5 +850,13 @@ public class CommonDaoImpl implements CommonDao {
 			return null;
 		}
 		
-	    
+		public List<CmsGeneralMaster> getImportOptionsByRole(String roleId) {
+		    String sql = "select cgm.GMNAME from CMSGENERALMASTER cgm join CMSROLERIGHTS crr on crr.PAGE_ID=cgm.GMID where crr.ROLE_ID=? and cgm.GMNAME like 'data%' and crr.DELETED_FLAG=0";
+
+		    return jdbcTemplate.query(sql, new Object[]{roleId}, (rs, rowNum) -> {
+		        CmsGeneralMaster gm = new CmsGeneralMaster();
+		        gm.setGmName(rs.getString("GMNAME"));
+		        return gm;
+		    });
+}
 }

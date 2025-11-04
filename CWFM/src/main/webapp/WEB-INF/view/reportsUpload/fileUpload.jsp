@@ -1,9 +1,10 @@
 <%@ page import="com.wfd.dot1.cwfm.pojo.MasterUser" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.wfd.dot1.cwfm.pojo.CmsGeneralMaster" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -287,25 +288,16 @@ background-color: #DDF3FF; /* Light green for the table header */
         <!-- Import & Export Buttons -->
     <!-- <button id="importBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="background-color: #007bff; color: white; border-radius: 5px;">Import</button> -->
     <!-- <button id="exportBtn"class="btn btn-default process-footer-button-cancel ng-binding" style="border: 1px solid #007bff; color: #007bff; border-radius: 5px;">Export</button> -->
-
     <br><br>
         <h4 style="color:grey;">Select a template to import data</h2>
-        <select id="templateType" name="templateType" onchange="fetchTemplateOptions()" style="width: 100%; height: 45px;color:gray;" >
-                <option value=""style="color:gray;">Template</option>
-                <% if (user != null && !"Contractor".equals(roleName)) { %>
-                <option value="generalMaster"style="color:gray;">Data-General Master</option>
-              <!--  <option value="minimumWage"style="color:gray;">Data-Minimum Wage</option> -->
-                <option value="principalEmployer"style="color:gray;">Data-Principal Employer</option>
-                <option value="contractor"style="color:gray;">Data-Contractor</option>
-                 <option value="workorder"style="color:gray;">Data-Workorder</option> 
-                 <option value="workmenbulkupload"style="color:gray;">Data-Workmen Bulk Upload</option>
-                 <option value="tradeskillunitmapping"style="color:gray;">Data-Trade Skill Mapping</option>
-                 <option value="departmentareaunitmapping"style="color:gray;">Data-Department Area Mapping</option>
-                   <% } %>
-                  <% if (user != null && "Contractor".equals(roleName)) { %>
-                 <option value="workmenbulkuploaddraft"style="color:gray;">Data-Workmen Bulk Upload Draft</option>
-                 <% } %>
-              </select>
+    <select id="templateType" name="templateType" onchange="fetchTemplateOptions()" 
+        style="width: 100%; height: 45px; color: gray;">
+    <option value="">Template</option>
+    <c:forEach var="item" items="${ImportOptions}">
+        <option value="${item.gmName}" style="color:gray;">${item.gmName}</option>
+        
+    </c:forEach>
+</select>
               <a href="#" onclick="fetchTemplateInfo()"id="templateinfo">Template Information</a><br><br>
               <a href="#" onclick="viewTemplateInfo()" id="viewtemplate">View Template</a><br><br>
                <a href="#" onclick="downloadTemplateInfo()">Download Template</a>

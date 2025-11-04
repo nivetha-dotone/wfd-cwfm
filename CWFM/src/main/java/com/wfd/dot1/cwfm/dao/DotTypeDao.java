@@ -6,5 +6,7 @@ public interface DotTypeDao {
 
 	    Long findBuidByUnitId(Long principalEmployerId);
 	    void insertWorkflowType(Long businessTypeId, int workflowType, String createdBy);
+	    
+	    Integer   getSelectedDotType(Long principalEmployerId, Long businessTypeId);
 		
 }

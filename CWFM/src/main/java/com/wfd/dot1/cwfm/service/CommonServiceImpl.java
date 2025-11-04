@@ -283,5 +283,8 @@ public class CommonServiceImpl implements CommonService {
 	public CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription) {
 		return commonDAO.hasPageActionPermissionForRole(roleId, pageDescription);
 	}
-	
+	@Override
+	public List<CmsGeneralMaster> getImportOptionsByRole(String roleId) {
+	    return commonDAO.getImportOptionsByRole(roleId);
+	}
 }

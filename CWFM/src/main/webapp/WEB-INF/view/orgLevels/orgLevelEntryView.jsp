@@ -14,9 +14,9 @@
     <script src="resources/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> 
     <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/commonjs.js"></script>  
- <script src="resources/js/dottype.js"></script> -->
-    <script src="resources/js/cms/dottype.js"></script>
+    <script src="resources/js/commonjs.js"></script>  -->
+
+    
        <style>
  
  
@@ -114,7 +114,7 @@
         justify-content: space-between; /* Distribute space between search and buttons */
         padding: 8px; /* Adjust padding */
         background-color: #FFFFFF; /* White background */
-        border-bottom: 1px solid #ccc; /* Subtle border for separation */
+       /*  border-bottom: 1px solid #ccc; /* Subtle border for separation */ */
     }
 
     .page-header > div {
@@ -193,38 +193,24 @@
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
 <div>
-<label for="orgLevelDefId">Org Level:</label>
-<select id="orgLevelDefId" name="orgLevelDefId" onchange="loadOrgLevelEntries()">
+<label for="orgLevelDefId" style=" color: darkcyan;">Org Level Entry:</label>
+<!-- <label for="orgLevelDefId">Select Organization Level:</label> -->
+<select id="orgLevelDefId" name="orgLevelDefId" onchange="navigateToOrgLevel()">
     <option value="">Select Org Level</option>
     <c:forEach items="${orgLevels}" var="level">
-        <option value="${level.orgLevelDefId}">${level.name}</option>
+         <option value="${level.orgLevelDefId}" 
+            <c:if test="${level.orgLevelDefId == orgLevelDefId}">selected</c:if>>
+            ${level.name}
+        </option>
     </c:forEach>
 </select>
  <!-- <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportOrgLevelEntryCSV()">Export</button> -->
 </div>
 </div>
-<!-- Form for Adding/Editing Entries -->
-<h3 style=" color: darkcyan;">Add Entry</h3>
-<div>
-    <input type="hidden" name="orgLevelEntryId" id="orgLevelEntryId" value="0" />
-
-    <label for="entryName" style="color: darkcyan;">Entry Name:</label>
-<select id="entryName" name="entryName" style="padding:3px;">
-    <option value="">Select Entry Name</option>
-</select>
-
-<label for="description" style="color: darkcyan;">Description:</label>
-<!-- Description text field (read-only) -->
-<input type="text" id="description" name="description" readonly />
-
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgEntries()">Save</button>
-    <div id="formErrorMessage" class="error-message" style="display:none; color:red; font-weight:bold;"></div>
-</div>
-
 <hr/>
-<div id="entriesTableContainer">
+
 <!-- Table for displaying entries -->
-<%-- <table border="1" id="entriesTable">
+<table border="1" id="table-body">
     <thead>
         <tr>
         <td><input type="checkbox" id="selectAllGMMCheckbox" onchange="toggleSelectAllGMMaster()"></td> 
@@ -241,11 +227,11 @@
                     <tr id="row-${entry.orgLevelEntryId}">
                     <td><input type="checkbox"
 							name="selectedGMMaster" value="${entry.name}"></td>
-                        <td>${entry.orgLevelEntryId}</td>
+                       <%--  <td>${entry.orgLevelEntryId}</td> --%>
                         <td>${entry.name}</td>
                         <td>${entry.description}</td>
                         <td>
-                            <button onclick="editEntry(${entry.orgLevelEntryId}, '${entry.name}', '${entry.description}', ${param.orgLevelDefId})">Edit</button>
+                            <%-- <button onclick="editEntry(${entry.orgLevelEntryId}, '${entry.name}', '${entry.description}', ${param.orgLevelDefId})">Edit</button> --%>
                             <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteOrgLevelEntry(${entry.orgLevelEntryId}, ${orgLevelDefId})">Delete</button>
                         </td>
                     </tr>
@@ -254,7 +240,6 @@
            
         </c:choose>
     </tbody>
-</table> --%>
-</div>
+</table>
 </body>
 </html>

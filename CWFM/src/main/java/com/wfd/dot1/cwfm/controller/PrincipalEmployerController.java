@@ -41,6 +41,9 @@ import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Base64;
 
 @Controller
 @RequestMapping("/principalEmployer")
@@ -81,17 +84,40 @@ public class PrincipalEmployerController {
     }
 	
 	@GetMapping("/view/{id}")
-    public String getIndividualPEDetailByUnitId(@PathVariable("id") String id,HttpServletRequest request,HttpServletResponse response,Model model) {
-		PrincipalEmployer principalEmployer = peService.getIndividualPEDetailByUnitId(id);
-        request.setAttribute("principalEmployer", principalEmployer);
-        Map<String, List<PrincipalEmployerDocument>> docsByType = peService.getDocumentsGroupedByType(id);
-        List<KronosReport> docTypes = peService.getAllDocTypes();
+	public String getIndividualPEDetailByUnitId(@PathVariable("id") String id,
+	                                            HttpServletRequest request,
+	                                            HttpServletResponse response,
+	                                            Model model) {
+	    // 1️⃣ Fetch PE details
+	    PrincipalEmployer principalEmployer = peService.getIndividualPEDetailByUnitId(id);
+	    request.setAttribute("principalEmployer", principalEmployer);
 
-        //model.addAttribute("employerId", id);
-        model.addAttribute("docTypes", docTypes);
-        model.addAttribute("docsByType", docsByType);
-        return "principalEmployer/view";
-    }
+	    // 2️⃣ Get documents grouped by type
+	    Map<String, List<PrincipalEmployerDocument>> docsByType = peService.getDocumentsGroupedByType(id);
+
+	    // 3️⃣ Encode document IDs for masking
+	    for (List<PrincipalEmployerDocument> docList : docsByType.values()) {
+	        for (PrincipalEmployerDocument doc : docList) {
+	            if (doc.getId() != 0) {
+	                // Encode doc.id → Base64
+	                String encodedId = Base64.getUrlEncoder()
+	                        .encodeToString(String.valueOf(doc.getId()).getBytes(StandardCharsets.UTF_8));
+	                // Set a new field for JSP usage
+	                doc.setEncodedId(encodedId);
+	            }
+	        }
+	    }
+
+	    // 4️⃣ Get all document types
+	    List<KronosReport> docTypes = peService.getAllDocTypes();
+
+	    // 5️⃣ Add to model
+	    model.addAttribute("docTypes", docTypes);
+	    model.addAttribute("docsByType", docsByType);
+
+	    return "principalEmployer/view";
+	}
+
 	@GetMapping("/edit/{id}")
     public String editIndividualPEDetailByUnitId(@PathVariable("id") String id,HttpServletRequest request,HttpServletResponse response,Model model) {
 		PrincipalEmployer principalEmployer = peService.getIndividualPEDetailByUnitId(id);
@@ -142,9 +168,52 @@ public class PrincipalEmployerController {
     }
 	 
 
-	@GetMapping("/download/{docId}")
-	public void downloadFile(@PathVariable("docId") int docId, HttpServletResponse response) {
+	//@GetMapping("/download/{docId}")
+	//public void downloadFile(@PathVariable("docId") int docId, HttpServletResponse response) {
+	   // try {
+	     //   PrincipalEmployerDocument doc = peDao.getDocumentById(docId);
+	     //   if (doc == null || doc.getFilePath() == null) {
+	      //      response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+	     //       return;
+	    //    }
+
+	      //  File file = new File(doc.getFilePath());
+	      //  if (!file.exists()) {
+	      //      response.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist");
+	      //      return;
+	      //  }
+
+	        // Detect content type
+	       // String contentType = Files.probeContentType(file.toPath());
+	       // if (contentType == null) {
+	       //     contentType = "application/octet-stream"; // fallback
+	       // }
+
+	      //  response.setContentType(contentType);
+
+	        // Open inline in browser (do not set attachment)
+	     //   response.setHeader("Content-Disposition", "inline; filename=\"" + doc.getFileName() + "\"");
+
+	    //    Files.copy(file.toPath(), response.getOutputStream());
+	    //    response.getOutputStream().flush();
+	   // } catch (Exception e) {
+	    //    e.printStackTrace();
+	   //     try {
+	   //         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error opening file");
+	   //     } catch (IOException ignored) {}
+	 //   }
+	//}
+
+
+	    // ✅ Download masked link: /principalEmployer/download/{encodedId}
+	@GetMapping("/download/{encodedId}")
+	public void downloadFile(@PathVariable("encodedId") String encodedId, HttpServletResponse response) {
 	    try {
+	        // 🔒 Decode Base64 to get original docId
+	        String decoded = new String(Base64.getUrlDecoder().decode(encodedId), StandardCharsets.UTF_8);
+	        int docId = Integer.parseInt(decoded);
+
+	        // Fetch document details securely
 	        PrincipalEmployerDocument doc = peDao.getDocumentById(docId);
 	        if (doc == null || doc.getFilePath() == null) {
 	            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
@@ -157,19 +226,22 @@ public class PrincipalEmployerController {
 	            return;
 	        }
 
-	        // Detect content type
+	        // Detect file type
 	        String contentType = Files.probeContentType(file.toPath());
 	        if (contentType == null) {
-	            contentType = "application/octet-stream"; // fallback
+	            contentType = "application/octet-stream";
 	        }
 
+	        // Serve inline (viewable in browser)
 	        response.setContentType(contentType);
-
-	        // Open inline in browser (do not set attachment)
 	        response.setHeader("Content-Disposition", "inline; filename=\"" + doc.getFileName() + "\"");
 
 	        Files.copy(file.toPath(), response.getOutputStream());
 	        response.getOutputStream().flush();
+
+	    } catch (IllegalArgumentException e) {
+	        // Invalid Base64 string
+	        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        try {
@@ -178,7 +250,4 @@ public class PrincipalEmployerController {
 	    }
 	}
 
-
-
-
-}
+	}

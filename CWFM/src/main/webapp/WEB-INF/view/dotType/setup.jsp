@@ -265,7 +265,7 @@
                                 </select>
         
         <label for="masterName" style="color: darkcyan;">Business Type</label>
-         <select class="custom-select" id="businessType" name="businessTypeId" required>
+         <select class="custom-select" id="businessType" name="businessTypeId"   onchange="onBusinessTypeChange()" required>
                                 <option value="">Please select Business Type</option>
                                 </select>
        

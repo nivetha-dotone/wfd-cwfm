@@ -61,6 +61,9 @@ public class PrincipalEmployerDocument {
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
+	private String encodedId;
+	public String getEncodedId() { return encodedId; }
+	public void setEncodedId(String encodedId) { this.encodedId = encodedId; }
 
     // Getters and Setters
 }

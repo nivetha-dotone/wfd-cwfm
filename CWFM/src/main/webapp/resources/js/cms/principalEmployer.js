@@ -629,7 +629,12 @@ function savePeDocuments() {
 }
 
 
-function downloadFile(docId) {
+/*function downloadFile(docId) {
     const url = `/CWFM/principalEmployer/download/${docId}`;
     window.open(url, '_blank');
+}*/
+function downloadFile(encodedId) {
+    const url = `/CWFM/principalEmployer/download/${encodedId}`;
+    window.open(url, '_blank'); // Opens securely in a new tab
 }
+

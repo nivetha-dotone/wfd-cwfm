@@ -100,6 +100,8 @@ public interface ContractorDao {
 	boolean isLastApprover(String roleName);
 
 	boolean isLastApproverForParallel(String transactionId, String roleId);
+	
+	 void insertWorkOrderLLWC(String contractorRegId, String contractorId, String unitId, String createdBy);
 	   
 	}
 

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1158,6 +1159,43 @@ public boolean isLastApproverForParallel( String transactionId, String roleId) {
     log.info("Exit from isLastApproverForParallel method = " + status);
     return status;
 }
+@Override
+public void insertWorkOrderLLWC(String contractorRegId, String contractorId, String unitId, String createdBy) {
+    try {
+        // Step 1: Fetch all LLWC records for this contractorRegId
+        String fetchSql = "SELECT WONUMBER, WCCODE, LICENCETYPE FROM CMSCONTRACTORREGISTRATIONLLWC WHERE CONTRACTORREGID = ?";
+        List<Map<String, Object>> records = jdbcTemplate.queryForList(fetchSql, contractorRegId);
+
+        if (records == null || records.isEmpty()) {
+            System.out.println("⚠️ No LLWC records found for ContractorRegId: " + contractorRegId);
+            return;
+        }
+
+        // Step 2: Prepare insert SQL for CMSWORKORDER_LLWC
+        String insertSql = "INSERT INTO CMSWORKORDER_LLWC (WONUMBER, LICENSE_NUMBER, LICENSE_TYPE) VALUES (?, ?, ?)";
+
+        // Step 3: Loop through records and insert one by one
+        for (Map<String, Object> record : records) {
+            try {
+                String woNumber = (String) record.get("WONUMBER");
+                String licenseNum = (String) record.get("WCCODE");
+                String licenseType = (String) record.get("LICENCETYPE");
+
+                jdbcTemplate.update(insertSql, woNumber, licenseNum, licenseType);
+                System.out.println("✅ Inserted record: WO=" + woNumber + ", License=" + licenseNum + ", Type=" + licenseType);
+            } catch (Exception innerEx) {
+                System.err.println("⚠️ Skipped one record due to error: " + innerEx.getMessage());
+            }
+        }
+
+        System.out.println("✅ All eligible records inserted into CMSWORKORDER_LLWC for ContractorRegId: " + contractorRegId);
+
+    } catch (Exception e) {
+        System.err.println("❌ Error in insertWorkOrderLLWC: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
 
 }
 

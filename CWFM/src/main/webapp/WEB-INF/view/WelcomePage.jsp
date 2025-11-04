@@ -1761,6 +1761,9 @@ function updateSidebar(sections, selectedRole) {
 
     console.log("Updating sidebar for role:", selectedRole);
 
+    // ✅ Sort sections alphabetically (case-insensitive)
+    sections.sort((a, b) => a.sectionName.localeCompare(b.sectionName, undefined, { sensitivity: 'base' }));
+
     sections.forEach(section => {
         if (!section.sectionId) {
             console.error("Skipping section with missing ID:", section);
@@ -1777,16 +1780,13 @@ function updateSidebar(sections, selectedRole) {
 
         // Section icon
         const icon = document.createElement('i');
-if (section.sectionIcon) {
-    section.sectionIcon.split(' ').forEach(cls => icon.classList.add(cls.trim())); 
-} else {
-    icon.classList.add('fa', 'fa-cog'); // Default icon if not found
-}
-icon.classList.add('nav-icon'); // Ensures additional class is applied
+        if (section.sectionIcon) {
+            section.sectionIcon.split(' ').forEach(cls => icon.classList.add(cls.trim()));
+        } else {
+            icon.classList.add('fa', 'fa-cog'); // Default icon
+        }
+        icon.classList.add('nav-icon');
         sectionLink.appendChild(icon);
-       /*  const icon = document.createElement('i');
-        icon.classList.add('fa', 'fa-cog', 'nav-icon');
-        sectionLink.appendChild(icon); */
 
         // Section name
         const sectionText = document.createElement('span');
@@ -1812,27 +1812,27 @@ icon.classList.add('nav-icon'); // Ensures additional class is applied
 
         menuItem.appendChild(sectionLink);
 
-        // Submenu (Fix for subsections)
+        // Submenu
         const subMenu = document.createElement('ul');
         subMenu.classList.add('sub-menu');
         subMenu.id = 'sub-menu-' + section.sectionId;
         subMenu.style.display = 'none';
 
+        // ✅ Sort pages alphabetically inside each section (case-insensitive)
         if (section.pages && section.pages.length > 0) {
-            section.pages.forEach(page => {
-               /*  if (page.role === selectedRole || selectedRole === 'SystemAdmin') { */
-                    const pageItem = document.createElement('li');
-                    const pageLink = document.createElement('a');
-                    pageLink.href = page.url || '#';
-                    pageLink.textContent = page.pageName;
-                    pageLink.classList.add('nav-link');
-                    pageLink.onclick = function () {
-                        loadCommonList(page.pageUrl, page.pageName);
-                    };
+            section.pages.sort((a, b) => a.pageName.localeCompare(b.pageName, undefined, { sensitivity: 'base' }));
 
-                    pageItem.appendChild(pageLink);
-                    subMenu.appendChild(pageItem);
-               /*  } */
+            section.pages.forEach(page => {
+                const pageItem = document.createElement('li');
+                const pageLink = document.createElement('a');
+                pageLink.href = page.url || '#';
+                pageLink.textContent = page.pageName;
+                pageLink.classList.add('nav-link');
+                pageLink.onclick = function () {
+                    loadCommonList(page.pageUrl, page.pageName);
+                };
+                pageItem.appendChild(pageLink);
+                subMenu.appendChild(pageItem);
             });
 
             if (subMenu.childNodes.length > 0) {
@@ -4879,468 +4879,7 @@ table th {
         });
     } 
     
-   /*  function fetchTemplateOptions() {
-        var dropdown = document.getElementById("templateType");
-        var selectedTemplate = dropdown.value;
-
-        if (selectedTemplate) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/CWFM/data/getTemplateOptions?selectedTemplate=" + selectedTemplate, true);
-            xhr.setRequestHeader("Content-Type", "application/json");
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-
-                    document.getElementById("templateOptions").style.display = "block";
-                    document.getElementById("templateMessage").innerText = "What would you like to do with this template?";
-                    document.getElementById("infoTemplate").href = response.infoUrl;
-                    document.getElementById("viewTemplate").href = response.viewUrl;
-                    document.getElementById("downloadTemplate").href = response.downloadUrl;
-                }
-            };
-
-            xhr.send();
-        } else {
-            document.getElementById("templateOptions").style.display = "none";
-        }
-    } */
-    function fetchTemplateOptions() {
-        var selectedTemplate = $("#templateType").val();
-
-        // Hide the message initially
-        $("#templateOptions").hide();
-
-        if (selectedTemplate) {
-            $.ajax({
-                url: "/CWFM/data/getTemplateOptions",
-                type: "GET",
-                data: { selectedTemplate: selectedTemplate },
-                
-                success: function(response) {
-                	console.log(1);
-                    if (response) {
-                        $("#templateMessage").text(response);  // Set response text
-                        $("#templateOptions").fadeIn();  // Show message smoothly
-                    }
-                },
-                error: function() {
-                    console.error("Error fetching template options");
-                }
-            });
-        }
-    }
-    function fetchTemplateInfo() {
-        var selectedTemplate = document.getElementById("templateType").value;
-
-        if (!selectedTemplate) {
-            alert("Please select a template first.");
-            return;
-        }
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/CWFM/data/getTemplateInfo?templateType=" + encodeURIComponent(selectedTemplate), true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-       console.log(2);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                console.log(5);
-                document.getElementById("modalTitle").innerText = response.title;
-                document.getElementById("modalDescription").innerText = response.description;
-
-                var tableHtml = "<table border='1' style='width:100%;'>";
-                tableHtml += "<tr><th>Field Name</th><th>Field Type</th><th>Example</th></tr>";
-
-                response.fields.forEach(function (field) {
-                    tableHtml += "<tr><td>" + field.name + "</td><td>" + field.type + "</td><td>" + field.example + "</td></tr>";
-                });
-
-                tableHtml += "</table>";
-                document.getElementById("modalTable").innerHTML = tableHtml;
-
-                document.getElementById("templateModal").style.display = "block"; // Show modal
-            } else if (xhr.readyState === 4) {
-                alert("Error fetching template details.");
-            }
-        };
-
-        xhr.send();
-    }
-
-    function closeTemplateModal() {
-        document.getElementById("templateModal").style.display = "none"; // Hide modal
-    }
-    function viewTemplateInfo() {
-        var selectedTemplate = document.getElementById("templateType").value;
-
-        if (!selectedTemplate) {
-            alert("Please select at least one template.");
-            return; // Stop execution if no template is selected
-        }
-
-        // Hide sidebar
-        document.getElementById("sidebar").style.display = "none";  
-
-        // Hide import/export buttons & arrows
-        document.querySelector(".button-container").style.display = "none";
-        document.querySelector(".arrow-container").style.display = "none";
-
-        // Show the table container
-        var tableContainer = document.getElementById("viewTemplateContainer");
-        tableContainer.style.display = "block";  
-
-        // Get table header and body elements
-        var tableHeaderRow = document.getElementById("tableHeaderRow");
-        var tableBody = document.getElementById("tableBody");
-
-        // Clear previous headers and rows
-        tableHeaderRow.innerHTML = "";
-        tableBody.innerHTML = "";
-
-        // Define headers based on the selected template
-        var headers = [];
-        if (selectedTemplate === "generalMaster") {
-            headers = ["GM Name", "GM Description", "GM TypeID","IS Active","Created Time","Updated Time","Updated By"];
-        }
-        else if (selectedTemplate === "minimumWage") {
-            headers = ["Trade", "Skill", "Basic","Da","Allowance","From Date","Unit Code","Organization"];
-        }
-        else if (selectedTemplate === "workorder") {
-            headers = ["Work Order Number","Item","Line","Line Number","Service Code","Short Text","Delivery Completion","Item Changed ON","Vendor Code","Vendor Name",
-            	"Vendor Address","Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code",
-            	"G/L Code","Cost Center","Nature of Job","Rate / Unit","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Qty Completed",
-            	"Work Order Release Date","Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Company_code"];
-        }
-        else if (selectedTemplate === "contractor") {
-            headers = ["Contractor Name", "Contractor Address","City","Plant Code","Contractor Manager Name","License Num","License Valid From","License Valid To",
-            	"License Coverage","Total Strength","Maximum Number of Workmen","Nature of Work","Location of Work","Contractor Validity Start Date","Contractor Validity End Date",
-            	"Contractor Id","PF Code","EC/WC Number","EC/WC Validity Start Date","EC/WC Validity End Date","Coverage","PF Number","PF Apply Date","Reference","Mobile Number",
-            	"ESI Number","ESI Valid From","ESI Valid To","Organisation","Main Contractor Code","Work Order Number"];
-        }
-        else if (selectedTemplate === "principalEmployer") {
-            headers = ["Organization","Plant Code","Name", "Address","Manager Name","Manager Address","Bussiness Type","Max Workmen","Max Contract Workmen","BOCW Applicability",
-            	"Is MW Applicability","License Number","PF Code","ESWC Number","Factory License Number",,"State"];
-        }
-        else if (selectedTemplate === "workmenbulkupload") {
-            headers = ["First Name","Last Name","Father's Name or Husband's Name","Date of Birth","Trade","Skil","Nature of Work","Hazardous Area","Aadhar/Id proof number",
-            	"Vendor Code","Gender","Date of Joining","Department","Area","Work Order Number","PF A/C Number","Marital Status" ,"Technical/Non Technical","Academic",
-            	"Blood Group","Accommodation","Bank Name","Account Number","Mobile Number","Emergency Contact Number","Police verification Date Valid To","Health chekup Date",
-            	"Access Levels","ESIC Number","UNIT CODE","Organization name" ,"EIC Number","EC number","UAN Number","Emergency Contact Person",
-            	"Is eligible for PF","SpecializationName","Insurance type","LL number","Address","Zone","IdMark"];
-        }
-        else if (selectedTemplate === "workmenbulkuploaddraft") {
-            headers = ["First Name","Last Name","Father's Name or Husband's Name","Date of Birth","Trade","Skil","Nature of Work","Hazardous Area","Aadhar/Id proof number",
-            	"Vendor Code","Gender","Date of Joining","Department","Area","Work Order Number","PF A/C Number","Marital Status" ,"Technical/Non Technical","Academic",
-            	"Blood Group","Accommodation","Bank Name","Account Number","Mobile Number","Emergency Contact Number","Police verification Date Valid To","Health chekup Date",
-            	"Access Levels","ESIC Number","UNIT CODE","Organization name" ,"EIC Number","EC number","UAN Number","Emergency Contact Person",
-            	"Is eligible for PF","SpecializationName","Insurance type","LL number","Address","Zone","IdMark"];
-        }else if (selectedTemplate === "tradeskillunitmapping") {
-            headers = ["Plant Code","Trade", "Skill"];
-        }else if (selectedTemplate === "departmentareaunitmapping") {
-            headers = ["Plant Code","Department", "SubDepartment"];
-        }
-        // Populate table headers
-        headers.forEach(function(header) {
-            var th = document.createElement("th");
-            th.style.border = "1px solid #ddd";
-            th.style.padding = "8px";
-            th.textContent = header;
-            tableHeaderRow.appendChild(th);
-        });
-
-        // Add empty rows (5 rows as an example)
-        for (var i = 0; i < 5; i++) {  
-            var tr = document.createElement("tr");
-            headers.forEach(function() {
-                var td = document.createElement("td");
-                td.style.border = "1px solid #ddd";
-                td.style.padding = "8px";
-                td.textContent = ""; // Ensuring empty rows
-                tr.appendChild(td);
-            });
-            tableBody.appendChild(tr); // Append row to tbody
-        }
-    }
-    function openFileSidebar() {
-        document.getElementById("fileUploadSidebar").style.width = "300px"; // Open sidebar
-    }
-
-    function closeFileSidebar() {
-        document.getElementById("fileUploadSidebar").style.width = "0"; // Close sidebar
-    }
-   
-    /* function cancelButton() {
-        // Hide all other sections (viewTemplate, sidebar, etc.)
-        document.getElementById("viewTemplateContainer").style.display = "none";
-        document.getElementById("fileUploadSidebar").style.width = "0";
-
-        // Show the initial section
-        document.querySelector(".button-container").style.display = "block";
-    } */
-
-   
-
-
-
-   /*  function submitFile() {
-        var fileInput = document.getElementById("fileInput");
-        
-        if (fileInput.files.length === 0) {
-            alert("Please choose a file before uploading.");
-        } else {
-            alert("File uploaded successfully!");
-            closeFileSidebar(); // Close sidebar after upload
-        }
-    } */
-
-    
-    function uploadTemplateFile() {
-        const fileInput = document.getElementById("fileInput");
-        const templateType = document.getElementById("templateType").value;
-
-        if (!fileInput.files[0] || !templateType) {
-            alert("Please select a template and a file.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("file", fileInput.files[0]);
-        formData.append("templateType", templateType);
-
-        fetch("/CWFM/data/uploadTemplate", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log("Server Response:", result);
-
-            const messageDiv = document.getElementById("uploadMessage");
-            messageDiv.innerHTML = "";
-            messageDiv.style.display = "block";
-
-            let messageColor = "black";
-            if (result.status === "success") {
-                messageColor = "green";
-            } else if (result.status === "partial") {
-                messageColor = "orange";
-            } else {
-                messageColor = "red";
-            }
-
-            messageDiv.innerText = result.message || "Unknown result.";
-            messageDiv.style.color = messageColor;
-
-            // Automatically hide message after 5 seconds
-            setTimeout(() => {
-                messageDiv.style.display = "none";
-            }, 5000);
-
-            // Clear previous error display
-            document.getElementById("errorContainer").innerHTML = "";
-
-            const successData = result.data?.successData ?? [];
-            const errorData = result.data?.errorData ?? [];
-            let anyDataProcessed = false;
-
-            if (successData.length > 0) {
-                renderUploadedData(successData, templateType);
-                anyDataProcessed = true;
-            }
-
-            if (errorData.length > 0) {
-                renderErrors(errorData);
-                anyDataProcessed = true;
-            }
-
-            closeFileSidebar();
-            fileInput.value = "";
-        })
-        .catch(err => {
-            console.error("Upload error", err);
-            const messageDiv = document.getElementById("uploadMessage");
-            messageDiv.innerText = "Something went wrong during file upload.";
-            messageDiv.style.color = "red";
-            messageDiv.style.display = "block";
-
-            // Automatically hide error after 5 seconds
-            setTimeout(() => {
-                messageDiv.style.display = "none";
-            }, 5000);
-        });
-    }
-
-
-
-
-
   
-
-
-    function renderUploadedData(data, templateType) {
-        const tableBody = document.getElementById("tableBody");
-        const tableHeaderRow = document.getElementById("tableHeaderRow");
-        tableBody.innerHTML = "";
-        tableHeaderRow.innerHTML = "";
-
-        if (!data || data.length === 0) {
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            td.colSpan = 10;
-            td.textContent = "No data found.";
-            tr.appendChild(td);
-            tableBody.appendChild(tr);
-            return;
-        }
-
-        let headers = [];
-        let fieldMap = [];
-
-        if (templateType === "generalMaster") {
-            headers = ["GM Name", "GM Description", "GM TypeID", "IS Active", "Created Time", "Updated Time", "Updated By"];
-            fieldMap = ["gmName", "gmDescription", "gmTypeId", "isActive", "createdTM", "updatedTM", "updatedBy"];
-        }
-        else if (templateType === "minimumWage") {
-            headers = ["Trade", "Skill", "Basic", "Da", "Allowance", "From Date", "Unit Code", "Organization"];
-            fieldMap = ["trade", "skill", "basic", "da", "allowamce", "fromDate", "unitCode", "organization"];
-        }
-        else if (templateType === "workorder") {
-            headers = ["Work Order Number","Item","Line","Line Number","Service Code","Short Text","Delivery Completion","Item Changed ON","Vendor Code","Vendor Name","Vendor Address","Blocked Vendor","Work Order Validitiy From","Work Order Validitiy To","Work Order Type","Plant code","Section Code","Department Code","G/L Code","Cost Center","Nature of Job","Rate / Unit","Quantity","Base Unit of Measure","Work Order Released","PM Order No","WBS Element","Qty Completed","Work Order Release Date","Service Entry Created Date","Service Entry Updated Date","Purchase Org Level","Company_code"];
-            fieldMap = ["workOrderNumber", "item", "line", "lineNumber", "serviceCode", "shortText", "deliveryCompletion","itemChangedON", "vendorCode", "vendorName", "vendorAddress", "blockedVendor","workOrderValiditiyFrom", "workOrderValiditiyTo", "workOrderType", "plantcode", "sectionCode","departmentCode", "GLCode", "costCenter", "natureofJob", "rateUnit", "quantity", "baseUnitofMeasure","workOrderReleased", "PMOrderNo", "WBSElement", "qtyCompleted", "workOrderReleaseDate","serviceEntryCreatedDate", "serviceEntryUpdatedDate", "purchaseOrgLevel",  "companycode"];
-        } 
-        else if (templateType === "contractor") {
-            headers = ["CONTRACTOR NAME", "CONTRACTOR ADDRESS", "City", "Contractor MANAGER NAME", "LICENSE NUM", "LICENCSE VALID FROM", "LICENCSE VALID TO", "LICENCSE COVERAGE", "TOTAL STRENGTH", "MAXIMUM NUMBER OF WORKMEN", "NATURE OF WORK", "LOCATION OF WORK", "CONTRACTOR VALIDITY START DATE", "CONTRACTOR VALIDITY END DATE", "CONTRACTOR ID", "PF CODE", "EC/WC number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF NUMBER", "PF APPLY DATE", "Reference", "Mobile Number", "ESI NUMBER", "ESI VALID FROM", "ESI VALID TO", "Main Contractor Code", "Work Order Number"];
-            fieldMap = ["contractorName", "contractorAddress", "city", "managerNm", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "totalStrength", "maxNoEmp", "natureofWork", "locationofWork", "periodStartDt", "periodEndDt", "contractorId", "pfCode", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "pfNum", "pfApplyDt", "reference", "mobileNumber", "esiwc", "esiValidFrom", "esiValidTo", "contractorCode", "workOrderNumber"];
-        } 
-        else if (templateType === "principalEmployer") {
-            headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number","State"];
-            fieldMap = ["organization", "code", "name", "address", "managerName", "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen", "bocwApplicability", "isMwApplicability", "licenseNumber", "pfCode", "wcNumber", "factoryLicenseNumber","stateNM"];
-        }
-        else if (templateType === "workmenbulkupload") {
-            headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
-            fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
-        }
-        else if (templateType === "workmenbulkuploaddraft") {
-            headers = ["First Name", "Last Name", "Father's Name or Husband's Name", "Date of Birth", "Trade", "Skill", "Nature of Work", "Hazardous Area", "Aadhar/Id proof number", "Vendor Code", "Gender", "Date of Joining", "Department", "Area", "Work Order Number","PF A/C Number","Marital Status","Technical","Academic","Blood Group","Accommodation","Bank Name Branch","Account Number","Mobile Number","Emergency Contact Number","Police verification Date","Health chekup Date","Access Levels","ESIC Number","UNIT CODE","Organization name","EIC Number","EC number","UAN Number","Emergency Contact Person","Is eligible for PF","SpecializationName","Insurance Type","LL number","Address","Zone","IdMark"];
-            fieldMap = ["firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork", "hazardousArea",  "aadhaarNumber", "vendorCode", "gender", "doj", "department", "area", "workorderNumber","pfNumber", "maritalStatus", "technical", "academic","bloodGroup", "accommodation", "bankName", "accountNumber", "mobileNumber", "emergencyNumber", "policeVerificationDate", "healthCheckDate", "accessArea", "esicNumber", "unitCode", "organizationName","EICNumber", "ECnumber", "uanNumber", "emergencyName", "pfApplicable", "specializationName", "insuranceType", "LLnumber","address","zone","idMark"];
-        } 
-        else if (templateType === "tradeskillunitmapping") {
-            headers = ["Plant Code","Trade", "Skill"];
-            fieldMap = ["plantCode","trade","skill"];
-        }
-        else if (templateType === "departmentareaunitmapping") {
-            headers = ["Plant Code","Trade", "Skill"];
-            fieldMap = ["plantCode","department","subDepartment"];
-        }
-
-        headers.forEach(header => {
-            const th = document.createElement("th");
-            th.style.border = "1px solid grey";
-            th.style.padding = "8px";
-            th.textContent = header;
-            tableHeaderRow.appendChild(th);
-        });
-
-        const safe = val => (val !== null && val !== undefined ? val : "");
-
-        data.forEach(row => {
-            const tr = document.createElement("tr");
-            fieldMap.forEach(field => {
-                const td = document.createElement("td");
-                td.style.border = "1px solid grey";
-                td.style.padding = "8px";
-                td.textContent = safe(row[field]);
-                tr.appendChild(td);
-            });
-            tableBody.appendChild(tr);
-        });
-    }
-
-    function renderErrors(errorData) {
-        const container = document.getElementById("errorContainer");
-        container.innerHTML = "";
-
-        if (!errorData || errorData.length === 0) {
-            container.textContent = "No errors found.";
-            return;
-        }
-
-        const table = document.createElement("table");
-        table.classList.add("table", "table-bordered");
-        table.style.marginTop = "10px";
-        table.style.borderCollapse = "collapse";
-        table.style.width = "100%";
-
-        const headerRow = document.createElement("tr");
-        ["Row", "Field", "Error Message"].forEach(text => {
-            const th = document.createElement("th");
-            th.innerText = text;
-            th.style.border = "1px solid #999";
-            th.style.padding = "6px";
-            headerRow.appendChild(th);
-        });
-        table.appendChild(headerRow);
-
-        errorData.forEach(error => {
-            if (error.fieldErrors) {
-                // Loop through all field-level errors
-                for (const [field, message] of Object.entries(error.fieldErrors)) {
-                    const row = document.createElement("tr");
-
-                    const rowCell = document.createElement("td");
-                    rowCell.textContent = error.row || "-";
-                    rowCell.style.border = "1px solid #999";
-                    rowCell.style.padding = "6px";
-
-                    const fieldCell = document.createElement("td");
-                    fieldCell.textContent = field;
-                    fieldCell.style.border = "1px solid #999";
-                    fieldCell.style.padding = "6px";
-
-                    const messageCell = document.createElement("td");
-                    messageCell.textContent = message;
-                    messageCell.style.border = "1px solid #999";
-                    messageCell.style.padding = "6px";
-
-                    row.appendChild(rowCell);
-                    row.appendChild(fieldCell);
-                    row.appendChild(messageCell);
-                    table.appendChild(row);
-                }
-            } else {
-                // General row-level error
-                const row = document.createElement("tr");
-
-                const rowCell = document.createElement("td");
-                rowCell.textContent = error.row || "-";
-                rowCell.style.border = "1px solid #999";
-                rowCell.style.padding = "6px";
-
-                const fieldCell = document.createElement("td");
-                fieldCell.textContent = "-";
-                fieldCell.style.border = "1px solid #999";
-                fieldCell.style.padding = "6px";
-
-                const messageCell = document.createElement("td");
-                messageCell.textContent = error.error || "Unknown error";
-                messageCell.style.border = "1px solid #999";
-                messageCell.style.padding = "6px";
-
-                row.appendChild(rowCell);
-                row.appendChild(fieldCell);
-                row.appendChild(messageCell);
-                table.appendChild(row);
-            }
-        });
-
-        container.appendChild(table);
-    }
-
-
-
-
-
     function searchUserByShortName() {
         var shortName = $('#shortNameSearch').val().trim();
         console.log("Searching for userAccount:", shortName);

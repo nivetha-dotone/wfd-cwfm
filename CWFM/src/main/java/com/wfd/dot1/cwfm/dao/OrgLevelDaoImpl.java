@@ -9,12 +9,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.OrgLevel;
 import com.wfd.dot1.cwfm.pojo.OrgLevelMapping;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
@@ -368,5 +373,81 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 		    	String query = getAllOrgLevelQuery();
 		        return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(OrgLevel.class));
 		    }
+			
+			@Override
+			public OrgLevelDefDTO getOrgLevelById(Integer orgLevelDefId) {
+			    String sql = "SELECT ORGLEVELDEFID, NAME FROM ORGLEVELDEF WHERE ORGLEVELDEFID = ?";
+			    try {
+			        return jdbcTemplate.queryForObject(
+			            sql,
+			            new Object[]{orgLevelDefId},
+			            (rs, rowNum) -> {
+			                OrgLevelDefDTO dto = new OrgLevelDefDTO();
+			                dto.setOrgLevelDefId(rs.getLong("ORGLEVELDEFID")); // ✅ use getLong
+			                dto.setName(rs.getString("NAME"));
+			                return dto;
+			            }
+			        );
+			    } catch (EmptyResultDataAccessException e) {
+			        return null; // if no row found
+			    }
+			}
+
+			@Override
+			public List<PrincipalEmployer> getPrincipalEmployers() {
+				List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
+			    String sql = "SELECT CODE, NAME FROM CMSPRINCIPALEMPLOYER ";
+			    SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
+			    while(rs.next()) {
+			        PrincipalEmployer pe = new PrincipalEmployer();
+			        pe.setCode(rs.getString("CODE"));
+			        pe.setName(rs.getString("NAME"));
+			        peList.add(pe);
+			    }
+			        return peList;
+			}
+			
+			
+			@Override
+			public List<Contractor> getContractors() {
+			    String sql = "SELECT CODE, NAME FROM CMSCONTRACTOR";
+			    return jdbcTemplate.query(sql, (rs, rowNum) -> {
+			        Contractor c = new Contractor();
+			        c.setVendorCode(rs.getString("CODE"));
+			        c.setContractorName(rs.getString("NAME"));
+			        return c;
+			    });
+			}
+			@Override
+			public List<CmsGeneralMaster> getGeneralMasters(String type) {
+			    String sql = "SELECT cmsgm.GMNAME, cmsgm.GMDESCRIPTION \r\n"
+			    		+ "FROM CMSGENERALMASTER cmsgm \r\n"
+			    		+ "JOIN CMSGMTYPE cmsgt ON cmsgt.GMTYPEID = cmsgm.GMTYPEID \r\n"
+			    		+ "WHERE \r\n"
+			    		+ "    cmsgm.ISACTIVE = 1 AND\r\n"
+			    		+ "    (\r\n"
+			    		+ "        (? = 'area' AND cmsgt.GMTYPE = 'area') \r\n"
+			    		+ "        OR \r\n"
+			    		+ "        (? = 'dept' AND cmsgt.GMTYPE LIKE 'Dep%')\r\n"
+			    		+ "    );\r\n";
+			    		
+			    return jdbcTemplate.query(sql, new Object[]{type, type}, (rs, rowNum) -> {
+			        CmsGeneralMaster gm = new CmsGeneralMaster();
+			        gm.setGmName(rs.getString("GMNAME"));
+			        gm.setGmDescription(rs.getString("GMDESCRIPTION"));
+			        return gm;
+			    });
+			}
+			@Override
+			public List<Workorder> getWorkorders() {
+			    String sql = "select SAP_WORKORDER_NUM,NAME from CMSWORKORDER where VALIDDT>GETDATE()";
+			    return jdbcTemplate.query(sql, (rs, rowNum) -> {
+			    	Workorder w = new Workorder();
+			        w.setSapWorkorderNumber(rs.getString("SAP_WORKORDER_NUM"));
+			        w.setName(rs.getString("NAME"));
+			        return w;
+			    });
+			}
+
 }
 

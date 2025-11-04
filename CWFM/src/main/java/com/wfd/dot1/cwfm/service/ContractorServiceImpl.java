@@ -230,12 +230,12 @@ public class ContractorServiceImpl implements ContractorService{
 		ObjectMapper mapper = new ObjectMapper();
         ContractorRegistration reg=new ContractorRegistration();
         RenewalDTO renewal = new RenewalDTO();
-        int workFlowTypeId=billDao.getWorkflowType("Contractor", String.valueOf(reg.getPrincipalEmployer()));
-		if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
-			reg.setStatus(GatePassStatus.APPROVED.getStatus());
-		}else {
-			reg.setStatus(GatePassStatus.APPROVALPENDING.getStatus());
-		}
+       // int workFlowTypeId=billDao.getWorkflowType("CONTRACTOR RENEWAL", String.valueOf(reg.getPrincipalEmployer()));
+		//if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+		///	reg.setStatus(GatePassStatus.APPROVED.getStatus());
+		//}else {
+		//	reg.setStatus(GatePassStatus.APPROVALPENDING.getStatus());
+		//}
 		try {
 			//contreg = mapper.readValue(jsonData, ContractorRegistration.class);
 			  renewal = mapper.readValue(jsonData, RenewalDTO.class);
@@ -266,6 +266,13 @@ public class ContractorServiceImpl implements ContractorService{
 				reg.setCreatedBy(username);
 				reg.setRequestType("Renew");
 
+				 int workFlowTypeId=billDao.getWorkflowType("CONTRACTOR RENEWAL", String.valueOf(reg.getPrincipalEmployer()));
+					if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+						reg.setStatus(GatePassStatus.APPROVED.getStatus());
+					}else {
+						reg.setStatus(GatePassStatus.APPROVALPENDING.getStatus());
+					}
+					
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -367,7 +374,12 @@ public class ContractorServiceImpl implements ContractorService{
 			
 			if(isLastApprover) {
 				status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
-				
+				  contrDao.insertWorkOrderLLWC(
+			                gpm.getContractorregId(),
+			                gpm.getContractorId(),
+			                gpm.getPrincipalEmployer(),
+			                gpm.getCreatedBy() != null ? gpm.getCreatedBy() : "SYSTEM"
+			            );
 			}
 		}
 

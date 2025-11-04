@@ -101,4 +101,12 @@ public class DotTypeController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred.");
 	    }
 	}
+	
+	@GetMapping("/getDotTypeByEmployerAndBusiness")
+	@ResponseBody
+	public Integer getDotTypeByEmployerAndBusiness(
+	        @RequestParam Long principalEmployerId,
+	        @RequestParam Long businessTypeId) {
+	    return dotTypeService.getMappedDotType(principalEmployerId, businessTypeId);
+	}
 }

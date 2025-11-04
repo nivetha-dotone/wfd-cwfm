@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import com.wfd.dot1.cwfm.dao.OrgLevelDao;
 import com.wfd.dot1.cwfm.dto.OrgLevelDefDTO;
 import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.OrgLevel;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.pojo.Workorder;
 
 @Service
 public class OrgLevelServiceImpl implements OrgLevelService {
@@ -100,5 +104,26 @@ public class OrgLevelServiceImpl implements OrgLevelService {
 	    public List<OrgLevel> getAllOrgLevel() {
 	        return orgLevelDao.getAllOrgLevel();
 	    }
+	 
+	 @Override
+		public OrgLevelDefDTO getOrgLevelById(Integer orgLevelDefId) {
+			return orgLevelDao.getOrgLevelById(orgLevelDefId);
+		}
+		@Override
+		public List<PrincipalEmployer> getPrincipalEmployers() {
+			return orgLevelDao.getPrincipalEmployers();
+		}
+		@Override
+		public List<Contractor> getContractors() {
+			return orgLevelDao.getContractors();
+		}
+		@Override
+		public List<CmsGeneralMaster> getGeneralMasters(String type) {
+			return orgLevelDao.getGeneralMasters(type);
+		}
+		@Override
+		public List<Workorder> getWorkorders() {
+			return orgLevelDao.getWorkorders();
+		}
 }
 

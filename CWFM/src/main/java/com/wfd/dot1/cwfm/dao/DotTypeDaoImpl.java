@@ -1,9 +1,12 @@
 package com.wfd.dot1.cwfm.dao;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
@@ -36,5 +39,30 @@ public class DotTypeDaoImpl implements DotTypeDao {
 	          //           "VALUES (?, ?, ?, GETDATE(), ?, GETDATE())";
 	        jdbcTemplate.update(query, businessTypeId, workflowType, createdBy, createdBy);
 	    }
+	    @Override
+	    public Integer  getSelectedDotType(Long principalEmployerId, Long businessTypeId) {
+	        String sql = "select top 1 gwt.WorkflowType\r\n"
+	        		+ " from GATEPASSWORKFLOWTYPE gwt\r\n"
+	        		+ " join CMSBUUnitMapping cbu on cbu.BUId=gwt.BusinessTypeId \r\n"
+	        		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=cbu.UnitID where cbu.BUId=? and cbu.UnitID=? ORDER BY gwt.WorkflowTypeId DESC;";
+
+	        List<Integer> results = jdbcTemplate.query(sql, new Object[]{businessTypeId, principalEmployerId},
+	                (rs, rowNum) -> rs.getInt("WorkflowType"));
+
+	            if (results.isEmpty()) {
+	                return 0;
+	            }
+
+	            int workflowType = results.get(0);
+
+	            // ✅ Map integer ID to enum name
+	            for (DotType dotType : DotType.values()) {
+	                if (dotType.getStatus() == workflowType) {
+	                    return dotType.getStatus(); // returns the enum name like "LLWCWO"
+	                }
+	            }
+
+	            return 0;
+	        }
 
 }

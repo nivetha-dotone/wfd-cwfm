@@ -3,7 +3,7 @@
     <%@ page isELIgnored="false" %>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-
+<%@ page import="java.util.Base64, java.nio.charset.StandardCharsets" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -394,8 +394,8 @@ table.ControlLayout td {
                                     <c:forEach var="doc" items="${docsByType[docType.reportName]}">
                                         <tr>
                                             <td>
-                                                <%-- <a href="${pageContext.request.contextPath}/documents/download/${doc.id}"  target="_blank"   style="text-decoration: none; color: blue;">   ${doc.fileName}  </a> --%>
-                                            <a href="#" onclick="downloadFile('${doc.id}')">${doc.fileName}</a>
+                                               <a href="#" onclick="downloadFile('${doc.encodedId}')">${doc.fileName}</a>
+
                                             </td>
                                             <td style="color:gray;">v${doc.version}</td>
                                         </tr>
@@ -404,7 +404,7 @@ table.ControlLayout td {
                             </table>
                         </c:when>
                         <c:otherwise>
-                            <p style="color: gray;">No documents uploaded for ${docType.reportName}</p>
+                            <p style="color:gray;">No documents uploaded for ${docType.reportName}</p>
                         </c:otherwise>
                     </c:choose>
                 </div>

@@ -1,5 +1,7 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +23,26 @@ public class DotTypeServiceImpl implements DotTypeService {
 			 }
 	        dotTypedao.insertWorkflowType(buid, dotType, createdBy);
 	    }
+
+	 @Override
+	 public Integer getMappedDotType(Long principalEmployerId, Long businessTypeId) {
+		 Integer  workflowType = dotTypedao.getSelectedDotType(principalEmployerId, businessTypeId);
+
+		 if (workflowType == null) {
+		        return null;
+		    }
+
+		    // Compare numeric status values against enum entries
+		    for (DotType dt : DotType.values()) {
+		        if (dt.getStatus() == workflowType.intValue()) {
+		            return Integer.valueOf(dt.getStatus());
+		        }
+		    }
+
+		    // No matching enum found
+		    return null;
+		}
+
 	
+
 }

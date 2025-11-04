@@ -81,4 +81,5 @@ public interface  CommonDao {
 					CMSRoleRights hasPageActionPermissionForRole(String roleId, String pageDescription);
 					void deleteOrgLevel(List<Long> orgLevelDefIds);
 					List<OrgLevel> getAllOrgLevels();
+					List<CmsGeneralMaster> getImportOptionsByRole(String roleId);
 }

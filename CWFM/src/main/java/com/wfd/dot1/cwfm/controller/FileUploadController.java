@@ -1,8 +1,13 @@
 package com.wfd.dot1.cwfm.controller;
 
+import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
+import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.FileUploadService;
+import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
+import com.wfd.dot1.cwfm.service.WorkmenService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,42 +34,80 @@ public class FileUploadController {
 
     @Autowired
     private FileUploadService fileUploadService;
+	
+    @Autowired
+	WorkmenService workmenService;
+    @Autowired
+	CommonService commonService;
+	
+	@Autowired
+	PrincipalEmployerService peService;
+	
+	@GetMapping("/importExport")
+	public String showUploadForm(HttpServletRequest request, HttpServletResponse response) {
 
-    // Display the form
-    @GetMapping("/importExport")
-    public String showUploadForm(HttpServletRequest request, HttpServletResponse response) {
-    	
-        return "reportsUpload/fileUpload";  
-    }
+	    HttpSession session = request.getSession(false);
+	    MasterUser user = (session != null) ? (MasterUser) session.getAttribute("loginuser") : null;
 
-	/*
-	 * // Handle the file upload
-	 * 
-	 * @PostMapping("/uploadfile") public String
-	 * handleFileUpload(@RequestParam("files") List<MultipartFile> files,
-	 * RedirectAttributes redirectAttributes) { // Validate CSV file type for
-	 * (MultipartFile file : files) { if
-	 * (!file.getOriginalFilename().endsWith(".csv")) {
-	 * redirectAttributes.addFlashAttribute("errorMessage",
-	 * "Only CSV files are allowed!"); return "redirect:/upload"; // Redirect back
-	 * to the form with error message } }
-	 * 
-	 * // If all files are valid CSV files, process them
-	 * fileUploadService.uploadFiles(files);
-	 * 
-	 * // Add success message and redirect to the upload form
-	 * redirectAttributes.addFlashAttribute("successMessage",
-	 * "Files uploaded successfully!"); return "redirect:/upload"; // Redirect back
-	 * to the form with success message }
-	 */
-    
-	/*
-	 * @GetMapping("/getPreviewData")
-	 * 
-	 * @ResponseBody public List<Map<String, String>> getPreviewData() { return
-	 * fileUploadService.fetchCsvData(); // Fetch list of records from DB }
-	 */
-    
+	    if (user == null) {
+	        // Redirect to login if session expired
+	        return "redirect:/login";
+	    }
+
+	    // ✅ Step 1: Load Page Permission
+	    CMSRoleRights rr = commonService.hasPageActionPermissionForRole(
+	            user.getRoleId(), "/data/importExport");
+	    request.setAttribute("UserPermission", rr);
+
+	    // ✅ Step 2: Load all Principal Employers for this user
+	    List<PrincipalEmployer> listDtos = peService.getAllPrincipalEmployer(user.getUserAccount());
+	    request.setAttribute("PrincipalEmployers", listDtos);
+
+	    // ✅ Step 3: Load all General Master data
+	    List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
+
+	    // ✅ Step 4: Group by gmType (MASTERDATAIMPORT)
+	    Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
+	            .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+	    List<CmsGeneralMaster> importOptions =
+	            groupedByGmType.getOrDefault("IMPORTOPTIONS", new ArrayList<>());
+
+	    // ✅ Step 5: Get role-based allowed import options
+	    List<CmsGeneralMaster> roleBasedOptions = commonService.getImportOptionsByRole(user.getRoleId());
+
+	    if (roleBasedOptions != null && !roleBasedOptions.isEmpty()) {
+
+	        // 🔹 Convert to uppercase names for case-insensitive comparison
+	        Set<String> allowedNames = roleBasedOptions.stream()
+	                .map(gm -> gm.getGmName().trim().toUpperCase())
+	                .collect(Collectors.toSet());
+
+	        // 🔹 Special case: if "DATAIMPORTOPTIONS" exists → show all
+	        //if (allowedNames.contains("DATA IMPORT")) {
+	          //  System.out.println("✅ Role contains 'DataImportOptions' → showing all import options.");
+	       // } else {
+	            // Otherwise → filter options normally
+	            importOptions = importOptions.stream()
+	                    .filter(opt -> allowedNames.contains(opt.getGmName().trim().toUpperCase()))
+	                    .collect(Collectors.toList());
+	        //}
+	    }
+
+	    // Debug logs
+	    System.out.println("User Role: " + user.getRoleName());
+	    System.out.println("Visible ImportOptions count: " + importOptions.size());
+	    for (CmsGeneralMaster gm : importOptions) {
+	        System.out.println("Visible to role [" + user.getRoleName() + "]: " +
+	                gm.getGmId() + " - " + gm.getGmName());
+	    }
+
+	    // ✅ Step 6: Set dropdown data
+	    request.setAttribute("ImportOptions", importOptions);
+
+	    return "reportsUpload/fileUpload";
+	}
+
     @GetMapping("/getTemplateOptions")
     public ResponseEntity<String> getTemplateOptions(@RequestParam String selectedTemplate) {
         return ResponseEntity.ok("What would you like to do with this template?");
@@ -73,7 +118,7 @@ public class FileUploadController {
     	 System.out.println("Received request for template: " + templateType); // Debugging
         Map<String, Object> templateInfo = new HashMap<>();
 
-        if ("generalMaster".equals(templateType)) {
+        if ("Data-General Master".equals(templateType)) {
             templateInfo.put("title", "Data - General Master Event");
             templateInfo.put("description", "Imports GeneralMaster events.");
 
@@ -81,14 +126,9 @@ public class FileUploadController {
             fields.add(Map.of("name", "GM Name", "type", "Text", "example", "B.Tech"));
             fields.add(Map.of("name", "GM Description", "type", "Text", "example", "B.Tech"));
             fields.add(Map.of("name", "GM TypeID", "type", "Number", "example", "1"));
-            fields.add(Map.of("name", "IS Active", "type", "Number", "example", "1"));
-            fields.add(Map.of("name", "Created Time", "type", "Date", "example", "2024-04-17"));
-            fields.add(Map.of("name", "Updated Time", "type", "Date", "example", "2024-04-17"));
-            fields.add(Map.of("name", "Updated By", "type", "Text", "example", "Admin"));
-			
-
+            
             templateInfo.put("fields", fields);
-        }else if("minimumWage".equals(templateType)){
+        }else if("Data-minimumWage".equals(templateType)){
         	templateInfo.put("title", "Data - Minimum Wage Event");
             templateInfo.put("description", "Imports Minimum Wage events.");
 
@@ -103,7 +143,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "Organization", "type", "Text", "example", "Adani Wilmar Limited"));
             
             templateInfo.put("fields", fields);
-        }else if("workorder".equals(templateType)){
+        }else if("Data-Work Order".equals(templateType)){
         	templateInfo.put("title", "Data - Workorder Event");
             templateInfo.put("description", "Imports Workorder events.");
 
@@ -143,7 +183,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "Organization", "type", "Text", "example", "Adani Wilmar Limited"));
             
             templateInfo.put("fields", fields);
-        }else if("contractor".equals(templateType)){
+        }else if("Data-Contractor".equals(templateType)){
         	templateInfo.put("title", "Data - Contractor Event");
             templateInfo.put("description", "Imports Contractor events.");
 
@@ -181,7 +221,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "Work Order Number", "type", "Number", "example", "1511234563"));
             
             templateInfo.put("fields", fields);
-        }else if("principalEmployer".equals(templateType)){
+        }else if("Data-Principal Employer".equals(templateType)){
         	templateInfo.put("title", "Data - Principal Employer Event");
             templateInfo.put("description", "Imports PrincipalEmployer events.");
 
@@ -214,7 +254,7 @@ public class FileUploadController {
           //  fields.add(Map.of("name", "Updated By", "type", "Date", "example", "12/05/2025"));
             
             templateInfo.put("fields", fields);
-        }else if("workmenbulkupload".equals(templateType)){
+        }else if("Data-Workmen Bulk Upload".equals(templateType)){
         	templateInfo.put("title", "Data - Workmen Bulk Upload Event");
             templateInfo.put("description", "Workmen Bulk Upload events.");
 
@@ -263,7 +303,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "IdMark", "type", "Text", "example", "A Mole on Right Jaw"));
             
             templateInfo.put("fields", fields);
-        }else if("workmenbulkuploaddraft".equals(templateType)){
+        }else if("Data-Workmen Bulk Upload Draft".equals(templateType)){
         	templateInfo.put("title", "Data - Workmen Bulk Draft Upload Event");
             templateInfo.put("description", "Workmen Bulk Draft Upload events.");
 
@@ -312,7 +352,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "IdMark", "type", "Text", "example", "A Mole on Right Jaw"));
             
             templateInfo.put("fields", fields);
-        }else if("tradeskillunitmapping".equals(templateType)){
+        }else if("Data-Trade Skill".equals(templateType)){
         	templateInfo.put("title", "Data - Trade Skill Event");
             templateInfo.put("description", "Imports Trade Skill events.");
 
@@ -322,7 +362,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "Skill", "type", "Text", "example", "Skilled"));
             
             templateInfo.put("fields", fields);
-        }else if("departmentareaunitmapping".equals(templateType)){
+        }else if("Data-Department Area".equals(templateType)){
         	templateInfo.put("title", "Data - Department SubDepartment Event");
             templateInfo.put("description", "Imports Department SubDepartment events.");
 

@@ -145,34 +145,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
     
     @Override
     public void saveGeneralMaster(CmsGeneralMaster gm) {
-        java.sql.Date createdDate = null;
-        java.sql.Date updatedDate = null;
-
-        // Flexible formatter: allows 2024-12-1, 2024-1-01, etc.
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-            .appendValue(ChronoField.YEAR)
-            .appendLiteral('-')
-            .appendValue(ChronoField.MONTH_OF_YEAR)
-            .appendLiteral('-')
-            .appendValue(ChronoField.DAY_OF_MONTH)
-            .toFormatter();
-
-        try {
-            if (gm.getCreatedTM() != null && !gm.getCreatedTM().trim().equalsIgnoreCase("NULL") && !gm.getCreatedTM().trim().isEmpty()) {
-                LocalDate createdLocalDate = LocalDate.parse(gm.getCreatedTM().trim(), formatter);
-                createdDate = java.sql.Date.valueOf(createdLocalDate);
-            }
-
-            if (gm.getUpdatedTM() != null && !gm.getUpdatedTM().trim().equalsIgnoreCase("NULL") && !gm.getUpdatedTM().trim().isEmpty()) {
-                LocalDate updatedLocalDate = LocalDate.parse(gm.getUpdatedTM().trim(), formatter);
-                updatedDate = java.sql.Date.valueOf(updatedLocalDate);
-            }
-        } catch (DateTimeParseException e) {
-            throw new RuntimeException("Date format error: " + e.getParsedString() + " — " + e.getMessage());
-        }
-    	String sql=saveGeneralMasterTemplate();
-         //String sql = "INSERT INTO CMSGENERALMASTER (GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId(), gm.isActive(), createdDate, updatedDate, gm.getUpdatedBy());
+        
+    	//String sql=saveGeneralMasterTemplate();
+         String sql = "insert into CMSGENERALMASTER(GMNAME,GMDESCRIPTION,GMTYPEID,UPDATEDBY) values (?,?,?,'Admin')";
+        jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId());
     }
 
     @Override
@@ -397,37 +373,37 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	
 	@Override
     public String getCSVHeaders(String templateType) {
-        switch (templateType.toLowerCase()) {
-            case "generalmaster":
-                return "GMNAME,GMDESCRIPTION,GMTYPEID,ISACTIVE,CREATEDTM,UPDATEDTM,UPDATEDBY\n";
+        switch (templateType) {
+            case "Data-General Master":
+                return "GMNAME,GMDESCRIPTION,GMTYPEID\n";
 
-            case "principalemployer":
+            case "Data-Principal Employer":
                 return "ORGANISATION,PLANTCODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAX CONTRACT WORKMEN,BOCWAPPLICABILITY,"
                 		+ "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State\n";
 
-            case "contractor":
+            case "Data-Contractor":
                 return "CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,LICENCSE COVERAGE,"
                 		+ "TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
                 		+ "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,"
                 		+ "Mobile Number,ESI NUMBER,ESI VALID FROM,ESI VALID TO,Organisation,Main Contractor Code,Work Order Number\n";
-            case "workorder":
+            case "Data-Work Order":
             	return "Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
                         + "Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code\n";
-            case "workmenbulkupload":
+            case "Data-Workmen Bulk Upload":
             	return "First Name*,Last Name*,Father's Name or Husband's Name*,Date of Birth*,Trade*,Skill*,Nature of Work*,Hazardous Area*,"
                 		+ "Aadhar/Id proof number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
                 		+ "Technical Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Name Branch,Account Number,"
                 		+ "Mobile Number,Emergency Contact Number*,Police verification Date Valid To,Health chekup Date,Access Levels*,ESIC Number,UNIT CODE*,Organization name,"
                 		+ "EIC Number*,EC number*,UAN Number,Emergency Contact Person*,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark\n";
-            case "workmenbulkuploaddraft":
+            case "Data-Workmen Bulk Upload Draft":
               return      "First Name,Last Name,Father's Name or Husband's Name,Date of Birth,Trade,Skill,Nature of Work,Hazardous Area,"
                 		+ "Aadhar/Id proof number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
                 		+ "Technical Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Name Branch,Account Number,"
                 		+ "Mobile Number,Emergency Contact Number,Police verification Date Valid To,Health chekup Date,Access Levels,ESIC Number,UNIT CODE,Organization name,"
                 		+ "EIC Number,EC number,UAN Number,Emergency Contact Person,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark\n";
-            case "tradeskillunitmapping":
+            case "Data-Trade Skill":
             	return "PLANT CODE,TRADE,SKILL";
-            case "departmentareaunitmapping":
+            case "Data-Department Area":
             	return "PLANT CODE,DEPARTMENT,SUBDEPARTMENT";
             default:
                 // fallback/default template

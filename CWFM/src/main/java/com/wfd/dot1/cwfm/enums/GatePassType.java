@@ -10,7 +10,9 @@ public enum GatePassType {
 	BLACKLIST("6","BLACKLIST"),
 	DEBLACKLIST("7","DEBLACKLIST"),
 	LOSTORDAMAGE("8","LOST OR DAMAGE"),
-	CANCEL("9","CANCEL");
+	CANCEL("9","CANCEL"),
+	BILLVERIFICATION("10","Bill Creation"),
+	CONTRACTORRENEWAL("11","CONTRACTOR RENEWAL");
 	
 	private String status;
 	private String name;

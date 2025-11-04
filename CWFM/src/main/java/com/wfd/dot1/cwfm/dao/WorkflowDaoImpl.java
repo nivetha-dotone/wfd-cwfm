@@ -139,7 +139,8 @@ public class WorkflowDaoImpl implements WorkflowDao{
         actionStatusMap.put(GatePassType.BLACKLIST.getName(), GatePassType.BLACKLIST.getStatus());
         actionStatusMap.put(GatePassType.DEBLACKLIST.getName(), GatePassType.DEBLACKLIST.getStatus());
         actionStatusMap.put(GatePassType.LOSTORDAMAGE.getName(), GatePassType.LOSTORDAMAGE.getStatus());
-
+        actionStatusMap.put(GatePassType.BILLVERIFICATION.getName(), GatePassType.BILLVERIFICATION.getStatus());
+        actionStatusMap.put(GatePassType.CONTRACTORRENEWAL.getName(), GatePassType.CONTRACTORRENEWAL.getStatus());
      // Insert approver hierarchy
         String insertApprover = "INSERT INTO CMSAPPROVERHIERARCHY (WORKFLOWTYPEID, ACTION_ID, ACTION_NAME,ROLE_ID,ROLE_NAME, [INDEX]) VALUES (?, ?, ?, ?,?,?)";
        

@@ -159,24 +159,24 @@ table.ControlLayout td {
         <!-- Form fields -->
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>First Name:</label></th>
-            <td><input type="text" name="firstName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off"/>
+            <td><input type="text" name="firstName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" placeholder="John" required/>
              <span id="firstNameError" class="error-message"></span>
              </td>
            
             <th><label class="custom-label"><span class="required-field">*</span>Last Name:</label></th>
-            <td><input type="text" name="lastName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" />
+            <td><input type="text" name="lastName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" placeholder="Leo"/>
             <span id="lastNameError" class="error-message"></span>
             </td>
             
         </tr>
         <tr>
              <th><label class="custom-label"><span class="required-field">*</span>Email:</label></th>
-        <td style="color: black;"><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
+        <td style="color: black;"><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" autocomplete="off" placeholder="username@gmail.com"/>
         <span id="emailIdError" class="error-message"></span>
         </td>
         
             <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
-            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="10" autocomplete="off"/>
+            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="10" autocomplete="off" placeholder="6000000000" pattern="[6-9][0-9]{9}"/>
             <span id="contactNumberError" class="error-message"></span>
             </td>
              

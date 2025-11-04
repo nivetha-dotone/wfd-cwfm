@@ -41,17 +41,33 @@ public class OrgLevelEntryController {
         model.addAttribute("orgLevels", orgLevels);
 
         // Handle entries based on orgLevelDefId if it's provided
-        if (orgLevelDefId != null) {
+        /*if (orgLevelDefId != null) {
             List<OrgLevelEntryDTO> entries = orgLevelService.getOrgLevelEntriesByDefId(orgLevelDefId);
             model.addAttribute("entries", entries); // Add entries to the model
         } else {
             model.addAttribute("entries", new ArrayList<>()); // Empty list if no org level selected
-        }
+        }*/
 
         return "orgLevels/orgLevelEntry"; // Return the JSP view
     }
 
 
+    @GetMapping("/org-level-entrys")
+    public String getOrgLevelEntrie(@RequestParam(required = false) Integer orgLevelDefId, Model model) {
+        // Fetch all active org levels for dropdown
+        List<OrgLevelDefDTO> orgLevels = orgLevelService.getActiveOrgLevels();
+        model.addAttribute("orgLevels", orgLevels);
+        model.addAttribute("orgLevelDefId", orgLevelDefId);
+        // Handle entries based on orgLevelDefId if it's provided
+       /* if (orgLevelDefId != null) {
+            List<OrgLevelEntryDTO> entries = orgLevelService.getOrgLevelEntriesByDefId(orgLevelDefId);
+            model.addAttribute("entries", entries); // Add entries to the model
+        } else {
+            model.addAttribute("entries", new ArrayList<>()); // Empty list if no org level selected
+        }*/
+
+        return "orgLevels/orgLevelEntryView"; // Return the JSP view
+    }
 
 //
 //    @GetMapping("/org-level-entry")
@@ -80,10 +96,10 @@ public class OrgLevelEntryController {
         List<OrgLevelEntryDTO> entries = orgLevelService.getOrgLevelEntriesByDefId(orgLevelDefId);
         System.out.println("Retrieved entries: " + entries); // Debug log
         model.addAttribute("entries", entries);
-        model.addAttribute("orgLevelDefId", orgLevelDefId);
+       model.addAttribute("orgLevelDefId", orgLevelDefId);
         List<OrgLevelDefDTO> orgLevels = orgLevelService.getActiveOrgLevels();
         model.addAttribute("orgLevels", orgLevels);
-        return "orgLevels/orgLevelEntry";
+        return "orgLevels/orgLevelEntryView";
     }
 
     @PostMapping("/save-org-level-entry")
@@ -134,7 +150,7 @@ public class OrgLevelEntryController {
         model.addAttribute("orgLevelDefId", orgLevelDefId);
         List<OrgLevelDefDTO> orgLevels = orgLevelService.getActiveOrgLevels();
         model.addAttribute("orgLevels", orgLevels);
-        return "orgLevels/orgLevelEntry";
+        return "orgLevels/orgLevelEntryView";
         // Redirect back to the org level entry page
 //        return "redirect:/org-level-entry/" + orgLevelDefId;
     }
@@ -171,4 +187,69 @@ public class OrgLevelEntryController {
         return response;
     }
     
+    @GetMapping("/org-level-entry-dropdowns")
+    @ResponseBody
+    public List<Map<String, Object>> getOrgLevelEntriesData(@RequestParam Integer orgLevelDefId,Model model) {
+        List<Map<String, Object>> entries = new ArrayList<>();
+        
+        OrgLevelDefDTO levelDef = orgLevelService.getOrgLevelById(orgLevelDefId);
+        if (levelDef != null) {
+            String levelName = levelDef.getName();
+
+            switch (levelName) {
+                case "Principal Employer":
+                    entries = orgLevelService.getPrincipalEmployers()
+                            .stream()
+                            .map(pe -> {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("entryName", pe.getCode());
+                                map.put("description", pe.getName());
+                                return map;
+                            })
+                            .toList();
+                    break;
+
+                case "Contractor":
+                    entries = orgLevelService.getContractors()
+                            .stream()
+                            .map(c -> {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("entryName", c.getVendorCode());
+                                map.put("description", c.getContractorName());
+                                return map;
+                            })
+                            .toList();
+                    break;
+                    
+                case "Work Order":
+                    entries = orgLevelService.getWorkorders()
+                            .stream()
+                            .map(w -> {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("entryName", w.getSapWorkorderNumber());
+                                map.put("description", w.getName());
+                                return map;
+                            })
+                            .toList();
+                    break;
+
+                case "Dept":
+                case "Area":
+                    entries = orgLevelService.getGeneralMasters(levelName)
+                            .stream()
+                            .map(gm -> {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("entryName", gm.getGmName());
+                                map.put("description", gm.getGmDescription());
+                                return map;
+                            })
+                            .toList();
+                    break;
+            }
+        }
+        return entries;  // ✅ this will return JSON
+        
+    }
+
+
 }
