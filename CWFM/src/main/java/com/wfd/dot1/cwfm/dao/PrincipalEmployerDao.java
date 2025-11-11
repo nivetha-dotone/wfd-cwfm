@@ -24,4 +24,6 @@ public interface PrincipalEmployerDao {
     
     PrincipalEmployerDocument getDocumentById(int docId);
 
+	public List<PrincipalEmployer> getAllDepartmentForAdmin();
+
 }

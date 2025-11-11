@@ -4,7 +4,8 @@ public enum UserRole {
 	CONTRACTORSUPERVISOR("0","CONTRACTOR"),
 	EIC("1","EIC"),
 	SECURITY("2","SECURITY"),
-	HR("3","HR");
+	HR("3","HR"),
+	SystemAdmin("4","SYSTEM ADMIN");
 	
 	private UserRole(String index, String name) {
 		this.index = index;

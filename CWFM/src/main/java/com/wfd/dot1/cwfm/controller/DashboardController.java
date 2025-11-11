@@ -21,6 +21,7 @@ import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.service.CommonService;
 import com.wfd.dot1.cwfm.service.DashboardService;
+import com.wfd.dot1.cwfm.service.PrincipalEmployerService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,22 +52,36 @@ public class DashboardController {
         return result;
 	}
 	
+	@Autowired
+	PrincipalEmployerService peService;
+	
 	@GetMapping("/getOrgDetails")
 	public String loadOrg(HttpServletRequest request, HttpServletResponse response, Model model) {
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		 
    		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-   		List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
-        
+   		
+   		if(user!=null) {
+   			
+            if(user.getRoleName().equals("System Admin")) {
+            	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+       	   		List<PrincipalEmployer> departments =new ArrayList<PrincipalEmployer>();
+           	 listDto = peService.getAllPrincipalEmployerForAdmin();
+           	departments = peService.getAllDepartmentForAdmin();
+         	request.setAttribute("principalEmployers", listDto);
+         	  request.setAttribute("Dept", departments);
+            }else {
    		
    		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
        	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
        			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
        	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
        	List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+            
        	request.setAttribute("principalEmployers", peList);
        	  request.setAttribute("Dept", departments);
-       	  
+            }
+   		}
 		return "dashboard/primarySelect";
 	}
 	
@@ -94,7 +109,7 @@ public class DashboardController {
 		MasterUser user = (session != null) ? (MasterUser) session.getAttribute("loginuser") : null; 
 		String role = user.getRoleName().toUpperCase();
 		List<CardDto> cards = new ArrayList<>();
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
 			int quick = service.getGatePassListingDetails(principalEmployerId, deptId, GatePassType.CREATE.getStatus(),"quick");
 			String quickUrl = "/CWFM/contractworkmen/quickOnboardingListDashboardNav"
 			        + "?principalEmployerId=" + principalEmployerId

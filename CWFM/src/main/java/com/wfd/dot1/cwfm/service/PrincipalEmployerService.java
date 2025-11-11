@@ -23,4 +23,6 @@ public interface PrincipalEmployerService {
 	 Map<String, List<PrincipalEmployerDocument>> getDocumentsGroupedByType(String id);
 	 
 	    List<KronosReport> getAllDocTypes();
+
+		List<PrincipalEmployer> getAllDepartmentForAdmin();
 }

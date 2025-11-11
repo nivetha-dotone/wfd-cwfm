@@ -186,9 +186,9 @@ function toggleSelectAllGMTYPE() {
     <c:if test="${UserPermission.addRights eq 1 }">
           <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToMappingAdd()">Add</button> 
      </c:if> 
-    <c:if test="${UserPermission.editRights eq 1 }">
+    <%-- <c:if test="${UserPermission.editRights eq 1 }">
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectEdit()">Edit</button> 
-     </c:if>
+     </c:if> --%>
      <c:if test="${UserPermission.viewRights eq 1 }">
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectView()">View</button>
 

@@ -41,6 +41,13 @@ public class PrincipalEmployerServiceImpl implements PrincipalEmployerService{
 		// TODO Auto-generated method stub
 		return peDao.getAllPrincipalEmployerForAdmin();
 	}
+	
+	@Override
+	public List<PrincipalEmployer> getAllDepartmentForAdmin() {
+		// TODO Auto-generated method stub
+		return peDao.getAllDepartmentForAdmin();
+	}
+	
 	@Override
 	public void saveDocument(int employerId, String docType, MultipartFile file, String uploadedBy) throws IOException {
 	    int version = peDao.getNextVersion(employerId, docType);

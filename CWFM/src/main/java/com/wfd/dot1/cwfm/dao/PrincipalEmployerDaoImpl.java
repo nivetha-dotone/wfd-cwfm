@@ -166,6 +166,25 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 			pe.setAttachmentNm(rs.getString("ATTACHMENTNM"));
 			pe.setStateId(rs.getInt("STATEID"));
 			pe.setIsActive(rs.getInt("ISACTIVE"));
+			pe.setId(String.valueOf(rs.getInt("UNITID")));
+			pe.setDescription(rs.getString("NAME"));
+			peList.add(pe);
+		}
+		log.info("Exiting from getAllPrincipalEmployerForAdmin dao method "+peList.size());
+		return peList;
+	}
+	
+	@Override
+	public List<PrincipalEmployer> getAllDepartmentForAdmin() {
+		log.info("Entering into getAllPrincipalEmployerForAdmin dao method ");
+		List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
+		String query = "select GMID,GMNAME from CMSGENERALMASTER cgm join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID where cgt.GMTYPE='Department'";
+		log.info("Query to getAllPrincipalEmployerForAdmin "+query);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+		while(rs.next()) {
+			PrincipalEmployer pe = new PrincipalEmployer();
+			pe.setId(rs.getString("GMID"));
+			pe.setDescription(rs.getString("GMNAME"));
 			
 			peList.add(pe);
 		}

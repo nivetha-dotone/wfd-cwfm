@@ -99,7 +99,7 @@ return null;
 				+ "	join CMSWORKORDERLN cwln on cwln.WORKORDERID=cmwo.WORKORDERID\r\n"
 				+ "	join CMSWORKORDERTYP cwty on cwty.TYPEID = cmwo.TYPEID WHERE cmwo.CONTRACTORID=? and cmwo.UNITID=?";
 		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+query);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorId,unitId);
 		while(rs.next()) {
 			Workorder wo = new Workorder();
 			wo.setWorkorderId(rs.getString("WORKORDERID"));

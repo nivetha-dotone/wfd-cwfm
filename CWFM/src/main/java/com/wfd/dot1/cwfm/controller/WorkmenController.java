@@ -2048,7 +2048,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     	request.setAttribute("selectedDept", deptId);
     	  
     	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName()) || user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
 			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
 		}else {	
 			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
@@ -2082,7 +2082,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     	request.setAttribute("selectedDept", deptId);
     	  
     	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName()) || user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
 			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
 		}else {	
 			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
@@ -2110,7 +2110,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
         List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
         if(action.equals(GatePassType.BLOCK.getStatus())) {
         rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/blockListFilter");
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName()) || user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
 			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus());
     		
 		}else {	
@@ -2119,7 +2119,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
 		result ="contractWorkmen/blockListing";
         }else if(action.equals(GatePassType.UNBLOCK.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/unblockListFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus());
         		
     		}else {	
@@ -2137,7 +2137,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/blackListing";
         }else if(action.equals(GatePassType.DEBLACKLIST.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/deblackListFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus());
         		
     		}else {	
@@ -2146,7 +2146,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/deblackListing";
         }else if(action.equals(GatePassType.CANCEL.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/cancelFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CANCEL.getStatus());
         		
     		}else {	
@@ -2155,7 +2155,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/cancelListing";
         }else if(action.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/lostordamageFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus());
         		
     		}else {	
@@ -2164,7 +2164,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/lostListing";
         }else if(action.equals(GatePassType.RENEW.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/renewFilter");
-        	if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+        	if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
         		//write union for renewal pending and renewed
     				gplistDto= workmenService.getRenewListingDetails( String.valueOf(user.getUserId()), GatePassType.CREATE.getStatus(), GatePassStatus.APPROVED.getStatus(), deptId, principalEmployerId) ;
         		}else {	

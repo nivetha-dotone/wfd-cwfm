@@ -1905,13 +1905,14 @@ function changeRole(selectedRoleId, selectedRoleName) {
         .then(data => {
         	 console.log('Sidebar update data:', data); 
             updateSidebar(data,selectedRoleName); // Update the sidebar with the fetched pages
-          if(selectedRoleName === 'System Admin'){
+          //if(selectedRoleName === 'System Admin'){
         	  
-          }else{
+          //}else{
          // Fetch the role-based dashboard 
             return fetch('/CWFM/dashboard/getOrgDetails', {
                 method: 'GET'
-            });}
+            });
+         //}
         })
         .then(response => response.text())
         .then(html => {

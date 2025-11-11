@@ -204,11 +204,11 @@
 </div>
 </div>
 <!-- Form for Adding/Editing Entries -->
-<h3 style=" color: darkcyan;">Add Entry</h3>
+<h3 style=" color: darkcyan;padding:10px;">Add Entry</h3>
 <div>
     <input type="hidden" name="orgLevelEntryId" id="orgLevelEntryId" value="0" />
 
-    <label for="entryName" style="color: darkcyan;">Entry Name:</label>
+    <label for="entryName" style="color: darkcyan;padding:10px;">Entry Name:</label>
 <select id="entryName" name="entryName" style="padding:3px;">
     <option value="">Select Entry Name</option>
 </select>

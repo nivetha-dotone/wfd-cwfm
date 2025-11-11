@@ -3488,9 +3488,9 @@ if(valid){
 									  let g = response.data.aadhaar_xml_data.gender|| "";
 									  let gender;
 									  if(g === "F"){
-										gender = "12";
+										gender = "30";
 									  }else{
-										gender = "11";
+										gender = "29";
 									  }
 									  let address= response.data.aadhaar_xml_data.full_address|| ""+" "+response.data.aadhaar_xml_data.zip|| "";
 									  document.getElementById("firstName").value = firstname;
