@@ -512,6 +512,13 @@ public class GatePassMain {
 		this.llNo = llNo;
 	}
 	
+	private String newDot;
+	public String getNewDot() {
+		return newDot;
+	}
+	public void setNewDot(String newDot) {
+		this.newDot = newDot;
+	}
 	
 	}
 	

@@ -1870,7 +1870,7 @@ function redirectToWorkmenBlockView(mode) {
  }
  
  var selectedRow = selectedCheckboxes[0].closest('tr');
- var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+ var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
@@ -1885,7 +1885,7 @@ function redirectToWorkmenBlockView(mode) {
          document.getElementById("mainContent").innerHTML = xhr.responseText;
      }
  };
- xhr.open("GET", "/CWFM/contractworkmen/blockview/" + transactionId+ "/" + mode, true);
+ xhr.open("GET", "/CWFM/contractworkmen/blockview/" + gatePassId+ "/" + mode, true);
  xhr.send();
  }
  function redirectToWorkmenUnblockView(mode) {
@@ -1896,7 +1896,7 @@ function redirectToWorkmenBlockView(mode) {
   }
   
   var selectedRow = selectedCheckboxes[0].closest('tr');
-  var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+  var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
   var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
   												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
@@ -1910,7 +1910,7 @@ function redirectToWorkmenBlockView(mode) {
           document.getElementById("mainContent").innerHTML = xhr.responseText;
       }
   };
-  xhr.open("GET", "/CWFM/contractworkmen/unblockview/" + transactionId+"/"+mode, true);
+  xhr.open("GET", "/CWFM/contractworkmen/unblockview/" + gatePassId+"/"+mode, true);
   xhr.send();
   }
   function redirectToWorkmenBlackView(mode) {
@@ -1921,7 +1921,7 @@ function redirectToWorkmenBlockView(mode) {
     }
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
-    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 													   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
@@ -1935,7 +1935,7 @@ function redirectToWorkmenBlockView(mode) {
             document.getElementById("mainContent").innerHTML = xhr.responseText;
         }
     };
-    xhr.open("GET", "/CWFM/contractworkmen/blackview/" + transactionId+ "/" + mode, true);
+    xhr.open("GET", "/CWFM/contractworkmen/blackview/" + gatePassId+ "/" + mode, true);
     xhr.send();
     }
 	function redirectToWorkmenDeblackView(mode) {
@@ -1946,7 +1946,7 @@ function redirectToWorkmenBlockView(mode) {
 	  }
 	  
 	  var selectedRow = selectedCheckboxes[0].closest('tr');
-	  var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+	  var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 	  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 	  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
@@ -1960,7 +1960,7 @@ function redirectToWorkmenBlockView(mode) {
 	          document.getElementById("mainContent").innerHTML = xhr.responseText;
 	      }
 	  };
-	  xhr.open("GET", "/CWFM/contractworkmen/deblackview/" + transactionId+"/"+mode, true);
+	  xhr.open("GET", "/CWFM/contractworkmen/deblackview/" + gatePassId+"/"+mode, true);
 	  xhr.send();
 	  }
 	  function redirectToWorkmenLostView(mode) {
@@ -1971,7 +1971,7 @@ function redirectToWorkmenBlockView(mode) {
 	    }
 	    
 	    var selectedRow = selectedCheckboxes[0].closest('tr');
-	    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+	    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 		var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 														   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 														   if(mode === "add"){
@@ -1985,7 +1985,7 @@ function redirectToWorkmenBlockView(mode) {
 	            document.getElementById("mainContent").innerHTML = xhr.responseText;
 	        }
 	    };
-	    xhr.open("GET", "/CWFM/contractworkmen/lostordamageview/" + transactionId+"/"+mode, true);
+	    xhr.open("GET", "/CWFM/contractworkmen/lostordamageview/" + gatePassId+"/"+mode, true);
 	    xhr.send();
 	    }	
 function searchWorkmenWithGatePassId(){
@@ -2152,7 +2152,7 @@ function previewImage(event, inputId, displayId) {
 										            if (Array.isArray(response) &&response.length > 0) {
 										                $.each(response, function(index, wo) {
 										                    var row = '<tr  >' +
-																	'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+																	'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																	'<td  >' + wo.transactionId + '</td>' +
 										                              '<td  >' + wo.gatePassId + '</td>' +
 										                              '<td  >' + wo.firstName + ' '+wo.lastName +'</td>' +
@@ -2202,7 +2202,7 @@ function previewImage(event, inputId, displayId) {
 										            if (Array.isArray(response) && response.length > 0) {
 										                $.each(response, function(index, wo) {
 										                    var row = '<tr>' +
-										                        '<td><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>' +
+										                        '<td><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>' +
 										                        '<td>' + wo.transactionId + '</td>' +
 										                        '<td>' + wo.gatePassId + '</td>' +
 										                        '<td>' + wo.firstName + ' ' + wo.lastName + '</td>' +
@@ -2248,7 +2248,7 @@ function previewImage(event, inputId, displayId) {
 										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
-																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
 										                          '<td  >' + wo.firstName + ' '+ wo.lastName +'</td>' +
@@ -2294,7 +2294,7 @@ function previewImage(event, inputId, displayId) {
 										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
-																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
 										                          '<td  >' + wo.firstName + ''  + wo.lastName + '</td>' +
@@ -2339,7 +2339,7 @@ function previewImage(event, inputId, displayId) {
 										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
-																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
 										                          '<td  >' + wo.firstName + ' '+ wo.lastName +'</td>' +
@@ -2382,7 +2382,7 @@ function previewImage(event, inputId, displayId) {
 										        if (Array.isArray(response) &&response.length > 0) {
 										            $.each(response, function(index, wo) {
 										                var row = '<tr  >' +
-																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
 										                          '<td  >' + wo.firstName +''+ wo.lastName + '</td>' +
@@ -2617,7 +2617,7 @@ function previewImage(event, inputId, displayId) {
 											        if (Array.isArray(response) &&response.length > 0) {
 											            $.each(response, function(index, wo) {
 											                var row = '<tr  >' +
-																							'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.transactionId + '"></td>'+
+																							'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																							'<td  >' + wo.transactionId + '</td>' +
 																							 '<td  >' + wo.gatePassId + '</td>' +
 											                          '<td  >' + wo.firstName + ' ' + wo.lastName +'</td>' +
@@ -2650,7 +2650,7 @@ function redirectToWorkmenRenewEdit() {
 	}
 																 
 	var selectedRow = selectedCheckboxes[0].closest('tr');
-	var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+	var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 	   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 
@@ -2664,7 +2664,7 @@ function redirectToWorkmenRenewEdit() {
 			document.getElementById("mainContent").innerHTML = xhr.responseText;
 	}
 	};
-	xhr.open("GET", "/CWFM/contractworkmen/renew/" + transactionId, true);
+	xhr.open("GET", "/CWFM/contractworkmen/renew/" + gatePassId, true);
 	xhr.send();
 }
 function renewGatePass(userId) {
@@ -2882,7 +2882,7 @@ if(isValid){
 	    }
 	    
 	    var selectedRow = selectedCheckboxes[0].closest('tr');
-	    var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+	    var gatePassId = selectedRow.querySelector('[name="selectedWOs"]').value;
 
 	    var xhr = new XMLHttpRequest();
 	    xhr.onreadystatechange = function() {
@@ -2890,7 +2890,7 @@ if(isValid){
 	            document.getElementById("mainContent").innerHTML = xhr.responseText;
 	        }
 	    };
-	    xhr.open("GET", "/CWFM/contractworkmen/renewview/" + transactionId, true);
+	    xhr.open("GET", "/CWFM/contractworkmen/renewview/" + gatePassId, true);
 	    xhr.send();
 	}
 
@@ -3488,9 +3488,9 @@ if(valid){
 									  let g = response.data.aadhaar_xml_data.gender|| "";
 									  let gender;
 									  if(g === "F"){
-										gender = "30";
+										gender = "12";
 									  }else{
-										gender = "29";
+										gender = "11";
 									  }
 									  let address= response.data.aadhaar_xml_data.full_address|| ""+" "+response.data.aadhaar_xml_data.zip|| "";
 									  document.getElementById("firstName").value = firstname;

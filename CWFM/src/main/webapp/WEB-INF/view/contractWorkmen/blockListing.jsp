@@ -253,7 +253,7 @@
         <tbody>
             <c:forEach items="${GatePassListingDto}" var="wo" >
             <tr>
-            <td  ><input type="checkbox" name="selectedWOs" value="${wo.transactionId}"></td>
+            <td  ><input type="checkbox" name="selectedWOs" value="${wo.gatePassId}"></td>
 												<td  > ${ wo.transactionId } </td> 
 												 <td  > ${ wo.gatePassId } </td> 
 					                              <td  > ${ wo.firstName } ${ wo.lastName}  </td> 

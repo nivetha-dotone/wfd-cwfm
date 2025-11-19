@@ -22,9 +22,11 @@ import org.springframework.web.client.RestTemplate;
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
+import com.wfd.dot1.cwfm.dto.CMSPerson;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
+import com.wfd.dot1.cwfm.dto.PersonStatusIds;
 import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
@@ -170,13 +172,23 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.getIndividualContractWorkmenDetails(transactionId);
 	}
 	@Override
+	public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatepassid) {
+		return workmenDao.getIndividualContractWorkmenDetailsByGatePassId(gatepassid);
+	}
+	
+	@Override
 	public List<CmsGeneralMaster> getAllGeneralMasterForGatePass(GatePassMain gatePassMainObj) {
 		return workmenDao.getAllGeneralMastersForGatePass(gatePassMainObj);
 	}
 	@Override
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto) {
+		GatePassMain gpm=null;
+		if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
+			 gpm = workmenDao.getIndividualContractWorkmenDetailsByTransId(dto.getTransactionId());
+		}else {
+			gpm = workmenDao.getIndividualContractWorkmenDetailsByGatePassIdForApprove(dto.getGatePassId());
+		}
 		
-		GatePassMain gpm = workmenDao.getIndividualContractWorkmenDetailsByTransId(dto.getTransactionId());
 		String result=null;
 		//if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gpm.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus())) {
 		 result = workmenDao.approveRejectGatePass(dto);
@@ -198,7 +210,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			}
 		}else {
 			boolean isLastApprover=false;
-			int workFlowTypeId = workmenDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId(),dto.getGatePassType());
+			int workFlowTypeId = workmenDao.getWorkFlowTYpeByTransactionId(gpm.getTransactionId(),dto.getGatePassType());
 			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 				 isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(),String.valueOf(dto.getGatePassType()));
 			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
@@ -215,11 +227,60 @@ public class WorkmenServiceImpl implements WorkmenService{
 				if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()) || dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
 					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
 				//rollback status and type to create
+				
+					
 				}else {
 					String gatePassId=dto.getGatePassId();
 					if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
 						//create gatepassId on final approval
 						gatePassId= workmenDao.updateGatePassIdByTransactionId(dto.getTransactionId());
+						gpm.setGatePassId(gatePassId);
+						//insert into CMSPerson
+						long personInsert = this.saveIntoCMSPerson(gpm);
+						System.out.println("Insert into CMSPerson result "+personInsert);
+						if(personInsert>0) {
+							//insert into CMSPERSONJOBHIST
+							boolean personJobHist = this.saveIntoCMSPERSONJOBHIST(gpm,personInsert);
+							System.out.println("Insert into CMSPerson result "+personJobHist);
+							if(personJobHist) {
+								boolean cMSPERSONSTATUSMM = this.saveCMSPERSONSTATUSMM(gpm,personInsert);
+								System.out.println("Insert into CMSPerson result "+cMSPERSONSTATUSMM);
+								if(cMSPERSONSTATUSMM) {
+									gpm.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
+									boolean cmsPersonCustData = this.saveCMSPERSONCUSTOMDATA(gpm,personInsert);
+									System.out.println("Insert into CMSPerson result "+cmsPersonCustData);
+								}
+							}
+						}
+					}else if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus()) ||
+							dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus()) ||
+							dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
+						long personId = this.getPersonIdFromCmsPerson(gpm.getGatePassId());
+						boolean effectiveTillUpdate = workmenDao.updateCmsPersonCustDataEffectiveTill(personId);
+						if(effectiveTillUpdate) {
+							boolean insertIntoCustData=false;
+							if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus())) {
+								insertIntoCustData = workmenDao.insertIntoCustData(gpm.getCreatedBy(),personId,GatePassType.BLOCK.getStatus());
+							}else if(dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus())) {
+								insertIntoCustData = workmenDao.insertIntoCustData(gpm.getCreatedBy(),personId,GatePassType.BLACKLIST.getStatus());
+							}else if(dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
+								insertIntoCustData = workmenDao.insertIntoCustData(gpm.getCreatedBy(),personId,GatePassType.CANCEL.getStatus());
+							}
+							if(insertIntoCustData) {
+								boolean personActiveinMM = workmenDao.isPersonActiveInStatusMM(personId);
+								if(personActiveinMM) {
+									PersonStatusIds ids = workmenDao.getPersonStatusIds(personId);
+
+								    if (ids.getInactiveId() != null) {
+								        boolean personStatusMM= workmenDao.updatePersonStatusValidity(ids.getActiveId(),ids.getInactiveId());
+								   if(personStatusMM) {
+									   System.out.print(personStatusMM);
+								   }
+								    }
+								}
+							}
+						}
+						
 					}
 					
 				status = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
@@ -230,6 +291,14 @@ public class WorkmenServiceImpl implements WorkmenService{
 //			result="Other gatepass action performed on this gatepass";
 //		}
 		return result;
+	}
+	private long getPersonIdFromCmsPerson(String gatePassId) {
+		// TODO Auto-generated method stub
+		return workmenDao.getPersonIdFromCmsPerson(gatePassId);
+	}
+	private boolean saveCMSPERSONCUSTOMDATA(GatePassMain gpm, long personInsert) {
+		// TODO Auto-generated method stub
+		return workmenDao.saveCMSPERSONCUSTDATA(gpm, personInsert);
 	}
 	@Override
 	public String gatePassAction(GatePassActionDto dto) {
@@ -452,7 +521,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public String renewGatePass(GatePassMain gatePassMain) {
 		String transactionId =gatePassMain.getTransactionId();
 		try {
-			int workFlowTypeId = workmenDao.getWorkFlowTYpe(gatePassMain.getPrincipalEmployer());
+			int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(gatePassMain.getPrincipalEmployer(),GatePassType.RENEW.getStatus());
 			gatePassMain.setWorkFlowType(workFlowTypeId);
 			
 			int dotTypeId = workmenDao.getDOTTYpe(gatePassMain.getPrincipalEmployer());
@@ -649,4 +718,55 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId) {
 		return workmenDao.getAllSubDepartments(unitId,departmentId);
 	}
+	@Override
+	public String getTransactionIdByGPId(String gatepassid,String gatepasstypeid) {
+		return workmenDao.getTransactionIdByGPId(gatepassid,gatepasstypeid);
+	}
+	
+	public long saveIntoCMSPerson(GatePassMain gpm) {
+		CMSPerson person = new CMSPerson();
+		person.setEmployeeCode(gpm.getGatePassId());
+		person.setFirstName(gpm.getFirstName());
+		person.setLastName(gpm.getLastName());
+		person.setRelationName(gpm.getRelationName());
+		person.setDateOfBirth(gpm.getDateOfBirth());
+		person.setDateOfJoining(gpm.getDoj());
+		person.setDateOfTermination(gpm.getDot());
+		person.setBloodGroup(Integer.parseInt(gpm.getBloodGroup()));
+		person.setHazardousArea(gpm.getHazardousArea());
+		person.setGender(Integer.parseInt(gpm.getGender()));
+		person.setAcademics(Integer.parseInt(gpm.getAcademic()));
+		person.setAccomodation(gpm.getAccommodation().equals("Yes")?1:0);
+		person.setBankBranch(gpm.getIfscCode());
+		person.setAccountNo(gpm.getAccountNumber());
+		person.setEmergencyName(gpm.getEmergencyName());
+		person.setEmergencyNumber(gpm.getEmergencyNumber());
+		person.setMobileNumber(gpm.getMobileNumber());
+		person.setAccessLevel(Integer.parseInt(gpm.getAccessArea()));
+		person.setEsicNumber(gpm.getEsicNumber());
+		person.setUanNumber(gpm.getUanNumber());
+		person.setIsPfEligible(gpm.getPfApplicable().equals("Yes")?1:0);
+		person.setIdMark(gpm.getIdMark());
+		person.setPanNumber(gpm.getPfNumber());
+		person.setAadharNumber(gpm.getAadhaarNumber());
+		person.setUpdatedBy(gpm.getCreatedBy());
+		
+		return workmenDao.saveIntoCMSPerson(person);
+	}
+	
+	public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm,long employeeId) {
+		
+		return workmenDao.saveIntoCMSPERSONJOBHIST(gpm,employeeId);
+	}
+	
+	public boolean saveCMSPERSONSTATUSMM(GatePassMain gpm,long employeeId) {
+		String dot = gpm.getDot();  // e.g. "2025-12-31"
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate date = LocalDate.parse(dot, formatter);
+		LocalDate nextDate = date.plusDays(1);
+		String newDot = nextDate.format(formatter);
+		gpm.setNewDot(newDot);
+		return workmenDao.saveCMSPERSONSTATUSMM(gpm,employeeId);
+	}
+	
 }

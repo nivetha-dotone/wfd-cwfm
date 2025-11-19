@@ -112,5 +112,8 @@ public interface WorkmenService {
 	public List<DeptMapping> getAllDepartmentsOnPE(String unitId);
 
 	public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId);
+	
+	String getTransactionIdByGPId(String gatepassid,String gatepasstypeid);
+	GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatepassid);
 
 }	

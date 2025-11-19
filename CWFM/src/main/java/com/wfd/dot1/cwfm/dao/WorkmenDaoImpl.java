@@ -3,10 +3,12 @@ package com.wfd.dot1.cwfm.dao;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +20,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
+import com.wfd.dot1.cwfm.dto.CMSPerson;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
+import com.wfd.dot1.cwfm.dto.PersonStatusIds;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
@@ -35,7 +41,6 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
 import com.wfd.dot1.cwfm.pojo.Contractor;
-import com.wfd.dot1.cwfm.pojo.ContractorComplianceDto;
 import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
@@ -899,7 +904,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	            int status = jdbcTemplate.update(query, parameters);
 	            if (status > 0) {
 	                log.info("GatePass action created successfully for GatePassId: " + dto.getGatePassId());
-	                result="GatePass action created successfully";
+	               // result="GatePass action created successfully";
+	                result=gatePassTransactionMapping(dto);
 	            } else {
 	                log.warn("Failed to create GatePass action for GatePassId: " + dto.getGatePassId());
 	            }
@@ -912,6 +918,24 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	    return result;
 	}
 
+	public String gatePassTransactionMapping(GatePassActionDto dto) {
+		 String sql = "insert into GatePassTransactionMapping (TransactionId,GatePassId,GatePassTypeId) VALUES (?,?,?)";
+        String result=null;
+        Object[] parameters = new Object[] {dto.getTransactionId(),dto.getGatePassId(),dto.getGatePassType()};
+        try {
+        int status = jdbcTemplate.update(sql, parameters);
+        if (status > 0) {
+        	result="GatePass action created successfully";
+        }else {
+            log.warn("Failed to create GatePass action for GatePassId: " + dto.getGatePassId());
+        }
+        }catch (Exception e) {
+            log.error("Error creating GatePass action for GatePassId: " + dto.getGatePassId(), e);
+            return null;
+        }
+        return result;
+     
+	}
 	public String getSaveGatePassStatusLog() {
 		return QueryFileWatcher.getQuery("SAVE_GATEPASS_STATUSLOG");
 	}
@@ -942,7 +966,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		String query = getGatePassActionListingDetailsQuery();
 		log.info("Query to getGatePassListingDetails "+query);
 		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -1643,6 +1667,8 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setPfApplicable(rs.getString("pfapplicable"));
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
+		dto.setOnboardingType(rs.getString("OnboardingType"));
+		dto.setLlNo(rs.getString("LLNo"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 	return dto;
@@ -1807,6 +1833,7 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setPfApplicable(rs.getString("pfapplicable"));
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
+		dto.setLlNo(rs.getString("LLNo"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -1822,11 +1849,11 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 		query=this.getAllGatePassActionForSquential();
 		log.info("Query to getGatePassListingForApprovers "+query);
 		
-		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,gatePassTypeId,gatePassTypeId,roleId,deptId,unitId);
+		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,gatePassTypeId,gatePassTypeId,gatePassTypeId,roleId,deptId,unitId);
 	}else {
 		query=this.getAllGatePassActionForParallel();
 		log.info("Query to getGatePassListingForApprovers "+query);
-		 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
+		 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
 	}
 	
 	while(rs.next()) {
@@ -2272,4 +2299,521 @@ public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId
 	log.info("Exiting from getAllSkillsBasedOnPE dao method "+areaList.size());
 	return areaList;
 }
+
+@Override
+public String getTransactionIdByGPId(String gatepassid,String gatepasstypeid) {
+	String query="select TransactionId from GatePassTransactionMapping where GatePassId=? and GatePassTypeId=?";
+	String transactionId=null;
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatepassid,gatepasstypeid);
+	if(rs.next()) {
+		transactionId = rs.getString("TransactionId");
+	}
+	return transactionId;
+}
+
+@Override
+public long saveIntoCMSPerson(CMSPerson person) {
+    String sql = "INSERT INTO CMSPERSON (EMPLOYEECODE, FIRSTNAME, RELATIONNAME, LASTNAME, DATEOFBIRTH, DATEOFJOINING, " +
+            "DATEOFTERMINATION, BLOODGROUP, HAZARDOUSAREA, GENDER, ACADEMICS, ACCOMODATION, BANKBRANCH, ACCOUNTNO, " +
+            "EMERGENCYNAME, EMERGENCYNUMBER, MOBILENUMBER, ACCESSLEVEL, ESICNUMBER, UANNUMBER, ISPFELIGIBLE, IDMARK, " +
+            "PANNO, UPDATEDBY, AADHARNUMBER) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    Object[] parameters = new Object[]{
+        person.getEmployeeCode(),
+        person.getFirstName(),
+        person.getRelationName(),
+        person.getLastName(),
+        person.getDateOfBirth(),
+        person.getDateOfJoining(),
+        person.getDateOfTermination(),
+        person.getBloodGroup(),
+        person.getHazardousArea(),
+        person.getGender(),
+        person.getAcademics(),
+        person.getAccomodation(),
+        person.getBankBranch(),
+        person.getAccountNo(),
+        person.getEmergencyName(),
+        person.getEmergencyNumber(),
+        person.getMobileNumber(),
+        person.getAccessLevel(),
+        person.getEsicNumber(),
+        person.getUanNumber(),
+        person.getIsPfEligible(),
+        person.getIdMark(),
+        person.getPanNumber(),
+        person.getUpdatedBy(),
+        person.getAadharNumber()
+    };
+
+    try {
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            for (int i = 0; i < parameters.length; i++) {
+                ps.setObject(i + 1, parameters[i]);
+            }
+            return ps;
+        }, keyHolder);
+
+        Number generatedId = keyHolder.getKey();
+        if (generatedId != null) {
+            return generatedId.longValue();  // return EMPLOYEEID
+        } else {
+            log.warn("Insert succeeded but no EMPLOYEEID returned for EmployeeCode: " + person.getEmployeeCode());
+            return -1;
+        }
+    } catch (Exception e) {
+        log.error("Error inserting into CMSPerson for EmployeeCode: " + person.getEmployeeCode(), e);
+        return -1;
+    }
+}
+
+@Override
+public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm, long employeeId) {
+	boolean result = false;
+	 String sql = "INSERT INTO CMSPERSONJOBHIST ( EMPLOYEEID , TRADEID , SKILLID , UNITID , CONTRACTORID , DEPARTMENTID , "
+	 		+ " SUBDEPARTMENTID , WORKORDERID , EICID , VALIDFROM , VALIDTO  ) "
+	 		+ "     VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+     Object[] parameters = new Object[] {employeeId,gpm.getTrade(),gpm.getSkill(),gpm.getUnitId(),gpm.getContractor(),gpm.getDepartment(),
+    		 gpm.getSubdepartment(),gpm.getWorkorder(),gpm.getEic(),gpm.getDoj(), "1/1/3000"};
+     try {
+     int status = jdbcTemplate.update(sql, parameters);
+     if (status > 0) {
+     	result=true;
+     }else {
+         log.warn("Failed to create GatePass action for GatePassId: " + gpm.getGatePassId());
+     }
+     }catch (Exception e) {
+         log.error("Error creating GatePass action for GatePassId: " + gpm.getGatePassId(), e);
+         return false;
+     }
+     return result;
+}
+
+@Override
+public boolean saveCMSPERSONSTATUSMM(GatePassMain gpm, long employeeId) {
+	
+	boolean result = false;
+	 String sql = "INSERT INTO CMSPERSONSTATUSMM ( EMPLOYEEID , ISACTIVE , VALIDFROM , VALIDTO)  VALUES (?,?,?,? )";
+    Object[] parameters = new Object[] {employeeId,1,gpm.getDoj(),gpm.getDot()};
+    try {
+    int status = jdbcTemplate.update(sql, parameters);
+    if (status > 0) {
+    	boolean r = saveCMSPERSONSTATUSMMTerminated(gpm,employeeId);
+    	result=r;
+    }else {
+        log.warn("Failed to create GatePass action for GatePassId: " + gpm.getGatePassId());
+    }
+    }catch (Exception e) {
+        log.error("Error creating GatePass action for GatePassId: " + gpm.getGatePassId(), e);
+        return false;
+    }
+    return result;
+}
+
+@Override
+public boolean saveCMSPERSONSTATUSMMTerminated(GatePassMain gpm, long employeeId) {
+	
+	boolean result = false;
+	
+	 String sql = "INSERT INTO CMSPERSONSTATUSMM ( EMPLOYEEID , ISACTIVE , VALIDFROM , VALIDTO)  VALUES (?,?,?,? )";
+    Object[] parameters = new Object[] {employeeId,0,gpm.getNewDot(),"1/1/3000"};
+    try {
+    int status = jdbcTemplate.update(sql, parameters);
+    if (status > 0) {
+    	result=true;
+    }else {
+        log.warn("Failed to create GatePass action for GatePassId: " + gpm.getGatePassId());
+    }
+    }catch (Exception e) {
+        log.error("Error creating GatePass action for GatePassId: " + gpm.getGatePassId(), e);
+        return false;
+    }
+    return result;
+}
+
+
+
+@Override
+public boolean saveCMSPERSONCUSTDATA( GatePassMain gp,long employeeId) {
+
+    String sql = "INSERT INTO CMSPERSONCUSTOMDATA "
+            + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
+            + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
+
+    // Fetch all active custom definitions
+    String defSql = "SELECT CSTMDEFID, CSTMDEFNAME FROM CMSPERSONCUSTOMDATADEFINITION WHERE ISACTIVE = 1";
+    List<Map<String, Object>> defList = jdbcTemplate.queryForList(defSql);
+
+    boolean isQuick = "quick".equalsIgnoreCase(gp.getOnboardingType());
+
+    // Allowed fields only for quick onboarding
+    List<String> quickAllowed = Arrays.asList(
+            "IdProof",
+            "MobileNumber",
+            "ContractorId",
+            "UnitId",
+            "GatePassType",
+            "Status"
+    );
+
+    List<Object[]> batchArgs = new ArrayList<>();
+
+    for (Map<String, Object> def : defList) {
+
+        int defId = (Integer) def.get("CSTMDEFID");
+        String fieldName = (String) def.get("CSTMDEFNAME");
+
+        // If quick onboarding, allow only selected fields
+        if (isQuick && !quickAllowed.contains(fieldName)) {
+            continue;
+        }
+
+        String value = mapGatePassValue(fieldName, gp);
+
+        // Skip null/empty values
+        if (value == null || value.trim().isEmpty()) {
+            continue;
+        }
+
+        batchArgs.add(new Object[]{
+                employeeId,
+                defId,
+                value,
+                gp.getCreatedBy()
+        });
+    }
+
+    if (batchArgs.isEmpty()) {
+        return false; // nothing inserted
+    }
+
+    jdbcTemplate.batchUpdate(sql, batchArgs);
+    return true; // records inserted
+}
+
+private String mapGatePassValue(String field, GatePassMain gp) {
+
+    switch (field) {
+
+        case "IdProof":
+            return gp.getAadhaarNumber();
+
+        case "PoliceVerificationDate":
+            return gp.getPoliceVerificationDate();
+
+        case "HealthCheckupDate":
+            return gp.getHealthCheckDate();
+
+        case "UnitId":
+            return gp.getUnitId();
+
+        case "ContractorId":
+            return gp.getContractor();
+
+        case "DepartmentId":
+            return gp.getDepartment();
+
+        case "SkillId":
+            return gp.getSkill();
+
+        case "TradeId":
+            return gp.getTrade();
+
+        case "WorkorderId":
+            return gp.getWorkorder();
+
+        case "SectionId":
+            return gp.getSubdepartment();
+
+        case "MobileNumber":
+            return gp.getMobileNumber();
+
+        case "MaritalStatus":
+            return gp.getMaritalStatus();
+
+        case "NatureOfJob":
+            return gp.getNatureOfJob();
+
+        case "WcEsicNo":
+            return gp.getWcEsicNo();
+
+        case "Technical":
+            return gp.getTechnical();
+
+        case "WorkFlowType":
+            return String.valueOf(gp.getWorkFlowType());
+
+        case "Comments":
+            return gp.getComments();
+
+        case "Address":
+            return gp.getAddress();
+
+        case "OnboardingType":
+            return gp.getOnboardingType();
+
+        case "PfNumber":
+            return gp.getPfNumber();
+
+        case "LLNo":
+            return gp.getLlNo();
+
+        case "GatePassType":
+            return gp.getGatePassAction();
+
+        case "Status":
+            return gp.getGatePassStatus();  // Block / Approve etc.
+
+        default:
+            return null;
+    }
+}
+public String getContractWorkmenDetailsByGpIdForApprove() {
+	return QueryFileWatcher.getQuery("GET_CONTRACT_WORKMEN_DETAILS_BY_GPID_APPROVE");
+}
+
+@Override
+public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdForApprove(String gatePassId) {
+	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
+	GatePassMain dto = null;
+	String query = getContractWorkmenDetailsByGpIdForApprove();
+	log.info("Query to getIndividualContractWorkmenDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
+	if(rs.next()) {
+		dto = new GatePassMain();
+		dto.setOnboardingType(rs.getString("OnboardingType"));
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId(rs.getString("GatePassId"));
+		dto.setUnitId(rs.getString("peId"));
+		dto.setGatePassAction(rs.getString("GatePassTypeId"));
+		dto.setGatePassStatus(rs.getString("GatePassStatus"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setFirstName(rs.getString("FirstName"));
+		dto.setLastName(rs.getString("LastName"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setGender(rs.getString("Gender"));
+		dto.setRelationName(rs.getString("RelativeName"));
+		dto.setIdMark(rs.getString("IdMark"));
+		dto.setMobileNumber(rs.getString("MobileNumber"));
+		dto.setMaritalStatus(rs.getString("MaritalStatus"));
+		dto.setPrincipalEmployer(rs.getString("UnitId"));
+		dto.setContractor(rs.getString("ContractorId"));
+		dto.setWorkorder(rs.getString("WorkorderId"));
+		dto.setTrade(rs.getString("TradeId"));
+		dto.setSkill(rs.getString("SkillId"));
+		dto.setDepartment(rs.getString("DepartmentId"));
+		dto.setSubdepartment(rs.getString("AreaId"));
+		dto.setEic(rs.getString("EicId"));
+		dto.setNatureOfJob(rs.getString("NatureOfJob"));
+		dto.setWcEsicNo(rs.getString("WcEsicNo"));
+		dto.setHazardousArea(rs.getString("HazardousArea"));
+		dto.setAccessArea(rs.getString("AccessAreaId"));
+		dto.setUanNumber(rs.getString("UanNumber"));
+		dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+		dto.setPfNumber(rs.getString("pfnumber"));
+		dto.setEsicNumber(rs.getString("esicNumber"));
+		dto.setBloodGroup(rs.getString("BloodGroupId"));
+		dto.setAccommodation(rs.getString("Accommodation"));
+		dto.setAcademic(rs.getString("AcademicId"));
+		dto.setTechnical(rs.getString("Technical"));
+		dto.setIfscCode(rs.getString("IfscCode"));
+		dto.setAccountNumber(rs.getString("AccountNumber"));
+		dto.setEmergencyName(rs.getString("EmergencyContactName"));
+		dto.setEmergencyNumber(rs.getString("EmergencyContactNumber"));
+		dto.setWageCategory(rs.getString("WorkmenWageCategoryId"));
+		dto.setBonusPayout(rs.getString("BonusPayoutId"));
+		dto.setZone(rs.getString("ZoneId"));
+		dto.setBasic(new BigDecimal(rs.getString("Basic")));
+		dto.setDa(new BigDecimal(rs.getString("DA")));
+		dto.setHra(new BigDecimal(rs.getString("HRA")));
+		dto.setWashingAllowance(new BigDecimal(rs.getString("WashingAllowance")));
+		dto.setOtherAllowance(new BigDecimal(rs.getString("OtherAllowance")));
+		dto.setUniformAllowance(new BigDecimal(rs.getString("UniformAllowance")));
+		dto.setPfCap(rs.getString("PfCap"));
+		dto.setCreatedBy(rs.getString("UpdatedBy"));
+		dto.setAadharDocName(rs.getString("AadharDocName"));
+		dto.setPhotoName(rs.getString("PhotoName"));
+		dto.setPoliceVerificationDocName(rs.getString("PoliceVerificationDocName"));
+		dto.setBankDocName(rs.getString("BankDocName"));
+		dto.setIdProof2DocName(rs.getString("IdProof2DocName"));
+		dto.setMedicalDocName(rs.getString("MedicalDocName"));
+		dto.setForm11DocName(rs.getString("Form11DocName"));
+		dto.setOtherDocName(rs.getString("OtherDocName"));
+		dto.setTrainingDocName(rs.getString("TrainingDocName"));
+		dto.setEducationDocName(rs.getString("EducationDocName"));
+		dto.setComments(rs.getString("Comments"));
+		dto.setAddress(rs.getString("Address"));
+		dto.setDoj(rs.getString("DOJ"));
+		dto.setPfApplicable(rs.getString("pfapplicable"));
+		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
+		dto.setDot(rs.getString("DOT"));
+		dto.setLlNo(rs.getString("LLNo"));
+	}
+	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
+	return dto;
+}
+
+@Override
+public long getPersonIdFromCmsPerson(String gatePassId) {
+	String query="select EMPLOYEEID from cmsperson where EMPLOYEECODE=?";
+	long personId = 0;
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
+	if(rs.next()) {
+		personId = rs.getLong("EMPLOYEEID");
+	}
+	return personId;
+}
+
+@Override
+public boolean updateCmsPersonCustDataEffectiveTill(long personId) {
+
+    // 1. Get CSTMDEFID for Status
+    String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
+                  + "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'Status'";
+
+    Integer defId = jdbcTemplate.queryForObject(defSql, Integer.class);
+
+    if (defId == null) {
+        return false; // No definition → nothing to update
+    }
+
+    // 2. Get latest REFID
+    String refSql = "SELECT MAX(REFID) FROM CMSPERSONCUSTOMDATA "
+                  + "WHERE CSTMDEFID = ? AND EMPLOYEEID = ?";
+
+    Long refId = jdbcTemplate.queryForObject(refSql, Long.class, defId, personId);
+
+    if (refId == null || refId == 0) {
+        return false; // No record → nothing to update
+    }
+
+    // 3. Update EFFECTIVETILL
+    String updateSql = "UPDATE CMSPERSONCUSTOMDATA "
+                     + "SET EFFECTIVETILL = CONVERT(date, GETDATE() - 1) "
+                     + "WHERE REFID = ?";
+
+    return jdbcTemplate.update(updateSql, refId) > 0;
+}
+
+@Override
+public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus) {
+	String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
+			+ "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'GatePassType'";
+
+	Integer defId = jdbcTemplate.queryForObject(defSql, Integer.class);
+
+	if (defId == null) {
+		return false; // No definition → nothing to update
+	}
+	
+	
+	boolean result = false;
+	String sql = "INSERT INTO CMSPERSONCUSTOMDATA "
+            + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
+            + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
+
+   Object[] parameters = new Object[] {personId,defId,gatePassStatus,updatedBy};
+   try {
+   int status = jdbcTemplate.update(sql, parameters);
+   if (status > 0) {
+   	result=true;
+   }else {
+       log.warn("Failed to create GatePass action for GatePassId: " );
+   }
+   }catch (Exception e) {
+       log.error("Error creating GatePass action for GatePassId: " , e);
+       return false;
+   }
+   return result;
+}
+
+@Override
+public boolean isPersonActiveInStatusMM(long personId) {
+
+    String sql = "SELECT COUNT(1) "
+               + "FROM CMSPERSONSTATUSMM "
+               + "WHERE EMPLOYEEID = ? "
+               + "  AND GETDATE() BETWEEN VALIDFROM AND VALIDTO "
+               + "  AND ISACTIVE = 1";
+
+    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, personId);
+
+    return count != null && count > 0;
+}
+
+@Override
+public PersonStatusIds getPersonStatusIds(long personId) {
+
+    PersonStatusIds ids = new PersonStatusIds();
+
+    // Fetch Active ID
+    String activeSql = "SELECT PERSONSTATUSMMID "
+                     + "FROM CMSPERSONSTATUSMM "
+                     + "WHERE EMPLOYEEID = ? "
+                     + "  AND GETDATE() BETWEEN VALIDFROM AND VALIDTO "
+                     + "  AND ISACTIVE = 1";
+
+    try {
+        Long activeId = jdbcTemplate.queryForObject(activeSql, Long.class, personId);
+        ids.setActiveId(activeId);
+    } catch (EmptyResultDataAccessException ex) {
+        ids.setActiveId(null);
+    }
+
+    // Fetch Inactive ID
+    String inactiveSql = "SELECT PERSONSTATUSMMID "
+                       + "FROM CMSPERSONSTATUSMM "
+                       + "WHERE EMPLOYEEID = ? "
+                       + "  AND VALIDTO = '3000-01-01' "
+                       + "  AND ISACTIVE = 0";
+
+    try {
+        Long inactiveId = jdbcTemplate.queryForObject(inactiveSql, Long.class, personId);
+        ids.setInactiveId(inactiveId);
+    } catch (EmptyResultDataAccessException ex) {
+        ids.setInactiveId(null);
+    }
+
+    return ids;
+}
+
+@Override
+public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
+
+    boolean updated = false;
+
+    // Update active record → VALIDTO = yesterday
+    if (activeId != null) {
+        String sqlActive = "UPDATE CMSPERSONSTATUSMM "
+                         + "SET VALIDTO = CONVERT(date, GETDATE() - 1) "
+                         + "WHERE PERSONSTATUSMMID = ?";
+
+        int count1 = jdbcTemplate.update(sqlActive, activeId);
+        updated = updated || count1 > 0;
+    }
+
+    // Update inactive record → VALIDFROM = today
+    if (inactiveId != null) {
+        String sqlInactive = "UPDATE CMSPERSONSTATUSMM "
+                           + "SET VALIDFROM = CONVERT(date, GETDATE()) "
+                           + "WHERE PERSONSTATUSMMID = ?";
+
+        int count2 = jdbcTemplate.update(sqlInactive, inactiveId);
+        updated = updated || count2 > 0;
+    }
+
+    return updated;
+}
+
+
+
+
+
+
+
+
 }

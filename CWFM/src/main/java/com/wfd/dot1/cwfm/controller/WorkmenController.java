@@ -1039,9 +1039,15 @@ public class WorkmenController {
     @GetMapping("/cancelview/{gatePassId}/{mode}")
     public String cancelviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
-    	GatePassMain gatePassMainObj =null;
+    	GatePassMain gatePassMainObj =null;String transactionId=null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(gatePassId);
+    		if(mode.equals("add")){
+     			 transactionId= workmenService.generateTransactionId();
+     		}else {
+     			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.UNBLOCK.getStatus());
+     		}
+      		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+      		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
 
     		 request.setAttribute("mode", mode);
@@ -1084,12 +1090,18 @@ public class WorkmenController {
     		return "contractWorkmen/cancelView";
     	
     }
-    @GetMapping("/blockview/{transactionId}/{mode}")
-    public String blockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId, @PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
-    	GatePassMain gatePassMainObj =null;
+    @GetMapping("/blockview/{gatePassId}/{mode}")
+    public String blockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId, @PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;String transactionId=null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		if(mode.equals("add")){
+    			 transactionId= workmenService.generateTransactionId();
+    		}else {
+    			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.BLOCK.getStatus());
+    		}
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+    		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
     		
@@ -1126,18 +1138,25 @@ public class WorkmenController {
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
     	
     		return "contractWorkmen/blockView";
     	
     }
-    @GetMapping("/unblockview/{transactionId}/{mode}")
-    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    @GetMapping("/unblockview/{gatePassId}/{mode}")
+    public String unblockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,
     		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
+    	String transactionId=null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		if(mode.equals("add")){
+   			 transactionId= workmenService.generateTransactionId();
+   		}else {
+   			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.UNBLOCK.getStatus());
+   		}
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+    		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
     		
@@ -1179,13 +1198,19 @@ public class WorkmenController {
     		return "contractWorkmen/unblockView";
     	
     }
-    @GetMapping("/blackview/{transactionId}/{mode}")
-    public String blackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    @GetMapping("/blackview/{gatePassId}/{mode}")
+    public String blackviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,
     		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
-    	GatePassMain gatePassMainObj =null;
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;String transactionId=null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		if(mode.equals("add")){
+      			 transactionId= workmenService.generateTransactionId();
+      		}else {
+      			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.BLACKLIST.getStatus());
+      		}
+       		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+       		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
     		
@@ -1228,14 +1253,20 @@ public class WorkmenController {
     	
     }
     
-    @GetMapping("/deblackview/{transactionId}/{mode}")
-    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    @GetMapping("/deblackview/{gatePassId}/{mode}")
+    public String deblackviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,
     		@PathVariable("mode") String mode,
     		HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
-    	GatePassMain gatePassMainObj =null;
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;String transactionId=null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		if(mode.equals("add")){
+     			 transactionId= workmenService.generateTransactionId();
+     		}else {
+     			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.DEBLACKLIST.getStatus());
+     		}
+      		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+      		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		 request.setAttribute("mode", mode);
@@ -1277,13 +1308,19 @@ public class WorkmenController {
     		return "contractWorkmen/deblackView";
     	
     }
-    @GetMapping("/lostordamageview/{transactionId}/{mode}")
-    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,
+    @GetMapping("/lostordamageview/{gatePassId}/{mode}")
+    public String lostordamageviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,
     		    		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
-    	GatePassMain gatePassMainObj =null;
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
+    	GatePassMain gatePassMainObj =null;String transactionId=null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		if(mode.equals("add")){
+     			 transactionId= workmenService.generateTransactionId();
+     		}else {
+     			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.LOSTORDAMAGE.getStatus());
+     		}
+      		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+      		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
 
     		 request.setAttribute("mode", mode);
@@ -1586,9 +1623,9 @@ public class WorkmenController {
 		}
     }
     
-    @GetMapping("/renew/{transactionId}")
-    public String renew(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
+    @GetMapping("/renew/{gatePassId}")
+    public String renew(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
 
 	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
     MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
@@ -1634,9 +1671,13 @@ public class WorkmenController {
 	    request.setAttribute(attributeName, gmList1);
 	});
 
-	GatePassMain gatePassMainObj = workmenService.getIndividualContractWorkmenDraftDetails(transactionId);
-	request.setAttribute("transactionId", gatePassMainObj.getTransactionId());
-	request.setAttribute("GatePassObj", gatePassMainObj);
+	
+	GatePassMain gpm = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+	GatePassMain gatePassMainObj = workmenService.getIndividualContractWorkmenDraftDetails(gpm.getTransactionId());
+	String transactionId= workmenService.generateTransactionId();
+	gpm.setTransactionId(transactionId);
+	request.setAttribute("transactionId", transactionId);
+	request.setAttribute("GatePassObj", gpm);
 	
 	List<Contractor> contractors= workmenService.getAllContractorBasedOnPE(gatePassMainObj.getUnitId(),user.getUserAccount());
 	request.setAttribute("Contractors", contractors);	
@@ -1774,12 +1815,12 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
         }
     }
     
-    @GetMapping("/renewview/{transactionId}")
-    public String renewviewIndividualContractWorkmenDetails(@PathVariable("transactionId") String transactionId,HttpServletRequest request,HttpServletResponse response) {
-    	log.info("Entered into viewIndividualContractWorkmenDetails: "+transactionId);
+    @GetMapping("/renewview/{gatePassId}")
+    public String renewviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
+    	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	try {
-    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetails(transactionId);
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		
@@ -1816,7 +1857,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
-    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
+    	log.info("Exiting from viewIndividualContractWorkmenDetails: "+gatePassId);
     	
     		return "contractWorkmen/renewView";
     	
@@ -2048,7 +2089,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     	request.setAttribute("selectedDept", deptId);
     	  
     	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName()) || user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
 			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
 		}else {	
 			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
@@ -2082,7 +2123,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     	request.setAttribute("selectedDept", deptId);
     	  
     	List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName()) || user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
 			gplistDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
 		}else {	
 			gplistDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
@@ -2110,7 +2151,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
         List<GatePassListingDto> gplistDto = new ArrayList<GatePassListingDto>();
         if(action.equals(GatePassType.BLOCK.getStatus())) {
         rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/blockListFilter");
-		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName()) || user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
 			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus());
     		
 		}else {	
@@ -2119,7 +2160,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
 		result ="contractWorkmen/blockListing";
         }else if(action.equals(GatePassType.UNBLOCK.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/unblockListFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus());
         		
     		}else {	
@@ -2137,7 +2178,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/blackListing";
         }else if(action.equals(GatePassType.DEBLACKLIST.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/deblackListFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus());
         		
     		}else {	
@@ -2146,7 +2187,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/deblackListing";
         }else if(action.equals(GatePassType.CANCEL.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/cancelFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CANCEL.getStatus());
         		
     		}else {	
@@ -2155,7 +2196,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/cancelListing";
         }else if(action.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/lostordamageFilter");
-    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+    		if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
     			gplistDto= workmenService.getGatePassActionListingDetailsForDashboardNav(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus());
         		
     		}else {	
@@ -2164,7 +2205,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		result ="contractWorkmen/lostListing";
         }else if(action.equals(GatePassType.RENEW.getStatus())) {
         	rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/renewFilter");
-        	if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())|| user.getRoleName().toUpperCase().equals(UserRole.SystemAdmin.getName())){
+        	if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
         		//write union for renewal pending and renewed
     				gplistDto= workmenService.getRenewListingDetails( String.valueOf(user.getUserId()), GatePassType.CREATE.getStatus(), GatePassStatus.APPROVED.getStatus(), deptId, principalEmployerId) ;
         		}else {	

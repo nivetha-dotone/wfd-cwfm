@@ -6,9 +6,11 @@ import java.util.Map;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
+import com.wfd.dot1.cwfm.dto.CMSPerson;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
+import com.wfd.dot1.cwfm.dto.PersonStatusIds;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.ContractWorkmenExportDto;
@@ -147,4 +149,32 @@ public interface WorkmenDao {
 	public List<DeptMapping> getAllDepartmentsOnPE(String unitId);
 
 	public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId);
+	
+	public String getTransactionIdByGPId(String gatepassid,String gatepasstypeid);
+
+	public long saveIntoCMSPerson(CMSPerson person);
+
+	public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm, long employeeId);
+
+	public boolean saveCMSPERSONSTATUSMM(GatePassMain gpm, long employeeId);
+
+	boolean saveCMSPERSONSTATUSMMTerminated(GatePassMain gpm, long employeeId);
+
+	public boolean saveCMSPERSONCUSTDATA(GatePassMain gpm, long personInsert);
+
+	public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdForApprove(String gatePassId);
+
+	public long getPersonIdFromCmsPerson(String gatePassId);
+
+	boolean updateCmsPersonCustDataEffectiveTill(long personId);
+
+	public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus);
+
+	boolean isPersonActiveInStatusMM(long personId);
+
+	PersonStatusIds getPersonStatusIds(long personId);
+
+
+	boolean updatePersonStatusValidity(Long activeId, Long inactiveId);
+
 }
