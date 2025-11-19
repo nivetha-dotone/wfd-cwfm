@@ -38,8 +38,14 @@ public class ContractorRegistration{
 	
 	private List<String> availableLicenses;
 	private List<String> selectedLicenses;
+	private String pfDoc;
 	
-	
+	public String getPfDoc() {
+		return pfDoc;
+	}
+	public void setPfDoc(String pfDoc) {
+		this.pfDoc = pfDoc;
+	}
 	public List<String> getAvailableLicenses() {
 		return availableLicenses;
 	}
@@ -283,5 +289,12 @@ public void setEsicRegNo(String esicRegNo) {
 		this.actionId = actionId;
 	}
 	
-	
+	private Long unitId;
+
+	public Long getUnitId() {
+		return unitId;
+	}
+	public void setUnitId(Long unitId) {
+		this.unitId = unitId;
+	}
 }

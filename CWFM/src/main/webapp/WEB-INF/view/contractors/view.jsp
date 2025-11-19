@@ -194,7 +194,7 @@ table.ControlLayout td {
          <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>
             <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
-            <button data-target="tab3" onclick="showTabOther('tab3')">ESIC Information</button>
+            <button data-target="tab3" onclick="showTabOther('tab3')">Policy Information</button>
             <button data-target="tab4" onclick="showTabOther('tab4')">WorkOrder Information</button>
          </div>
           <div class="action-buttons" > 
@@ -259,7 +259,7 @@ table.ControlLayout td {
                             <th><label class="custom-label"><spring:message code="label.contractValidTill"/></label></th>
                             <td><input type="text" name="" value="${contractorPEMM.validTo }" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         </tr>
-                        <tr>
+                        <%-- <tr>
                             <th><label class="custom-label"><spring:message code="label.isRcVerified"/></label></th>
                             <td>
     <c:choose>
@@ -271,7 +271,7 @@ table.ControlLayout td {
         </c:otherwise>
     </c:choose>
 </td>
-                        </tr>
+                        </tr> --%>
                      <%--    <tr>
                             <th><label class="custom-label"><span class="required-field">*</span>License Number</label></th>
                             <td><input type="text" name="LICENSENUMBER" value="${principalEmployer.LICENSENUMBER}" style="height: 20px;"  size="30" maxlength="30" /></td>

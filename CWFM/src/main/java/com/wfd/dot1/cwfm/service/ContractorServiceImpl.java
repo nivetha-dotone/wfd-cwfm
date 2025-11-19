@@ -225,7 +225,7 @@ public class ContractorServiceImpl implements ContractorService{
 	 @Autowired
 	 BillVerificationDao billDao;
 	@Override
-	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile,
+	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile,MultipartFile pfFile,
 			List<MultipartFile> attachments, String username) {
 		ObjectMapper mapper = new ObjectMapper();
         ContractorRegistration reg=new ContractorRegistration();
@@ -243,7 +243,8 @@ public class ContractorServiceImpl implements ContractorService{
 			  reg.setVendorCode(renewal.getVendorCode());
 		        reg.setContractorId(String.valueOf(renewal.getContractorId()));
 		        reg.setContractorName(renewal.getContractorName());
-		        reg.setPrincipalEmployer(renewal.getPrincipalEmployer());
+		        //reg.setPrincipalEmployer(renewal.getPrincipalEmployer());
+		        reg.setUnitId(renewal.getUnitId());
 		        reg.setManagerName(renewal.getManagerName());
 		        reg.setTotalStrength(renewal.getTotalStrength());
 		        reg.setRcMaxEmp(renewal.getRcMaxEmp());
@@ -258,17 +259,23 @@ public class ContractorServiceImpl implements ContractorService{
 		        reg.setEmail(renewal.getEmail());
 		        reg.setMobile(renewal.getMobile());
 		        reg.setAadhar(renewal.getAadhar());
+		        reg.setPan(renewal.getPan());
 		        reg.setGst(renewal.getGst());
 		        reg.setAddress(renewal.getAddress());
 		        reg.setPfApplyDate(renewal.getPfApplyDate());
 		        reg.setAadharDoc(aadharFile.getOriginalFilename());
 				reg.setPanDoc(panFile.getOriginalFilename());
 				reg.setCreatedBy(username);
+				reg.setPfDoc(panFile.getOriginalFilename());
 				reg.setRequestType("Renew");
 
-				 int workFlowTypeId=billDao.getWorkflowType("CONTRACTOR RENEWAL", String.valueOf(reg.getPrincipalEmployer()));
+				 int workFlowTypeId=billDao.getWorkflowType("CONTRACTOR RENEWAL", String.valueOf(reg.getUnitId()));
 					if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
 						reg.setStatus(GatePassStatus.APPROVED.getStatus());
+						
+						System.out.println("AUTO approver detected → inserting work order into CMSWORKORDER_LLWC");
+		                contrDao.saveContractorPemm(reg);
+
 					}else {
 						reg.setStatus(GatePassStatus.APPROVALPENDING.getStatus());
 					}
@@ -314,7 +321,14 @@ public class ContractorServiceImpl implements ContractorService{
              }
 
              this.savePolicies(policies, reg);
-             
+             int workFlowTypeId=billDao.getWorkflowType("CONTRACTOR RENEWAL", String.valueOf(reg.getUnitId()));
+				if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+					reg.setStatus(GatePassStatus.APPROVED.getStatus());
+					
+					System.out.println("AUTO approver detected → inserting work order into CMSWORKORDER_LLWC");
+	                contrDao.saveContractorWC(policies, reg);
+
+				}
         
         
 		
@@ -353,36 +367,55 @@ public class ContractorServiceImpl implements ContractorService{
 	}
 	@Override
 	public String approveRejectContRenew(ApproveRejectContRenewDto dto) {
-		ContractorRegistration gpm = contrDao.getContractorRegistration(dto.getTransactionId());
-		String result=null;
-		 result = contrDao.approveRejectContRenew(dto);
-		
-		boolean status=false;
-		if(dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
-			status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
-		}else {
-			boolean isLastApprover=false;
-			int workFlowTypeId = contrDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
-			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-				 isLastApprover = contrDao.isLastApprover(dto.getApproverRole());
-			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
-				 isLastApprover = contrDao.isLastApproverForParallel(dto.getTransactionId(),dto.getRoleId());
-				
-			}
-			
-			//check if last approver, if last approver change the status of gate pass main to approved
-			
-			if(isLastApprover) {
-				status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
-				  contrDao.insertWorkOrderLLWC(
-			                gpm.getContractorregId(),
-			                gpm.getContractorId(),
-			                gpm.getPrincipalEmployer(),
-			                gpm.getCreatedBy() != null ? gpm.getCreatedBy() : "SYSTEM"
-			            );
-			}
-		}
+	    // Fetch contractor registration details
+	    ContractorRegistration gpm = contrDao.getContractorRegistration(dto.getTransactionId());
+	    List<ContractorRegistrationPolicy> policy = contrDao.getPoliciesByContractorRegId(dto.getTransactionId());
+	    String result = null;
 
-		return result;
+	    // Perform approve/reject main logic
+	    result = contrDao.approveRejectContRenew(dto);
+
+	    boolean status = false;
+
+	    // If rejected → directly update contractor status
+	    if (dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
+	        status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(), dto.getStatus());
+	    } else {
+	        boolean isLastApprover = false;
+
+	        int workFlowTypeId = contrDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
+
+	        if (workFlowTypeId == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
+	            isLastApprover = contrDao.isLastApprover(dto.getApproverRole());
+	        } else if (workFlowTypeId == WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
+	            isLastApprover = contrDao.isLastApproverForParallel(dto.getTransactionId(), dto.getRoleId());
+	        }
+
+	        // ✅ If last approver, update status and save renewal data into CMSCONTRPEMM
+	        if (isLastApprover) {
+	            status = contrDao.updateContStatusByTransactionId(dto.getTransactionId(), dto.getStatus());
+
+	            // Insert work order LLWC record
+	            contrDao.insertWorkOrderLLWC(
+	                gpm.getContractorregId(),
+	                gpm.getContractorId(),
+	                gpm.getPrincipalEmployer(),
+	                gpm.getCreatedBy() != null ? gpm.getCreatedBy() : "SYSTEM"
+	            );
+
+	            // ✅ Call saveContractorPemm() to insert renewal data
+	            try {
+	                contrDao.saveContractorPemm(gpm);
+	                contrDao.saveContractorWC(policy,gpm);
+	                System.out.println("✅ Renewal data inserted successfully into CMSCONTRPEMM for contractor: " + gpm.getContractorId());
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	                System.err.println("❌ Error while inserting renewal data into CMSCONTRPEMM for contractor: " + gpm.getContractorId());
+	            }
+	        }
+	    }
+
+	    return result;
 	}
+
 }

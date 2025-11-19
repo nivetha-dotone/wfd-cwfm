@@ -388,8 +388,7 @@ label {
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharDoc"/></label></th>
                 <td>
-                	<input type="text" id="aadharDocId" name="aadharDoc"  autocomplete="off" value="${contractor.aadharDoc}" readonly/>
-                	<label id="error-aadharDoc" style="color: red;display: none;">Aadhar Document is required</label>
+                 <a href="#" onclick="viewContractorFile('${contractor.contractorregId}','${contractor.createdBy }','${contractor.aadharDoc }')">Download Aadhar</a>
                 </td>
                
            </tr>
@@ -402,8 +401,8 @@ label {
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.panDoc"/></label></th>
                 <td>
-                	<input type="text" id="panDocId" name="panDoc"  accept="application/pdf" autocomplete="off" value="${contractor.panDoc}" readonly>
-                	<label id="error-panDoc" style="color: red;display: none;">Pan Document is required</label>
+                 <a href="#" onclick="viewContractorFile('${contractor.contractorregId}','${contractor.createdBy }','${contractor.panDoc }')">Download Pan</a>
+               
                 </td>
            </tr>
             <tr>
@@ -505,6 +504,10 @@ label {
                 <td>
                 	<input id="pfApplyDateId" name="pfApplyDate" style="width: 100%;height: 20px; color: black;" type="text" size="30" value="${contractor.pfApplyDate}" readonly> 
                 	<label id="error-contractFrom" style="color: red;display: none;">PF apply date is required</label>
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfDoc"/></label></th>
+                <td>
+                 <a href="#" onclick="viewContractorFile('${contractor.contractorregId}','${contractor.createdBy }','${contractor.pfDoc }')">Download PF</a>
                 </td>
 </tr>
    

@@ -1,9 +1,13 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
@@ -414,8 +419,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return result;
 	}
 	@Override
-	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction) {
-		return workmenDao.getGatePassActionListingDetails(unitId,deptId,userId,gatePassTypeId,previousGatePassAction);
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction,String renewGatePassAction) {
+		return workmenDao.getGatePassActionListingDetails(unitId,deptId,userId,gatePassTypeId,previousGatePassAction,renewGatePassAction);
 	}
 	@Override
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId) {
@@ -523,6 +528,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		try {
 			int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(gatePassMain.getPrincipalEmployer(),GatePassType.RENEW.getStatus());
 			gatePassMain.setWorkFlowType(workFlowTypeId);
+
 			
 			int dotTypeId = workmenDao.getDOTTYpe(gatePassMain.getPrincipalEmployer());
 			gatePassMain.setDotType(dotTypeId);
@@ -769,4 +775,65 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.saveCMSPERSONSTATUSMM(gpm,employeeId);
 	}
 	
-}
+
+	
+	@Override
+    public Map<String, String> getPreviousDocuments(String transactionId) {
+        return workmenDao.getPreviousDocuments(transactionId);
+    }
+	 @Override
+	    public List<Map<String, Object>> getAllVersionedDocuments(String transactionId, Integer userId) {
+	        List<Map<String, Object>> allDocs = new ArrayList<>();
+
+	        // Base directory for files
+	        String baseDir = "D:/wfd_cwfm/ep_docs/" + userId + "/" + transactionId + "/";
+	        File folder = new File(baseDir);
+	        File[] files = folder.listFiles();
+
+	        // 1️⃣ Version 1 docs (from GATEPASSMAIN)
+	        Map<String, String> v1Docs = workmenDao.getPreviousDocuments(transactionId);
+	        for (Map.Entry<String, String> entry : v1Docs.entrySet()) {
+	            String docType = entry.getKey();
+	            String value = entry.getValue();
+	            if (value != null && !value.trim().isEmpty()) {
+	                String matchedFile = null;
+	                if (files != null) {
+	                    for (File f : files) {
+	                        if (f.getName().toLowerCase().startsWith(value.toLowerCase())) {
+	                            matchedFile = f.getName();
+	                            break;
+	                        }
+	                    }
+	                }
+	                if (matchedFile != null) {
+	                    Map<String, Object> map = new LinkedHashMap<>();
+	                    map.put("DOCTYPE", docType);
+	                    map.put("FILENAME", matchedFile);
+	                    map.put("VERSIONNO", 1);
+	                    allDocs.add(map);
+	                }
+	            }
+	        }
+
+	        // 2️⃣ Renewal docs (V2 and beyond)
+	        List<Map<String, Object>> renewalDocs = workmenDao.getRenewalDocs(transactionId);
+	        allDocs.addAll(renewalDocs);
+
+	        // 3️⃣ Sort by DOC_TYPE, then version
+	        allDocs.sort(Comparator.comparing((Map<String, Object> m) -> (String) m.get("DOCTYPE"))
+	                .thenComparingInt(m -> ((Number) m.get("VERSIONNO")).intValue()));
+
+	        return allDocs;
+	    }
+	 @Override
+	 public void saveRenewedDocuments(String transactionId, String userId,
+	                                  MultipartFile aadharFile,
+	                                  MultipartFile policeFile,
+	                                  MultipartFile profilePic,
+	                                  List<MultipartFile> additionalFiles,
+	                                  List<String> documentTypes,String filePath) {
+	     workmenDao.saveRenewedDocuments(transactionId, userId, aadharFile, policeFile, profilePic, additionalFiles, documentTypes, filePath);
+	 }
+
+	}
+

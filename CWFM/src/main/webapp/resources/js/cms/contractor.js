@@ -348,7 +348,7 @@ function exportCSVFormat() {
    xhr.send(JSON.stringify(data));
    
 	}
-	function validateContractorFiles(aadharFile, policeFile) {
+	function validateContractorFiles(aadharFile, policeFile,pfFile) {
 	    let valid = true;
 
 	    // Aadhaar file presence and size check
@@ -372,7 +372,15 @@ function exportCSVFormat() {
 	    } else {
 	        $("#error-panDoc").hide(); // Clear error if valid
 	    }
-
+      if (!pfFile) {
+	        $("#error-pfDoc").text("PF file is required.").show();
+	        valid = false;
+	    } else if (pfFile.size > 5 * 1024 * 1024) {
+	        $("#error-pfDoc").text("PF file must be less than 5 MB.").show();
+	        valid = false;
+	    } else {
+	        $("#error-pfDoc").hide(); // Clear error if valid
+	    }
 	    return valid;
 	}
 
@@ -426,7 +434,8 @@ function validateFormData() {
 		 	}
 			const aadharDoc = $("#aadharDocId")[0]?.files?.[0] || null;
 			const panDoc = $("#panDocId")[0]?.files?.[0] || null;
-	const isFileValid = validateContractorFiles(aadharDoc, panDoc);
+			const pfDoc = $("#pfDocId")[0]?.files?.[0] || null;
+	const isFileValid = validateContractorFiles(aadharDoc, panDoc,pfDoc);
 	console.log("file is:"+isFileValid);
 				
 				   if (!isFileValid) {
@@ -495,26 +504,83 @@ function validateFormData() {
 		 $("#error-pfnumber").hide();
 	 }
 	const natureOfWork = $("#natureOfWorkId").val();
-	 if (natureOfWork === "") {
+	 if (!locofworkRegex.test(natureOfWork)) {
         $("#error-natureOfWork").show();
         isValid = false;
     }else{
 		$("#error-natureOfWork").hide();
 	}
-	const contractFrom = $("#contractFromId").val();
-	 if (contractFrom === "") {
+	/*const contractFrom = $("#contractFromId").val();
+	 if (contractFrom === "" || contractFrom <= today) {
         $("#error-contractFrom").show();
         isValid = false;
     }else{
 		$("#error-contractFrom").hide();
 	}
 	const contractTo = $("#contractToId").val();
-	 if (contractTo === "") {
+	 if (contractTo === "" || contractTo <= today || contractTo <= contractFrom) {
         $("#error-contractTo").show();
         isValid = false;
     }else{
 		$("#error-contractTo").hide();
-	}
+	}*/
+	
+// Get today's date in yyyy-mm-dd format
+const today = new Date().toISOString().split("T")[0];
+
+const contractFrom = $("#contractFromId").val();
+const contractTo = $("#contractToId").val();
+
+/* --------------------------------
+   Validate Contract From
+----------------------------------*/
+if (!contractFrom || contractFrom.trim() === "") {
+    $("#error-contractFrom").show();
+    isValid = false;
+} 
+else if (contractFrom < today) {
+    // Past date is invalid, today & future allowed
+    $("#error-contractFrom").text("Contract From must be today or a future date").show();
+    isValid = false;
+} 
+else {
+    $("#error-contractFrom").hide();
+}
+
+/* --------------------------------
+   Validate Contract To
+----------------------------------*/
+if (!contractTo || contractTo.trim() === "") {
+    $("#error-contractTo").show();
+    isValid = false;
+} 
+else if (contractTo < today) {
+    // Past date invalid
+    $("#error-contractTo").text("Contract To must be today or a future date").show();
+    isValid = false;
+}
+else if (contractTo <= contractFrom) {
+    // Must be strictly after Contract From
+    $("#error-contractTo").text("Contract To must be after Contract From").show();
+    isValid = false;
+}
+else {
+    $("#error-contractTo").hide();
+}
+
+const pfApplyDate = $("#pfApplyDateId").val();
+	 if (!pfApplyDate || pfApplyDate.trim() == "") {
+    $("#error-pfApplyDate").text("PF Apply Date is required").show();
+    isValid = false;
+} 
+else if (pfApplyDate > today) {
+    // today or future is invalid — must be strictly past
+    $("#error-pfApplyDate").text("PF Apply Date must be a past date").show();
+    isValid = false;
+} 
+else {
+    $("#error-pfApplyDate").hide();
+}
 	const contractType = $("#contractTypeId").val();
 	 if (contractType === "") {
         $("#error-contractType").show();
@@ -834,8 +900,9 @@ function validateRenewFormData() {
     const data = new FormData();
     const aadharFile = $("#aadharDocId").prop("files")[0];
     const panFile = $("#panDocId").prop("files")[0];
+    const pfFile = $("#pfDocId").prop("files")[0];
     const selectedOption = $("#vendorCodeId option:selected");
-
+    const selectedPEOption = $("#principalEmployerId option:selected");
     // ✅ Utility function for Capital Case
     function toCapitalCase(str) {
         return str
@@ -864,6 +931,7 @@ function validateRenewFormData() {
     const jsonData = {
         contractorregId: $("#contractorregId").val().trim(),
         principalEmployer: $("#principalEmployerId").val(),
+        unitId: selectedPEOption.val(),
         contractorId: selectedOption.val(),
         vendorCode: selectedOption.data("code"),
         contractorName: contractorName,
@@ -919,6 +987,9 @@ function validateRenewFormData() {
     }
     if (panFile) {
         data.append("panFile", panFile);
+    }
+     if (pfFile) {
+        data.append("pfFile", pfFile);
     }
 
     // Append JSON data
@@ -1270,21 +1341,36 @@ document.addEventListener('click', function (e) {
 		    }
 		}
 		
-		function downloadContractorDoc(contregId, userId, docName) {
-		    const baseUrl = '/CWFM/contractor/downloadFile';
-		    
-		    const url = `${baseUrl}/${contregId}/${userId}/${docName}`;
-			//alert("url is"+url);
-		    const a = document.createElement('a');
-		    a.href = url;
-		    a.download = ''; // This attribute tells the browser to download the file
+		function viewContractorFile(contregId, userId, docName) {
+    // Prepare secure JSON data
+    const data = { contregId, userId, docName };
 
-		    // Append to the body to make it work in Firefox
-		    document.body.appendChild(a);
+    // Encode using Base64 (URL-safe)
+    const encodedData = btoa(JSON.stringify(data));
 
-		    // Programmatically click the anchor
-		    a.click();
+    // Build masked endpoint URL
+    const url = `/CWFM/contractor/viewFile/${encodedData}`;
 
-		    // Remove the anchor from the document
-		    document.body.removeChild(a);
-		}
+    // Fetch the file securely
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("File not found or server error");
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a temporary URL for the blob
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            // Open in new tab securely
+            window.open(blobUrl, '_blank');
+            
+            // Revoke blob after some time
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        })
+        .catch(err => {
+            console.error("Error opening file:", err);
+            alert("Unable to open file.");
+        });
+}

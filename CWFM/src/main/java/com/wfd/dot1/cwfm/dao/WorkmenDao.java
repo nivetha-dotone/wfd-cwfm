@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.CMSPerson;
@@ -76,7 +78,7 @@ public interface WorkmenDao {
 
 	public void saveGatePassStatusLog(GatePassStatusLogDto dto);
 
-	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction);
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction,String renewGatePassAction);
 
 	public List<MasterUser> getApproversForGatePassAction(String createdBy,String gatepassAction);
 
@@ -176,5 +178,18 @@ public interface WorkmenDao {
 
 
 	boolean updatePersonStatusValidity(Long activeId, Long inactiveId);
+
+	Map<String, String> getPreviousDocuments(String transactionId);
+
+	//public Map<String, String> getVersionOneDocs(String transactionId);
+
+	public List<Map<String, Object>> getRenewalDocs(String transactionId);
+
+	public void saveRenewedDocuments(String transactionId, String userId, MultipartFile aadharFile,
+			MultipartFile policeFile, MultipartFile profilePic, List<MultipartFile> additionalFiles,
+			List<String> documentTypes,String filePath);
+
+	
+
 
 }

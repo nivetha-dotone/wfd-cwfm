@@ -211,6 +211,7 @@ public class ContractorRenewalController {
 	            @RequestParam("jsonData") String jsonData,
 	            @RequestParam("aadharFile") MultipartFile aadharFile,
 	            @RequestParam("panFile") MultipartFile panFile,
+	            @RequestParam("pfFile") MultipartFile pfFile,
 	            @RequestParam("renewalAttachments") List<MultipartFile> renewalAttachments,
 	            HttpServletRequest request) {
 
@@ -219,7 +220,7 @@ public class ContractorRenewalController {
 	        String username = String.valueOf(user.getUserId());
 
 	        try {
-	        	contrService.saveRenewal(jsonData, aadharFile, panFile, renewalAttachments, username);
+	        	contrService.saveRenewal(jsonData, aadharFile, panFile,pfFile, renewalAttachments, username);
 	            return ResponseEntity.ok("Success");
 	        } catch (Exception e) {
 	            e.printStackTrace();

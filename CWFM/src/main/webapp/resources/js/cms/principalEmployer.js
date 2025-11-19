@@ -633,8 +633,34 @@ function savePeDocuments() {
     const url = `/CWFM/principalEmployer/download/${docId}`;
     window.open(url, '_blank');
 }*/
-function downloadFile(encodedId) {
+/*function downloadFile(encodedId) {
     const url = `/CWFM/principalEmployer/download/${encodedId}`;
     window.open(url, '_blank'); // Opens securely in a new tab
+}
+*/
+function downloadFile(encodedId) {
+    const url = `/CWFM/principalEmployer/download/${encodedId}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("File not found or server error");
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create an object URL for the blob
+            const blobUrl = window.URL.createObjectURL(blob);
+
+            // Open the file in a new tab
+            window.open(blobUrl, '_blank');
+
+            // Optional: revoke after a few seconds to free memory
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        })
+        .catch(err => {
+            console.error("Error opening file:", err);
+            alert("Unable to open file.");
+        });
 }
 

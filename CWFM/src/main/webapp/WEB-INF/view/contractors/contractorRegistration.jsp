@@ -503,7 +503,12 @@ label {
 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplyDate"/></label></th>
                 <td>
                 	<input id="pfApplyDateId" name="pfApplyDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off">
-                	<label id="error-contractFrom" style="color: red;display: none;">PF apply date is required</label>
+                	<label id="error-pfApplyDate" style="color: red;display: none;">PF apply date is required</label>
+                </td>
+                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfDoc"/></label></th>
+                <td>
+                	<input type="file" class="form-control pfdoc" id="pfDocId" name="pfDoc"  accept="application/pdf" autocomplete="off"/>
+                	<label id="error-pfDoc" style="color: red;display: none;">PF Document is required</label>
                 </td>
 </tr>
    

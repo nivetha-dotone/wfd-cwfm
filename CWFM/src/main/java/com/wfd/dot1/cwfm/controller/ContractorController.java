@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSRoleRights;
@@ -46,6 +48,7 @@ import com.wfd.dot1.cwfm.service.WorkmenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.Base64;
 
 @Controller
 @RequestMapping("/contractor")
@@ -300,6 +303,7 @@ public class ContractorController {
 	     @RequestParam("policyAttachments") List<MultipartFile> attachments,
 	     @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
          @RequestParam(value = "panFile", required = false) MultipartFile panFile,
+         @RequestParam(value = "pfFile", required = false) MultipartFile pfFile,
 	     HttpServletRequest request
 	 ) {
 	     try {
@@ -308,6 +312,7 @@ public class ContractorController {
 	         ContractorRegistration contreg = mapper.readValue(jsonData, ContractorRegistration.class);
 	         contreg.setAadharDoc(aadharFile.getOriginalFilename());
 	         contreg.setPanDoc(panFile.getOriginalFilename());
+	         contreg.setPfDoc(pfFile.getOriginalFilename());
 	         HttpSession session = request.getSession(false);
 	         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 	         contreg.setCreatedBy(String.valueOf(user.getUserId()));
@@ -318,6 +323,7 @@ public class ContractorController {
 	         if (regId != null) {
 	        	 uploadDocuments(aadharFile,String.valueOf(user.getUserId()),regId);
 	        	 uploadDocuments(panFile,String.valueOf(user.getUserId()),regId);
+	        	 uploadDocuments(pfFile,String.valueOf(user.getUserId()),regId);
 	             List<ContractorRegistrationPolicy> policies = contreg.getRegPolicy();
 
 	             // Set regId and file details in each policy
@@ -417,30 +423,43 @@ public class ContractorController {
 	}
 	
 	
-	@GetMapping("/downloadFile/{contregId}/{userId}/{docName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("contregId") String contregId,@PathVariable("userId") String userId,  @PathVariable("docName") String docName) {
-        try {
-        	String filePath=null;
-        	
-                filePath = ROOT_DIRECTORY+userId+"/" + contregId + "/" + docName;
-        	
-        	
-            File file = new File(filePath);
-            Resource resource = new FileSystemResource(file);
+	@GetMapping("/viewFile/{encodedData}")
+	public void viewContractorFile(@PathVariable("encodedData") String encodedData, HttpServletResponse response) {
+	    try {
+	        // 🔐 Decode Base64 string back to JSON
+	        String decodedJson = new String(Base64.getUrlDecoder().decode(encodedData), StandardCharsets.UTF_8);
+	        
+	        // Example decoded: {"contregId":"123","userId":"EMP01","docName":"PFDocument.pdf"}
+	        ObjectMapper mapper = new ObjectMapper();
+	        Map<String, String> data = mapper.readValue(decodedJson, new TypeReference<>() {});
+	        
+	        String contregId = data.get("contregId");
+	        String userId = data.get("userId");
+	        String docName = data.get("docName");
 
-            if (!resource.exists()) {
-                return ResponseEntity.notFound().build();
-            }
+	        String filePath = ROOT_DIRECTORY + userId + "/" + contregId + "/" + docName;
+	        File file = new File(filePath);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+	        if (!file.exists()) {
+	            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+	            return;
+	        }
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(resource);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+	        // Detect file type
+	        String contentType = Files.probeContentType(file.toPath());
+	        if (contentType == null) contentType = "application/octet-stream";
+
+	        response.setContentType(contentType);
+	        response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
+	        Files.copy(file.toPath(), response.getOutputStream());
+	        response.getOutputStream().flush();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        try {
+	            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error displaying file");
+	        } catch (IOException ignored) {}
+	    }
+	}
 
 }

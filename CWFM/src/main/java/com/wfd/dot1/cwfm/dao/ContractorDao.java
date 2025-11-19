@@ -102,6 +102,11 @@ public interface ContractorDao {
 	boolean isLastApproverForParallel(String transactionId, String roleId);
 	
 	 void insertWorkOrderLLWC(String contractorRegId, String contractorId, String unitId, String createdBy);
+
+	public void saveContractorPemm(ContractorRegistration reg);
+
+	public void saveContractorWC(List<ContractorRegistrationPolicy> policy, ContractorRegistration gpm);
+
 	   
 	}
 

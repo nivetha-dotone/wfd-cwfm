@@ -1,18 +1,24 @@
 package com.wfd.dot1.cwfm.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
@@ -146,36 +153,66 @@ public class BillVerificationController {
     	}
 		return "bill/view"; // Return the JSP file name
 	}
-    @GetMapping("/downloadFile/{docType}")
-    public ResponseEntity<Resource> downloadFile(  @PathVariable("docType") String docType) {
+    @GetMapping("/viewFile/{encodedData}")
+    public ResponseEntity<InputStreamResource> viewFile(@PathVariable("encodedData") String encodedData) {
         try {
-        	String filePath=null;
-        	if(docType.equals("musterroll")||docType.equals("billverification")||docType.equals("wagecost")||docType.equals("bonusreport")||docType.equals("bankstatement")||docType.equals("annualreturn")||docType.equals("challanpt")||docType.equals("userattachment1")||docType.equals("userattachment2")
-        			||docType.equals("extrahours")||docType.equals("forma")||docType.equals("formb")||docType.equals("formc")||docType.equals("formd")||docType.equals("ecrpf")||docType.equals("challanpf")||docType.equals("ecresic")||docType.equals("challanesic")||docType.equals("userattachment3")||docType.equals("bonusregister")||docType.equals("lwfchallan"))
-        	{
-        		// Construct the file path based on gatePassId and docType
-                filePath = ROOT_DIRECTORY+ "/" + docType + ".pdf";
-        	}else {
-                filePath = ROOT_DIRECTORY+ "/" + docType;
-        	}
-        	
-            File file = new File(filePath);
-            Resource resource = new FileSystemResource(file);
+            // Decode the Base64-encoded JSON
+            String decodedJson = new String(Base64.getUrlDecoder().decode(encodedData), StandardCharsets.UTF_8);
+            System.out.println("🔍 Decoded JSON: " + decodedJson);
 
-            if (!resource.exists()) {
-                return ResponseEntity.notFound().build();
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> data = mapper.readValue(decodedJson, new TypeReference<>() {});
+
+            String reportType = data.get("reportType");
+            String transactionId = data.get("transactionId");
+            String fileName = data.get("fileName");
+
+            // ✅ Build file path based on report type
+            String baseDir;
+            if ("Kronos".equalsIgnoreCase(reportType)) {
+                baseDir = "D:/wfd_cwfm/Bill/KronosReports/" + transactionId + "/";
+            } else if ("Statutory".equalsIgnoreCase(reportType)) {
+                baseDir = "D:/wfd_cwfm/Bill/StatutoryReports/" + transactionId + "/";
+            } else {
+                System.out.println("❌ Unknown reportType: " + reportType);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                     .body(null);
             }
 
+            File file = new File(baseDir + fileName);
+            System.out.println("📁 Looking for file: " + file.getAbsolutePath());
+
+            if (!file.exists()) {
+                System.out.println("❌ File not found at: " + file.getAbsolutePath());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            // Determine MIME type
+            String contentType = Files.probeContentType(file.toPath());
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            // Serve file for inline view (not download)
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"");
+
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
             return ResponseEntity.ok()
                     .headers(headers)
+                    .contentLength(file.length())
                     .body(resource);
+
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+
     
     @GetMapping("/createBill")
     public String createBill(HttpServletRequest request,HttpServletResponse response) {

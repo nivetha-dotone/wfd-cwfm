@@ -472,26 +472,39 @@ function showFileNameBill(input, id) {
 					}  
 					
 
-						function downloadBill(reportType, transactionId, fileName) {
-					    const baseUrl = '/CWFM/billVerification/downloadFile';
-					    
-					    // Construct the URL based on gatePassId, userId, and docType
-					    const url = `${baseUrl}/${reportType}/${transactionId}/${fileName}`;
-						//alert("url is"+url);
-					    // Create a temporary anchor element
-					    const a = document.createElement('a');
-					    a.href = url;
-					    a.download = ''; // This attribute tells the browser to download the file
+					function openFile(reportType, transactionId, fileName) {
+    const payload = {
+        reportType: reportType,
+        transactionId: transactionId,
+        fileName: fileName
+    };
 
-					    // Append to the body to make it work in Firefox
-					    document.body.appendChild(a);
+    const encodedData = btoa(JSON.stringify(payload))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, ''); // URL-safe Base64
 
-					    // Programmatically click the anchor
-					    a.click();
+    const url = `/CWFM/billVerification/viewFile/${encodedData}`;
 
-					    // Remove the anchor from the document
-					    document.body.removeChild(a);
-					} 
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("File not found or error fetching file");
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, "_blank");
+        })
+        .catch(err => {
+            console.error("Error opening file:", err);
+            alert("Unable to open file. It may not exist on the server.");
+        });
+}
+
+
+
 					function approveRejectBill(status){
 						let isValid=true;
 					

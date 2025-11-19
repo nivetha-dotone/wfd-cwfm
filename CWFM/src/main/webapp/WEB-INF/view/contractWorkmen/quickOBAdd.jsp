@@ -633,7 +633,7 @@ label {
                                 
 								<c:forEach var="pe" items="${PrincipalEmployer}">
 								
-                					<option value="${pe.id}" ${GatePassObj.principalEmployer eq pe.id ? 'selected="selected"' : ''}
+                					<option value="${pe.id}" ${GatePassObj.principalEmployer eq pe.id ? 'selected="selected"' : ''} 
 									>
 									${pe.description}</option>
             					</c:forEach>

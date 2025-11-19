@@ -3,6 +3,8 @@ package com.wfd.dot1.cwfm.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
@@ -56,7 +58,7 @@ public interface WorkmenService {
 
 	public String gatePassAction(GatePassActionDto dto);
 	
-	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String previousGatePassAction);
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String previousGatePassAction,String renewGatePassAction);
 
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId);
 
@@ -116,4 +118,13 @@ public interface WorkmenService {
 	String getTransactionIdByGPId(String gatepassid,String gatepasstypeid);
 	GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gatepassid);
 
+	 Map<String, String> getPreviousDocuments(String transactionId);
+
+	public List<Map<String, Object>> getAllVersionedDocuments(String transactionId, Integer userId);
+
+	public void saveRenewedDocuments(String transactionId, String valueOf, MultipartFile aadharFile,
+			MultipartFile policeFile, MultipartFile profilePic, List<MultipartFile> additionalFiles,
+			List<String> documentTypes,String filePath);
+
+	
 }	

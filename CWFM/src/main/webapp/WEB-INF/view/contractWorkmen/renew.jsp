@@ -4,6 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ page import="java.util.*" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -378,11 +379,6 @@ label {
         initializeDatePicker();
     });
        
-
-    
-  
-  
-
     </script>
 </head>
 <body>
@@ -399,6 +395,7 @@ label {
             <button data-target="tab3" onclick="showTab('tab3')">Other Information</button>
             <button data-target="tab4" onclick="showTab('tab4')">Wages</button>
             <button data-target="tab5" onclick="showTab('tab5')">Documents</button>
+            <button data-target="tab6" onclick="showTab('tab6')">Previous Documents</button>
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="renewGatePass('${sessionScope.loginuser.userId}')">Save</button>
@@ -543,10 +540,10 @@ label {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
                 <td>
                 	<c:if test="${empty GatePassObj.mobileNumber }">
-                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" autocomplete="off">
                 	</c:if>
                 	<c:if test="${not empty GatePassObj.mobileNumber }">
-                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" value="${GatePassObj.mobileNumber }" autocomplete="off">
+                		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" value="${GatePassObj.mobileNumber }" autocomplete="off">
                 	</c:if>
                 	<label id="error-mobileNumber" style="color: red;display: none;">Please enter a valid Mobile Number</label>
                 </td>
@@ -1187,10 +1184,68 @@ label {
                 </tbody>
                 </table>
             </div>
+          <%@ page import="java.util.*" %>
+
+<div id="tab6" class="tab-content">
+  <div class="card-body p-3">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th style="width: 35%;color:black;">Document Type</th>
+                    <th style="width: 45%;color:black;">File Name</th>
+                    <th style="width: 20%;color:black;">Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="doc" items="${PreviousDocuments}" varStatus="loop">
+                    <c:choose>
+                        
+                        <c:when test="${loop.first or doc.DOCTYPE ne PreviousDocuments[loop.index - 1].DOCTYPE}">
+                            <tr>
+                                <td style="color:black;">${doc.DOCTYPE}</td>
+                                <td>
+                                    <a href="javascript:void(0);" 
+                                       onclick="downloadPreviousFile('${transactionId}', '${doc.FILENAME}')"
+                                       class="text-primary text-decoration-underline">
+                                        ${doc.FILENAME}
+                                    </a>
+                                </td>
+                                <td style="color:black;">
+                                    <%-- <span class="badge bg-info text-dark">V${doc.VERSIONNO}</span> --%>
+                                    <span>V${doc.VERSIONNO}</span>
+                                </td>
+                            </tr>
+                        </c:when>
+
+                        
+                        <c:otherwise>
+                            <tr>
+                                <td></td> <!-- Empty cell to visually group -->
+                                <td>
+                                    <a href="javascript:void(0);" 
+                                       onclick="downloadPreviousFile('${transactionId}', '${doc.FILENAME}')"
+                                       class="text-primary text-decoration-underline">
+                                        ${doc.FILENAME}
+                                    </a>
+                                </td>
+                                <td style="color:black;"><!-- class="text-center"> -->
+                                    <span>V${doc.VERSIONNO}</span>
+                                </td>
+                            </tr>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
         </f:form>
     </div>
-   
-   
+
 </body>
+ 
  
 </html>

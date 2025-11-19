@@ -979,7 +979,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     function approveRejectGatePass(status,type){
 		let isValid=true;
 		 const approvercomments = $("#approvercomments").val().trim();
-    if (approvercomments === "") {
+    if (approvercomments === "" && status==5) {
         $("#error-approvercomments").show();
         isValid = false;
     }else{
@@ -1208,29 +1208,33 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     }
 }
 
-function downloadDoc(transactionId, userId, docType) {
-    const baseUrl = '/CWFM/contractworkmen/downloadFile';
-    const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
+function viewDoc(transactionId, userId, docType) {
+    // Prepare data for secure encoding
+    const data = { transactionId, userId, docType };
 
-    // Open the document in a new browser tab
-    window.open(url, '_blank');
-    // Construct the URL based on gatePassId, userId, and docType
-    //const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
-	//alert("url is"+url);
-    // Create a temporary anchor element
-   /* const a = document.createElement('a');
-    a.href = url;
-    a.download = ''; // This attribute tells the browser to download the file
+    // Encode as Base64 JSON (URL-safe)
+    const encodedData = btoa(JSON.stringify(data));
 
-    // Append to the body to make it work in Firefox
-    document.body.appendChild(a);
+    // Build masked endpoint URL
+    const url = `/CWFM/contractworkmen/viewFile/${encodedData}`;
 
-    // Programmatically click the anchor
-    a.click();
-
-    // Remove the anchor from the document
-    document.body.removeChild(a);*/
+    // Fetch the file and open in a new tab
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error("File not found or server error");
+            return response.blob();
+        })
+        .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank'); // ✅ Opens inline in a new tab
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        })
+        .catch(err => {
+            console.error("Error opening file:", err);
+            alert("Unable to open file.");
+        });
 }
+
 
 
 
@@ -1383,7 +1387,7 @@ if(isValid){
 function approveRejectCancel(status,gatePassType){
 	let isValid=true;
 	 const approvercomments = $("#approvercomments").val().trim();
-   if (approvercomments === "") {
+   if (approvercomments === "" && status==5) {
        $("#error-approvercomments").show();
        isValid = false;
    }else{
@@ -1474,7 +1478,7 @@ if(isValid){
 	function approveRejectBlock(status,gatePassType){
 		let isValid=true;
 		 const approvercomments = $("#approvercomments").val().trim();
-	   if (approvercomments === "") {
+	   if (approvercomments === "" && status==5 ) {
 	       $("#error-approvercomments").show();
 	       isValid = false;
 	   }else{
@@ -1564,7 +1568,7 @@ if(isValid){
 		function approveRejectUnblock(status,gatePassType){
 			let isValid=true;
 			 const approvercomments = $("#approvercomments").val().trim();
-		   if (approvercomments === "") {
+		   if (approvercomments === "" && status==5) {
 		       $("#error-approvercomments").show();
 		       isValid = false;
 		   }else{
@@ -1655,7 +1659,7 @@ xhr.send(JSON.stringify(data));
 			function approveRejectBlack(status,gatePassType){
 let isValid=true;
  const approvercomments = $("#approvercomments").val().trim();
-					   if (approvercomments === "") {
+					   if (approvercomments === "" && status==5 ) {
 					       $("#error-approvercomments").show();
 					       isValid = false;
 					   }else{
@@ -1746,7 +1750,7 @@ function submitDeblack(userId,gatePassType){
 function approveRejectDeblacklist(status,gatePassType){
 			let isValid=true;
 			 const approvercomments = $("#approvercomments").val().trim();
-		if (approvercomments === "") {
+		if (approvercomments === "" && status==5) {
 		    $("#error-approvercomments").show();
 		    isValid = false;
 		}else{
@@ -1847,7 +1851,7 @@ function redirectToWorkmenCancelView(mode) {
 	if(mode === "add"){
 	 												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 
-	 												   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+	 												   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
 	 												       alert("Cancel request already created.");
 	 												       return;
 	 												   }}
@@ -1874,7 +1878,7 @@ function redirectToWorkmenBlockView(mode) {
  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
- 												   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+ 												   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
  												       alert("Block request already created.");
  												       return;
  												   }
@@ -1900,7 +1904,7 @@ function redirectToWorkmenBlockView(mode) {
   var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
   												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
-  												   if (gatePassType.toLowerCase() !== "block" || status.toLowerCase() !== "approved") {
+  												   if ((gatePassType.toLowerCase() !== "block" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
   												       alert("UnBlock request already created.");
   												       return;
   												   }}
@@ -1925,7 +1929,7 @@ function redirectToWorkmenBlockView(mode) {
 	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 													   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
-													   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+													   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
 													       alert("Black request already created.");
 													       return;
 													   }}
@@ -1950,7 +1954,7 @@ function redirectToWorkmenBlockView(mode) {
 	  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 	  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
-	  												   if (gatePassType.toLowerCase() !== "blacklist" || status.toLowerCase() !== "approved") {
+	  												   if ((gatePassType.toLowerCase() !== "blacklist" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
 	  												       alert("Deblack request already created.");
 	  												       return;
 	  												   }}
@@ -1975,7 +1979,7 @@ function redirectToWorkmenBlockView(mode) {
 		var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 														   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 														   if(mode === "add"){
-														   if (gatePassType.toLowerCase() !== "create" || status.toLowerCase() !== "approved") {
+														   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
 														       alert("Lost or damange request already created.");
 														       return;
 														   }}
@@ -2828,7 +2832,7 @@ for (const [key, value] of data.entries()) {
 function approveRejectRenew(status,gatePassType){
 	let isValid=true;
 	 const approvercomments = $("#approvercomments").val().trim();
-   if (approvercomments === "") {
+   if (approvercomments === "" && status==5) {
        $("#error-approvercomments").show();
        isValid = false;
    }else{
@@ -3566,3 +3570,32 @@ if(valid){
 
 		    return result;  // ✅ return after ajax finishes
 		}
+		function downloadPreviousFile(transactionId, fileName) {
+  if (!transactionId || !fileName) {
+    alert("Missing transaction or file name.");
+    return;
+  }
+
+  const url = `/CWFM/contractworkmen/downloadPreviousDoc?transactionId=${encodeURIComponent(transactionId)}&fileName=${encodeURIComponent(fileName)}`;
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("File not found or server error");
+      }
+      return response.blob();  // get file as blob
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob); // create secure blob link
+      window.open(blobUrl, '_blank');            // open in new tab
+
+      // optional cleanup after a short delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+    })
+    .catch(err => {
+      console.error("Error opening file:", err);
+      alert("Unable to open file.");
+    });
+}
+
+

@@ -1,5 +1,6 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,11 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
@@ -960,13 +964,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction) {
+	public List<GatePassListingDto> getGatePassActionListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction,String renewGatePassAction) {
 		log.info("Entering into getGatePassListingDetails dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		String query = getGatePassActionListingDetailsQuery();
 		log.info("Query to getGatePassListingDetails "+query);
 		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,previousGatePassAction,renewGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -995,6 +1000,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 				dto.setGatePassType("Cancel");
 			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassType("Lost/Damage");
+			}else if(gatePassType.equals(GatePassType.RENEW.getStatus())) {
+				dto.setGatePassType("Renew");
 			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -1729,7 +1736,9 @@ public List<GatePassListingDto> getRenewListingDetails(String userId,String gate
 	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
 	return listDto;
 }
-
+public String getUpdateRenewContractWorkmen() {
+	 return QueryFileWatcher.getQuery("UPDATE_RENEW_CONTRACT_WORKMEN"); 
+}
 @Override
 public String renewGatePass(GatePassMain gatePassMain) {
     log.info("Entering into saveGatePass dao method");
@@ -1738,9 +1747,9 @@ public String renewGatePass(GatePassMain gatePassMain) {
 	
     
     	
-    	Object[] parameters = prepareGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
+    	Object[] parameters = prepareRenewGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
     	 try {
-    		 String query = this.getUpdateContractWorkmen();
+    		 String query = this.getUpdateRenewContractWorkmen();
 	            int result = jdbcTemplate.update(query, parameters);
 	            if (result > 0) {
 	            	transId=gatePassMain.getTransactionId();
@@ -2815,5 +2824,170 @@ public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
 
 
 
+@Override
+public Map<String, String> getPreviousDocuments(String transactionId) {
+    String sql = "SELECT AadharDocName, PhotoName, BankDocName, PoliceVerificationDocName, " +
+                 "IdProof2DocName, MedicalDocName, EducationDocName, Form11DocName, " +
+                 "TrainingDocName, OtherDocName " +
+                 "FROM GATEPASSMAIN WHERE TransactionId = ?";
+
+    return jdbcTemplate.query(sql, rs -> {
+        Map<String, String> map = new LinkedHashMap<>();
+        if (rs.next()) {
+        //Map<String, String> map = new LinkedHashMap<>();
+        map.put("AADHAR", rs.getString("AadharDocName"));
+        map.put("PHOTO", rs.getString("PhotoName"));
+        map.put("BANK", rs.getString("BankDocName"));
+        map.put("POLICE", rs.getString("PoliceVerificationDocName"));
+        map.put("IDPROOF2", rs.getString("IdProof2DocName"));
+        map.put("MEDICAL", rs.getString("MedicalDocName"));
+        map.put("EDUCATION", rs.getString("EducationDocName"));
+        map.put("FORM11", rs.getString("Form11DocName"));
+        map.put("TRAINING", rs.getString("TrainingDocName"));
+        map.put("OTHER", rs.getString("OtherDocName"));
+        }
+        return map;
+    }, transactionId);
+    }
+@Override
+public List<Map<String, Object>> getRenewalDocs(String transactionId) {
+    String sql = "SELECT DOCTYPE, FILENAME, VERSIONNO " +
+                 "FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ? ORDER BY VERSIONNO ASC";
+    return jdbcTemplate.queryForList(sql, transactionId);
 
 }
+@Override
+public void saveRenewedDocuments(String transactionId, String userId,
+                                 MultipartFile aadharFile,
+                                 MultipartFile policeFile,
+                                 MultipartFile profilePic,
+                                 List<MultipartFile> additionalFiles,
+                                 List<String> documentTypes,String filePath) {
+    try {
+        // ✅ Determine next version number
+        String versionSql = "SELECT MAX(VERSIONNO)+ 1 FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ?";
+        Integer currentVersion = jdbcTemplate.queryForObject(versionSql, Integer.class, transactionId);
+
+        // If no version found, start from 2 (since version 1 is from GATEPASSMAIN)
+        int nextVersion = (currentVersion == null) ? 2 : currentVersion + 1;
+        String insertSql = "INSERT INTO GATEPASSDOCUMENTS (TRANSACTIONID, DOCTYPE, FILENAME, VERSIONNO, USERID, FILEPATH) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+// Ensure folder exists
+File folder = new File(filePath);
+if (!folder.exists()) folder.mkdirs();
+
+// 2️⃣ Save Aadhaar File
+if (aadharFile != null && !aadharFile.isEmpty()) {
+ String newFileName = "aadhar_V" + nextVersion + getFileExtension(aadharFile.getOriginalFilename());
+ File dest = new File(filePath + newFileName);
+ aadharFile.transferTo(dest);
+
+ jdbcTemplate.update(insertSql, transactionId, "AADHAR", newFileName, nextVersion, userId, dest.getAbsolutePath());
+}
+
+// 3️⃣ Save Police File
+if (policeFile != null && !policeFile.isEmpty()) {
+ String newFileName = "police_V" + nextVersion + getFileExtension(policeFile.getOriginalFilename());
+ File dest = new File(filePath + newFileName);
+ policeFile.transferTo(dest);
+
+ jdbcTemplate.update(insertSql, transactionId, "POLICE", newFileName, nextVersion, userId, dest.getAbsolutePath());
+}
+
+// 4️⃣ Save Profile Pic
+if (profilePic != null && !profilePic.isEmpty()) {
+ String newFileName = "photo_V" + nextVersion + getFileExtension(profilePic.getOriginalFilename());
+ File dest = new File(filePath + newFileName);
+ profilePic.transferTo(dest);
+
+ jdbcTemplate.update(insertSql, transactionId, "PHOTO", newFileName, nextVersion, userId, dest.getAbsolutePath());
+}
+
+// 5️⃣ Save Additional Files
+if (additionalFiles != null && documentTypes != null) {
+ for (int i = 0; i < additionalFiles.size(); i++) {
+     MultipartFile file = additionalFiles.get(i);
+     String docType = documentTypes.get(i);
+     if (file != null && !file.isEmpty()) {
+         String newFileName = docType.toLowerCase() + "_V" + nextVersion + getFileExtension(file.getOriginalFilename());
+         File dest = new File(filePath + newFileName);
+         file.transferTo(dest);
+
+         jdbcTemplate.update(insertSql, transactionId, docType.toUpperCase(), newFileName, nextVersion, userId, dest.getAbsolutePath());
+     }
+ }
+}
+
+log.info("✅ Renewed documents saved successfully with version V{}", nextVersion);
+
+} catch (Exception e) {
+log.error("❌ Error saving renewed documents: ", e);
+}
+}
+
+/** Helper method to get extension from filename */
+     private String getFileExtension(String filename) {
+      int dotIndex = filename.lastIndexOf(".");
+     return (dotIndex != -1) ? filename.substring(dotIndex) : "";
+   }
+private Object[] prepareRenewGatePassParameters1(String transId, GatePassMain gatePassMain) {
+	
+    return new Object[]{
+    		
+        gatePassMain.getGatePassAction(),
+        gatePassMain.getGatePassStatus(),
+        gatePassMain.getAadhaarNumber(),
+        gatePassMain.getFirstName(),
+        gatePassMain.getLastName(),
+        gatePassMain.getDateOfBirth(),
+        gatePassMain.getGender(),
+        gatePassMain.getRelationName(),
+        gatePassMain.getIdMark(),
+        gatePassMain.getMobileNumber(),
+        gatePassMain.getMaritalStatus(),
+        gatePassMain.getPrincipalEmployer(),
+        gatePassMain.getContractor(),
+        gatePassMain.getWorkorder(),
+        gatePassMain.getTrade(),
+        gatePassMain.getSkill(),
+        gatePassMain.getDepartment(),
+        gatePassMain.getSubdepartment(),
+        gatePassMain.getEic(),
+        gatePassMain.getNatureOfJob(),
+        gatePassMain.getWcEsicNo(),
+        gatePassMain.getHazardousArea(),
+        gatePassMain.getAccessArea(),
+        gatePassMain.getUanNumber(),
+        gatePassMain.getHealthCheckDate(),
+        gatePassMain.getPfNumber(),
+        gatePassMain.getEsicNumber(),
+        gatePassMain.getBloodGroup(),
+        gatePassMain.getAccommodation(),
+        gatePassMain.getAcademic(),
+        gatePassMain.getTechnical(),
+        gatePassMain.getIfscCode(),
+        gatePassMain.getAccountNumber(),
+        gatePassMain.getEmergencyName(),
+        gatePassMain.getEmergencyNumber(),
+        gatePassMain.getWageCategory(),
+        gatePassMain.getBonusPayout(),
+        gatePassMain.getPfCap(),
+        gatePassMain.getZone(),
+        gatePassMain.getBasic(),
+        gatePassMain.getDa(),
+        gatePassMain.getHra(),
+        gatePassMain.getWashingAllowance(),
+        gatePassMain.getOtherAllowance(),
+        gatePassMain.getUniformAllowance(),
+        0,
+        gatePassMain.getComments()!=null?gatePassMain.getComments():"",
+        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
+        				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
+        gatePassMain.getUserId(),gatePassMain.getLlNo(),transId
+    };
+}
+
+}
+
+

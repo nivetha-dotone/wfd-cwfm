@@ -1,13 +1,17 @@
 package com.wfd.dot1.cwfm.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +41,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.GatePassActionDto;
@@ -65,6 +71,8 @@ import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.OutputStream;
+
 
 @Controller
 @RequestMapping("/contractworkmen")
@@ -80,6 +88,9 @@ public class WorkmenController {
 	
 	@Autowired
 	PrincipalEmployerService peService;
+	
+	@Autowired
+	WorkmenDao workmenDao;
 	
 	@GetMapping("/addQuickOB")
     public String createGatePass(HttpServletRequest request,HttpServletResponse response) {
@@ -627,15 +638,23 @@ public class WorkmenController {
          } 
     }
     
-    @GetMapping("/downloadFile/{transactionId}/{userId}/{docType}")
-    public ResponseEntity<Resource> downloadFile(
-            @PathVariable("transactionId") String transactionId,
-            @PathVariable("userId") String userId,
-            @PathVariable("docType") String docType) {
+    @GetMapping("/viewFile/{encodedData}")
+    public void viewFile(@PathVariable("encodedData") String encodedData, HttpServletResponse response) {
         try {
+            // 🔐 Decode Base64 encoded JSON
+            String decodedJson = new String(Base64.getUrlDecoder().decode(encodedData), StandardCharsets.UTF_8);
+
+            // Parse decoded JSON to extract parameters
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> data = mapper.readValue(decodedJson, new TypeReference<>() {});
+            String transactionId = data.get("transactionId");
+            String userId = data.get("userId");
+            String docType = data.get("docType");
+
+            // Determine file path
             String filePath;
-            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") || 
-                docType.equals("training") || docType.equals("other") || docType.equals("id2") || 
+            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") ||
+                docType.equals("training") || docType.equals("other") || docType.equals("id2") ||
                 docType.equals("medical") || docType.equals("education") || docType.equals("form11")) {
                 filePath = ROOT_DIRECTORY + userId + "/" + transactionId + "/" + docType + ".pdf";
             } else {
@@ -644,26 +663,26 @@ public class WorkmenController {
 
             File file = new File(filePath);
             if (!file.exists()) {
-                return ResponseEntity.notFound().build();
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+                return;
             }
 
-            // Detect content type
+            // Detect file type
             String contentType = Files.probeContentType(file.toPath());
-            if (contentType == null) {
-                contentType = "application/octet-stream"; // fallback
-            }
+            if (contentType == null) contentType = "application/octet-stream";
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType(contentType));
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + file.getName());
+            response.setContentType(contentType);
+            response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
 
-            Resource resource = new FileSystemResource(file);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(resource);
+            // Stream file content
+            Files.copy(file.toPath(), response.getOutputStream());
+            response.getOutputStream().flush();
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            e.printStackTrace();
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error opening file");
+            } catch (IOException ignored) {}
         }
     }
 
@@ -784,7 +803,7 @@ public class WorkmenController {
 			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus(),GatePassType.CREATE.getStatus());
+    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus(),GatePassType.CREATE.getStatus(),GatePassType.RENEW.getStatus());
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLOCK.getStatus());
@@ -830,7 +849,7 @@ public class WorkmenController {
 			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus(),GatePassType.BLOCK.getStatus());
+    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus(),GatePassType.BLOCK.getStatus()," ");
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
@@ -880,7 +899,7 @@ public class WorkmenController {
 			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus(),GatePassType.CREATE.getStatus());
+    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus(),GatePassType.CREATE.getStatus(),GatePassType.RENEW.getStatus());
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.BLACKLIST.getStatus());
@@ -925,7 +944,7 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus());
+    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus()," ");
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
@@ -970,7 +989,7 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CANCEL.getStatus(),GatePassType.CREATE.getStatus());
+    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CANCEL.getStatus(),GatePassType.CREATE.getStatus(),GatePassType.RENEW.getStatus());
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.CANCEL.getStatus());
@@ -1017,7 +1036,7 @@ public class WorkmenController {
 			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus(),GatePassType.CREATE.getStatus());
+    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.LOSTORDAMAGE.getStatus(),GatePassType.CREATE.getStatus(),GatePassType.RENEW.getStatus());
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.LOSTORDAMAGE.getStatus());
@@ -1040,6 +1059,9 @@ public class WorkmenController {
     public String cancelviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;String transactionId=null;
+
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		if(mode.equals("add")){
      			 transactionId= workmenService.generateTransactionId();
@@ -1051,7 +1073,10 @@ public class WorkmenController {
     		request.setAttribute("GatePassObj", gatePassMainObj);
 
     		 request.setAttribute("mode", mode);
-    		
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + gatePassId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1094,6 +1119,9 @@ public class WorkmenController {
     public String blockviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId, @PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;String transactionId=null;
+
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		if(mode.equals("add")){
     			 transactionId= workmenService.generateTransactionId();
@@ -1104,7 +1132,10 @@ public class WorkmenController {
     		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
-    		
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1149,6 +1180,8 @@ public class WorkmenController {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
     	String transactionId=null;
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		if(mode.equals("add")){
    			 transactionId= workmenService.generateTransactionId();
@@ -1159,7 +1192,11 @@ public class WorkmenController {
     		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
-    		
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
+    		 
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1203,6 +1240,9 @@ public class WorkmenController {
     		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;String transactionId=null;
+
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		if(mode.equals("add")){
       			 transactionId= workmenService.generateTransactionId();
@@ -1213,7 +1253,11 @@ public class WorkmenController {
        		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
-    		
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
+    		 
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1259,6 +1303,9 @@ public class WorkmenController {
     		HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;String transactionId=null;
+
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		if(mode.equals("add")){
      			 transactionId= workmenService.generateTransactionId();
@@ -1270,6 +1317,11 @@ public class WorkmenController {
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		 request.setAttribute("mode", mode);
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
+    		 
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1313,6 +1365,9 @@ public class WorkmenController {
     		    		@PathVariable("mode") String mode,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;String transactionId=null;
+
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		if(mode.equals("add")){
      			 transactionId= workmenService.generateTransactionId();
@@ -1324,7 +1379,11 @@ public class WorkmenController {
     		request.setAttribute("GatePassObj", gatePassMainObj);
 
     		 request.setAttribute("mode", mode);
-    		
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
+    		 
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
@@ -1744,6 +1803,12 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
 
 	 request.setAttribute("Subdept", subdepSet);
 	 
+	 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
+
+     // ✅ Pass versioned documents to JSP
+     request.setAttribute("PreviousDocuments", allVersionedDocs);
+
+
     return "contractWorkmen/renew";
 }
     
@@ -1798,12 +1863,17 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
             transactionId = workmenService.renewGatePass(gatePassMain);
             if (transactionId != null) {
                 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                    uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+                	//uploadRenewDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
                 }
                 // Upload additional files
                 if (additionalFiles != null && documentTypes != null) {
-                    uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
-                }
+                	//uploadRenewAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
+                }  
+                    // ✅ ADD THIS NEW LINE
+                String filePath = ROOT_DIRECTORY + user.getUserId() + "/" + transactionId + "/";
+                    workmenService.saveRenewedDocuments(transactionId, String.valueOf(user.getUserId()), aadharFile, policeFile, profilePic, additionalFiles, documentTypes,filePath);
+
+                
                 return new ResponseEntity<>("contractWorkmen/renewList", HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -1819,10 +1889,17 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     public String renewviewIndividualContractWorkmenDetails(@PathVariable("gatePassId") String gatePassId,HttpServletRequest request,HttpServletResponse response) {
     	log.info("Entered into viewIndividualContractWorkmenDetails: "+gatePassId);
     	GatePassMain gatePassMainObj =null;
+    	String transactionId=null;
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+    		transactionId = gatePassMainObj.getTransactionId();
     		request.setAttribute("GatePassObj", gatePassMainObj);
-          
+    		 if(null != gatePassMainObj.getPhotoName()) {
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		 request.setAttribute("imagePath", profilePicFilePath);
+           		}
     		
     		//Get All GeneralMaster
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
@@ -1853,7 +1930,24 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		}
     		}
     		
-    		 
+    		 // ✅ Pass versioned documents to JSP
+    		 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
+    	     request.setAttribute("PreviousDocuments", allVersionedDocs);
+    	     
+    	     List<Map<String, Object>> renewDocsList=workmenDao.getRenewalDocs(transactionId);
+    	     Map<String, String> latestDocs = new HashMap<>();
+
+    	     for (Map<String, Object> doc : renewDocsList) {
+    	         String docType = doc.get("DOCTYPE").toString();   // PHOTO
+    	         String fileName = doc.get("FILENAME").toString(); // photo_V2.jpg
+
+    	         latestDocs.put(docType, fileName);  // Store latest version filename
+    	     }
+
+    	     // Send to JSP
+    	     request.setAttribute("LatestDocs", latestDocs);
+    	     
+    	     
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -2391,7 +2485,126 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
         return ResponseEntity.ok(responseMap);
     }
 
-    
-  
+    @GetMapping("/downloadPreviousDoc")
+    public void downloadPreviousDoc(@RequestParam("transactionId") String transactionId,
+                                    @RequestParam("fileName") String fileName,
+                                    HttpServletResponse response,
+                                    HttpServletRequest request) throws IOException {
 
-}
+        HttpSession session = request.getSession(false);
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+        if (user == null || fileName == null || fileName.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request");
+            System.out.println(response);
+            return;
+        }
+
+        // Construct secure file path
+        String baseDir = "D:/wfd_cwfm/ep_docs/" + user.getUserId() + "/" + transactionId + "/";
+        File file = new File(baseDir, fileName);
+
+        if (!file.exists() || !file.isFile()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+            System.out.println(response);
+            return;
+        }
+
+        // Detect MIME type dynamically
+        String mimeType = request.getServletContext().getMimeType(file.getName());
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+
+        response.setContentType(mimeType);
+        response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
+        response.setContentLengthLong(file.length());
+
+        try (FileInputStream in = new FileInputStream(file);
+             OutputStream out = response.getOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+    }
+    public String uploadRenewDocuments( MultipartFile aadharFile,
+            MultipartFile policeFile,
+            MultipartFile profilePic,
+            String userId,
+            String gatePassId) {
+
+          // Create directory path
+           String directoryPath = ROOT_DIRECTORY + userId + "/"+gatePassId+"/";
+
+          try {
+                  // Ensure the directory exists, if not create it
+           Path path = Paths.get(directoryPath);
+           if (!Files.exists(path)) {
+           Files.createDirectories(path);
+         }
+
+           // Save Aadhar PDF
+         if (!aadharFile.isEmpty()) {
+         String aadharFilePath = directoryPath + "aadharV.pdf";
+         saveFile(aadharFile, aadharFilePath);
+        }
+
+          // Save Police Verification PDF
+         if (!policeFile.isEmpty()) {
+         String policeFilePath = directoryPath + "policeV.pdf";
+         saveFile(policeFile, policeFilePath);
+        }
+
+        // Save Profile Pic
+           if(!profilePic.isEmpty()) {
+           String profilePicPath = directoryPath +profilePic.getOriginalFilename();
+           saveFile(profilePic,profilePicPath);
+        }
+
+      // Return success message
+      return "success";
+
+      } catch (IOException e) {
+      e.printStackTrace();
+      return "failed";
+    }
+  }
+    private String uploadRenewAdditionalDocuments(List<MultipartFile> additionalFiles,
+    		List<String> documentTypes,
+    		String userId,
+    		String gatePassId) {
+    	// Create directory path
+    	String directoryPath = ROOT_DIRECTORY + userId + "/" + gatePassId + "/";
+
+    	try {
+    		// Ensure the directory exists, if not create it
+    		Path path = Paths.get(directoryPath);
+    		if (!Files.exists(path)) {
+    			Files.createDirectories(path);
+    		}
+
+    		for (int i = 0; i < additionalFiles.size(); i++) {
+    			MultipartFile file = additionalFiles.get(i);
+    			String docType = documentTypes.get(i);
+
+    			// Create a filename based on the document type
+    			String fileName = docType + "V.pdf"; // or any other format you prefer
+    			String filePath = directoryPath + fileName;
+
+    			// Save the file
+    			if (!file.isEmpty()) {
+    				saveFile(file, filePath);
+    			}
+    		}
+
+    		return "success";
+
+    	} catch (IOException e) {
+    		log.error("Failed to save additional documents: ", e);
+    		return "failed";
+    	}
+    }
+    
+    }

@@ -73,7 +73,7 @@ public interface ContractorService {
 
 	public ContractorRegistration getAllContractorDetailForRenewal(String unitId, String contractorId);
 
-	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile,
+	public void saveRenewal(String jsonData, MultipartFile aadharFile, MultipartFile panFile, MultipartFile pfFile,
 			List<MultipartFile> renewalAttachments, String username);
 
 	public ContractorRegistration getAllAvailableWoAndLicense(String unitId, String contractorId, String contractorCode,

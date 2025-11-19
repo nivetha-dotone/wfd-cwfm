@@ -364,7 +364,7 @@ function checkSessionStatus() {
     var approveButton = document.getElementById('approveButton');
     var rejectButton = document.getElementById('rejectButton');
     var actionButton = document.getElementById('actionButton');
-    if (tabId === 'tab5') { // Assuming 'tab5' is the Documents tab
+    /* if (tabId === 'tab1') { // Assuming 'tab5' is the Basic Data tab
     	approveButton.style.display = 'inline-block'; // Show Save button
     	rejectButton.style.display = 'inline-block'; // Show Save button
     	actionButton.style.display = 'inline-block'; // Show Save button
@@ -372,7 +372,7 @@ function checkSessionStatus() {
     	approveButton.style.display = 'none'; // Hide Save button
     	rejectButton.style.display = 'none'; // Hide Save button
     	actionButton.style.display = 'none'; // Hide Save button
-    }
+    } */
 } 
 function validateCurrentTab() {
     let isValid = true;

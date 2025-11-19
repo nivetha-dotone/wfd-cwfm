@@ -503,7 +503,7 @@ label {
             <c:forEach var="file" items="${kronosFiles}">
     <tr>
         <td style="color:black;">${file.reportName}
-       <a href="#" onclick="downloadBill('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
+       <a href="#" onclick="openFile('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
     </tr>
 </c:forEach>
             
@@ -522,7 +522,7 @@ label {
         <td style="color:black;">${file.reportName} : 
         
         
-        <a href="#" onclick="downloadBill('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
+        <a href="#" onclick="openFile('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
     </tr>
 </c:forEach>
             	

@@ -69,6 +69,8 @@ function getAllContractorDetailForRenewal(contractorId) {
             setValueIfPresent("gstId", contractors.gst);
             setValueIfPresent("addressId", contractors.address);
             setValueIfPresent("contractTypeId", contractors.contractType);
+			const pfApplydate = contractors.pfApplyDate.split(" ")[0];
+			setValueIfPresent("pfApplyDateId", pfApplydate);
 			
 			const availableBox = document.getElementById("availableWorkOrders");
 			            const selectedBox = document.getElementById("selectedWorkOrders");
@@ -177,8 +179,9 @@ function saveRenewalDetails() {
 
     const aadharFile = $("#aadharDocId").prop("files")[0];
     const panFile = $("#panDocId").prop("files")[0];
+    const pfFile = $("#pfDocId").prop("files")[0];
 	const selectedOption = $("#vendorCodeId option:selected");
-   
+   const selectedPEOption = $("#principalEmployerId option:selected");
 
     const contractorName = toCapitalCase($("#contractorNameId").val().trim());
     const managerName = toCapitalCase($("#managerNameId").val().trim());
@@ -190,7 +193,9 @@ function saveRenewalDetails() {
     const jsonData = {
         contractorregId: $("#contractorregId").val().trim(),
         contractorId:selectedOption.val(),
-        principalEmployer: $("#principalEmployerId").val().trim(),
+        principalEmployer: $("#principalEmployerId").val(),
+       unitId: selectedPEOption.val(),
+        //principalEmployer:selectedPEOption.val(),
         contractorName: contractorName,
 		vendorCode: selectedOption.data("code"),
         email: $("#emailId").val().trim(),
@@ -246,6 +251,7 @@ function saveRenewalDetails() {
     // Step 5: Append files
     if (aadharFile) data.append("aadharFile", aadharFile);
     if (panFile) data.append("panFile", panFile);
+    if (pfFile) data.append("pfFile", pfFile);
 
     // Step 6: Append JSON
     data.append("jsonData", JSON.stringify(jsonData));
@@ -374,13 +380,17 @@ function saveTab2AndGoToTab3() {
     const data = new FormData();
     const aadharFile = $("#aadharDocId").prop("files")[0];
     const panFile = $("#panDocId").prop("files")[0];
+    const pfFile = $("#pfDocId").prop("files")[0];
     const selectedOption = $("#vendorCodeId option:selected");
+    const selectedPEOption = $("#principalEmployerId option:selected");
 
     const jsonData = {
         contractorregId: $("#contractorregId").val().trim(),
         contractorId: selectedOption.val(),
         vendorCode: selectedOption.data("code"),
-        principalEmployer: $("#principalEmployerId").val().trim(),
+        principalEmployer: $("#principalEmployerId").val(),
+       // principalEmployer:selectedPEOption.val(),
+        unitId: selectedPEOption.val(),
         contractorName: toCapitalCase($("#contractorNameId").val().trim()),
         email: $("#emailId").val().trim(),
         mobile: $("#mobileId").val().trim(),
@@ -427,6 +437,7 @@ function saveTab2AndGoToTab3() {
 
     if (aadharFile) data.append("aadharFile", aadharFile);
     if (panFile) data.append("panFile", panFile);
+     if (pfFile) data.append("pfFile", pfFile);
     data.append("jsonData", JSON.stringify(jsonData));
 
     const xhr = new XMLHttpRequest();

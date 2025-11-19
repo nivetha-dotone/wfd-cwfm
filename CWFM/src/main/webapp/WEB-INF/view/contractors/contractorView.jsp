@@ -241,7 +241,7 @@ table.ControlLayout td {
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharDoc"/></label></th>
                 <td>
-                 <a href="#" onclick="downloadContractorDoc('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.aadharDoc }')">Download Aadhar</a>
+                 <a href="#" onclick="viewContractorFile('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.aadharDoc }')">Download Aadhar</a>
                 </td>
                
            </tr>
@@ -253,7 +253,7 @@ table.ControlLayout td {
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.panDoc"/></label></th>
                 <td>
-                 <a href="#" onclick="downloadContractorDoc('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.panDoc }')">Download Pan</a>
+                 <a href="#" onclick="viewContractorFile('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.panDoc }')">Download Pan</a>
                
                 </td>
            </tr>
@@ -316,6 +316,10 @@ table.ControlLayout td {
 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplyDate"/></label></th>
                 <td>
                 	<input id="pfApplyDateId" name="pfApplyDate" value ="${principalEmployer.pfApplyDate}" style="width: 100%;height: 20px; color: black;" type="text" size="30" maxlength="30" readonly />
+                </td>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfDoc"/></label></th>
+                <td>
+                 <a href="#" onclick="viewContractorFile('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${principalEmployer.pfDoc }')">Download PF</a>
                 </td>
 </tr>
         </tbody>

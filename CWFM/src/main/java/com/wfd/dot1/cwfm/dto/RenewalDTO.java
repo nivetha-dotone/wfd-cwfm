@@ -185,7 +185,14 @@ public void setVendorCode(String vendorCode) {
 	public void setSelectedWorkOrders(List<String> selectedWorkOrders) {
 		this.selectedWorkOrders = selectedWorkOrders;
 	}
+	private Long unitId;
 
+	public Long getUnitId() {
+		return unitId;
+	}
+	public void setUnitId(Long unitId) {
+		this.unitId = unitId;
+	}
     // Getters and setters
 }
 

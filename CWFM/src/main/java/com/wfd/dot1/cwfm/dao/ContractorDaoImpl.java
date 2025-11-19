@@ -235,7 +235,8 @@ public class ContractorDaoImpl implements ContractorDao{
 			    contreg.getContractorregId(),
 			    contreg.getContractorId(),
 			    contreg.getVendorCode(),
-			    contreg.getPrincipalEmployer(),
+			    contreg.getUnitId(),
+			   // contreg.getPrincipalEmployer(),
 			    contreg.getContractorName(),
 			    contreg.getManagerName(),
 
@@ -267,7 +268,8 @@ public class ContractorDaoImpl implements ContractorDao{
 			    contreg.getAddress(),
 			    contreg.getEmail(),
 			    contreg.getMobile(),
-			    contreg.getActionId()
+			    contreg.getActionId(),
+			    contreg.getPfDoc()
 			};
 
         try {
@@ -276,14 +278,14 @@ public class ContractorDaoImpl implements ContractorDao{
         		    "TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, " +
         		    "MAINCONTRACTOR, CONTTYPE, PERIODSTARTDATE, PERIODENDDATE, TYPE, STATUS, " +
         		    "CREATEDBY, AADHARNUM, AADHARDOCNAME, PANNUM, PANDOCNAME, PFAPPLYDT, GST, " +
-        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM,ACTIONID) " +
-        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?)";
+        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM,ACTIONID,PFDOCNAME) " +
+        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?,?)";
 
            status  = jdbcTemplate.update(query, parameters);
-           if (status > 0) {
-               // ✅ Call saveContractorPemm method after successful registration save
-               saveContractorPemm(contreg);
-           }
+           if (status > 0 && "Create".equalsIgnoreCase(contreg.getRequestType())) {
+        	    saveContractorPemm(contreg);
+        	}
+
 
            return contreg.getContractorregId();
         } catch (Exception e) {
@@ -299,7 +301,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	        jdbcTemplate.update(sql,
 	           
 	            contreg.getContractorId(),
-	            contreg.getPrincipalEmployer(),
+	            //contreg.getPrincipalEmployer(),
+	            contreg.getUnitId(),
 	            contreg.getManagerName(),
 	            contreg.getTotalStrength() != null ? Integer.parseInt(contreg.getTotalStrength()) : null,
 	    	    contreg.getRcMaxEmp() != null ? Integer.parseInt(contreg.getRcMaxEmp()) : null,
@@ -440,7 +443,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	            contr.setAddress(rs.getString("ADDRESS"));
 	            contr.setGst(rs.getString("GST"));
 	            contr.setCreatedBy(rs.getString("CREATEDBY"));
-	        }
+	            contr.setPfDoc(rs.getString("PFDOCNAME"));
+	            }
 			return contr;
 	}
 	
@@ -694,34 +698,57 @@ public class ContractorDaoImpl implements ContractorDao{
 //		}
 
 	@Override
-	public   void savePolicies(List<ContractorRegistrationPolicy> policies,ContractorRegistration contreg) {
-		 String sql = "INSERT INTO CMSContractorRegPolicy (" +
-		    		" [CONTRACTORID],[UNITID],[WONUMBER] ,[LICENCETYPE],[WCCODE] ,[NATUREOFID] ,[WCTOTAL]  ,[WCFROMDTM] ,[WCTODTM] ,[ATTACHMENTNAME],[CREATEDDTM] ,[CREATEDBY],[CONTRACTORREGID],[DELETESW]) " +
-		            " VALUES (?,?,?,?, ?,?,?,? ,?,?,GETDATE(),?,?,0)";
-		int[] save = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				
-				ps.setString(1, contreg.getContractorId());
-	            ps.setString(2, contreg.getPrincipalEmployer());
-	            ps.setString(3, policies.get(i).getWoNumber());
-	            ps.setString(4, policies.get(i).getDocumentType());
-	            ps.setString(5, policies.get(i).getDocumentNumber());
-	            ps.setString(6, policies.get(i).getNatureOfJob());
-	            ps.setInt(7, policies.get(i).getCoverage());
-	            ps.setString(8, policies.get(i).getValidFrom());
-	            ps.setString(9, policies.get(i).getValidTo());
-	            ps.setString(10, policies.get(i).getFileName());
-	            ps.setString(11, contreg.getCreatedBy());
-	            ps.setString(12, contreg.getContractorregId());
-				
-			}
+	public void savePolicies(List<ContractorRegistrationPolicy> policies, ContractorRegistration contreg) {
+	    try {
+	        String requestType = contreg.getRequestType() != null ? contreg.getRequestType().trim() : "";
 
-			public int getBatchSize() {
-				return policies.size();
-			}
-		});
-		 saveContractorWC(policies, contreg);
+	        // 🔹 Common insert into CMSContractorRegPolicy
+	        String sql = "INSERT INTO CMSContractorRegPolicy (" +
+	                "CONTRACTORID, UNITID, WONUMBER, LICENCETYPE, WCCODE, NATUREOFID, " +
+	                "WCTOTAL, WCFROMDTM, WCTODTM, ATTACHMENTNAME, CREATEDDTM, CREATEDBY, CONTRACTORREGID, DELETESW) " +
+	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), ?, ?, 0)";
+
+	        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+	            @Override
+	            public void setValues(PreparedStatement ps, int i) throws SQLException {
+	                ContractorRegistrationPolicy policy = policies.get(i);
+
+	                ps.setString(1, contreg.getContractorId());
+	              //  ps.setString(2, contreg.getPrincipalEmployer());
+	                ps.setLong(2, contreg.getUnitId());
+	                ps.setString(3, policy.getWoNumber());
+	                ps.setString(4, policy.getDocumentType());
+	                ps.setString(5, policy.getDocumentNumber());
+	                ps.setString(6, policy.getNatureOfJob());
+	                ps.setInt(7, policy.getCoverage());
+	                ps.setString(8, policy.getValidFrom());
+	                ps.setString(9, policy.getValidTo());
+	                ps.setString(10, policy.getFileName());
+	                ps.setString(11, contreg.getCreatedBy());
+	                ps.setString(12, contreg.getContractorregId());
+	            }
+
+	            @Override
+	            public int getBatchSize() {
+	                return policies.size();
+	            }
+	        });
+
+	        System.out.println("✅ Policies inserted successfully in CMSContractorRegPolicy.");
+
+	        // 🔹 Additional insert into CMSContractorWC ONLY for 'Create'
+	        if (requestType.equalsIgnoreCase("Create")) {
+	            saveContractorWC(policies, contreg);
+	            System.out.println("✅ Additional policies saved in CMSContractorWC for CREATE request.");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.err.println("❌ Error saving contractor policies: " + e.getMessage());
+	    }
 	}
+
+
 	public void saveContractorWC(List<ContractorRegistrationPolicy> policies, ContractorRegistration contreg) {
 	    String sql = "INSERT INTO CMSCONTRACTOR_WC (" +
 	            "[CONTRACTORID],[UNITID],[LICENCE_TYPE],[WC_CODE],[WC_TOTAL]," +
@@ -731,7 +758,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	    for (ContractorRegistrationPolicy policy : policies) {
 	        jdbcTemplate.update(sql,
 	            contreg.getContractorId(),              // CONTRACTORID
-	            contreg.getPrincipalEmployer(),         // UNITID
+	            //contreg.getPrincipalEmployer(),         // UNITID
+	            contreg.getUnitId(),         // UNITID
 	            policy.getDocumentType(),               // LICENCE_TYPE
 	            policy.getDocumentNumber(),             // WC_CODE
 	            //policy.getNatureOfJob(),                // [NATURE_OF_ID],
@@ -853,6 +881,7 @@ public class ContractorDaoImpl implements ContractorDao{
 			cont.setContractType(rs.getString("CONTTYPE"));
 			cont.setServices(rs.getString("SERVICES"));
 			cont.setEsicRegNo(rs.getString("ESICREGNO"));
+			cont.setPfApplyDate(rs.getString("PFAPPLYDT"));
 			cont.setContractorId(rs.getString("CONTRACTORID"));
 		}
 		//String sqlWO = this.getAllAvailableWos();
@@ -890,13 +919,13 @@ public class ContractorDaoImpl implements ContractorDao{
 	
 	@Override
 	public ContractorRegistration getContractorRegistration(String contractorRegId) {
-	    String sql = "SELECT * FROM CMSContractorRegistration WHERE CONTRACTORREGID = ?";
+	    String sql = "SELECT *,cpe.NAME FROM CMSContractorRegistration ccr join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID WHERE CONTRACTORREGID = ?";
 	    return jdbcTemplate.queryForObject(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
 	        ContractorRegistration cr = new ContractorRegistration();
 	        cr.setContractorregId(rs.getString("CONTRACTORREGID"));
 	        cr.setContractorId(rs.getString("CONTRACTORID"));
 	        cr.setVendorCode(rs.getString("CODE"));
-	        cr.setPrincipalEmployer(rs.getString("UNITID"));
+	        cr.setPrincipalEmployer(rs.getString("NAME"));
 	        cr.setContractorName(rs.getString("CONTRACTORNAME"));
 	        cr.setManagerName(rs.getString("MANAGERNM"));
 	        cr.setTotalStrength(String.valueOf(rs.getInt("TOTALSTRENGTH")));
@@ -920,6 +949,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	        cr.setAddress(rs.getString("ADDRESS"));
 	        cr.setEmail(rs.getString("EMAILADDR"));
 	        cr.setMobile(rs.getString("MOBILENO"));
+	        cr.setPfDoc(rs.getString("PFDOCNAME"));
+	        cr.setUnitId(rs.getLong("UNITID"));
 	        return cr;
 	    });
 	}
@@ -937,6 +968,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	        policy.setValidFrom(rs.getString("WCFROMDTM"));
 	        policy.setValidTo(rs.getString("WCTODTM"));
 	        policy.setFileName(rs.getString("ATTACHMENTNAME"));
+	        policy.setUnitId(rs.getString("UNITID"));
 	        return policy;
 	    });
 	}
