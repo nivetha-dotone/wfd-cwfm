@@ -2819,6 +2819,63 @@ public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
 }
 
 
+@Override
+public int getActiveWorkmenCount(String unitId,String contractorId,String gatePassStatus, String gatePassType) {
+	String query="WITH Defs AS ( "
+			+ "    SELECT  "
+			+ "        MAX(CASE WHEN CSTMDEFNAME = 'ContractorId' THEN CSTMDEFID END) AS ContractorDefId, "
+			+ "        MAX(CASE WHEN CSTMDEFNAME = 'UnitId' THEN CSTMDEFID END) AS UnitDefId, "
+			+ "        MAX(CASE WHEN CSTMDEFNAME = 'Status' THEN CSTMDEFID END) AS StatusDefId, "
+			+ "        MAX(CASE WHEN CSTMDEFNAME = 'GatePassType' THEN CSTMDEFID END) AS GatePassTypeDefId "
+			+ "    FROM CMSPERSONCUSTOMDATADEFINITION "
+			+ "), "
+			+ "EmployeeData AS ( "
+			+ "    SELECT  "
+			+ "        E.EMPLOYEEID, "
+			+ "        MAX(CASE WHEN C.CSTMDEFID = D.ContractorDefId THEN C.CUSTOMDATATEXT END) AS ContractorValue, "
+			+ "        MAX(CASE WHEN C.CSTMDEFID = D.UnitDefId THEN C.CUSTOMDATATEXT END) AS UnitValue, "
+			+ "        MAX(CASE WHEN C.CSTMDEFID = D.StatusDefId THEN C.CUSTOMDATATEXT END) AS StatusValue, "
+			+ "        MAX(CASE WHEN C.CSTMDEFID = D.GatePassTypeDefId THEN C.CUSTOMDATATEXT END) AS GatePassValue "
+			+ "    FROM CMSPERSONCUSTOMDATA C "
+			+ "    CROSS JOIN Defs D "
+			+ "    JOIN ( "
+			+ "        SELECT DISTINCT EMPLOYEEID  "
+			+ "        FROM CMSPERSONCUSTOMDATA "
+			+ "    ) E ON E.EMPLOYEEID = C.EMPLOYEEID "
+			+ "    GROUP BY E.EMPLOYEEID "
+			+ ") "
+			+ "SELECT COUNT(DISTINCT ED.EMPLOYEEID) AS ActiveEmployeeCount "
+			+ "FROM EmployeeData ED "
+			+ "JOIN CMSPERSONSTATUSMM S "
+			+ "    ON S.EMPLOYEEID = ED.EMPLOYEEID "
+			+ "    AND S.ISACTIVE = 1 "
+			+ "WHERE ED.ContractorValue = ? "
+			+ "  AND ED.UnitValue = ? "
+			+ "  AND ED.StatusValue in ('3','4') "
+			+ "  AND ED.GatePassValue =?; "
+			+ "";
+	
+	
+	int activeCount = 0;
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorId,unitId,gatePassType);
+	if(rs.next()) {
+		activeCount = rs.getInt("ActiveEmployeeCount");
+	}
+	return activeCount;
+	
+}
+@Override
+public int getLLDeploymentCountByUnitId(String unitId) {
+	String query ="  select COUNT_NO from CMS_LL_DEPLOYMENT_COUNT where UNIT_ID=? ";
+	int llCount = 0;
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
+	if(rs.next()) {
+		llCount = rs.getInt("COUNT_NO");
+	}
+	return llCount;
+	
+}
+
 
 
 
@@ -2854,7 +2911,29 @@ public List<Map<String, Object>> getRenewalDocs(String transactionId) {
     String sql = "SELECT DOCTYPE, FILENAME, VERSIONNO " +
                  "FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ? ORDER BY VERSIONNO ASC";
     return jdbcTemplate.queryForList(sql, transactionId);
-
+}
+@Override
+public int licenseExistsAndCount(String unitId,String contractorId,String workorderId,String licenseType,String licenseId) {
+	String query=null;
+	if(licenseType.equals("LL")) {
+		query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
+				+ "  from CMSCONTRACTOR_WC ccwc \r\n"
+				+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
+				+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
+				+ "  and ccwc.LICENCE_TYPE='LL' and ccwc.WCID=? ";
+	}else {
+	 query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
+			+ "  from CMSCONTRACTOR_WC ccwc \r\n"
+			+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
+			+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
+			+ "  and ccwc.LICENCE_TYPE in ('WC','ESIC')  and ccwc.WCID=? ";
+	}
+	int licenseCount=0;
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId,licenseId);
+	if(rs.next()) {
+		licenseCount = rs.getInt("WC_TOTAL");
+	}
+	return licenseCount;
 }
 @Override
 public void saveRenewedDocuments(String transactionId, String userId,

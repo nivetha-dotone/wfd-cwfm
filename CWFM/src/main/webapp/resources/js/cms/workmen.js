@@ -1191,10 +1191,18 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
                 }else{
                     loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
                 }
-            } else {
-                console.error("Error saving data:", xhr.status, xhr.responseText);
-				sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
-            }
+            }else if (xhr.status === 400) {  
+				       const msg = xhr.responseText;
+				       console.error("Server validation failed: " + msg);
+					   showLicenseError(msg);
+				       //alert(msg); // or show in UI better
+				       //sessionStorage.setItem("errorMessage", msg);
+					   
+				   }
+				   else {
+				       console.error("Error saving data:", xhr.status, xhr.responseText);
+				       sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
+				   }
         };
 
         xhr.onerror = function () {
@@ -1208,9 +1216,21 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     }
 }
 
+function showLicenseError(msg) {
+    const div = document.getElementById("licenseError");
+    div.innerHTML = msg;
+    div.style.display = "block";
+}
 function viewDoc(transactionId, userId, docType) {
     // Prepare data for secure encoding
     const data = { transactionId, userId, docType };
+
+}
+
+function downloadDoc(transactionId, userId, docType) {
+    const baseUrl = '/CWFM/contractworkmen/downloadFile';
+    const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
+
 
     // Encode as Base64 JSON (URL-safe)
     const encodedData = btoa(JSON.stringify(data));

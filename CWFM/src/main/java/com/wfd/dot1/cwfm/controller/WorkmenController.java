@@ -467,8 +467,15 @@ public class WorkmenController {
                 }
             }
             }
+            
+            
             transactionId = workmenService.saveGatePass(gatePassMain);
             if (transactionId != null) {
+            	if (transactionId.contains("mandatory") || transactionId.contains("exceeded")) {
+            		//if user wants we can draft the record
+            		//workmenService.draftGatePass(gatePassMain);
+                    return new ResponseEntity<>(transactionId, HttpStatus.BAD_REQUEST);
+                }else {
                 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
                     uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
                 }
@@ -477,6 +484,7 @@ public class WorkmenController {
                     uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
                 }
                 return new ResponseEntity<>("contractWorkmen/list", HttpStatus.OK);
+            	}
             }
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             

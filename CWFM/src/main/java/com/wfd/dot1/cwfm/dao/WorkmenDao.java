@@ -179,6 +179,7 @@ public interface WorkmenDao {
 
 	boolean updatePersonStatusValidity(Long activeId, Long inactiveId);
 
+
 	Map<String, String> getPreviousDocuments(String transactionId);
 
 	//public Map<String, String> getVersionOneDocs(String transactionId);
@@ -190,6 +191,14 @@ public interface WorkmenDao {
 			List<String> documentTypes,String filePath);
 
 	
+
+
+	int getActiveWorkmenCount(String unitId, String contractorId, String gatePassStatus, String gatePassType);
+
+	int getLLDeploymentCountByUnitId(String unitId);
+
+	int licenseExistsAndCount(String unitId, String contractorId, String workorderId, String licenseType,
+			String licenseId);
 
 
 }

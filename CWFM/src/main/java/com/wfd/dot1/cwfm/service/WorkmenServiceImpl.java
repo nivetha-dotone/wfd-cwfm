@@ -100,7 +100,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	@Override
 	public String saveGatePass(GatePassMain gatePassMain) {
 		String transactionId =null;
+		
 		try {
+	
+			String allowOnboarding = this.workmenCountCheck(gatePassMain);
+			if("allow".equals(allowOnboarding)) {
 			int workFlowTypeId = workmenDao.getWorkFlowTYpeNew(gatePassMain.getPrincipalEmployer(),GatePassType.CREATE.getStatus());
 			gatePassMain.setWorkFlowType(workFlowTypeId);
 			
@@ -136,26 +140,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 				dto.setComments(gatePassMain.getComments());
 				dto.setUpdatedBy(gatePassMain.getUserId());
 				workmenDao.saveGatePassStatusLog(dto);
-				//get approvers for gatepass
-//				List<MasterUser> approversList = workmenDao.getApproversForGatePass(gatePassMain.getCreatedBy());
-//				
-//				if(null!=approversList && approversList.size()>0){
-//					for(MasterUser mu :approversList) {
-//						mu.setStatus(GatePassType.CREATE.getStatus());
-//						if(mu.getRoleName().equalsIgnoreCase(UserRole.EIC.getName())) {
-//								mu.setIndex(1);
-//							
-//						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.SECURITY.getName())){
-//								mu.setIndex(2);
-//							
-//						}else if(mu.getRoleName().equalsIgnoreCase(UserRole.HR.getName())) {
-//								mu.setIndex(3);
-//							
-//						}
-//					}
-//					workmenDao.saveGatePassApprover(gatePassId, approversList, gatePassMain.getCreatedBy());
-//				}
+				return transactionId;
 				
+			}
+			}else {
+				return allowOnboarding;
 			}
 		}catch(Exception e) {
 			
@@ -163,6 +152,59 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return transactionId;
 	}
 	
+	public String workmenCountCheck(GatePassMain gatePassMain) {
+		int activeCount = workmenDao.getActiveWorkmenCount(gatePassMain.getPrincipalEmployer(), gatePassMain.getContractor(), 
+				GatePassStatus.APPROVED.getStatus(), GatePassType.CREATE.getStatus());
+		int llDeployedCount = workmenDao.getLLDeploymentCountByUnitId(gatePassMain.getPrincipalEmployer());
+		if(activeCount < llDeployedCount) {
+			return "allow";
+		}else {
+			return this.licenseExistsAndCount(gatePassMain, activeCount);
+			
+		}
+	}
+	public String licenseExistsAndCount(GatePassMain gatePassMain, int activeCount) {
+
+	    String unit = gatePassMain.getPrincipalEmployer();
+	    String contractor = gatePassMain.getContractor();
+	    String workorder = gatePassMain.getWorkorder();
+
+	    int llCount = workmenDao.licenseExistsAndCount(unit, contractor, workorder, "LL", gatePassMain.getLlNo());
+	    int wcCount = workmenDao.licenseExistsAndCount(unit, contractor, workorder, "WC", gatePassMain.getWcEsicNo());
+
+	    // --- Step 1: Mandatory validation ---
+	    boolean llMandatory = (llCount == 0);
+	    boolean wcMandatory = (wcCount == 0);
+
+	    if (llMandatory || wcMandatory) {
+	        if (llMandatory && wcMandatory) {
+	            return "LL and WC/ESIC are mandatory";
+	        }
+	        if (llMandatory) {
+	            return "LL is mandatory";
+	        }
+	        // wcMandatory must be true here
+	        return "WC/ESIC is mandatory";
+	    }
+
+	    // --- Step 2: Capacity check ---
+	    boolean llExceeded = activeCount >= llCount;
+	    boolean wcExceeded = activeCount >= wcCount;
+
+	    if (llExceeded || wcExceeded) {
+	        if (llExceeded && wcExceeded) {
+	            return "LL and WC exceeded";
+	        }
+	        if (llExceeded) {
+	            return "LL exceeded";
+	        }
+	        return "WC exceeded";
+	    }
+
+	    // --- Step 3: All good ---
+	    return "allow";
+	}
+
 	@Override
 	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String type) {
 		return workmenDao.getGatePassListingDetails(unitId,deptId,userId,gatePassTypeId,type);
