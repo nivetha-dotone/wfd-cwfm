@@ -13,12 +13,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -53,8 +56,12 @@ import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 @Service
 public class WorkmenServiceImpl implements WorkmenService{
 
+	private static final Logger log = LoggerFactory.getLogger(WorkmenServiceImpl.class);
+	
 	@Autowired
 	WorkmenDao workmenDao;
+	
+	
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		
@@ -127,6 +134,13 @@ public class WorkmenServiceImpl implements WorkmenService{
 				dto.setComments(gatePassMain.getComments());
 				dto.setUpdatedBy(gatePassMain.getUserId());
 				workmenDao.saveGatePassStatusLog(dto);
+				
+				boolean cmsDone = this.cmsPersonInsert(gatePassMain);
+
+		        if (!cmsDone) {
+		            throw new RuntimeException("CMS Person Insert failed unexpectedly.");
+		        }
+
 				return transactionId;
 			}else {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
@@ -228,116 +242,202 @@ public class WorkmenServiceImpl implements WorkmenService{
 		return workmenDao.getAllGeneralMastersForGatePass(gatePassMainObj);
 	}
 	@Override
+	@Transactional
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto) {
-		GatePassMain gpm=null;
-		if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
-			 gpm = workmenDao.getIndividualContractWorkmenDetailsByTransId(dto.getTransactionId());
-		}else {
-			gpm = workmenDao.getIndividualContractWorkmenDetailsByGatePassIdForApprove(dto.getGatePassId());
-		}
-		
-		String result=null;
-		//if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gpm.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus())) {
-		 result = workmenDao.approveRejectGatePass(dto);
-		GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
-		statusLog.setTransactionId(dto.getTransactionId());
-		statusLog.setGatePassId(dto.getGatePassId());
-		statusLog.setGatePassType(dto.getGatePassType());
-		statusLog.setStatus(Integer.parseInt(dto.getStatus()));
-		statusLog.setComments(dto.getComments());
-		statusLog.setUpdatedBy(dto.getApproverId());
-		workmenDao.saveGatePassStatusLog(statusLog);
-		boolean status=false;
-		if(dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
-			if(gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus())) {
-			status = workmenDao.updateGatePassMainStatusByTransactionId(dto.getTransactionId(),dto.getStatus());
-			}else {
-			//rollback status and type to create
-			status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),GatePassStatus.APPROVED.getStatus(),GatePassType.CREATE.getStatus());
-			}
-		}else {
-			boolean isLastApprover=false;
-			int workFlowTypeId = workmenDao.getWorkFlowTYpeByTransactionId(gpm.getTransactionId(),dto.getGatePassType());
-			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-				 isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(),String.valueOf(dto.getGatePassType()));
-			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
-				if(GatePassType.CREATE.getStatus().equals(dto.getGatePassType())) {
-				 isLastApprover = workmenDao.isLastApproverForParallel(String.valueOf(dto.getGatePassType()),dto.getTransactionId(),dto.getRoleId());
-				}else {
-				 isLastApprover = workmenDao.isLastApproverForParallelGatePassAction(String.valueOf(dto.getGatePassType()),dto.getGatePassId(),dto.getRoleId());
-				}
-			}
-			
-			//check if last approver, if last approver change the status of gate pass main to approved
-			
-			if(isLastApprover) {
-				if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()) || dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
-					status = workmenDao.updateGatePassMainStatusAndType(dto.getGatePassId(),dto.getStatus(),GatePassType.CREATE.getStatus());
-				//rollback status and type to create
-				
-					
-				}else {
-					String gatePassId=dto.getGatePassId();
-					if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
-						//create gatepassId on final approval
-						gatePassId= workmenDao.updateGatePassIdByTransactionId(dto.getTransactionId());
-						gpm.setGatePassId(gatePassId);
-						//insert into CMSPerson
-						long personInsert = this.saveIntoCMSPerson(gpm);
-						System.out.println("Insert into CMSPerson result "+personInsert);
-						if(personInsert>0) {
-							//insert into CMSPERSONJOBHIST
-							boolean personJobHist = this.saveIntoCMSPERSONJOBHIST(gpm,personInsert);
-							System.out.println("Insert into CMSPerson result "+personJobHist);
-							if(personJobHist) {
-								boolean cMSPERSONSTATUSMM = this.saveCMSPERSONSTATUSMM(gpm,personInsert);
-								System.out.println("Insert into CMSPerson result "+cMSPERSONSTATUSMM);
-								if(cMSPERSONSTATUSMM) {
-									gpm.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
-									boolean cmsPersonCustData = this.saveCMSPERSONCUSTOMDATA(gpm,personInsert);
-									System.out.println("Insert into CMSPerson result "+cmsPersonCustData);
-								}
-							}
-						}
-					}else if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus()) ||
-							dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus()) ||
-							dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
-						long personId = this.getPersonIdFromCmsPerson(gpm.getGatePassId());
-						boolean effectiveTillUpdate = workmenDao.updateCmsPersonCustDataEffectiveTill(personId);
-						if(effectiveTillUpdate) {
-							boolean insertIntoCustData=false;
-							if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus())) {
-								insertIntoCustData = workmenDao.insertIntoCustData(gpm.getCreatedBy(),personId,GatePassType.BLOCK.getStatus());
-							}else if(dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus())) {
-								insertIntoCustData = workmenDao.insertIntoCustData(gpm.getCreatedBy(),personId,GatePassType.BLACKLIST.getStatus());
-							}else if(dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
-								insertIntoCustData = workmenDao.insertIntoCustData(gpm.getCreatedBy(),personId,GatePassType.CANCEL.getStatus());
-							}
-							if(insertIntoCustData) {
-								boolean personActiveinMM = workmenDao.isPersonActiveInStatusMM(personId);
-								if(personActiveinMM) {
-									PersonStatusIds ids = workmenDao.getPersonStatusIds(personId);
 
-								    if (ids.getInactiveId() != null) {
-								        boolean personStatusMM= workmenDao.updatePersonStatusValidity(ids.getActiveId(),ids.getInactiveId());
-								   if(personStatusMM) {
-									   System.out.print(personStatusMM);
-								   }
-								    }
-								}
-							}
-						}
-						
-					}
-					
-				status = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
-				}
-			}
-		}
-//		}else {
-//			result="Other gatepass action performed on this gatepass";
-//		}
-		return result;
+	    // Load GatePassMain based on type (CREATE vs others)
+	    GatePassMain gpm = dto.getGatePassType().equals(GatePassType.CREATE.getStatus())
+	            ? workmenDao.getIndividualContractWorkmenDetailsByTransId(dto.getTransactionId())
+	            : workmenDao.getIndividualContractWorkmenDetailsByGatePassIdForApprove(dto.getGatePassId());
+
+	    if (gpm == null) {
+	        throw new RuntimeException("GatePass details not found for approval.");
+	    }
+
+	    // Save Approve/Reject Action
+	    String result = workmenDao.approveRejectGatePass(dto);
+
+	    // Log status change
+	    GatePassStatusLogDto statusLog = new GatePassStatusLogDto();
+	    statusLog.setTransactionId(dto.getTransactionId());
+	    statusLog.setGatePassId(dto.getGatePassId());
+	    statusLog.setGatePassType(dto.getGatePassType());
+	    statusLog.setStatus(Integer.parseInt(dto.getStatus()));
+	    statusLog.setComments(dto.getComments());
+	    statusLog.setUpdatedBy(dto.getApproverId());
+	    workmenDao.saveGatePassStatusLog(statusLog);
+
+	    // Handle REJECT first
+	    if (dto.getStatus().equals(GatePassStatus.REJECTED.getStatus())) {
+
+	        boolean updated;
+	        
+	        if (gpm.getGatePassAction().equals(GatePassType.CREATE.getStatus())) {
+	            // Rejecting CREATE → update by transactionId
+	            updated = workmenDao.updateGatePassMainStatusByTransactionId(
+	                    dto.getTransactionId(), dto.getStatus());
+	        } else {
+	            // Rejecting other actions → revert to CREATE + Approved
+	            updated = workmenDao.updateGatePassMainStatusAndType(
+	                    dto.getGatePassId(),
+	                    GatePassStatus.APPROVED.getStatus(),
+	                    GatePassType.CREATE.getStatus()
+	            );
+	        }
+
+	        if (!updated) {
+	            throw new RuntimeException("Failed to update GatePass status on reject.");
+	        }
+
+	        return result;
+	    }
+
+	    // Approve Flow
+	    boolean isLastApprover;
+	    int workFlowType = workmenDao.getWorkFlowTYpeByTransactionId(gpm.getTransactionId(), dto.getGatePassType());
+
+	    if (workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
+	        isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(), dto.getGatePassType());
+	    } else {
+	        // Parallel approval
+	        isLastApprover = dto.getGatePassType().equals(GatePassType.CREATE.getStatus())
+	                ? workmenDao.isLastApproverForParallel(dto.getGatePassType(), dto.getTransactionId(), dto.getRoleId())
+	                : workmenDao.isLastApproverForParallelGatePassAction(dto.getGatePassType(), dto.getGatePassId(), dto.getRoleId());
+	    }
+
+	    // If not last approver — don't perform final action
+	    if (!isLastApprover) {
+	        return result;
+	    }
+
+	    // LAST APPROVER LOGIC
+	    String gatePassId = dto.getGatePassId();
+
+	    // Case: UNBLOCK / DEBLACKLIST → revert type to CREATE
+	    if (dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())
+	            || dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())) {
+
+	        boolean updated = workmenDao.updateGatePassMainStatusAndType(
+	                dto.getGatePassId(),
+	                dto.getStatus(),
+	                GatePassType.CREATE.getStatus()
+	        );
+
+	        if (!updated) {
+	            throw new RuntimeException("Failed to update GatePass on UNBLOCK/DEBLACKLIST.");
+	        }
+
+	        return result;
+	    }
+
+	    // Case: CREATE → insert CMS Person
+	    if (dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
+
+	        gatePassId = workmenDao.updateGatePassIdByTransactionId(dto.getTransactionId());
+	        gpm.setGatePassId(gatePassId);
+
+	        boolean cmsDone = this.cmsPersonInsert(gpm);
+
+	        if (!cmsDone) {
+	            throw new RuntimeException("CMS Person Insert failed unexpectedly.");
+	        }
+
+	        return String.valueOf(true);
+	    }
+
+	    // Case: BLOCK, BLACKLIST, CANCEL → perform person action
+	    if (dto.getGatePassType().equals(GatePassType.BLOCK.getStatus())
+	            || dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus())
+	            || dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
+
+	        boolean actionDone = this.gatePassActionPersonInsert(gpm, dto.getGatePassType());
+
+	        if (!actionDone) {
+	            throw new RuntimeException("GatePass action insert failed unexpectedly.");
+	        }
+
+	        return String.valueOf(true);
+	    }
+
+	    // OTHER APPROVALS → just update GatePass status
+	    boolean statusUpdated = workmenDao.updateGatePassMainStatus(
+	            gatePassId, dto.getStatus());
+
+	    if (!statusUpdated) {
+	        throw new RuntimeException("Failed to update GatePass status on final approval.");
+	    }
+
+	    return result;
+	}
+	@Transactional
+	public boolean cmsPersonInsert(GatePassMain gpm) {
+
+	    long personId = saveIntoCMSPerson(gpm);
+	    if (!logAndCheck("CMSPERSON", personId > 0)) return false;
+
+	    if (!logAndCheck("CMSPERSONJOBHIST", saveIntoCMSPERSONJOBHIST(gpm, personId)))
+	        return false;
+
+	    if (!logAndCheck("CMSPERSONSTATUSMM", saveCMSPERSONSTATUSMM(gpm, personId)))
+	        return false;
+
+	    gpm.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
+
+	    return logAndCheck("CMSPERSONCUSTOMDATA", saveCMSPERSONCUSTOMDATA(gpm, personId));
+	}
+	@Transactional(rollbackFor = Exception.class)
+	public boolean gatePassActionPersonInsert(GatePassMain gpm, String gatePassType) {
+
+	    long personId = getPersonIdFromCmsPerson(gpm.getGatePassId());
+	    if (personId <= 0) return false;
+
+	    // Step 1: Close existing CUSTDATA rows
+	    if (!logAndCheck("CUSTDATA_UPDATE",
+	            workmenDao.updateCmsPersonCustDataEffectiveTill(personId)))
+	        return false;
+
+	    // Step 2: Insert new CUSTDATA row
+	    if (!logAndCheck("CUSTDATA_INSERT",
+	            insertCustData(gpm.getCreatedBy(), personId, gatePassType)))
+	        return false;
+
+	    // Step 3: Update StatusMM only if active
+	    if (workmenDao.isPersonActiveInStatusMM(personId)) {
+
+	        PersonStatusIds ids = workmenDao.getPersonStatusIds(personId);
+
+	        if (ids.getActiveId() != null && ids.getInactiveId() != null) {
+
+	            boolean statusUpdated =
+	                    workmenDao.updatePersonStatusValidity(ids.getActiveId(), ids.getInactiveId());
+
+	            if (!logAndCheck("STATUSMM_UPDATE", statusUpdated))
+	                return false;
+	        }
+	    }
+
+	    return true;
+	}
+	private boolean logAndCheck(String label, boolean success) {
+	    log.info(label + " : " + (success ? "SUCCESS" : "FAILED"));
+	    return success;
+	}
+
+	
+	
+	private boolean insertCustData(String createdBy, long personId, String gatePassType) {
+
+	    GatePassType type = GatePassType.fromStatus(gatePassType);
+	    if (type == null) {
+	        log.info("Unknown GatePassType: " + gatePassType);
+	        return false;
+	    }
+
+	    return workmenDao.insertIntoCustData(createdBy, personId, type.getStatus());
+	}
+
+	private void log(String section, boolean status) {
+	    System.out.println("Insert into " + section + " result: " + status);
 	}
 	private long getPersonIdFromCmsPerson(String gatePassId) {
 		// TODO Auto-generated method stub
@@ -382,6 +482,18 @@ public class WorkmenServiceImpl implements WorkmenService{
 						statusLog.setUpdatedBy(dto.getCreatedBy());
 						workmenDao.saveGatePassStatusLog(statusLog);
 					}
+				 if (dto.getGatePassType().equals(GatePassType.BLOCK.getStatus())
+				            || dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus())
+				            || dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
+
+				        boolean actionDone = this.gatePassActionPersonInsert(gatePassMain, dto.getGatePassType());
+
+				        if (!actionDone) {
+				            throw new RuntimeException("GatePass action insert failed unexpectedly.");
+				        }
+
+				        
+				    }
 			}else {
 					dto.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());
 				 result = workmenDao.gatePassAction(dto);

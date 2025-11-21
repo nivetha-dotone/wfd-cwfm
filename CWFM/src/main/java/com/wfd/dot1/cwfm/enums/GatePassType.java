@@ -1,5 +1,8 @@
 package com.wfd.dot1.cwfm.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum GatePassType {
 
 	CREATE("1","CREATE"),
@@ -32,4 +35,22 @@ public enum GatePassType {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	private static final Map<String, GatePassType> STATUS_LOOKUP = new HashMap<>();
+    private static final Map<String, GatePassType> NAME_LOOKUP = new HashMap<>();
+
+    static {
+        for (GatePassType type : values()) {
+            STATUS_LOOKUP.put(type.status, type);
+            NAME_LOOKUP.put(type.name, type);
+        }
+    }
+
+    public static GatePassType fromStatus(String status) {
+        return STATUS_LOOKUP.get(status);
+    }
+
+    public static GatePassType fromName(String name) {
+        return NAME_LOOKUP.get(name);
+    }
 }
