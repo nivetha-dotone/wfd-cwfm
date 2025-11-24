@@ -1225,13 +1225,6 @@ function viewDoc(transactionId, userId, docType) {
     // Prepare data for secure encoding
     const data = { transactionId, userId, docType };
 
-}
-
-function downloadDoc(transactionId, userId, docType) {
-    const baseUrl = '/CWFM/contractworkmen/downloadFile';
-    const url = `${baseUrl}/${transactionId}/${userId}/${docType}`;
-
-
     // Encode as Base64 JSON (URL-safe)
     const encodedData = btoa(JSON.stringify(data));
 
