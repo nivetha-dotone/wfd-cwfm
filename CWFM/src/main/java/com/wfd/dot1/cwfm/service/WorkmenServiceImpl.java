@@ -341,8 +341,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        if (!cmsDone) {
 	            throw new RuntimeException("CMS Person Insert failed unexpectedly.");
 	        }
-
-	        return String.valueOf(true);
+	        boolean statusUpdated  = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
+	        if(!statusUpdated) {
+	        	throw new RuntimeException("Gatepassmain status update failed unexpectedly.");
+	        }
+	        return result;
 	    }
 
 	    // Case: BLOCK, BLACKLIST, CANCEL → perform person action
@@ -356,7 +359,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	            throw new RuntimeException("GatePass action insert failed unexpectedly.");
 	        }
 
-	        return String.valueOf(true);
+	        boolean statusUpdated  = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
+	        if(!statusUpdated) {
+	        	throw new RuntimeException("Gatepassmain status update failed unexpectedly.");
+	        }
+	        return result;
 	    }
 
 	    // OTHER APPROVALS → just update GatePass status
