@@ -206,7 +206,6 @@ public class CommonDaoImpl implements CommonDao {
 	 public String getWorkOrdersByContractorIdAndUnitId() {
 		    return QueryFileWatcher.getQuery("GET_WORKORDERS_BY_CONTRACTORID_UNITID");
 		}
-	 
 	 public String getPageActionPermissionForRoleQuery() {
 		 return QueryFileWatcher.getQuery("HAS_PAGE_ACTION_PERMISSION_FOR_ROLE");
 	 }
@@ -763,9 +762,15 @@ public class CommonDaoImpl implements CommonDao {
 			}
 			return personOrgList;
 		}
-		
-		@SuppressWarnings("deprecation")
-		public List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId) {
+
+	@Override
+	public List<CMSRoleRights> getRoleRightsByRoleAndPage(Long roleId, Long pageId) {
+		return List.of();
+	}
+
+
+	@SuppressWarnings("deprecation")
+		public List<CMSRoleRights> getPersonOrgLevelDetailsFORMAPPING(Long roleId, Long pageId) {
 			String query = getrolerightsbyroleandpage();
 		    return jdbcTemplate.query(query, new Object[]{roleId, pageId}, (rs, rowNum) -> {
 		        CMSRoleRights rights = new CMSRoleRights();

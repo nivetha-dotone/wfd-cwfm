@@ -29,26 +29,35 @@
 <!-- Include Digiboost Web SDK digilocker-->
     <script src="https://cdn.jsdelivr.net/gh/surepassio/surepass-digiboost-web-sdk@latest/index.min.js"></script>
     
- <link rel="stylesheet" type="text/css" href="resources/css/cms/dashboard.css" />    
-
+ <link rel="stylesheet" type="text/css" href="resources/css/cms/dashboard.css" />  
+         <script src="resources/js/cms/requestorList.js"></script>
+        <script src="resources/js/cms/plantZoneMappingList.js"></script>  
+     <script src="resources/js/cms/requestorHRList.js"></script>
      <script src="resources/js/cms/principalEmployer.js"></script>
     <script src="resources/js/cms/contractor.js"></script>
     <script src="resources/js/cms/workorder.js"></script>
        <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/report.js"></script>
      <script src="resources/js/cms/bill.js"></script>
-
+    <script src="resources/js/cms/plantZoneMappingForm.js"></script>
       <script src="resources/js/cms/workflow.js"></script>
 
 <script src="resources/js/cms/users.js"></script>
-     <script src="resources/js/cms/dataimportexport.js"></script>
+        <script src="resources/js/cms/dataimportexport.js"></script>
 
+        <script src="resources/js/cms/requestor.js"></script>
+        <script src="resources/js/cms/export.js"></script>
+        <script src="resources/js/cms/contRenewal.js"></script>
+        <script src="resources/js/cms/dashboard.js"></script>
 
+<<<<<<< Updated upstream
       <script src="resources/js/cms/export.js"></script>
        <script src="resources/js/cms/contRenewal.js"></script>
        <script src="resources/js/cms/dashboard.js"></script>
         <script src="resources/js/cms/dottype.js"></script>
  <script src="resources/js/cms/unitDeptMapping.js"></script>
+=======
+>>>>>>> Stashed changes
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   

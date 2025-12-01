@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+<<<<<<< Updated upstream
+=======
+import com.wfd.dot1.cwfm.dto.*;
+>>>>>>> Stashed changes
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
+<<<<<<< Updated upstream
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.CMSPerson;
@@ -35,6 +40,8 @@ import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.dto.PersonStatusIds;
+=======
+>>>>>>> Stashed changes
 import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
@@ -57,7 +64,10 @@ import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 public class WorkmenServiceImpl implements WorkmenService{
 
 	private static final Logger log = LoggerFactory.getLogger(WorkmenServiceImpl.class);
+<<<<<<< Updated upstream
 	
+=======
+>>>>>>> Stashed changes
 	@Autowired
 	WorkmenDao workmenDao;
 	
@@ -104,6 +114,13 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public List<CmsGeneralMaster> getAllGeneralMaster() {
 		return workmenDao.getAllGeneralMasters();
 	}
+
+//	@Autowired
+//	private EmployeeMapper employeeMapper;
+//
+//	@Autowired
+//	private  WfdEmployeeService wfdEmployeeService;
+
 	@Override
 	public String saveGatePass(GatePassMain gatePassMain) {
 		String transactionId =null;
@@ -123,7 +140,15 @@ public class WorkmenServiceImpl implements WorkmenService{
 			gatePassMain.setGatePassAction(GatePassType.CREATE.getStatus());
 			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
-				 transactionId = workmenDao.saveGatePass(gatePassMain); 
+
+				 transactionId = workmenDao.saveGatePass(gatePassMain);
+
+//				EmployeeRequestDTO employeeDTO = employeeMapper.mapFromGatePass(gatePassMain);
+//				String wfdResponse = wfdEmployeeService.createEmployee(employeeDTO);
+//				log.info("WFD Response: {}", wfdResponse);
+
+
+
 				 String gatePassId = workmenDao.updateGatePassIdByTransactionId(transactionId);
 				gatePassMain.setGatePassId(gatePassId);
 				GatePassStatusLogDto dto =new GatePassStatusLogDto();
@@ -741,10 +766,12 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public String getSurePassURL() {
 	    return QueryFileWatcher.getQuery("SUREPASS_VERIFY_OTP_URL");
 	}
-    
-    public String getToken() {
-	    return QueryFileWatcher.getQuery("TOKEN");
+
+
+	public String getToken() {
+		return QueryFileWatcher.getQuery("TOKEN");
 	}
+
     
     public String getGenderIdFromCode(String code, List<CmsGeneralMaster> genderList) {
         for (CmsGeneralMaster gm : genderList) {
@@ -770,7 +797,7 @@ public class WorkmenServiceImpl implements WorkmenService{
         headers.set("Authorization", bearerToken);
 
         Map<String, String> body = new HashMap<>();
-        body.put("client_id", clientId);
+		body.put("client_id", clientId);
         body.put("otp", otp);
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);

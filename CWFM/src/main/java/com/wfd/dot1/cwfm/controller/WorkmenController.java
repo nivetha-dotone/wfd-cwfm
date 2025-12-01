@@ -30,13 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -2240,7 +2234,7 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
 		request.setAttribute("GatePassListingDto", gplistDto);
 		return "contractWorkmen/approverList";
 	}
-    
+
     @GetMapping("/gatepassActionListDashboardNav")
     public String gatepassActionListDashboardNav(HttpServletRequest request, HttpServletResponse response
     		,@RequestParam(value = "principalEmployerId", required = false) String principalEmployerId,
@@ -2500,11 +2494,16 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
         return ResponseEntity.ok(responseMap);
     }
 
+<<<<<<< Updated upstream
     @GetMapping("/downloadPreviousDoc")
     public void downloadPreviousDoc(@RequestParam("transactionId") String transactionId,
                                     @RequestParam("fileName") String fileName,
                                     HttpServletResponse response,
                                     HttpServletRequest request) throws IOException {
+=======
+
+
+>>>>>>> Stashed changes
 
         HttpSession session = request.getSession(false);
         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);

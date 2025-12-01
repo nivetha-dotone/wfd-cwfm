@@ -539,7 +539,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	
 	@Override
 	public String saveRole(MasterUser user) {
-		String result = null; 
+		String result = null;
 		int status=0;
         Object[] parameters = new Object[] {user.getFirstName(),user.getLastName(),user.getUserId(),user.getEmailId(),user.getContactNumber(),user.getPassword(),user.getRoleName()}; 
         try {

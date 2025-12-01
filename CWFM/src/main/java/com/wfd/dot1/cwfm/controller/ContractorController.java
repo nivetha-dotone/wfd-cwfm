@@ -261,6 +261,7 @@ public class ContractorController {
 	 
 
 	 private static final String ROOT_DIRECTORY = "D:/wfd_cwfm/contractor_docs/";
+
 	 public String uploadDocuments( MultipartFile aadharFile,
 			 String userId,
 			 String contractorRegId) {

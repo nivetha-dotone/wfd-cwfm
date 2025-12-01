@@ -179,7 +179,7 @@ th label {
 				</td> -->
 			</tr>
 			
-			<tr>
+			<tr>Bill End Date
 				<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.vendorCode"/></label></th>
 				<td><input type="text" value="135597"   onchange="setDataChanged();" style="width: 180px;height: 20px;" /></td>
 				
