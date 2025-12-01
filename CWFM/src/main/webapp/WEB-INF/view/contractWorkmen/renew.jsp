@@ -814,7 +814,7 @@ label {
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.pfNumber }" autocomplete="off">
                             </c:if>
                             <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter PF (e.g., New Joinee)</span>
+                                    <span style="color: #666; font-size: 11px;">Enter PF (e.g., CMPPF12345)</span>
                                 </div>
                             		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
                             </td>

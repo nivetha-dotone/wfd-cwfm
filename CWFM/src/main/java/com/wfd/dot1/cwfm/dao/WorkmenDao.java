@@ -205,5 +205,5 @@ public interface WorkmenDao {
 
 	public String getAadharStatus(String aadharNumber);
 
-
+	public String getTransactionIdByGatePassId(String gatePassId) ;
 }

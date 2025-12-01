@@ -1811,8 +1811,8 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
 		        .collect(Collectors.toSet());
 
 	 request.setAttribute("Subdept", subdepSet);
-	 
-	 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
+	 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+	 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(oldTransactionId, user.getUserId());
 
      // ✅ Pass versioned documents to JSP
      request.setAttribute("PreviousDocuments", allVersionedDocs);

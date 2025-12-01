@@ -1751,8 +1751,9 @@ public String renewGatePass(GatePassMain gatePassMain) {
    
 	
     
+        String transactionid=this.getTransactionIdByGatePassId(gatePassMain.getGatePassId());
+    	Object[] parameters = prepareRenewGatePassParameters1(transactionid, gatePassMain); 
     	
-    	Object[] parameters = prepareRenewGatePassParameters1(gatePassMain.getTransactionId(), gatePassMain); 
     	 try {
     		 String query = this.getUpdateRenewContractWorkmen();
 	            int result = jdbcTemplate.update(query, parameters);
@@ -3188,7 +3189,15 @@ String sql ="SELECT \r\n"
 		+ "";
     return jdbcTemplate.queryForObject(sql, new Object[]{aadharNumber, aadharNumber,aadharNumber}, String.class);
 }
+public String getTransactionIdByGatePassId(String gatePassId) {
 
+    String sql = "SELECT TransactionId FROM GATEPASSMAIN WHERE GatePassId = ?";
+
+    try {
+        return jdbcTemplate.queryForObject(sql, new Object[]{gatePassId}, String.class);
+    } catch (EmptyResultDataAccessException e) {
+        return null; // No record found
+    }
 }
 
-
+}
