@@ -370,38 +370,35 @@ function initializeDatePicker() {
 	let aadharCheckPassed = false;
     const aadharNumber = $("#aadharNumber").val().trim();
 
-	const transactionId=$("#transactionId").val().trim();
+	//const transactionId=$("#transactionId").val().trim();
     if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
 
         $("#error-aadhar").show();
         isValid = false;
     }else{
 		 // $("#error-aadhar").hide();
-		  
+		  $.ajax({
+            url: "/CWFM/contractworkmen/checkAadharExistsCreation",
+            type: "GET",
+            data: { aadharNumber: aadharNumber },
+            async: false,   // IMPORTANT → Make the call synchronous
+            success: function (response) {
 
-		         // Check in backend if Aadhar exists
-		         $.ajax({
-		             url: "/CWFM/contractworkmen/checkAadharExists",
-		             type: "GET",
-		             data: { aadharNumber: aadharNumber,transactionId : transactionId },
-		             async: false, // NOTE: synchronous to block form submission
-		             success: function (response) {
-		                 if (response.exists) {
-		                     $("#error-aadhar").text("Aadhar number already exists").show();
-		                     isValid = false;
-		                 } else {
-		                     $("#error-aadhar").hide();
-		                     aadharCheckPassed = true;
-		                 }
-		             },
-		             error: function () {
-		                 $("#error-aadhar").text("Error checking Aadhar").show();
-		                 isValid = false;
-		             }
-		         });
+                if (response.status !== "") {
+                    $("#error-aadhar").text("Aadhaar exists as " + response.status).show();
+                    aadharCheckPassed = false;   // Aadhaar found → fail
+                } else {
+                    $("#error-aadhar").hide();
+                    aadharCheckPassed = true;    // Aadhaar free → pass
+                }
+            },
+            error: function () {
+                // In case of error, don't block the user
+                $("#error-aadhar").text("Unable to verify Aadhaar").show();
+                aadharCheckPassed = false;
+            }
+        });
 		     }
-
-
 	
     const firstName = $("#firstName").val().trim();
     const firstnameRegex = /^[A-Za-z\s]{2,}$/;
@@ -1192,12 +1189,12 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
                     loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
                 }
             }else if (xhr.status === 400) {  
-				       const msg = xhr.responseText;
+				       const msg = xhr.responseText.trim();
 				       console.error("Server validation failed: " + msg);
 					   showLicenseError(msg);
 				       //alert(msg); // or show in UI better
 				       //sessionStorage.setItem("errorMessage", msg);
-					   
+					   return;
 				   }
 				   else {
 				       console.error("Error saving data:", xhr.status, xhr.responseText);

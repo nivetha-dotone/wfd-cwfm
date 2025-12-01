@@ -1,11 +1,15 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -417,5 +421,48 @@ public class ContractorServiceImpl implements ContractorService{
 
 	    return result;
 	}
+	@Override
+    public List<Map<String, Object>> getAllContractorVersionedDocuments(String contractorRegId, Integer userId,String requestType) {
+        List<Map<String, Object>> allDocs = new ArrayList<>();
 
+        // Base directory for files
+        String baseDir = "D:/wfd_cwfm/contractor_docs/" + userId + "/" + contractorRegId + "/";
+        File folder = new File(baseDir);
+        File[] files = folder.listFiles();
+
+        // 1️⃣ Version 1 docs (from contractorregistration)
+        Map<String, String> v1Docs = contrDao.getContractorPreviousDocuments(contractorRegId,requestType);
+        for (Map.Entry<String, String> entry : v1Docs.entrySet()) {
+            String docType = entry.getKey();
+            String value = entry.getValue();
+            if (value != null && !value.trim().isEmpty()) {
+                String matchedFile = null;
+                if (files != null) {
+                    for (File f : files) {
+                        if (f.getName().toLowerCase().startsWith(value.toLowerCase())) {
+                            matchedFile = f.getName();
+                            break;
+                        }
+                    }
+                }
+                if (matchedFile != null) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("DOCTYPE", docType);
+                    map.put("FILENAME", matchedFile);
+                    map.put("VERSIONNO", 1);
+                    allDocs.add(map);
+                }
+            }
+        }
+
+        // 2️⃣ Renewal docs (V2 and beyond)
+        //List<Map<String, Object>> renewalDocs = workmenDao.getRenewalDocs(transactionId);
+        //allDocs.addAll(renewalDocs);
+
+        // 3️⃣ Sort by DOC_TYPE, then version
+        allDocs.sort(Comparator.comparing((Map<String, Object> m) -> (String) m.get("DOCTYPE"))
+                .thenComparingInt(m -> ((Number) m.get("VERSIONNO")).intValue()));
+
+        return allDocs;
+    }
 }

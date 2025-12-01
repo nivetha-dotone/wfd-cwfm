@@ -126,5 +126,11 @@ public interface WorkmenService {
 			MultipartFile policeFile, MultipartFile profilePic, List<MultipartFile> additionalFiles,
 			List<String> documentTypes,String filePath);
 
+	public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String principalEmployerId, String deptId,
+			String roleId, String gatePassTypeId, String previousGatePassAction, String renewGatePassAction);
+
+
+	public String getAadharStatus(String aadharNumber);
+
 	
 }	

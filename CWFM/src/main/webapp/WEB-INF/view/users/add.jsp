@@ -159,24 +159,36 @@ table.ControlLayout td {
         <!-- Form fields -->
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>First Name:</label></th>
-            <td><input type="text" name="firstName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" placeholder="John" required/>
+            <td><input type="text" name="firstName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" required/>
+              <div style="text-align: center;">
+        <span style="color: #666; font-size: 11px;">Enter First Name (e.g., John)</span>
+       </div>
              <span id="firstNameError" class="error-message"></span>
              </td>
            
             <th><label class="custom-label"><span class="required-field">*</span>Last Name:</label></th>
-            <td><input type="text" name="lastName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off" placeholder="Leo"/>
+            <td><input type="text" name="lastName" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="off"/>
+           <div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter Last Name (e.g., Leo)</span>
+    </div>
             <span id="lastNameError" class="error-message"></span>
             </td>
             
         </tr>
         <tr>
              <th><label class="custom-label"><span class="required-field">*</span>Email:</label></th>
-        <td style="color: black;"><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" autocomplete="off" placeholder="username@gmail.com"/>
+        <td style="color: black;"><input type="email" name="emailId" style="height: 20px;" size="30" maxlength="30" autocomplete="off"/>
+        <div style="text-align: left;">
+        <span style="color: #666; font-size: 11px;">Enter Email Address (e.g., John@gmail.com)</span>
+       </div>
         <span id="emailIdError" class="error-message"></span>
         </td>
         
             <th><label class="custom-label"><span class="required-field">*</span>Contact Number:</label></th>
-            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="10" autocomplete="off" placeholder="6000000000" pattern="[6-9][0-9]{9}"/>
+            <td><input type="text" name="contactNumber" style="height: 20px;" size="30" maxlength="10" autocomplete="off"  pattern="[6-9][0-9]{9}"/>
+            <div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter Mobile Number (e.g., 9989909890)</span>
+       </div>
             <span id="contactNumberError" class="error-message"></span>
             </td>
              
@@ -184,11 +196,17 @@ table.ControlLayout td {
         <tr>
             <th><label class="custom-label"><span class="required-field">*</span>Password:</label></th>
             <td style="color: black;"><input type="password" name="password" style="height: 20px;" size="30" maxlength="30" autocomplete="new-password" autocomplete="off"/>
+           <div style="text-align:right;">
+        <span style="color: #666; font-size: 11px;">Must More than 8 Character(e.g,Johnleo@123)</span>
+       </div>
             <span id="passwordError" class="error-message"></span>
             </td>
             
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
             <td><input type="text" name="userAccount" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="new-userAccount"/>
+            <div style="text-align:right;">
+        <span style="color: #666; font-size: 11px;">Enter User Account (e.g., John)</span>
+       </div>
             <span id="userAccountError" class="error-message"></span>
             </td>
         

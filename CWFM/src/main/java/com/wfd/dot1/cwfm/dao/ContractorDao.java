@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
@@ -106,6 +107,8 @@ public interface ContractorDao {
 	public void saveContractorPemm(ContractorRegistration reg);
 
 	public void saveContractorWC(List<ContractorRegistrationPolicy> policy, ContractorRegistration gpm);
+
+	public Map<String, String> getContractorPreviousDocuments(String contractorRegId, String requestType);
 
 	   
 	}

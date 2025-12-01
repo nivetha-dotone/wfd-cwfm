@@ -378,7 +378,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	@Transactional
 	public boolean cmsPersonInsert(GatePassMain gpm) {
-
+    
 	    long personId = saveIntoCMSPerson(gpm);
 	    if (!logAndCheck("CMSPERSON", personId > 0)) return false;
 
@@ -391,7 +391,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	    gpm.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
 
 	    return logAndCheck("CMSPERSONCUSTOMDATA", saveCMSPERSONCUSTOMDATA(gpm, personId));
-	}
+ }
 	@Transactional(rollbackFor = Exception.class)
 	public boolean gatePassActionPersonInsert(GatePassMain gpm, String gatePassType) {
 
@@ -891,6 +891,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	}
 	
 	public long saveIntoCMSPerson(GatePassMain gpm) {
+		
 		CMSPerson person = new CMSPerson();
 		person.setEmployeeCode(gpm.getGatePassId());
 		person.setFirstName(gpm.getFirstName());
@@ -898,14 +899,15 @@ public class WorkmenServiceImpl implements WorkmenService{
 		person.setRelationName(gpm.getRelationName());
 		person.setDateOfBirth(gpm.getDateOfBirth());
 		person.setDateOfJoining(gpm.getDoj());
-		person.setDateOfTermination(gpm.getDot());
-		person.setBloodGroup(Integer.parseInt(gpm.getBloodGroup()));
+		person.setDateOfTermination(gpm.getDot()!=null?gpm.getDot().toString():" ");
+		//person.setBloodGroup(Integer.parseInt(gpm.getBloodGroup()));
+		person.setBloodGroup(gpm.getBloodGroup() != null && !gpm.getBloodGroup().trim().isEmpty()? Integer.parseInt(gpm.getBloodGroup()): 0);
 		person.setHazardousArea(gpm.getHazardousArea());
 		person.setGender(Integer.parseInt(gpm.getGender()));
-		person.setAcademics(Integer.parseInt(gpm.getAcademic()));
-		person.setAccomodation(gpm.getAccommodation().equals("Yes")?1:0);
+		person.setAcademics(gpm.getAcademic() != null && !gpm.getAcademic().trim().isEmpty()? Integer.parseInt(gpm.getAcademic()): 0);
+		person.setAccomodation(gpm.getAccommodation() != null && gpm.getAccommodation().trim().equalsIgnoreCase("Yes") ? 1 : 0);
 		person.setBankBranch(gpm.getIfscCode());
-		person.setAccountNo(gpm.getAccountNumber());
+		person.setAccountNo(gpm.getAccountNumber() != null && !gpm.getAccountNumber().trim().isEmpty()? gpm.getAccountNumber(): " ");
 		person.setEmergencyName(gpm.getEmergencyName());
 		person.setEmergencyNumber(gpm.getEmergencyNumber());
 		person.setMobileNumber(gpm.getMobileNumber());
@@ -995,6 +997,14 @@ public class WorkmenServiceImpl implements WorkmenService{
 	                                  List<String> documentTypes,String filePath) {
 	     workmenDao.saveRenewedDocuments(transactionId, userId, aadharFile, policeFile, profilePic, additionalFiles, documentTypes, filePath);
 	 }
+	 @Override
+		public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction,String renewGatePassAction) {
+			return workmenDao.getGatePassUnblockDeblackListingDetails(unitId,deptId,userId,gatePassTypeId,previousGatePassAction,renewGatePassAction);
+		}
+	 @Override
+	 public String getAadharStatus(String aadharNumber) {
+		    return workmenDao.getAadharStatus(aadharNumber);
+		}
 
 	}
 

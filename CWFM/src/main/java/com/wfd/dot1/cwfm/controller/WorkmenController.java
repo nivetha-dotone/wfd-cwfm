@@ -475,6 +475,13 @@ public class WorkmenController {
             		//if user wants we can draft the record
             		//workmenService.draftGatePass(gatePassMain);
                     return new ResponseEntity<>(transactionId, HttpStatus.BAD_REQUEST);
+            		//Map<String, String> errorResponse = new HashMap<>();
+                    //errorResponse.put("status", "error");
+                    //errorResponse.put("message", transactionId);
+
+                    //return ResponseEntity
+                     //       .status(HttpStatus.BAD_REQUEST)
+                     //       .body(new ObjectMapper().writeValueAsString(errorResponse));
                 }else {
                 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
                     uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
@@ -857,7 +864,7 @@ public class WorkmenController {
 			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus(),GatePassType.BLOCK.getStatus()," ");
+    			listDto= workmenService.getGatePassUnblockDeblackListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus(),GatePassType.BLOCK.getStatus()," ");
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
@@ -952,7 +959,7 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassActionListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus()," ");
+    			listDto= workmenService.getGatePassUnblockDeblackListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus()," ");
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
@@ -2614,5 +2621,16 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     		return "failed";
     	}
     }
-    
+    @GetMapping("/checkAadharExistsCreation")
+    @ResponseBody
+    public Map<String, String> checkAadharExistsCreation(@RequestParam("aadharNumber") String aadharNumber) {
+        
+        String status = workmenService.getAadharStatus(aadharNumber); 
+        // Status will be: Draft, Approval Pending, Approved, or null
+
+        Map<String, String> response = new HashMap<>();
+        response.put("status", status != null ? status : "");
+        return response;
+    }
+
     }

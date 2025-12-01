@@ -448,7 +448,9 @@ label {
      <c:if test="${not empty GatePassObj.aadhaarNumber }">
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" value="${GatePassObj.aadhaarNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </c:if>
-    	
+    	<div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter 12-digit Aadhar number (e.g., 1234 5678 9012)</span>
+    </div>
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
     
@@ -480,7 +482,9 @@ label {
                 <c:if test="${not empty GatePassObj.firstName }">
                 	<input id="firstName" name="firstName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.firstName  }" autocomplete="off">
                 </c:if>
-                
+                <div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter First Name (e.g., John)</span>
+       </div>
                 	<label id="error-firstName" style="color: red;display: none;">Please enter a valid First Name.</label>
                 </td>
            
@@ -493,6 +497,9 @@ label {
                 	 <c:if test="${not empty GatePassObj.lastName }">
                  	<input id="lastName" name="lastName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.lastName }" autocomplete="off">
                  </c:if>
+                 <div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter Lass Name (e.g., Leo)</span>
+    </div>
                 	 <label id="error-lastName" style="color: red;display: none;">Please enter a valid Last Name.</label>
                 </td>
           
@@ -503,7 +510,9 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <td>    	<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30" autocomplete="off"  >
-					
+					 <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Age is Minimum 18 Years and Above</span>
+                                </div>
 					  <label id="error-dateOfBirth" style="color: red;display: none;">Please enter a valid Date Of Birth</label>
 			</td>
                
@@ -530,6 +539,9 @@ label {
                 	<c:if test="${not empty GatePassObj.relationName }">
                 		<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.relationName }" autocomplete="off">
                 	</c:if>
+                	<div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter Relation Name (e.g., Mass)</span>
+    </div>
                 	<label id="error-relationName" style="color: red;display: none;">Please enter a valid Father / Husband name</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.idMark"/></label></th>
@@ -540,6 +552,9 @@ label {
                 	<c:if test="${not empty GatePassObj.idMark }">
                 		<input id="idMark" name="idMark" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${ GatePassObj.idMark }" autocomplete="off">
                 	</c:if>
+                	<div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter Id Mark (e.g, A mole on Face)</span>
+    </div>
                 	<label id="error-idMark"style="color: red;display: none;">Please enter a valid ID Mark</label>
                 </td>
             </tr>
@@ -552,6 +567,9 @@ label {
                 	<c:if test="${not empty GatePassObj.mobileNumber }">
                 		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" value="${GatePassObj.mobileNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 	</c:if>
+                	<div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter 10 digit Mobile number (e.g., 9989098909)</span>
+    </div>
                 	<label id="error-mobileNumber" style="color: red;display: none;">Please enter a valid Mobile Number</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.maritalStatus"/></label></th>
@@ -579,6 +597,9 @@ label {
                 	
 
                 </c:if>
+                <div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;">Enter Address (e.g., D.No-3-114,Banglore,514806)</span>
+    </div>
                 	<label id="error-address" style="color: red;display: none;">Please enter a valid Address</label>
                 </td>
            </tr>
@@ -707,6 +728,9 @@ label {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfJob"/></label></th>
                             <td>
                             	<input id="natureOfJob" name="natureOfJob" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${not empty GatePassObj.natureOfJob ? GatePassObj.natureOfJob : ''}">
+                            	  <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter NatureOfJob(e.g.,Supplier)</span>
+                                </div>
                             	  <label id="error-natureOfJob"style="color: red;display: none;">Please enter a valid Nature of Job</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcPolicyesicRegNumber"/></label></th>
@@ -769,7 +793,9 @@ label {
                             <c:if test="${not empty GatePassObj.uanNumber }">
                             	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" value="${GatePassObj.uanNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </c:if>
-                            
+                            <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Uan (e.g.,123456789012)</span>
+                                </div>
                             		<label id="error-uanNumber"style="color: red;display: none;">Please enter a valid UAN Number</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.healthCheckUpDate"/></label></th>
@@ -784,6 +810,9 @@ label {
                             		<input id="healthCheckDate" name="healthCheckDate" class="datetimepickerformat2" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" value="${GatePassObj.healthCheckDate }" autocomplete="off" readonly>
                             
                             	</c:if>
+                            	 <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Within Last 6 Months from Today</span>
+                                </div>
                             		<label id="error-healthCheckDate"style="color: red;display: none;">Please enter a valid Health Check Up Date</label>
                             	</td>
                         </tr>
@@ -798,7 +827,9 @@ label {
                             <c:if test="${not empty GatePassObj.pfNumber }">
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.pfNumber }" autocomplete="off">
                             </c:if>
-                            
+                             <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter PF (e.g., New Joinee)</span>
+                                </div>
                             		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicNumber"/></label></th>
@@ -811,6 +842,9 @@ label {
                             		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="10" value="${GatePassObj.esicNumber }" autocomplete="off">
                             
                             	</c:if>
+                            	<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter ESIC (e.g., 1234567890)</span>
+                                </div>
                             		<label id="error-esicNumber"style="color: red;display: none;">Please enter a valid ESIC Number</label>
                             	</td>
                         </tr>
@@ -824,6 +858,9 @@ label {
     						<c:if test="${ not empty GatePassObj.doj }">
                         		<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"    value="${ GatePassObj.doj}" autocomplete="off">
                         	</c:if>
+                        	 <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Within Future 15 Days from Today</span>
+                                </div>
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
 			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfApplicable"/></label></th>
@@ -913,6 +950,9 @@ label {
 				<input  style="width: 100%;height: 20px;text-transform:capitalize;" type="text" size="30" id="ifscCode" name="ifscCode"    maxlength="11"  value="${ GatePassObj.ifscCode}" autocomplete="off"/>
 				
 				</c:if>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter IFSC Code (e.g., PUNJ0123456)</span>
+                                </div>
 				<label id="error-ifscCode"style="color: red;display: none;">Please enter a valid IFSC Code</label>
 				</td>
 			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.accountNumber"/></label></th>
@@ -923,6 +963,9 @@ label {
 				<c:if test="${not  empty GatePassObj.accountNumber }">
 				<input style="width: 100%;height: 20px;" type="text" size="30" id="accountNumber" name="accountNumber"   value="${GatePassObj.accountNumber  }"  autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
 				</c:if>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Account Number (e.g., 123456789012345)</span>
+                                </div>
 				<label id="error-accountNumber"style="color: red;display: none;">Please enter a valid Account Number</label>
 				</td>
 			</tr>
@@ -936,6 +979,9 @@ label {
 				<c:if test="${not  empty GatePassObj.emergencyName }">
 					<input style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" id="emergencyName" name="emergencyName"    maxlength="30"  value="${GatePassObj.emergencyName }" autocomplete="off"/>
 				</c:if>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Emergency Name (e.g., Rama)</span>
+                                </div>
 					<label id="error-emergencyName"style="color: red;display: none;">Please enter a valid Emergency Name</label>
 				</td>			
 			<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emergencyContactNumber"/></label></th>
@@ -947,6 +993,9 @@ label {
 				<c:if test="${not empty GatePassObj.emergencyNumber }">
 				<input style="width: 100%;height: 20px;" type="text" size="30" id="emergencyNumber" name="emergencyNumber"    maxlength="10"   value="${GatePassObj.emergencyNumber }"  autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
 				</c:if>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Emergency Mobile Number (e.g., 9989909890)</span>
+                                </div>
 					<label id="error-emergencyNumber"style="color: red;display: none;">Please enter a valid Emergency Number</label>
 				</td>				
 			
@@ -1004,16 +1053,25 @@ label {
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.basic"/></label></th>
 			
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="basic" id="basic" autocomplete="off"  value="${not empty GatePassObj.basic ? GatePassObj.basic : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Basic (e.g., 10000.00)</span>
+                                </div>
 				<label id="error-basic"style="color: red;display: none;">Enter valid Basic</label>
 				</td>						
 			</tr>
         <tr>
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.da"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text" size="30" name="da" id="da" autocomplete="off"  value="${not empty GatePassObj.da ? GatePassObj.da : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter DA (e.g., 10000.00)</span>
+                                </div>
 				<label id="error-da"style="color: red;display: none;">Enter valid DA</label>
 				</td>				
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.hra"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text" size="30" name="hra"  id="hra" autocomplete="off" value="${not empty GatePassObj.hra ? GatePassObj.hra : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter HRA (e.g., 20000.00)</span>
+                                </div>
 				<label id="error-hra"style="color: red;display: none;">Enter valid HRA</label>
 				</td>				
 			
@@ -1022,16 +1080,25 @@ label {
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.washingAllowance"/></label></th>
 				<td>
 				<input style="width: 100%;height: 20px;" type="text" size="30" name="washingAllowance" id="washingAllowance" autocomplete="off" value="${not empty GatePassObj.washingAllowance ? GatePassObj.washingAllowance : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Washing Allowance (e.g., 10000.00)</span>
+                                </div>
 				<label id="error-washingAllowance"style="color: red;display: none;">Enter valid Washing Allowance</label>
 				</td>				
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.otherAllowance"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="otherAllowance" id="otherAllowance" autocomplete="off"  value="${not empty GatePassObj.otherAllowance ? GatePassObj.otherAllowance : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Other Allowance (e.g., 10000.00)</span>
+                                </div>
 				<label id="error-otherAllowance"style="color: red;display: none;">Enter valid Other Allowance</label>
 				</td>				
 			</tr>
         <tr>
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.uniformAllowance"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="uniformAllowance" id="uniformAllowance" autocomplete="off" value="${not empty GatePassObj.uniformAllowance ? GatePassObj.uniformAllowance : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
+				<div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Enter Uniform Allowance (e.g., 10000.00)</span>
+                                </div>
 				<label id="error-uniformAllowance"style="color: red;display: none;">Enter valid Uniform Allowance</label>
 				</td>				
 			
@@ -1049,6 +1116,13 @@ label {
             </div>
 
             <div id="tab5" class="tab-content">
+             <div id="licenseError" style="display:none;
+            background:#f8d7da;
+            color:#842029;
+            padding:10px;
+            border-radius:6px;
+            border:1px solid #f5c2c7;
+            margin-bottom:10px;"></div>
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
                    <tr>
@@ -1071,10 +1145,10 @@ label {
            onchange="previewImage(event,'imageFile','imageFileName')"
            style="overflow: hidden;"/>
 
-   <!--  
+     
     <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
       Use Camera
-    </button> -->
+    </button>
   </div>
 
   <!-- File Name Display -->
@@ -1120,6 +1194,9 @@ label {
     						<c:if test="${ not empty GatePassObj.policeVerificationDate }">
                         		<input id="policeVerificationDate" name="policeVerificationDate" class="datetimepickerformat3" style="margin-left: 10px;color:black;" type="text" size="30" maxlength="30"    value="${ GatePassObj.policeVerificationDate}" autocomplete="off">
                         	</c:if>
+                        	<!-- <div style="text-align: right;">
+                                    <span style="color: #666; font-size: 11px;">Within Last 1 Year from Today</span>
+                                </div> -->
 					  <label id="error-policeVerificationDate" style="color: red;display: none;">Please enter a valid Police Verification Date </label>
 			         </td>
 						

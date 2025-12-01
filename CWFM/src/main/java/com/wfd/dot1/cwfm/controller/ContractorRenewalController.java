@@ -284,6 +284,9 @@ public class ContractorRenewalController {
 	    public String viewContractorDetails(@PathVariable("contractorRegId") String contractorRegId,
 	                                        HttpServletRequest request) {
 	        try {
+	        	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+				MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
 	            ContractorRegistration contractor = contrService.getContractorRegistration(contractorRegId);
 	            request.setAttribute("contractor", contractor);
 
@@ -292,6 +295,10 @@ public class ContractorRenewalController {
 
 	            List<CMSContractorRegistrationLLWC> llwcRecords = contrService.getLLWC(contractorRegId);
 	            request.setAttribute("llwcRecords", llwcRecords);
+	            
+	         // ✅ Pass versioned documents to JSP
+	         //   List<Map<String, Object>> allVersionedDocs = contrService.getAllContractorVersionedDocuments(contractorRegId, user.getUserId(),contractor.getRequestType());
+	          //  request.setAttribute("PreviousDocuments", allVersionedDocs);
 
 	        } catch (Exception e) {
 	            e.printStackTrace();

@@ -200,5 +200,10 @@ public interface WorkmenDao {
 	int licenseExistsAndCount(String unitId, String contractorId, String workorderId, String licenseType,
 			String licenseId);
 
+	public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String unitId, String deptId, String userId,
+			String gatePassTypeId, String previousGatePassAction, String renewGatePassAction);
+
+	public String getAadharStatus(String aadharNumber);
+
 
 }

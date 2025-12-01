@@ -1,6 +1,7 @@
 package com.wfd.dot1.cwfm.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,6 +94,8 @@ public interface ContractorService {
 			MasterUser user);
 
 	public String approveRejectContRenew(ApproveRejectContRenewDto dto);
+
+	public List<Map<String, Object>> getAllContractorVersionedDocuments(String contractorRegId, Integer userId, String requestType);
 	   
 	}
 

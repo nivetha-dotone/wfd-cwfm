@@ -321,11 +321,12 @@ label {
             <button data-target="tab2" onclick="showTabNew('tab2')">License Information</button>
             <button data-target="tab3" onclick="showTabNew('tab3')">Work Order Information</button>
            <button data-target="tab5" onclick="showTabNew('tab5')">Comments</button>
+           <button data-target="tab4" onclick="showTabNew('tab4')">Previous Documents</button>
         </div>
          <div class="action-buttons" >
              <% if (user != null && !"Contractor".equals(roleName)) { %>
-    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectContRenew('4')">Approve</button>
-   				 <button id="rejectButton"  style="display:none;"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectContRenew('5')">Reject</button>
+    			<button id="approveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectContRenew('4')">Approve</button>
+   				 <button id="rejectButton"    type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectContRenew('5')">Reject</button>
 			<% } %>
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/renewal/listingFilter', 'Contractor Renewal');">Cancel</button>
   
@@ -598,6 +599,59 @@ label {
  </table> 
 	
 </div>
+</div>
+<div id="tab4" class="tab-content">
+  <div class="card-body p-3">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th style="width: 35%;color:black;">Document Type</th>
+                    <th style="width: 45%;color:black;">File Name</th>
+                    <th style="width: 20%;color:black;">Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="doc" items="${PreviousDocuments}" varStatus="loop">
+                    <c:choose>
+                        
+                        <c:when test="${loop.first or doc.DOCTYPE ne PreviousDocuments[loop.index - 1].DOCTYPE}">
+                            <tr>
+                                <td style="color:black;">${doc.DOCTYPE}</td>
+                                <td>
+                                    <a href="javascript:void(0);" 
+                                      onclick="viewContractorFile('${contractor.contractorregId}','${contractor.createdBy }','${contractor.aadharDoc }')"
+                                       class="text-primary text-decoration-underline">
+                                        ${doc.FILENAME}
+                                    </a>
+                                </td>
+                                <td style="color:black;">
+                                    <%-- <span class="badge bg-info text-dark">V${doc.VERSIONNO}</span> --%>
+                                    <span>V${doc.VERSIONNO}</span>
+                                </td>
+                            </tr>
+                        </c:when>
+
+                        
+                        <c:otherwise>
+                            <tr>
+                                <td></td> <!-- Empty cell to visually group -->
+                                <td>
+                                    <a href="javascript:void(0);" 
+                                       onclick="viewContractorFile('${contractor.contractorregId}','${contractor.createdBy }','${contractor.aadharDoc }')"
+                                       class="text-primary text-decoration-underline">
+                                        ${doc.FILENAME}
+                                    </a>
+                                </td>
+                                <td style="color:black;"><!-- class="text-center"> -->
+                                    <span>V${doc.VERSIONNO}</span>
+                                </td>
+                            </tr>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
 </div>	
 </div>
 

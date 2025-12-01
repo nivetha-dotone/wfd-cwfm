@@ -173,7 +173,12 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	 public String getAllSubDepartments() {
 		    return QueryFileWatcher.getQuery("GET_ALL_SUBDEPARTMENT_BY_PEID_DEPID");
 		}
-	 
+	 public String getGatePassUnblockDeblackListingDetailsQuery() {
+		 return QueryFileWatcher.getQuery("GET_ALL_GATE_PASS_UNBLOCK_DEBLACK_FOR_CREATOR");
+	 }
+	 public String getaadharUniqueQuery() {
+		 return QueryFileWatcher.getQuery("GET_ALL_AADHAR_UNIQUE");
+	 }
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
 		log.info("Entering into getAllPrincipalEmployer dao method "+userAccount);
@@ -971,7 +976,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("Query to getGatePassListingDetails "+query);
 		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
 
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,previousGatePassAction,renewGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,previousGatePassAction,renewGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
 		while(rs.next()) {
 			GatePassListingDto dto = new GatePassListingDto();
 			dto.setTransactionId(rs.getString("TransactionId"));
@@ -1862,7 +1867,7 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 	}else {
 		query=this.getAllGatePassActionForParallel();
 		log.info("Query to getGatePassListingForApprovers "+query);
-		 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
+		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
 	}
 	
 	while(rs.next()) {
@@ -2311,7 +2316,7 @@ public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId
 
 @Override
 public String getTransactionIdByGPId(String gatepassid,String gatepasstypeid) {
-	String query="select TransactionId from GatePassTransactionMapping where GatePassId=? and GatePassTypeId=?";
+	String query="select top 1 TransactionId from GatePassTransactionMapping where GatePassId=? and GatePassTypeId=? order by CreatedDate desc ";
 	String transactionId=null;
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatepassid,gatepasstypeid);
 	if(rs.next()) {
@@ -2329,7 +2334,10 @@ public long saveIntoCMSPerson(CMSPerson person) {
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
-
+    Object terminationValue = 
+            (person.getDateOfTermination() == null || person.getDateOfTermination().toString().trim().isEmpty())
+                    ? " " : person.getDateOfTermination();
+    
     Object[] parameters = new Object[]{
         person.getEmployeeCode(),
         person.getFirstName(),
@@ -2337,7 +2345,8 @@ public long saveIntoCMSPerson(CMSPerson person) {
         person.getLastName(),
         person.getDateOfBirth(),
         person.getDateOfJoining(),
-        person.getDateOfTermination(),
+       // person.getDateOfTermination(),
+        terminationValue,
         person.getBloodGroup(),
         person.getHazardousArea(),
         person.getGender(),
@@ -2386,7 +2395,7 @@ public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm, long employeeId) {
 	 String sql = "INSERT INTO CMSPERSONJOBHIST ( EMPLOYEEID , TRADEID , SKILLID , UNITID , CONTRACTORID , DEPARTMENTID , "
 	 		+ " SUBDEPARTMENTID , WORKORDERID , EICID , VALIDFROM , VALIDTO  ) "
 	 		+ "     VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-     Object[] parameters = new Object[] {employeeId,gpm.getTrade(),gpm.getSkill(),gpm.getUnitId(),gpm.getContractor(),gpm.getDepartment(),
+     Object[] parameters = new Object[] {employeeId,gpm.getTrade(),gpm.getSkill(),gpm.getPrincipalEmployer(),gpm.getContractor(),gpm.getDepartment(),
     		 gpm.getSubdepartment(),gpm.getWorkorder(),gpm.getEic(),gpm.getDoj(), "1/1/3000"};
      try {
      int status = jdbcTemplate.update(sql, parameters);
@@ -2518,7 +2527,7 @@ private String mapGatePassValue(String field, GatePassMain gp) {
             return gp.getHealthCheckDate();
 
         case "UnitId":
-            return gp.getUnitId();
+            return gp.getPrincipalEmployer();
 
         case "ContractorId":
             return gp.getContractor();
@@ -3065,6 +3074,119 @@ private Object[] prepareRenewGatePassParameters1(String transId, GatePassMain ga
         				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
         gatePassMain.getUserId(),gatePassMain.getLlNo(),transId
     };
+}
+@Override
+public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String unitId,String deptId,String userId, String gatePassTypeId,String previousGatePassAction,String renewGatePassAction) {
+	log.info("Entering into getGatePassListingDetails dao method ");
+	List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
+	String query = getGatePassUnblockDeblackListingDetailsQuery();
+	log.info("Query to getGatePassListingDetails "+query);
+	//SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,deptId,unitId,previousGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,deptId,unitId,previousGatePassAction,renewGatePassAction,GatePassStatus.APPROVED.getStatus(),gatePassTypeId);
+	while(rs.next()) {
+		GatePassListingDto dto = new GatePassListingDto();
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId((rs.getString("GatePassId")));
+		dto.setFirstName(rs.getString("firstName"));
+		dto.setLastName(rs.getString("lastName"));
+		dto.setGender(rs.getString("GMNAME"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setContractorName(rs.getString("ContractorName"));
+		dto.setVendorCode(rs.getString("VendorCode"));
+		dto.setUnitName(rs.getString("UnitName"));
+		String gatePassType = rs.getString("GatePassTypeId");
+		if(gatePassType.equals(GatePassType.CREATE.getStatus())) {
+			dto.setGatePassType("Create");
+		}else if(gatePassType.equals(GatePassType.BLOCK.getStatus())) {
+			dto.setGatePassType("Block");
+		}
+		else if(gatePassType.equals(GatePassType.UNBLOCK.getStatus())) {
+			dto.setGatePassType("Unblock");
+		}else if(gatePassType.equals(GatePassType.BLACKLIST.getStatus())) {
+			dto.setGatePassType("Blacklist");
+		}else if(gatePassType.equals(GatePassType.DEBLACKLIST.getStatus())) {
+			dto.setGatePassType("Deblacklist");
+		}else if(gatePassType.equals(GatePassType.CANCEL.getStatus())) {
+			dto.setGatePassType("Cancel");
+		}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+			dto.setGatePassType("Lost/Damage");
+		}else if(gatePassType.equals(GatePassType.RENEW.getStatus())) {
+			dto.setGatePassType("Renew");
+		}
+		String status =rs.getString("GatePassStatus");
+		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
+			dto.setStatus("Approval Pending");
+		}else if(status.equals(GatePassStatus.APPROVED.getStatus())) {
+			dto.setStatus("Approved");
+		}else if(status.equals(GatePassStatus.REJECTED.getStatus())) {
+			dto.setStatus("Rejected");
+		}else if(status.equals(GatePassStatus.DRAFT.getStatus())) {
+			dto.setStatus("Draft");
+		}
+		dto.setOnboardingType(rs.getString("OnboardingType"));
+		listDto.add(dto);
+	}
+	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
+	return listDto;
+}
+@Override
+public String getAadharStatus(String aadharNumber) {
+    //String sql = getaadharUniqueQuery();
+String sql ="SELECT \r\n"
+		+ "    CASE\r\n"
+		+ "        WHEN creationApprovedCnt = 0 THEN \r\n"
+		+ "            --- CREATION MODE\r\n"
+		+ "            CASE\r\n"
+		+ "                WHEN gpStatus = 1 THEN 'Draft'\r\n"
+		+ "                WHEN gpStatus = 3 THEN 'Approval Pending'\r\n"
+		+ "                WHEN gpStatus = 4 THEN 'Approved'\r\n"
+		+ "                ELSE NULL\r\n"
+		+ "            END\r\n"
+		+ "        \r\n"
+		+ "        ELSE\r\n"
+		+ "            --- RENEWAL MODE\r\n"
+		+ "            CASE\r\n"
+		+ "                WHEN renewalApprovedCnt > 0 THEN 'Approved (Renewal)'\r\n"
+		+ "                ELSE NULL   -- allow renewal\r\n"
+		+ "            END\r\n"
+		+ "    END AS AadhaarStatus\r\n"
+		+ "FROM (\r\n"
+		+ "        /* ✔ 1. CMS Creation Approved Exists? */\r\n"
+		+ "        SELECT \r\n"
+		+ "            (SELECT COUNT(*)\r\n"
+		+ "             FROM CMSPERSONCUSTOMDATA a1\r\n"
+		+ "             JOIN CMSPERSONCUSTOMDATA s1 ON a1.EMPLOYEEID = s1.EMPLOYEEID\r\n"
+		+ "             WHERE a1.CSTMDEFID = 16\r\n"
+		+ "               AND a1.CUSTOMDATATEXT = ?\r\n"
+		+ "               AND s1.CSTMDEFID = 14\r\n"
+		+ "               AND s1.CUSTOMDATATEXT = '4'\r\n"
+		+ "            ) AS creationApprovedCnt,\r\n"
+		+ "\r\n"
+		+ "        /* ✔ 2. CMS Renewal Approved? */\r\n"
+		+ "            (SELECT COUNT(*)\r\n"
+		+ "             FROM CMSPERSONCUSTOMDATA a2\r\n"
+		+ "             JOIN CMSPERSONCUSTOMDATA s2 ON a2.EMPLOYEEID = s2.EMPLOYEEID\r\n"
+		+ "             JOIN CMSPERSONCUSTOMDATA r2 ON r2.EMPLOYEEID = a2.EMPLOYEEID\r\n"
+		+ "             WHERE a2.CSTMDEFID = 16\r\n"
+		+ "               AND a2.CUSTOMDATATEXT = ?\r\n"
+		+ "               AND s2.CSTMDEFID = 14\r\n"
+		+ "               AND s2.CUSTOMDATATEXT = '4'\r\n"
+		+ "               AND r2.CSTMDEFID = 15\r\n"
+		+ "               AND r2.CUSTOMDATATEXT = '2'\r\n"
+		+ "            ) AS renewalApprovedCnt,\r\n"
+		+ "\r\n"
+		+ "        /* ✔ 3. Latest gatepass status (only used for creation mode) */\r\n"
+		+ "            (SELECT TOP 1 GatePassStatus\r\n"
+		+ "             FROM GATEPASSMAIN \r\n"
+		+ "             WHERE AadharNumber = ?\r\n"
+		+ "               AND GatePassStatus IN (1,3,4)\r\n"
+		+ "             ORDER BY GatePassId DESC\r\n"
+		+ "            ) AS gpStatus\r\n"
+		+ ") x;\r\n"
+		+ "";
+    return jdbcTemplate.queryForObject(sql, new Object[]{aadharNumber, aadharNumber,aadharNumber}, String.class);
 }
 
 }

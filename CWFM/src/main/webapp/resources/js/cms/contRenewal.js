@@ -593,7 +593,7 @@ function searchContRenewBasedOnPE() {
 											let isValid=true;
 										
 											 const approvercomments = $("#approvercomments").val().trim();
-										if (approvercomments === "") {
+										if (approvercomments === "" && status==5) {
 										    $("#error-approvercomments").show();
 										    isValid = false;
 										}else{

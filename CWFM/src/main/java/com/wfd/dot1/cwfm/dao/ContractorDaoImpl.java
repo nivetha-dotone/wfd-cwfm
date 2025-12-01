@@ -3,6 +3,7 @@ package com.wfd.dot1.cwfm.dao;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -1227,7 +1228,24 @@ public void insertWorkOrderLLWC(String contractorRegId, String contractorId, Str
         e.printStackTrace();
     }
 }
+@Override
+public Map<String, String> getContractorPreviousDocuments(String contractorRegId, String requestType) {
+    String sql = "select ccr.AADHARDOCNAME,ccr.PANDOCNAME,ccr.PFDOCNAME,ccrp.ATTACHMENTNAME from CMSContractorRegistration ccr\r\n"
+    		+ "join CMSContractorRegPolicy ccrp on ccrp.CONTRACTORREGID=ccr.CONTRACTORREGID\r\n"
+    		+ "where ccr.CONTRACTORREGID=? and ccr.TYPE=?";
 
+    return jdbcTemplate.query(sql, rs -> {
+        Map<String, String> map = new LinkedHashMap<>();
+        if (rs.next()) {
+        //Map<String, String> map = new LinkedHashMap<>();
+        map.put("AADHAR", rs.getString("AADHARDOCNAME"));
+        map.put("PAN", rs.getString("PANDOCNAME"));
+        map.put("PF", rs.getString("PFDOCNAME"));
+        map.put("Attachment", rs.getString("ATTACHMENTNAME"));
+        }
+        return map;
+    }, contractorRegId,requestType);
+    }
 
 }
 
