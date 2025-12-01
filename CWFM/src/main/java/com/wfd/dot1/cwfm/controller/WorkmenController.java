@@ -2494,16 +2494,12 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
         return ResponseEntity.ok(responseMap);
     }
 
-<<<<<<< Updated upstream
     @GetMapping("/downloadPreviousDoc")
     public void downloadPreviousDoc(@RequestParam("transactionId") String transactionId,
                                     @RequestParam("fileName") String fileName,
                                     HttpServletResponse response,
                                     HttpServletRequest request) throws IOException {
-=======
 
-
->>>>>>> Stashed changes
 
         HttpSession session = request.getSession(false);
         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);

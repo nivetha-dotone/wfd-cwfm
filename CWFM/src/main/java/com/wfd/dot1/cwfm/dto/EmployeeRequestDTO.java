@@ -1,11 +1,11 @@
 package com.wfd.dot1.cwfm.dto;
 
-import lombok.Data;
 import java.util.List;
+import lombok.Data;
 
 @Data
-public class EmployeeRequestDTO
-{
+public class EmployeeRequestDTO {
+
     private PersonInformation personInformation;
     private JobAssignment jobAssignment;
     private User user;
@@ -56,14 +56,11 @@ public class EmployeeRequestDTO
         private String shortName;
     }
 
-
-
     @Data
     public static class CustomDataDTO {
         private String customDataTypeName;
         private String text;
     }
-
 
     @Data
     public static class PersonAuthenticationType {
@@ -125,4 +122,3 @@ public class EmployeeRequestDTO
         private String userPassword;
     }
 }
-

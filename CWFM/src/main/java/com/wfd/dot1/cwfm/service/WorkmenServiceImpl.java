@@ -13,10 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-<<<<<<< Updated upstream
-=======
-import com.wfd.dot1.cwfm.dto.*;
->>>>>>> Stashed changes
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +28,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
-<<<<<<< Updated upstream
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
 import com.wfd.dot1.cwfm.dto.CMSPerson;
@@ -40,8 +35,7 @@ import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.dto.PersonStatusIds;
-=======
->>>>>>> Stashed changes
+
 import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
@@ -64,10 +58,7 @@ import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 public class WorkmenServiceImpl implements WorkmenService{
 
 	private static final Logger log = LoggerFactory.getLogger(WorkmenServiceImpl.class);
-<<<<<<< Updated upstream
-	
-=======
->>>>>>> Stashed changes
+
 	@Autowired
 	WorkmenDao workmenDao;
 	
@@ -929,6 +920,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 		person.setDateOfTermination(gpm.getDot()!=null?gpm.getDot().toString():" ");
 		//person.setBloodGroup(Integer.parseInt(gpm.getBloodGroup()));
 		person.setBloodGroup(gpm.getBloodGroup() != null && !gpm.getBloodGroup().trim().isEmpty()? Integer.parseInt(gpm.getBloodGroup()): 0);
+
 		person.setHazardousArea(gpm.getHazardousArea());
 		person.setGender(Integer.parseInt(gpm.getGender()));
 		person.setAcademics(gpm.getAcademic() != null && !gpm.getAcademic().trim().isEmpty()? Integer.parseInt(gpm.getAcademic()): 0);

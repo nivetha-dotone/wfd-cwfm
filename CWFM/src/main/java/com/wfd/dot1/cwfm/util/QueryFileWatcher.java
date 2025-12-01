@@ -5,10 +5,8 @@ import java.nio.file.*;
 import java.util.Properties;
 
 public class QueryFileWatcher {
-    private static final String QUERY_FILE_PATH = "D:/utkarsh/wfd-cwfm12/CWFM/src/main/webapp/resources/queries.properties";
+    private static final String QUERY_FILE_PATH = "D:/wfd_cwfm/config/queries.properties";
     private static Properties queries = new Properties();
-//"D:/utkarsh/wfd-cwfm12/CWFM/src/main/webapp/resources/queries.properties
-
 
     static {
         loadQueries();

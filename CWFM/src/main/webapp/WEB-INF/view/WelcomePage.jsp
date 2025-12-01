@@ -50,14 +50,12 @@
         <script src="resources/js/cms/contRenewal.js"></script>
         <script src="resources/js/cms/dashboard.js"></script>
 
-<<<<<<< Updated upstream
       <script src="resources/js/cms/export.js"></script>
        <script src="resources/js/cms/contRenewal.js"></script>
        <script src="resources/js/cms/dashboard.js"></script>
         <script src="resources/js/cms/dottype.js"></script>
  <script src="resources/js/cms/unitDeptMapping.js"></script>
-=======
->>>>>>> Stashed changes
+
     <script>
     var contextPath = '<%= request.getContextPath() %>';
   

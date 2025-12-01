@@ -2396,7 +2396,7 @@ public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm, long employeeId) {
 	 String sql = "INSERT INTO CMSPERSONJOBHIST ( EMPLOYEEID , TRADEID , SKILLID , UNITID , CONTRACTORID , DEPARTMENTID , "
 	 		+ " SUBDEPARTMENTID , WORKORDERID , EICID , VALIDFROM , VALIDTO  ) "
 	 		+ "     VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-     Object[] parameters = new Object[] {employeeId,gpm.getTrade(),gpm.getSkill(),gpm.getPrincipalEmployer(),gpm.getContractor(),gpm.getDepartment(),
+     Object[] parameters = new Object[] {employeeId,gpm.getTrade(),gpm.getSkill(),gpm.getUnitId(),gpm.getContractor(),gpm.getDepartment(),
     		 gpm.getSubdepartment(),gpm.getWorkorder(),gpm.getEic(),gpm.getDoj(), "1/1/3000"};
      try {
      int status = jdbcTemplate.update(sql, parameters);
