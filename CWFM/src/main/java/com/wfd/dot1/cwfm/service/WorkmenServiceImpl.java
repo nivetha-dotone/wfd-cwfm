@@ -27,6 +27,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wfd.dot1.cwfm.controller.CreateEmpFetchByGatePassAPICALL;
 import com.wfd.dot1.cwfm.dao.WorkmenDao;
 import com.wfd.dot1.cwfm.dto.ApproveRejectGatePassDto;
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
@@ -35,7 +36,6 @@ import com.wfd.dot1.cwfm.dto.GatePassActionDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
 import com.wfd.dot1.cwfm.dto.PersonStatusIds;
-
 import com.wfd.dot1.cwfm.enums.DotType;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
@@ -111,6 +111,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 //
 //	@Autowired
 //	private  WfdEmployeeService wfdEmployeeService;
+	
+	@Autowired
+	CreateEmpFetchByGatePassAPICALL api;
 
 	@Override
 	public String saveGatePass(GatePassMain gatePassMain) {
@@ -155,7 +158,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 
 		        if (!cmsDone) {
 		            throw new RuntimeException("CMS Person Insert failed unexpectedly.");
-		        }
+		        }try {
+		        	api.addOnBoardingDetailsActual(dto.getTransactionId());}catch(Exception e) {return transactionId;}
 
 				return transactionId;
 			}else {
@@ -313,7 +317,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 	    int workFlowType = workmenDao.getWorkFlowTYpeByTransactionId(gpm.getTransactionId(), dto.getGatePassType());
 
 	    if (workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-	        isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(), dto.getGatePassType());
+	    	int workflowTypeId = workmenDao.getWorkFlowTypeId(gpm.getUnitId(), dto.getGatePassType());
+	        isLastApprover = workmenDao.isLastApprover(dto.getApproverRole(), dto.getGatePassType(),workflowTypeId);
 	    } else {
 	        // Parallel approval
 	        isLastApprover = dto.getGatePassType().equals(GatePassType.CREATE.getStatus())
@@ -360,6 +365,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        boolean statusUpdated  = workmenDao.updateGatePassMainStatus(gatePassId,dto.getStatus());
 	        if(!statusUpdated) {
 	        	throw new RuntimeException("Gatepassmain status update failed unexpectedly.");
+	        }else {
+	        	try {
+	        	api.addOnBoardingDetailsActual(dto.getTransactionId());}catch(Exception e) {return result;}
 	        }
 	        return result;
 	    }
@@ -380,6 +388,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        	throw new RuntimeException("Gatepassmain status update failed unexpectedly.");
 	        }
 	        return result;
+	    } if (dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
+	    	try {
+	        	//api.updateOnBoardingDetails(dto.getTransactionId());
+	        	}catch(Exception e) {return result;}
+
 	    }
 
 	    // OTHER APPROVALS → just update GatePass status
@@ -477,7 +490,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 			//approver logic needs to be added
 			 GatePassMain gatePassMain = workmenDao.getIndividualContractWorkmenDetailsByGatePassId(dto.getGatePassId());
-			if((gatePassMain.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
+			if(( (gatePassMain.getGatePassAction().equals(GatePassType.CREATE.getStatus()) || gatePassMain.getGatePassAction().equals(GatePassType.RENEW.getStatus()) ) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
 					||dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()) || dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())
 					) {
 				
@@ -726,6 +739,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 				dto.setComments(gatePassMain.getComments());
 				dto.setUpdatedBy(gatePassMain.getUserId());
 				workmenDao.saveGatePassStatusLog(dto);
+				if (dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
+			    	try {
+			        	api.updateOnBoardingDetails(dto.getTransactionId());}catch(Exception e) {return transactionId;}
+
+			    }
 				return transactionId;
 			}else {
 				gatePassMain.setGatePassStatus(GatePassStatus.APPROVALPENDING.getStatus());

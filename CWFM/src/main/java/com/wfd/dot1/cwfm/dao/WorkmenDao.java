@@ -72,7 +72,7 @@ public interface WorkmenDao {
 
 	public boolean updateGatePassMainStatus(String gatePassId, String status);
 
-	public boolean isLastApprover(String roleName,String gatePassTypeId);
+	public boolean isLastApprover(String roleName,String gatePassTypeId,int workflowTypeId);
 
 	public String gatePassAction(GatePassActionDto dto);
 
@@ -206,4 +206,6 @@ public interface WorkmenDao {
 	public String getAadharStatus(String aadharNumber);
 
 	public String getTransactionIdByGatePassId(String gatePassId) ;
+
+	int getWorkFlowTypeId(String unitId, String actionId);
 }

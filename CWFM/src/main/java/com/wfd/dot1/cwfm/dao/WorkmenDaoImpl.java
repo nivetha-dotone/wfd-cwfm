@@ -565,13 +565,25 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
 		return listDto;
 	}
-
+	@Override
+public int getWorkFlowTypeId(String unitId, String actionId) {
+	String query = "select distinct cwt.WorkflowTypeId from CMSWORKFLOWTYPE cwt \r\n"
+			+ "join CMSAPPROVERHIERARCHY cah on cah.WorkFlowTypeId=cwt.WorkFlowTypeId where cwt.UnitId=? and cah.Action_id=?";
+	SqlRowSet rs =null;
+	rs = jdbcTemplate.queryForRowSet(query,unitId,actionId);
+	while(rs.next()) {
+		return rs.getInt("WorkflowTypeId");
+	}
+	return 0;
+}
 	@Override
 	public List<GatePassListingDto> getGatePassListingForApprovers(String roleId,int workFlowType,String gatePassTypeId,String deptId,String unitId,String type) {
 		log.info("Entering into getGatePassListingForApprovers dao method ");
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		SqlRowSet rs =null;
 		String query=null;
+		int workflowTypeId = this.getWorkFlowTypeId(unitId, "1");
+		
 		if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 			query=this.getAllGatePassForSquential();
 			log.info("Query to getGatePassListingForApprovers "+query);
@@ -580,7 +592,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		}else {
 			query=this.getAllGatePassForParallel();
 			log.info("Query to getGatePassListingForApprovers "+query);
-			 rs = jdbcTemplate.queryForRowSet(query,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId,type);
+			 rs = jdbcTemplate.queryForRowSet(query,workflowTypeId,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId,type);
 		}
 		
 		while(rs.next()) {
@@ -885,10 +897,10 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	@Override
-	public boolean isLastApprover(String roleName, String  gatePassTypeId) {
+	public boolean isLastApprover(String roleName, String  gatePassTypeId,int workflowTypeId) {
 		boolean status=false;
 		
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery(),gatePassTypeId,gatePassTypeId);
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery(),gatePassTypeId,workflowTypeId,gatePassTypeId,workflowTypeId);
 		if(rs.next()){
 			if(roleName.equals(rs.getString("Role_Name")))
 				status = true;
@@ -1860,11 +1872,12 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 	List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 	SqlRowSet rs =null;
 	String query=null;
+	int workflowTypeId = this.getWorkFlowTypeId(unitId, gatePassTypeId);
 	if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 		query=this.getAllGatePassActionForSquential();
 		log.info("Query to getGatePassListingForApprovers "+query);
 		
-		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,gatePassTypeId,gatePassTypeId,gatePassTypeId,roleId,deptId,unitId);
+		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,workflowTypeId,workflowTypeId,gatePassTypeId,gatePassTypeId,gatePassTypeId,roleId,deptId,unitId);
 	}else {
 		query=this.getAllGatePassActionForParallel();
 		log.info("Query to getGatePassListingForApprovers "+query);

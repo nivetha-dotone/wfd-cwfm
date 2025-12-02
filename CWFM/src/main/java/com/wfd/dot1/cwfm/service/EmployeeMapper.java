@@ -418,7 +418,14 @@ public class EmployeeMapper  {
                 labor.setEffectiveDate(individualOnBoardDetailsByTrnId.getHireDate());
                 labor.setExpirationDate("3000-01-01");
 //              labor.setOrganizationPath(individualOnBoardDetailsByTrnId.getCompany()+ "/" +individualOnBoardDetailsByTrnId.getLocation()+ "/" + individualOnBoardDetailsByTrnId.getPlantLocation() + "/" + individualOnBoardDetailsByTrnId.getDepartment() + "/" + individualOnBoardDetailsByTrnId.getSection() + "/" + individualOnBoardDetailsByTrnId.getSubSection() + "/" + individualOnBoardDetailsByTrnId.getContractorCode() + "/" +individualOnBoardDetailsByTrnId.getCategory());
-                labor.setOrganizationPath("DOT1 Solutions Pvt Ltd/Banglore/Main Plant/IT/IT/General/Bravispach/Team Lead");
+              //  labor.setOrganizationPath("DOT1 Solutions Pvt Ltd/Banglore/Main Plant/IT/IT/General/Bravispach/Team Lead");
+                
+               String orgPath = individualOnBoardDetailsByTrnId.getLocation()+"/"+individualOnBoardDetailsByTrnId.getCompany()+"/"+
+            		   individualOnBoardDetailsByTrnId.getPlantLocation()+"/"+individualOnBoardDetailsByTrnId.getDepartment()+"/"+
+            		   individualOnBoardDetailsByTrnId.getSection()+"/"+individualOnBoardDetailsByTrnId.getSubSection()+"/"+
+            		   individualOnBoardDetailsByTrnId.getContractorCode()+"/Team Lead";
+               System.out.println("orgPath"+orgPath);
+               labor.setOrganizationPath(orgPath);
                 job.setPrimaryLaborAccounts(Arrays.asList(labor));
                 dto.setJobAssignment(job);
                 // --- User ---
