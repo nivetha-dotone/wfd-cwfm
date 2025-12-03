@@ -208,4 +208,7 @@ public interface WorkmenDao {
 	public String getTransactionIdByGatePassId(String gatePassId) ;
 
 	int getWorkFlowTypeId(String unitId, String actionId);
+
+	public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId) ;
+
 }

@@ -377,27 +377,37 @@ function initializeDatePicker() {
         isValid = false;
     }else{
 		 // $("#error-aadhar").hide();
-		  $.ajax({
-            url: "/CWFM/contractworkmen/checkAadharExistsCreation",
-            type: "GET",
-            data: { aadharNumber: aadharNumber },
-            async: false,   // IMPORTANT → Make the call synchronous
-            success: function (response) {
+		 $.ajax({
+		 				     url: "/CWFM/contractworkmen/checkAadharExistsCreation",
+		 				     type: "GET",
+		 				     data: {
+		 				         aadharNumber: aadharNumber,
+		 				         gatePassId: $("#gatePassId").val(),        // NULL for draft
+		 				         transactionId: $("#transactionId").val()   // always present for draft/renewal
+		 				     },
+		 				     async: false,
+		 				     success: function (response) {
 
-                if (response.status !== "") {
-                    $("#error-aadhar").text("Aadhaar exists as " + response.status).show();
-                    aadharCheckPassed = false;   // Aadhaar found → fail
-                } else {
-                    $("#error-aadhar").hide();
-                    aadharCheckPassed = true;    // Aadhaar free → pass
-                }
-            },
-            error: function () {
-                // In case of error, don't block the user
-                $("#error-aadhar").text("Unable to verify Aadhaar").show();
-                aadharCheckPassed = false;
-            }
-        });
+		 						let status = response.status ? response.status.trim() : '';
+		 						if (status !== "Unique" && status !== "Invalid" && status !== "") {
+		 						    $("#error-aadhar").text("Aadhaar already exists").show();
+		 						    aadharCheckPassed = false;
+		 						} else if (status === "Invalid") {
+		 						    $("#error-aadhar").text("Invalid Aadhar Number").show();
+		 						    aadharCheckPassed = false;
+		 						} else {
+		 						    $("#error-aadhar").hide();
+		 						    aadharCheckPassed = true;
+		 						}
+
+		 				     },
+		 				     error: function () {
+		 				         $("#error-aadhar").text("Unable to verify Aadhaar").show();
+		 				         aadharCheckPassed = false;
+		 				     }
+		 				 });
+
+
 		     }
 	
     const firstName = $("#firstName").val().trim();
@@ -3368,7 +3378,7 @@ function verifyOtpDemo() {
 			        document.getElementById("otpMessage").innerText = "";
 			        return;
 			    }else{
-					valid = aadharDuplicateDBCheck(aadhaarNumber,transactionId);
+					valid = aadharDuplicateDBCheck(aadhaarNumber);
 				}				
 if(valid){
 			    var xhr = new XMLHttpRequest();
@@ -3555,30 +3565,40 @@ if(valid){
 		
 
 		
-		function aadharDuplicateDBCheck(aadharNumber, transactionId) {
-		    let result = false;
+		function aadharDuplicateDBCheck(aadharNumber) {
+		    let aadharCheckPassed = false;
 
-		    $.ajax({
-		        url: "/CWFM/contractworkmen/checkAadharExists",
-		        type: "GET",
-		        data: { aadharNumber: aadharNumber, transactionId: transactionId },
-		        async: false, 
-		        success: function (response) {
-		            if (response.exists) {
-		                $("#error-aadhar").text("Aadhar number already exists").show();
-		                result = false;
-		            } else {
-		                $("#error-aadhar").hide();
-		                result = true;
-		            }
-		        },
-		        error: function () {
-		            $("#error-aadhar").text("Error checking Aadhar").show();
-		            result = false;
-		        }
-		    });
+			$.ajax({
+				     url: "/CWFM/contractworkmen/checkAadharExistsCreation",
+				     type: "GET",
+				     data: {
+				         aadharNumber: aadharNumber,
+				         gatePassId: $("#gatePassId").val(),        // NULL for draft
+				         transactionId: $("#transactionId").val()   // always present for draft/renewal
+				     },
+				     async: false,
+				     success: function (response) {
 
-		    return result;  // ✅ return after ajax finishes
+						let status = response.status ? response.status.trim() : '';
+						if (status !== "Unique" && status !== "Invalid" && status !== "") {
+						    $("#error-aadhar").text("Aadhaar already exists").show();
+						    aadharCheckPassed = false;
+						} else if (status === "Invalid") {
+						    $("#error-aadhar").text("Invalid Aadhar Number").show();
+						    aadharCheckPassed = false;
+						} else {
+						    $("#error-aadhar").hide();
+						    aadharCheckPassed = true;
+						}
+
+				     },
+				     error: function () {
+				         $("#error-aadhar").text("Unable to verify Aadhaar").show();
+				         aadharCheckPassed = false;
+				     }
+				 });
+
+		    return aadharCheckPassed;  // ✅ return after ajax finishes
 		}
 		function downloadPreviousFile(transactionId, fileName) {
   if (!transactionId || !fileName) {

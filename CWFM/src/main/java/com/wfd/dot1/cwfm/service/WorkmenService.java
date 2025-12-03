@@ -132,5 +132,9 @@ public interface WorkmenService {
 
 	public String getAadharStatus(String aadharNumber);
 
+	public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId);
+
+	
+
 	
 }	

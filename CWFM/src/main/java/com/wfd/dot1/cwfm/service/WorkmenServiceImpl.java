@@ -390,7 +390,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        return result;
 	    } if (dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
 	    	try {
-	        	//api.updateOnBoardingDetails(dto.getTransactionId());
+	        	api.updateOnBoardingDetails(dto.getTransactionId());
 	        	}catch(Exception e) {return result;}
 
 	    }
@@ -1042,6 +1042,10 @@ public class WorkmenServiceImpl implements WorkmenService{
 	 public String getAadharStatus(String aadharNumber) {
 		    return workmenDao.getAadharStatus(aadharNumber);
 		}
+	 @Override
+	 public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId) {
 
+	        return workmenDao.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
+	    }
 	}
 

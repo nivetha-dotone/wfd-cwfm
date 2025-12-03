@@ -588,7 +588,7 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 			query=this.getAllGatePassForSquential();
 			log.info("Query to getGatePassListingForApprovers "+query);
 			
-			 rs = jdbcTemplate.queryForRowSet(query,deptId,unitId,roleId,gatePassTypeId,type);
+			 rs = jdbcTemplate.queryForRowSet(query,workflowTypeId,workflowTypeId,deptId,unitId,roleId,gatePassTypeId,type);
 		}else {
 			query=this.getAllGatePassForParallel();
 			log.info("Query to getGatePassListingForApprovers "+query);
@@ -1704,7 +1704,7 @@ public List<GatePassListingDto> getRenewListingDetails(String userId,String gate
 	List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 	String query =getAllRenewForContractor();
 	log.info("Query to getRenewListingDetails "+query);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,userId,gatePassTypeId,gatePassStatus,deptId,unitId);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,userId,gatePassTypeId,gatePassStatus,deptId,unitId);
 	while(rs.next()) {
 		GatePassListingDto dto = new GatePassListingDto();
 		dto.setTransactionId(rs.getString("TransactionId"));
@@ -1771,6 +1771,11 @@ public String renewGatePass(GatePassMain gatePassMain) {
 	            int result = jdbcTemplate.update(query, parameters);
 	            if (result > 0) {
 	            	transId=gatePassMain.getTransactionId();
+	            	GatePassActionDto dto = new GatePassActionDto();
+	            	dto.setTransactionId(gatePassMain.getTransactionId());
+	            	dto.setGatePassId(gatePassMain.getGatePassId());
+	            	dto.setGatePassType(GatePassType.RENEW.getStatus());
+	            	this.gatePassTransactionMapping(dto);
 	                log.info("GatePass saved successfully for transId: " + transId);
 	            } else {
 	                log.warn("Failed to save GatePass for transId: " + transId);
@@ -2541,7 +2546,7 @@ private String mapGatePassValue(String field, GatePassMain gp) {
             return gp.getHealthCheckDate();
 
         case "UnitId":
-            return gp.getPrincipalEmployer();
+            return gp.getUnitId();
 
         case "ContractorId":
             return gp.getContractor();
@@ -3145,63 +3150,7 @@ public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String u
 	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
 	return listDto;
 }
-@Override
-public String getAadharStatus(String aadharNumber) {
-    //String sql = getaadharUniqueQuery();
-String sql ="SELECT \r\n"
-		+ "    CASE\r\n"
-		+ "        WHEN creationApprovedCnt = 0 THEN \r\n"
-		+ "            --- CREATION MODE\r\n"
-		+ "            CASE\r\n"
-		+ "                WHEN gpStatus = 1 THEN 'Draft'\r\n"
-		+ "                WHEN gpStatus = 3 THEN 'Approval Pending'\r\n"
-		+ "                WHEN gpStatus = 4 THEN 'Approved'\r\n"
-		+ "                ELSE NULL\r\n"
-		+ "            END\r\n"
-		+ "        \r\n"
-		+ "        ELSE\r\n"
-		+ "            --- RENEWAL MODE\r\n"
-		+ "            CASE\r\n"
-		+ "                WHEN renewalApprovedCnt > 0 THEN 'Approved (Renewal)'\r\n"
-		+ "                ELSE NULL   -- allow renewal\r\n"
-		+ "            END\r\n"
-		+ "    END AS AadhaarStatus\r\n"
-		+ "FROM (\r\n"
-		+ "        /* ✔ 1. CMS Creation Approved Exists? */\r\n"
-		+ "        SELECT \r\n"
-		+ "            (SELECT COUNT(*)\r\n"
-		+ "             FROM CMSPERSONCUSTOMDATA a1\r\n"
-		+ "             JOIN CMSPERSONCUSTOMDATA s1 ON a1.EMPLOYEEID = s1.EMPLOYEEID\r\n"
-		+ "             WHERE a1.CSTMDEFID = 16\r\n"
-		+ "               AND a1.CUSTOMDATATEXT = ?\r\n"
-		+ "               AND s1.CSTMDEFID = 14\r\n"
-		+ "               AND s1.CUSTOMDATATEXT = '4'\r\n"
-		+ "            ) AS creationApprovedCnt,\r\n"
-		+ "\r\n"
-		+ "        /* ✔ 2. CMS Renewal Approved? */\r\n"
-		+ "            (SELECT COUNT(*)\r\n"
-		+ "             FROM CMSPERSONCUSTOMDATA a2\r\n"
-		+ "             JOIN CMSPERSONCUSTOMDATA s2 ON a2.EMPLOYEEID = s2.EMPLOYEEID\r\n"
-		+ "             JOIN CMSPERSONCUSTOMDATA r2 ON r2.EMPLOYEEID = a2.EMPLOYEEID\r\n"
-		+ "             WHERE a2.CSTMDEFID = 16\r\n"
-		+ "               AND a2.CUSTOMDATATEXT = ?\r\n"
-		+ "               AND s2.CSTMDEFID = 14\r\n"
-		+ "               AND s2.CUSTOMDATATEXT = '4'\r\n"
-		+ "               AND r2.CSTMDEFID = 15\r\n"
-		+ "               AND r2.CUSTOMDATATEXT = '2'\r\n"
-		+ "            ) AS renewalApprovedCnt,\r\n"
-		+ "\r\n"
-		+ "        /* ✔ 3. Latest gatepass status (only used for creation mode) */\r\n"
-		+ "            (SELECT TOP 1 GatePassStatus\r\n"
-		+ "             FROM GATEPASSMAIN \r\n"
-		+ "             WHERE AadharNumber = ?\r\n"
-		+ "               AND GatePassStatus IN (1,3,4)\r\n"
-		+ "             ORDER BY GatePassId DESC\r\n"
-		+ "            ) AS gpStatus\r\n"
-		+ ") x;\r\n"
-		+ "";
-    return jdbcTemplate.queryForObject(sql, new Object[]{aadharNumber, aadharNumber,aadharNumber}, String.class);
-}
+
 public String getTransactionIdByGatePassId(String gatePassId) {
 
     String sql = "SELECT TransactionId FROM GATEPASSMAIN WHERE GatePassId = ?";
@@ -3211,6 +3160,106 @@ public String getTransactionIdByGatePassId(String gatePassId) {
     } catch (EmptyResultDataAccessException e) {
         return null; // No record found
     }
+}
+
+@Override
+public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId) {
+String actionType = null;
+String gatePassIdNormalized = 
+(gatePassId == null || gatePassId.isBlank()) ? null : gatePassId;
+
+actionType = (gatePassIdNormalized == null) ? "CREATE" : "RENEW";
+
+//    String sql ="DECLARE @AadharNumber VARCHAR(50) = ?;\r\n"
+//    		+ "DECLARE @TransactionId VARCHAR(50) = ?;\r\n"
+//    		+ "DECLARE @ActionType VARCHAR(10) = ?;\r\n"
+//    		+ "DECLARE @GatePassId VARCHAR(50) = ?;   -- For CREATE this stays NULL\r\n"
+//    		+ "\r\n"
+//    		+ "\r\n"
+//    		+ "/* Dynamically lookup definition IDs (environment-independent) */\r\n"
+//    		+ "DECLARE @CSTMDEFID_AADHAAR INT = (\r\n"
+//    		+ "    SELECT CSTMDEFID \r\n"
+//    		+ "    FROM CMSPERSONCUSTOMDATADEFINITION \r\n"
+//    		+ "    WHERE CSTMDEFNAME = 'IdProof'\r\n"
+//    		+ ");\r\n"
+//    		+ "\r\n"
+//    		+ "DECLARE @CSTMDEFID_STATUS INT = (\r\n"
+//    		+ "    SELECT CSTMDEFID \r\n"
+//    		+ "    FROM CMSPERSONCUSTOMDATADEFINITION \r\n"
+//    		+ "    WHERE CSTMDEFNAME = 'Status'\r\n"
+//    		+ ");\r\n"
+//    		+ "\r\n"
+//    		+ "\r\n"
+//    		+ "SELECT TOP (1)\r\n"
+//    		+ "    CASE\r\n"
+//    		+ "        WHEN cms_exists = 1 THEN 'Exists_In_CMS_Approved'\r\n"
+//    		+ "        WHEN gp_exists_approved = 1 AND @ActionType = 'CREATE' THEN 'Exists_Gatepass_Approved'\r\n"
+//    		+ "        WHEN gp_exists_pending = 1 THEN 'Exists_Gatepass_Pending'\r\n"
+//    		+ "        WHEN gp_exists_draft = 1 THEN 'Exists_Gatepass_Draft'\r\n"
+//    		+ "        ELSE 'Unique'\r\n"
+//    		+ "    END AS AadhaarUniquenessStatus\r\n"
+//    		+ "FROM (\r\n"
+//    		+ "    /* CMS Approved Status Check (RUN ONLY DURING CREATE) */\r\n"
+//    		+ "    SELECT\r\n"
+//    		+ "        CASE WHEN @ActionType = 'CREATE' AND EXISTS (\r\n"
+//    		+ "            SELECT 1 \r\n"
+//    		+ "            FROM CMSPERSONCUSTOMDATA a\r\n"
+//    		+ "            JOIN CMSPERSONCUSTOMDATA s ON a.EMPLOYEEID = s.EMPLOYEEID\r\n"
+//    		+ "            WHERE a.CSTMDEFID = @CSTMDEFID_AADHAAR\r\n"
+//    		+ "              AND a.CUSTOMDATATEXT = @AadharNumber\r\n"
+//    		+ "              AND s.CSTMDEFID = @CSTMDEFID_STATUS\r\n"
+//    		+ "              AND s.CUSTOMDATATEXT = '4'\r\n"
+//    		+ "        ) THEN 1 ELSE 0 END AS cms_exists,\r\n"
+//    		+ "\r\n"
+//    		+ "        /* APPROVED GatePass */\r\n"
+//    		+ "        CASE WHEN EXISTS (\r\n"
+//    		+ "            SELECT 1 \r\n"
+//    		+ "            FROM GATEPASSMAIN gp\r\n"
+//    		+ "            WHERE gp.AadharNumber = @AadharNumber\r\n"
+//    		+ "              AND gp.GatePassStatus = 4\r\n"
+//    		+ "              AND (@GatePassId IS NULL OR gp.GatePassId <> @GatePassId)\r\n"
+//    		+ "        ) THEN 1 ELSE 0 END AS gp_exists_approved,\r\n"
+//    		+ "\r\n"
+//    		+ "        /* PENDING GatePass */\r\n"
+//    		+ "        CASE WHEN EXISTS (\r\n"
+//    		+ "            SELECT 1 \r\n"
+//    		+ "            FROM GATEPASSMAIN gp\r\n"
+//    		+ "            WHERE gp.AadharNumber = @AadharNumber\r\n"
+//    		+ "              AND gp.GatePassStatus = 3\r\n"
+//    		+ "              AND (\r\n"
+//    		+ "                   (@GatePassId IS NOT NULL AND gp.GatePassId <> @GatePassId)\r\n"
+//    		+ "                   OR\r\n"
+//    		+ "                   (@GatePassId IS NULL AND gp.TransactionId <> @TransactionId)\r\n"
+//    		+ "              )\r\n"
+//    		+ "        ) THEN 1 ELSE 0 END AS gp_exists_pending,\r\n"
+//    		+ "\r\n"
+//    		+ "        /* DRAFT GatePass */\r\n"
+//    		+ "        CASE WHEN EXISTS (\r\n"
+//    		+ "            SELECT 1 \r\n"
+//    		+ "            FROM GATEPASSMAIN gp\r\n"
+//    		+ "            WHERE gp.AadharNumber = @AadharNumber\r\n"
+//    		+ "              AND gp.GatePassStatus = 1\r\n"
+//    		+ "              AND (\r\n"
+//    		+ "                   (@GatePassId IS NOT NULL AND gp.GatePassId <> @GatePassId)\r\n"
+//    		+ "                   OR\r\n"
+//    		+ "                   (@GatePassId IS NULL AND gp.TransactionId <> @TransactionId)\r\n"
+//    		+ "              )\r\n"
+//    		+ "        ) THEN 1 ELSE 0 END AS gp_exists_draft\r\n"
+//    		+ "\r\n"
+//    		+ ") T;\r\n"
+//    		+ "";
+String sql = this.getAadharExistsQuery();
+    return jdbcTemplate.queryForObject(
+            sql,
+            new Object[]{aadharNumber, transactionId, actionType,gatePassIdNormalized},
+            String.class
+    );
+}
+
+@Override
+public String getAadharStatus(String aadharNumber) {
+	// TODO Auto-generated method stub
+	return null;
 }
 
 }

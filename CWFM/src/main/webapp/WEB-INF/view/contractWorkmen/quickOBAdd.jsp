@@ -466,6 +466,10 @@ label {
     	
     		<input id="transactionId" name="transactionId" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" value="${transactionId}" readonly>
    </td>
+   <td>
+    	
+    		<input id="gatePassId" name="gatePassId" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="" readonly>
+   </td>
 </tr>
             <tr>
     <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
