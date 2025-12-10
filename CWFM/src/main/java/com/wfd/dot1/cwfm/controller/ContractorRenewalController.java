@@ -121,7 +121,7 @@ public class ContractorRenewalController {
 				MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 				List<ContractorRegistration> listDto = new ArrayList<ContractorRegistration>();
 				if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-	    		listDto=contrService.getContRenewList(String.valueOf(user.getUserId()),deptId,principalEmployerId);
+					listDto=contrService.getContRenewList(String.valueOf(user.getUserId()),deptId,principalEmployerId);
 				}else {	
 				
 					listDto=contrService.getContRenewListForApprovers(principalEmployerId,deptId,user);
@@ -308,11 +308,7 @@ public class ContractorRenewalController {
 	    @PostMapping("/approveRejectContRenew")
 	    public ResponseEntity<String> approveRejectBill(@RequestBody ApproveRejectContRenewDto dto,HttpServletRequest request,HttpServletResponse response) {
 	    	String result=null; 
-	    	try {
-	             ObjectMapper objectMapper = new ObjectMapper();
-	             String approveRejectGatePass = objectMapper.writeValueAsString(dto);
-	         } catch (Exception e) {
-	         }
+	    	
 	         try {
 	        	 result = contrService.approveRejectContRenew(dto);
 	         	if(null!=result) {

@@ -349,7 +349,9 @@ label {
                 	<label id="error-registrationid" style="color: red;display: none;">Registration ID is required</label>
                 </td>
                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.principalEmployer"/></label></th>
-				 <td><input type="text" value="${contractor.principalEmployer}" readonly></td>
+				 <td><input type="text" value="${contractor.principalEmployer}" readonly>
+				 <input type="hidden" id="unitId" value="${contractor.unitId}" readonly>
+				 </td>
            </tr>
             <tr>
               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>

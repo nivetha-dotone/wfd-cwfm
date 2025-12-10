@@ -402,20 +402,39 @@ function saveBtn() {
     formData.append("checklistJson", JSON.stringify(checklist));
 
     // ===== Submit AJAX =====
-    $.ajax({
-        url: '/CWFM/billVerification/saveBill',
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            alert('Saved successfully!');
-			loadCommonList('/billVerification/listingFilter', 'Bill Verification List');
-        },
-        error: function (xhr) {
-            alert('Error: ' + xhr.responseText);
-        }
-    });
+	$.ajax({
+	    url: '/CWFM/billVerification/saveBill',
+	    method: 'POST',
+	    data: formData,
+	    processData: false,
+	    contentType: false,
+	    success: function (response, status, xhr) {
+
+	        if (xhr.status === 200) {
+	            alert('Saved successfully!');
+	            loadCommonList('/billVerification/listingFilter', 'Bill Verification List');
+	        } else {
+	            alert('Unexpected response: ' + xhr.status);
+	        }
+	    },
+	    error: function (xhr) {
+
+	        // 204 No Content
+	        if (xhr.status === 204) {
+	            alert("Save failed: No data saved (204)");
+	            return;
+	        }
+
+	        // 500 + any error with message
+	        if (xhr.responseText) {
+	            alert("Error: " + xhr.responseText);
+	        } else {
+	            alert("Error occurred. Status: " + xhr.status);
+	        }
+	    }
+	});
+
+	
 }
 
 function showFileNameBill(input, id) {
@@ -524,6 +543,7 @@ function showFileNameBill(input, id) {
 							approverRole : $("#roleName").val().trim(),
 							roleId :$("#roleId").val().trim(),
 							type : '1',
+							unitId: $("#unitId").val().trim(),
 						};
 							  const xhr = new XMLHttpRequest();
 					xhr.open("POST", "/CWFM/billVerification/approveRejectBill", true); // Replace with your actual controller URL

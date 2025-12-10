@@ -131,18 +131,19 @@ function deleteSelected() {
 
 function onModuleChange() {
     const unitId = document.getElementById("principalEmployer").value;
-    const businessType = document.getElementById("businessType").value;
+    //const businessType = document.getElementById("businessType").value;
     const moduleId = document.getElementById("module").value;
 	const actionSelect = document.getElementById("actionDropdown");
 	 const actionId = actionSelect?.value;
 	 const actionName = actionSelect?.options[actionSelect.selectedIndex]?.text;
     const tbody = document.querySelector("#approverTable tbody");
-
-    if (unitId && businessType && moduleId) {
+	//if (unitId && businessType && moduleId) {
+    if (unitId  && moduleId) {
         $.ajax({
             type: "GET",
             url: "/CWFM/workflow/getExistingWorkflow",
-            data: { unitId, businessType, moduleId,actionName },
+			//data: { unitId, businessType, moduleId,actionName },
+            data: { unitId,  moduleId,actionName },
             success: function (data) {
                 tbody.innerHTML = "";
 
@@ -191,14 +192,15 @@ function onModuleChange() {
 function saveWorkflow() {
     const workflowType = document.querySelector("input[name='workflowType']:checked")?.value;
     const unitId = document.getElementById("principalEmployer").value;
-    const businessType = document.getElementById("businessType").value;
+    ///const businessType = document.getElementById("businessType").value;
     const moduleId = document.getElementById("module").value;
 
     const actionSelect = document.getElementById("actionDropdown");
     const actionId = actionSelect?.value;
     const actionName = actionSelect?.options[actionSelect.selectedIndex]?.text;
 
-    if (!unitId || !businessType || !moduleId || !workflowType || !actionId) {
+    //if (!unitId || !businessType || !moduleId || !workflowType || !actionId) {
+		if (!unitId  || !moduleId || !workflowType || !actionId) {
         alert("Please fill all required fields.");
         return;
     }
@@ -294,7 +296,7 @@ function saveWorkflow() {
 
     const payload = {
         unitId,
-        businessType,
+        //businessType,
         moduleId,
         workflowType,
         hierarchy,

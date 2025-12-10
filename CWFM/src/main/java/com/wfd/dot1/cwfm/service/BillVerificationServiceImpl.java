@@ -152,9 +152,9 @@ public class BillVerificationServiceImpl implements BillVerificationService{
 			boolean isLastApprover=false;
 			int workFlowTypeId = billDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
 			if(workFlowTypeId==WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-				 isLastApprover = billDao.isLastApprover(dto.getApproverRole());
+				 isLastApprover = billDao.isLastApprover(dto.getApproverRole(),dto.getUnitId());
 			}else if(workFlowTypeId==WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
-				 isLastApprover = billDao.isLastApproverForParallel(dto.getTransactionId(),dto.getRoleId());
+				 isLastApprover = billDao.isLastApproverForParallel(dto.getTransactionId(),dto.getRoleId(),dto.getUnitId());
 				
 			}
 			

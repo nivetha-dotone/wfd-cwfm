@@ -376,11 +376,7 @@ public class BillVerificationController {
     @PostMapping("/approveRejectBill")
     public ResponseEntity<String> approveRejectBill(@RequestBody ApproveRejectBillDto dto,HttpServletRequest request,HttpServletResponse response) {
     	String result=null; 
-    	try {
-             ObjectMapper objectMapper = new ObjectMapper();
-             String approveRejectGatePass = objectMapper.writeValueAsString(dto);
-         } catch (Exception e) {
-         }
+    	
          try {
         	 result = billService.approveRejectBill(dto);
          	if(null!=result) {

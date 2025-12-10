@@ -2,7 +2,7 @@ package com.wfd.dot1.cwfm.dto;
 
 public class CMSWageCostDTO {
     private Long wcTransId;
-    private Integer unitId;
+    private String unitId;
     private String unitCode;
     private Integer contractorId;
     private String contractorCode;
@@ -27,10 +27,10 @@ public class CMSWageCostDTO {
 	public void setWcTransId(Long wcTransId) {
 		this.wcTransId = wcTransId;
 	}
-	public Integer getUnitId() {
+	public String getUnitId() {
 		return unitId;
 	}
-	public void setUnitId(Integer unitId) {
+	public void setUnitId(String unitId) {
 		this.unitId = unitId;
 	}
 	public String getUnitCode() {
@@ -158,6 +158,14 @@ public class CMSWageCostDTO {
 	}
 	public void setActionId(String actionId) {
 		this.actionId = actionId;
+	}
+	
+	private String moduleId;
+	public String getModuleId() {
+		return moduleId;
+	}
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
 	}
 	
 }

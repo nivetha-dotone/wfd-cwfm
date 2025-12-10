@@ -50,6 +50,14 @@ public class ApproveRejectContRenewDto {
 			this.transactionId = transactionId;
 		}
 		
+		private String unitId;
+		public String getUnitId() {
+			return unitId;
+		}
+		public void setUnitId(String unitId) {
+			this.unitId = unitId;
+		}
+		
 	}
 
 

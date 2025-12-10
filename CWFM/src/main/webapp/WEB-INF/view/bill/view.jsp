@@ -402,8 +402,8 @@ label {
    <div class="action-buttons" >
  
             <% if (user != null && !"Contractor".equals(roleName)) { %>
-    			<button id="approveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBill('4')">Approve</button>
-   				 <button id="rejectButton"  style="display:none;"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBill('5')">Reject</button>
+    			<button id="approveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBill('4')">Approve</button>
+   				 <button id="rejectButton"    type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectBill('5')">Reject</button>
 			<% } %>
             <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/billVerification/listingFilter', 'Bill Verification List');">Cancel</button>
         </div> 
@@ -427,7 +427,9 @@ label {
 	<input type="text" value="${bvr.unitName}" style="height: 20px;width: 100%;" readonly />                           
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.unitCode"/></label></th>
-                <td><input type="text" id="unitCodeId" name="unitCode"  style="height: 20px;width: 100%;" value="${bvr.unitCode}"  readonly  /></td>
+                <td><input type="text" id="unitCodeId" name="unitCode"  style="height: 20px;width: 100%;" value="${bvr.unitCode}"  readonly  />
+                	<input type="hidden" id="unitId" name="unitId"  style="height: 20px;width: 100%;" value="${bvr.unitId}"  readonly  />
+                </td>
              </tr>
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>

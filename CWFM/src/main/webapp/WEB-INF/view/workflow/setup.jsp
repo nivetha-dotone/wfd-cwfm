@@ -289,11 +289,11 @@
   
     
     
-        <label for="masterName" style="color: darkcyan;">Business Type</label>
+       <!--  <label for="masterName" style="color: darkcyan;">Business Type</label>
          <select class="custom-select" id="businessType" name="businessTypeId" required style="color:gray;padding:3px;">
                                 <option value="">Please select Business Type</option>
 								
-                                </select>
+                                </select> -->
        
 
         <label for="masterValue" style="color: darkcyan;">Module:</label>

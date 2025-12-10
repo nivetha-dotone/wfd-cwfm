@@ -19,6 +19,7 @@ import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.ApproveRejectContRenewDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
+import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
@@ -227,11 +228,12 @@ public class ContractorDaoImpl implements ContractorDao{
 		int status=0;
 		String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
 		   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
-		   		+ "		    where cgt.GMTYPE='ACTION' and cgm.GMNAME like 'Contractor Renewal%'";
+		   		+ "		    where cgt.GMTYPE='MODULE' and cgm.GMNAME like 'Contractor Renewal%'";
 		   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 		   while(rs.next()) {
-			   contreg.setActionId(rs.getString("GMID"));
+			   contreg.setModuleId(rs.getString("GMID"));
 		   }
+		contreg.setActionId(GatePassType.CONTRACTORRENEWAL.getStatus());
 		Object[] parameters = new Object[] {
 			    contreg.getContractorregId(),
 			    contreg.getContractorId(),
@@ -270,7 +272,8 @@ public class ContractorDaoImpl implements ContractorDao{
 			    contreg.getEmail(),
 			    contreg.getMobile(),
 			    contreg.getActionId(),
-			    contreg.getPfDoc()
+			    contreg.getPfDoc(),
+			    contreg.getModuleId()
 			};
 
         try {
@@ -279,8 +282,8 @@ public class ContractorDaoImpl implements ContractorDao{
         		    "TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, " +
         		    "MAINCONTRACTOR, CONTTYPE, PERIODSTARTDATE, PERIODENDDATE, TYPE, STATUS, " +
         		    "CREATEDBY, AADHARNUM, AADHARDOCNAME, PANNUM, PANDOCNAME, PFAPPLYDT, GST, " +
-        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM,ACTIONID,PFDOCNAME) " +
-        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?,?)";
+        		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM,ACTIONID,PFDOCNAME,MODULEID) " +
+        		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?,?,?)";
 
            status  = jdbcTemplate.update(query, parameters);
            if (status > 0 && "Create".equalsIgnoreCase(contreg.getRequestType())) {
@@ -1048,27 +1051,75 @@ public List<ContractorRegistration> getContRenewListForApprovers(String roleId, 
 	SqlRowSet rs =null;
 	String query=null;
 	if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-		query="select CCR.CONTRACTORREGID,cpe.NAME,ccr.CODE,CCR.CONTRACTORNAME,CCR.STATUS,CCR.TYPE \r\n"
-				+ " FROM CMSContractorRegistration  CCR join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID\r\n"
-				+ " JOIN CMSAPPROVERHIERARCHY cah   ON  cah.ACTION_ID =CCR.ActionId \r\n"
-				+ " AND cah.[Index] = (SELECT COUNT(DISTINCT gas.ContRenewApprovalStatusId) + 1 \r\n"
-				+ " FROM CONTRENEWAPPROVALSTATUS gas JOIN CMSAPPROVERHIERARCHY cah1 ON gas.RoleId = cah1.ROLE_ID \r\n"
-				+ " WHERE gas.status = 4   AND gas.CONTRACTORREGID = CCR.CONTRACTORREGID  ) \r\n"
-				+ " LEFT JOIN CONTRENEWAPPROVALSTATUS gas  ON CCR.CONTRACTORREGID = gas.CONTRACTORREGID AND cah.ROLE_ID = gas.RoleId   \r\n"
-				+ " WHERE CCR.status = '3'    AND CCR.ContractorId =? AND CCR.UnitId = ? AND gas.CONTRACTORREGID IS NULL AND cah.ROLE_ID = ? and CCR.TYPE='renew'\r\n"
+		query="SELECT DISTINCT\r\n"
+				+ "    CCR.CONTRACTORREGID,\r\n"
+				+ "    cpe.NAME,\r\n"
+				+ "    ccr.CODE,\r\n"
+				+ "    CCR.CONTRACTORNAME,\r\n"
+				+ "    CCR.STATUS,\r\n"
+				+ "    CCR.TYPE\r\n"
+				+ "FROM CMSContractorRegistration CCR\r\n"
+				+ "JOIN CMSPRINCIPALEMPLOYER cpe \r\n"
+				+ "       ON cpe.UNITID = ccr.UNITID\r\n"
+				+ "JOIN CMSWORKFLOWTYPE cwt \r\n"
+				+ "       ON cwt.ModuleId = ccr.ModuleId \r\n"
+				+ "      AND cwt.UnitId = CCR.UnitId\r\n"
+				+ "JOIN CMSAPPROVERHIERARCHY cah   \r\n"
+				+ "       ON cah.WORKFLOWTYPEID = cwt.WorkflowTypeId\r\n"
+				+ "WHERE \r\n"
+				+ "    CCR.status = '3'\r\n"
+				+ "    AND CCR.ContractorId = ?\r\n"
+				+ "    AND CCR.UnitId = ?\r\n"
+				+ "    AND CCR.TYPE = 'renew'\r\n"
+				+ "    AND cah.ROLE_ID = ?\r\n"
+				+ "    AND cah.[Index] = (\r\n"
+				+ "            SELECT COUNT(DISTINCT gas.ContRenewApprovalStatusId) + 1\r\n"
+				+ "            FROM CONTRENEWAPPROVALSTATUS gas\r\n"
+				+ "            JOIN CMSAPPROVERHIERARCHY cah1 \r\n"
+				+ "                  ON gas.RoleId = cah1.ROLE_ID\r\n"
+				+ "            JOIN CMSWORKFLOWTYPE cwt1 \r\n"
+				+ "                  ON cwt1.WorkflowTypeId = cah1.WORKFLOWTYPEID\r\n"
+				+ "                 AND cwt1.UnitId = CCR.UnitId\r\n"
+				+ "            WHERE gas.status = 4\r\n"
+				+ "              AND gas.CONTRACTORREGID = CCR.CONTRACTORREGID\r\n"
+				+ "        )\r\n"
+				+ "    AND NOT EXISTS (\r\n"
+				+ "        SELECT 1 \r\n"
+				+ "        FROM CONTRENEWAPPROVALSTATUS gas2\r\n"
+				+ "        WHERE gas2.CONTRACTORREGID = CCR.CONTRACTORREGID\r\n"
+				+ "          AND gas2.RoleId = cah.ROLE_ID\r\n"
+				+ "    );\r\n"
 				+ "";
 		log.info("Query to getBVRListingForApprovers "+query);
 		
 		 rs = jdbcTemplate.queryForRowSet(query,deptId,principalEmployerId,roleId);
 	}else {
-		query="select CCR.CONTRACTORREGID,cpe.NAME,ccr.CODE,CCR.CONTRACTORNAME,CCR.STATUS,CCR.TYPE \r\n"
-				+ " FROM CMSContractorRegistration  CCR join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID\r\n"
-				+ " JOIN CMSAPPROVERHIERARCHY cah   ON  cah.ACTION_ID =CCR.ActionId \r\n"
-				+ " left join  CONTRENEWAPPROVALSTATUS gas ON gas.CONTRACTORREGID = CCR.CONTRACTORREGID AND gas.RoleId =? \r\n"
-				+ " where (cah.ROLE_ID=?) and gas.CONTRACTORREGID IS NULL and CCR.Status='3' \r\n"
-				+ " and CCR.ContractorId=? and CCR.UnitId=? and ccr.TYPE='renew'";
+		query="SELECT DISTINCT\r\n"
+				+ "    CCR.CONTRACTORREGID,\r\n"
+				+ "    cpe.NAME,\r\n"
+				+ "    ccr.CODE,\r\n"
+				+ "    CCR.CONTRACTORNAME,\r\n"
+				+ "    CCR.STATUS,\r\n"
+				+ "    CCR.TYPE\r\n"
+				+ "FROM CMSContractorRegistration CCR\r\n"
+				+ "JOIN CMSPRINCIPALEMPLOYER cpe \r\n"
+				+ "       ON cpe.UNITID = ccr.UNITID\r\n"
+				+ "JOIN CMSAPPROVERHIERARCHY cah\r\n"
+				+ "       ON cah.ACTION_ID = CCR.ActionId\r\n"
+				+ "WHERE\r\n"
+				+ "    cah.ROLE_ID = ?\r\n"
+				+ "    AND CCR.Status = '3'\r\n"
+				+ "    AND CCR.ContractorId = ?\r\n"
+				+ "    AND CCR.UnitId = ?\r\n"
+				+ "    AND CCR.TYPE = 'renew'\r\n"
+				+ "    AND NOT EXISTS (\r\n"
+				+ "        SELECT 1\r\n"
+				+ "        FROM CONTRENEWAPPROVALSTATUS gas\r\n"
+				+ "        WHERE gas.CONTRACTORREGID = CCR.CONTRACTORREGID\r\n"
+				+ "          AND gas.RoleId = ?\r\n"
+				+ "    );";
 		log.info("Query to getBVRListingForApprovers "+query);
-		 rs = jdbcTemplate.queryForRowSet(query,roleId,roleId,deptId,principalEmployerId);
+		 rs = jdbcTemplate.queryForRowSet(query,roleId,deptId,principalEmployerId,roleId);
 	}
 	
 	while(rs.next()) {
@@ -1137,8 +1188,7 @@ public int getWorkFlowTYpeByTransactionId(String transactionId) {
 	int workflowTypeId = 0;
 	String query ="select distinct cwt.WorkflowType from CMSContractorRegistration ccr \r\n"
 			+ " join CMSPRINCIPALEMPLOYER CPE on cpe.UNITID=ccr.UnitId\r\n"
-			+ " join CMSBUUnitMapping cbt on cbt.UnitID=cpe.UNITID \r\n"
-			+ " join CMSWORKFLOWTYPE cwt on cwt.BusinessTypeId = cbt.BUId \r\n"
+			+ " join CMSWORKFLOWTYPE cwt on cwt.UnitId = ccr.UnitId  \r\n"
 			+ " join CMSAPPROVERHIERARCHY cah on cah.WorkFlowTypeId=cwt.WorkFlowTypeId\r\n"
 			+ " WHERE ccr.CONTRACTORREGID=?  and cah.ACTION_NAME='Contractor Renewal'";
 	log.info("Query to getWorkFlowTYpe "+query);
@@ -1150,11 +1200,15 @@ public int getWorkFlowTYpeByTransactionId(String transactionId) {
 	return workflowTypeId;
 }
 @Override
-public boolean isLastApprover(String roleName) {
+public boolean isLastApprover(String roleName,String unitId) {
 	boolean status=false;
-	String query="select Role_Name FROM CMSAPPROVERHIERARCHY WHERE  [Index] = (SELECT MAX([Index]) \r\n"
-			+ " FROM CMSAPPROVERHIERARCHY  WHERE ACTION_NAME = 'Contractor Renewal') and ACTION_NAME='Contractor Renewal'";
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
+	String query="select Role_Name FROM CMSAPPROVERHIERARCHY cah \r\n"
+			+ "join CMSWORKFLOWTYPE cwt on cwt.WorkflowTypeId=cah.WORKFLOWTYPEID\r\n"
+			+ "WHERE  cah.[Index] = (SELECT MAX(cah1.[Index])\r\n"
+			+ "FROM CMSAPPROVERHIERARCHY cah1 join CMSWORKFLOWTYPE cwt1 on cwt1.WorkflowTypeId=cah1.WORKFLOWTYPEID\r\n"
+			+ "WHERE cah1.ACTION_NAME = 'Contractor Renewal'  AND cwt1.UnitId=?) \r\n"
+			+ "and cah.ACTION_NAME='Contractor Renewal' and cwt.UnitId=?";
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,unitId);
 	if(rs.next()){
 		if(roleName.equals(rs.getString("Role_Name")))
 			status = true;
@@ -1164,12 +1218,15 @@ public boolean isLastApprover(String roleName) {
 }
 
 @Override
-public boolean isLastApproverForParallel( String transactionId, String roleId) {
+public boolean isLastApproverForParallel( String transactionId, String roleId,String unitId) {
     boolean status = false;
 
-    String query = "WITH RequiredApprovers AS (SELECT ROLE_ID FROM CMSAPPROVERHIERARCHY WHERE ACTION_NAME = 'Contractor Renewal' \r\n"
-    		+ " AND [INDEX] != 0  ), ApprovedRoles AS (SELECT DISTINCT RoleId FROM CONTRENEWAPPROVALSTATUS \r\n"
-    		+ " WHERE CONTRACTORREGID = ? and ContTypeId=1 )  SELECT CASE WHEN (SELECT COUNT(*) FROM ApprovedRoles) = \r\n"
+    String query = "WITH RequiredApprovers AS (SELECT ROLE_ID FROM CMSAPPROVERHIERARCHY cah\r\n"
+    		+ "join CMSWORKFLOWTYPE cwt on cwt.WorkflowTypeId=cah.WORKFLOWTYPEID\r\n"
+    		+ "WHERE cah.ACTION_NAME = 'Contractor Renewal' and cwt.UnitId=?\r\n"
+    		+ "AND cah.[INDEX] != 0  ), ApprovedRoles AS (SELECT DISTINCT RoleId FROM CONTRENEWAPPROVALSTATUS\r\n"
+    		+ "WHERE CONTRACTORREGID = ? and ContTypeId=1 )  SELECT CASE WHEN (SELECT COUNT(*) \r\n"
+    		+ "FROM ApprovedRoles) = \r\n"
     		+ " (SELECT COUNT(*) FROM RequiredApprovers) AND\r\n"
     		+ " EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?) THEN 'YES' ELSE 'NO' END AS IsLastApprover";
 
@@ -1178,7 +1235,7 @@ public boolean isLastApproverForParallel( String transactionId, String roleId) {
        
         int approverRoleId = Integer.parseInt(roleId);
 
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, transactionId, approverRoleId);
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId, transactionId, approverRoleId);
         if (rs.next()) {
             String result = rs.getString("IsLastApprover");
             status = "YES".equals(result);

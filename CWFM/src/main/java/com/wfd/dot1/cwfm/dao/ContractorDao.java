@@ -98,9 +98,9 @@ public interface ContractorDao {
 
 	int getWorkFlowTYpeByTransactionId(String transactionId);
 
-	boolean isLastApprover(String roleName);
+	boolean isLastApprover(String roleName,String unitId);
 
-	boolean isLastApproverForParallel(String transactionId, String roleId);
+	boolean isLastApproverForParallel(String transactionId, String roleId,String unitId);
 	
 	 void insertWorkOrderLLWC(String contractorRegId, String contractorId, String unitId, String createdBy);
 

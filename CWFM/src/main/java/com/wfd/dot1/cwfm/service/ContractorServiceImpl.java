@@ -390,9 +390,9 @@ public class ContractorServiceImpl implements ContractorService{
 	        int workFlowTypeId = contrDao.getWorkFlowTYpeByTransactionId(dto.getTransactionId());
 
 	        if (workFlowTypeId == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-	            isLastApprover = contrDao.isLastApprover(dto.getApproverRole());
+	            isLastApprover = contrDao.isLastApprover(dto.getApproverRole(),dto.getUnitId());
 	        } else if (workFlowTypeId == WorkFlowType.PARALLEL.getWorkFlowTypeId()) {
-	            isLastApprover = contrDao.isLastApproverForParallel(dto.getTransactionId(), dto.getRoleId());
+	            isLastApprover = contrDao.isLastApproverForParallel(dto.getTransactionId(), dto.getRoleId(),dto.getUnitId());
 	        }
 
 	        // ✅ If last approver, update status and save renewal data into CMSCONTRPEMM

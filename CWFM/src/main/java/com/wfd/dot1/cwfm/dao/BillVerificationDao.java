@@ -56,9 +56,9 @@ public interface BillVerificationDao {
 
 	public int getWorkFlowTYpeByTransactionId(String transactionId);
 
-	boolean isLastApproverForParallel(String transactionId, String roleId);
+	boolean isLastApproverForParallel(String transactionId, String roleId,String unitId);
 
-	boolean isLastApprover(String roleName);
+	boolean isLastApprover(String roleName,String unitId);
 
 }
 

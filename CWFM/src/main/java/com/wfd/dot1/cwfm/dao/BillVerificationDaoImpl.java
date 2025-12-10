@@ -17,6 +17,7 @@ import com.wfd.dot1.cwfm.dto.ApproveRejectBillDto;
 import com.wfd.dot1.cwfm.dto.CMSWageCostDTO;
 import com.wfd.dot1.cwfm.dto.ChecklistItemDTO;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
+import com.wfd.dot1.cwfm.enums.GatePassType;
 import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.BillReportFile;
 import com.wfd.dot1.cwfm.pojo.BillStatusLogDto;
@@ -173,16 +174,17 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 		    
 		   String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
 		   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
-		   		+ "		    where cgt.GMTYPE='ACTION' and cgm.GMNAME like 'Bill%'";
+		   		+ "		    where cgt.GMTYPE='MODULE' and cgm.GMNAME like 'Bill%'";
 		   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 		   while(rs.next()) {
-		   dto.setActionId(rs.getString("GMID"));
+		   dto.setModuleId(rs.getString("GMID"));
 		   }
+		   dto.setActionId(GatePassType.BILLVERIFICATION.getStatus());
 		    String query = "INSERT INTO CMSWageCostWorkFlow " +
 		            "(WCTransID, Status, UnitId, UnitCode, UnitName, ContractorId, ContractorCode, ContractorName, " +
 		            "WorkOrderNumber, StartDate, EndDate, Services, CreatedBy, CreatedDate, UpdatedDate, " +
-		            "WOValidFrom, WOValidTo, BillType, UpdatedBy, Comments, PreComments, ActionPlan,ActionId) " +
-		            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?, ?, ?, ?,?)";
+		            "WOValidFrom, WOValidTo, BillType, UpdatedBy, Comments, PreComments, ActionPlan,ActionId,ModuleId) " +
+		            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?, ?, ?, ?,?,?)";
 
 		    // Formatter to parse dd-MM-yyyy format coming from JSP
 		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -210,7 +212,7 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 		            dto.getComments(),
 		            dto.getPreComments(),
 		            dto.getActionPlan(),
-		            dto.getActionId()
+		            dto.getActionId(),dto.getModuleId()
 		        };
 
 		        int result = jdbcTemplate.update(query, parameters);
@@ -257,14 +259,79 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 			SqlRowSet rs =null;
 			String query=null;
 			if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
-				query=this.getAllBVRForSquential();
+				//query=this.getAllBVRForSquential();
+				
+				query = "select wcw.WCTransID,wcw.UnitCode,wcw.ContractorCode,wcw.ContractorName,cwo.SAP_WORKORDER_NUM \r\n"
+						+ "as WorkOrderNumber ,cgm.GMNAME as Services,wcw.StartDate,wcw.EndDate,wcw.Status \r\n"
+						+ "from cmswagecostworkflow wcw \r\n"
+						+ "join CMSGENERALMASTER cgm on cgm.GMID =wcw.Services \r\n"
+						+ "join CMSWORKORDER cwo on cwo.WORKORDERID=wcw.WorkOrderNumber \r\n"
+						+ "JOIN CMSWORKFLOWTYPE cwt \r\n"
+						+ "       ON cwt.ModuleId = wcw.ModuleId \r\n"
+						+ "      AND cwt.UnitId = wcw.UnitId\r\n"
+						+ "JOIN CMSAPPROVERHIERARCHY cah   \r\n"
+						+ "       ON cah.WORKFLOWTYPEID = cwt.WorkflowTypeId\r\n"
+						+ "WHERE \r\n"
+						+ "    wcw.status = '3'\r\n"
+						+ "    AND wcw.ContractorId = ?\r\n"
+						+ "    AND wcw.UnitId = ?\r\n"
+						+ "    AND cah.ROLE_ID = ?\r\n"
+						+ "    AND cah.[Index] = (\r\n"
+						+ "            SELECT COUNT(DISTINCT gas.BILLApprovalStatusId) + 1\r\n"
+						+ "            FROM BILLAPPROVALSTATUS gas\r\n"
+						+ "            JOIN CMSAPPROVERHIERARCHY cah1 \r\n"
+						+ "                  ON gas.RoleId = cah1.ROLE_ID\r\n"
+						+ "            JOIN CMSWORKFLOWTYPE cwt1 \r\n"
+						+ "                  ON cwt1.WorkflowTypeId = cah1.WORKFLOWTYPEID\r\n"
+						+ "                 AND cwt1.UnitId = wcw.UnitId\r\n"
+						+ "            WHERE gas.status = 4\r\n"
+						+ "              AND gas.WCTransID = wcw.WCTransID\r\n"
+						+ "        )\r\n"
+						+ "    AND NOT EXISTS (\r\n"
+						+ "        SELECT 1 \r\n"
+						+ "        FROM BILLAPPROVALSTATUS gas2\r\n"
+						+ "        WHERE gas2.WCTransID = wcw.WCTransID\r\n"
+						+ "          AND gas2.RoleId = cah.ROLE_ID\r\n"
+						+ "    );\r\n"
+						+ "\r\n"
+						+ "\r\n"
+						+ "";
 				log.info("Query to getBVRListingForApprovers "+query);
 				
 				 rs = jdbcTemplate.queryForRowSet(query,deptId,principalEmployerId,roleId);
 			}else {
-				query=this.getAllBVRForParallel();
+				//query=this.getAllBVRForParallel();
+				query="SELECT DISTINCT \r\n"
+						+ "    wcw.WCTransID,\r\n"
+						+ "    wcw.UnitCode,\r\n"
+						+ "    wcw.ContractorCode,\r\n"
+						+ "    wcw.ContractorName,\r\n"
+						+ "    cwo.SAP_WORKORDER_NUM AS WorkOrderNumber,\r\n"
+						+ "    cgm.GMNAME AS Services,\r\n"
+						+ "    wcw.StartDate,\r\n"
+						+ "    wcw.EndDate,\r\n"
+						+ "    wcw.Status\r\n"
+						+ "FROM cmswagecostworkflow wcw\r\n"
+						+ "JOIN CMSGENERALMASTER cgm \r\n"
+						+ "       ON cgm.GMID = wcw.Services\r\n"
+						+ "JOIN CMSWORKORDER cwo \r\n"
+						+ "       ON cwo.WORKORDERID = wcw.WorkOrderNumber\r\n"
+						+ "JOIN CMSAPPROVERHIERARCHY cah\r\n"
+						+ "       ON cah.ACTION_ID = wcw.ActionId\r\n"
+						+ "WHERE \r\n"
+						+ "    cah.ROLE_ID = ?\r\n"
+						+ "    AND wcw.Status = '3'\r\n"
+						+ "    AND wcw.ContractorId = ?\r\n"
+						+ "    AND wcw.UnitId = ?\r\n"
+						+ "    AND NOT EXISTS (\r\n"
+						+ "        SELECT 1\r\n"
+						+ "        FROM BILLAPPROVALSTATUS gas\r\n"
+						+ "        WHERE gas.WCTransID = wcw.WCTransID\r\n"
+						+ "          AND gas.RoleId = ?\r\n"
+						+ "    );\r\n"
+						+ "";
 				log.info("Query to getBVRListingForApprovers "+query);
-				 rs = jdbcTemplate.queryForRowSet(query,roleId,roleId,deptId,principalEmployerId);
+				 rs = jdbcTemplate.queryForRowSet(query,roleId,deptId,principalEmployerId,roleId);
 			}
 			
 			while(rs.next()) {
@@ -355,7 +422,7 @@ public CMSWageCostDTO getIndividualBVRDetails(String transactionId) {
 		d.setStatus(rs.getInt("Status"));
 		d.setBillType(rs.getString("BillType"));
 		d.setActionPlan(rs.getString("ActionPlan"));
-		d.setComments(rs.getString("Comments"));
+		d.setComments(rs.getString("Comments"));d.setUnitId(rs.getString("UNITID"));
 	}
 	return d;
 	
@@ -484,10 +551,10 @@ public String getLastApproverQuery() {
 }
 
 @Override
-public boolean isLastApprover(String roleName) {
+public boolean isLastApprover(String roleName,String unitId) {
 	boolean status=false;
 	
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery());
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getLastApproverQuery(),unitId,unitId);
 	if(rs.next()){
 		if(roleName.equals(rs.getString("Role_Name")))
 			status = true;
@@ -497,7 +564,7 @@ public boolean isLastApprover(String roleName) {
 }
 
 @Override
-public boolean isLastApproverForParallel( String transactionId, String roleId) {
+public boolean isLastApproverForParallel( String transactionId, String roleId,String unitId) {
     boolean status = false;
 
     String query = getIsLastApproverForParallel();
@@ -507,7 +574,7 @@ public boolean isLastApproverForParallel( String transactionId, String roleId) {
        
         int approverRoleId = Integer.parseInt(roleId);
 
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, transactionId, approverRoleId);
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, unitId,transactionId, approverRoleId);
         if (rs.next()) {
             String result = rs.getString("IsLastApprover");
             status = "YES".equals(result);

@@ -297,4 +297,13 @@ public void setEsicRegNo(String esicRegNo) {
 	public void setUnitId(Long unitId) {
 		this.unitId = unitId;
 	}
+	
+	private String moduleId;
+
+	public String getModuleId() {
+		return moduleId;
+	}
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
+	}
 }

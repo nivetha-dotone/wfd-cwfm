@@ -608,6 +608,7 @@ function searchContRenewBasedOnPE() {
 												approverRole : $("#roleName").val().trim(),
 												roleId :$("#roleId").val().trim(),
 												type : '1',
+												unitId:$("#unitId").val().trim(),
 											};
 												  const xhr = new XMLHttpRequest();
 										xhr.open("POST", "/CWFM/renewal/approveRejectContRenew", true); // Replace with your actual controller URL

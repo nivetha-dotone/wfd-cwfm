@@ -115,6 +115,10 @@ public class WorkmenServiceImpl implements WorkmenService{
 	@Autowired
 	CreateEmpFetchByGatePassAPICALL api;
 
+	
+	public String getWFDIntegration() {
+		return QueryFileWatcher.getQuery("WFD_INTEGRATION");
+	}
 	@Override
 	public String saveGatePass(GatePassMain gatePassMain) {
 		String transactionId =null;
@@ -159,7 +163,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 		        if (!cmsDone) {
 		            throw new RuntimeException("CMS Person Insert failed unexpectedly.");
 		        }try {
-		        	api.addOnBoardingDetailsActual(dto.getTransactionId());}catch(Exception e) {return transactionId;}
+		        	String wfdIntegration = this.getWFDIntegration();
+		        	if("yes".equalsIgnoreCase(wfdIntegration)) {
+		        		api.addOnBoardingDetailsActual(dto.getTransactionId());
+		        	}
+		        	}catch(Exception e) {return transactionId;}
 
 				return transactionId;
 			}else {
@@ -314,7 +322,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 
 	    // Approve Flow
 	    boolean isLastApprover;
-	    int workFlowType = workmenDao.getWorkFlowTYpeByTransactionId(gpm.getTransactionId(), dto.getGatePassType());
+	    //int workFlowType = workmenDao.getWorkFlowTYpeByTransactionId(gpm.getTransactionId(), dto.getGatePassType());
+	    int workFlowType = workmenDao.getWorkFlowTYpeNew(gpm.getUnitId(), dto.getGatePassType());
 
 	    if (workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 	    	int workflowTypeId = workmenDao.getWorkFlowTypeId(gpm.getUnitId(), dto.getGatePassType());
@@ -367,7 +376,11 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        	throw new RuntimeException("Gatepassmain status update failed unexpectedly.");
 	        }else {
 	        	try {
-	        	api.addOnBoardingDetailsActual(dto.getTransactionId());}catch(Exception e) {return result;}
+	        	String wfdIntegration = this.getWFDIntegration();
+	        	if("yes".equalsIgnoreCase(wfdIntegration)) {
+	        		api.addOnBoardingDetailsActual(dto.getTransactionId());
+	        	}
+	        	}catch(Exception e) {return result;}
 	        }
 	        return result;
 	    }
@@ -390,7 +403,10 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        return result;
 	    } if (dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
 	    	try {
-	        	api.updateOnBoardingDetails(dto.getTransactionId());
+	        	String wfdIntegration = this.getWFDIntegration();
+	        	if("yes".equalsIgnoreCase(wfdIntegration)) {
+	        		api.updateOnBoardingDetails(dto.getTransactionId());
+	        	}
 	        	}catch(Exception e) {return result;}
 
 	    }
@@ -740,8 +756,12 @@ public class WorkmenServiceImpl implements WorkmenService{
 				dto.setUpdatedBy(gatePassMain.getUserId());
 				workmenDao.saveGatePassStatusLog(dto);
 				if (dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
-			    	try {
-			        	api.updateOnBoardingDetails(dto.getTransactionId());}catch(Exception e) {return transactionId;}
+					try {
+			        	String wfdIntegration = this.getWFDIntegration();
+			        	if("yes".equalsIgnoreCase(wfdIntegration)) {
+			        		api.updateOnBoardingDetails(dto.getTransactionId());
+			        	}
+			        	}catch(Exception e) {return transactionId;}
 
 			    }
 				return transactionId;

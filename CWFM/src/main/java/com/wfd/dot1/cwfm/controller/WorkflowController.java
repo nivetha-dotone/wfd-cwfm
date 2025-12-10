@@ -97,11 +97,11 @@ public class WorkflowController {
     @ResponseBody
     public WorkflowResponseDto getExistingWorkflow(
             @RequestParam("unitId") String unitId,
-            @RequestParam("businessType") String businessType,
+            //@RequestParam("businessType") String businessType,
             @RequestParam("moduleId") String moduleId,
             @RequestParam("actionName") String actionName) {
-
-        return workflowService.fetchWorkflow(unitId, businessType, moduleId,actionName);
+		//return workflowService.fetchWorkflow(unitId, businessType, moduleId,actionName);
+        return workflowService.fetchWorkflow(unitId, null,moduleId,actionName);
     }
 	
 	 @PostMapping("/saveWorkflow")
