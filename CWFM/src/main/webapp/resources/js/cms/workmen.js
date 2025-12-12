@@ -2006,10 +2006,10 @@ function redirectToWorkmenBlockView(mode) {
 		var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 														   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 														   if(mode === "add"){
-														   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
-														       alert("Lost or damange request already created.");
-														       return;
-														   }}
+														   if (gatePassType.toLowerCase() === "lost/damage" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
+                                                       alert("Lost/Damage request already created.");
+                                                      return;
+                                                   }}
 	    var xhr = new XMLHttpRequest();
 	    xhr.onreadystatechange = function() {
 	        if (xhr.readyState == 4 && xhr.status == 200) {
