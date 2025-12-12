@@ -89,7 +89,34 @@ public class ContractorDaoImpl implements ContractorDao{
 	 public String setuniqueregistrationid() {
 		    return QueryFileWatcher.getQuery("SET_UNIQUE_REGISTRATION_ID");
 		}
-	 
+	 public String getGMID() {
+		    return QueryFileWatcher.getQuery("GET_GMID_FOR_ACTIONID_IN_CONTRACTOR");
+		}
+	 public String saveRegistration() {
+		    return QueryFileWatcher.getQuery("SAVE_CONTRACTOR_REGISTRATION");
+		}
+	 public String saveContractorPemm() {
+		    return QueryFileWatcher.getQuery("SAVE_CONTRACTORPEMM");
+		} 
+	 public String getContractorRenewList() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTOR_RENEW_LIST");
+		}
+	 public String savePolicies() {
+		    return QueryFileWatcher.getQuery("SAVE_CONTRACTORREGPOLICY");
+		}	
+	 public String saveContractorWC() {
+		    return QueryFileWatcher.getQuery("SAVE_CONTRACTOR_WC");
+		}	
+	 public String getContractorRegistration() {
+		    return QueryFileWatcher.getQuery("GET_CONTRACTOR_REGISTRATION_DETAILS");
+		}
+	 public String getPoliciesByContractorRegId() {
+		    return QueryFileWatcher.getQuery("GET_POLICIES_BY_CONTRACTORREGID");
+		}
+	 public String getLLWCByContractorRegId() {
+		    return QueryFileWatcher.getQuery("GET_LLWC_BY_CONTRACTORREGID");
+		}
+
 	@Override
 	public Contractor getContractorById(String contractorId) {
 		String query=getContractorByIdQuery();
@@ -229,6 +256,8 @@ public class ContractorDaoImpl implements ContractorDao{
 		String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
 		   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
 		   		+ "		    where cgt.GMTYPE='MODULE' and cgm.GMNAME like 'Contractor Renewal%'";
+		//String sql = getGMID();
+		
 		   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 		   while(rs.next()) {
 			   contreg.setModuleId(rs.getString("GMID"));
@@ -284,6 +313,8 @@ public class ContractorDaoImpl implements ContractorDao{
         		    "CREATEDBY, AADHARNUM, AADHARDOCNAME, PANNUM, PANDOCNAME, PFAPPLYDT, GST, " +
         		    "ADDRESS, EMAILADDR, MOBILENO, DELETESW, CREATEDDTM,ACTIONID,PFDOCNAME,MODULEID) " +
         		    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', GETDATE(),?,?,?)";
+        	//String query = saveRegistration();
+        	
 
            status  = jdbcTemplate.update(query, parameters);
            if (status > 0 && "Create".equalsIgnoreCase(contreg.getRequestType())) {
@@ -300,7 +331,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	
 	
 	public void saveContractorPemm(ContractorRegistration contreg) {
-	    String sql = "INSERT INTO CMSCONTRPEMM(CONTRACTORID, UNITID, MANAGERNM, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, PERIODSTARTDT, PERIODENDDT,PFAPPLYDT) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = saveContractorPemm();
+	    //String sql = "INSERT INTO CMSCONTRPEMM(CONTRACTORID, UNITID, MANAGERNM, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PFNUM, RCVALIDATED, PERIODSTARTDT, PERIODENDDT,PFAPPLYDT) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	    try {
 	        jdbcTemplate.update(sql,
 	           
@@ -348,7 +380,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	@Override
 	public List<ContractorRegistration> getContractorRenewList(String userId) {
 	List<ContractorRegistration> peList= new ArrayList<ContractorRegistration>();
-	String query = "SELECT CONTRACTORREGID,UNITCODE,CODE,CONTRACTORNAME,STATUS,TYPE FROM CMSContractorRegistration where TYPE='Renew'";
+	String query = getContractorRenewList();
+	//String query = "SELECT CONTRACTORREGID,UNITCODE,CODE,CONTRACTORNAME,STATUS,TYPE FROM CMSContractorRegistration where TYPE='Renew'";
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 	while(rs.next()) {
 		ContractorRegistration pe = new ContractorRegistration();
@@ -705,12 +738,12 @@ public class ContractorDaoImpl implements ContractorDao{
 	public void savePolicies(List<ContractorRegistrationPolicy> policies, ContractorRegistration contreg) {
 	    try {
 	        String requestType = contreg.getRequestType() != null ? contreg.getRequestType().trim() : "";
-
+	        String sql=savePolicies();
 	        // 🔹 Common insert into CMSContractorRegPolicy
-	        String sql = "INSERT INTO CMSContractorRegPolicy (" +
-	                "CONTRACTORID, UNITID, WONUMBER, LICENCETYPE, WCCODE, NATUREOFID, " +
-	                "WCTOTAL, WCFROMDTM, WCTODTM, ATTACHMENTNAME, CREATEDDTM, CREATEDBY, CONTRACTORREGID, DELETESW) " +
-	                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), ?, ?, 0)";
+	        //String sql = "INSERT INTO CMSContractorRegPolicy (" +
+	       //         "CONTRACTORID, UNITID, WONUMBER, LICENCETYPE, WCCODE, NATUREOFID, " +
+	       //         "WCTOTAL, WCFROMDTM, WCTODTM, ATTACHMENTNAME, CREATEDDTM, CREATEDBY, CONTRACTORREGID, DELETESW) " +
+	       //         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), ?, ?, 0)";
 
 	        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 	            @Override
@@ -754,10 +787,11 @@ public class ContractorDaoImpl implements ContractorDao{
 
 
 	public void saveContractorWC(List<ContractorRegistrationPolicy> policies, ContractorRegistration contreg) {
-	    String sql = "INSERT INTO CMSCONTRACTOR_WC (" +
-	            "[CONTRACTORID],[UNITID],[LICENCE_TYPE],[WC_CODE],[WC_TOTAL]," +
-	            "[WC_FROM_DTM],[WC_TO_DTM],[ATTACHMENTNM],[CREATED_DTM],[DELETE_SW]) " +
-	            "VALUES (?,?,?,?,?,?,?,?,GETDATE(),0)";
+		 String sql=saveContractorWC();
+	     //String sql = "INSERT INTO CMSCONTRACTOR_WC (" +
+	     //       "[CONTRACTORID],[UNITID],[LICENCE_TYPE],[WC_CODE],[WC_TOTAL]," +
+	     //       "[WC_FROM_DTM],[WC_TO_DTM],[ATTACHMENTNM],[CREATED_DTM],[DELETE_SW]) " +
+	     //       "VALUES (?,?,?,?,?,?,?,?,GETDATE(),0)";
 
 	    for (ContractorRegistrationPolicy policy : policies) {
 	        jdbcTemplate.update(sql,
@@ -923,7 +957,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	
 	@Override
 	public ContractorRegistration getContractorRegistration(String contractorRegId) {
-	    String sql = "SELECT *,cpe.NAME FROM CMSContractorRegistration ccr join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID WHERE CONTRACTORREGID = ?";
+		String sql=getContractorRegistration();
+	    //String sql = "SELECT *,cpe.NAME FROM CMSContractorRegistration ccr join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=ccr.UNITID WHERE CONTRACTORREGID = ?";
 	    return jdbcTemplate.queryForObject(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
 	        ContractorRegistration cr = new ContractorRegistration();
 	        cr.setContractorregId(rs.getString("CONTRACTORREGID"));
@@ -961,7 +996,8 @@ public class ContractorDaoImpl implements ContractorDao{
 
 	@Override
 	public List<ContractorRegistrationPolicy> getPoliciesByContractorRegId(String contractorRegId) {
-	    String sql = "SELECT * FROM CMSContractorRegPolicy WHERE CONTRACTORREGID = ?";
+		String sql=getPoliciesByContractorRegId();
+	    //String sql = "SELECT * FROM CMSContractorRegPolicy WHERE CONTRACTORREGID = ?";
 	    return jdbcTemplate.query(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
 	        ContractorRegistrationPolicy policy = new ContractorRegistrationPolicy();
 	        policy.setWoNumber(rs.getString("WONUMBER"));
@@ -979,7 +1015,8 @@ public class ContractorDaoImpl implements ContractorDao{
 
 	@Override
 	public List<CMSContractorRegistrationLLWC> getLLWCByContractorRegId(String contractorRegId) {
-	    String sql = "SELECT * FROM CMSContractorRegistrationLLWC WHERE CONTRACTORREGID = ?";
+		String sql=getLLWCByContractorRegId();
+	  //  String sql = "SELECT * FROM CMSContractorRegistrationLLWC WHERE CONTRACTORREGID = ?";
 	    return jdbcTemplate.query(sql, new Object[]{contractorRegId}, (rs, rowNum) -> {
 	        CMSContractorRegistrationLLWC record = new CMSContractorRegistrationLLWC();
 	        record.setContractorRegId(rs.getLong("CONTRACTORREGID"));
@@ -1043,7 +1080,36 @@ workflowTypeId = rs.getInt("WorkflowType");
 log.info("Exiting from getWorkFlowTYpeNew dao method "+unitId);
 return workflowTypeId;
 }
-
+public String getContRenewListForSequentialApprovers() {
+    return QueryFileWatcher.getQuery("GET_CONTRACTOR_RENEWLIST_FOR_SEQUENTIAL_APPROVERS");
+}
+public String getContRenewListForParallelApprovers() {
+    return QueryFileWatcher.getQuery("GET_CONTRACTOR_RENEWLIST_FOR_PARALLEL_APPROVERS");
+}
+public String approveRejectContRenew() {
+    return QueryFileWatcher.getQuery("APPROVE_REJECT_CONTRACTOR_RENEW");
+}
+public String updateContStatusByTransactionId() {
+    return QueryFileWatcher.getQuery("UPDATE_CONTRACTOR_STATUS_BY_TRANSACTIONID");
+}
+public String getWorkFlowTypeByTransactionIdforContReg() {
+    return QueryFileWatcher.getQuery("GET_WORKFLOWTYPE_BY_TRANSACTIONID_FOR_CONTREG");
+}
+public String isLastApprover() {
+    return QueryFileWatcher.getQuery("IS_LASTAPPROVER_FOR_CONTRACTOR_RENEWAL");
+}
+public String isLastApproverforParallel() {
+    return QueryFileWatcher.getQuery("IS_LASTAPPROVER_FOR_PARALLEL_CONTRACTOR_RENEWAL");
+}
+public String getWorkorderNumber() {
+    return QueryFileWatcher.getQuery("GET_WORKORDER_NUMBER_BY_CONTREGID");
+}
+public String insertWorkOrderLLWC() {
+    return QueryFileWatcher.getQuery("INSERT_WORKORDER_LLWC");
+}
+public String getContractorPreviousDocuments() {
+    return QueryFileWatcher.getQuery("GET_CONTRACTOR_PREVIOUS_DOCUMENTS");
+}
 @Override
 public List<ContractorRegistration> getContRenewListForApprovers(String roleId, int workFlowType, String deptId,
 		String principalEmployerId) {
@@ -1091,6 +1157,8 @@ public List<ContractorRegistration> getContRenewListForApprovers(String roleId, 
 				+ "    );\r\n"
 				+ "";
 		log.info("Query to getBVRListingForApprovers "+query);
+		//String query = getContRenewListForSequentialApprovers();
+		
 		
 		 rs = jdbcTemplate.queryForRowSet(query,deptId,principalEmployerId,roleId);
 	}else {
@@ -1120,6 +1188,8 @@ public List<ContractorRegistration> getContRenewListForApprovers(String roleId, 
 				+ "    );";
 		log.info("Query to getBVRListingForApprovers "+query);
 		 rs = jdbcTemplate.queryForRowSet(query,roleId,deptId,principalEmployerId,roleId);
+		//String query1 = getContRenewListForParallelApprovers();
+		
 	}
 	
 	while(rs.next()) {
@@ -1154,8 +1224,9 @@ public String approveRejectContRenew(ApproveRejectContRenewDto dto) {
 		        Object[] parameters = new Object[] {dto.getTransactionId(),dto.getApproverId(),dto.getApproverRole(),Integer.parseInt(dto.getStatus()),dto.getComments(),1,dto.getRoleId()}; 
 
 		        try {
-		        	String query = "INSERT INTO CONTRENEWAPPROVALSTATUS(ContractorRegId,UserId,UserRole,Status,Comments,ContTypeId,RoleId,LastUpdatedDate)\r\n"
-		        			+ " VALUES (?,?,?,?,?,?,?,GETDATE())";
+		        	String query = approveRejectContRenew();
+		        	//String query = "INSERT INTO CONTRENEWAPPROVALSTATUS(ContractorRegId,UserId,UserRole,Status,Comments,ContTypeId,RoleId,LastUpdatedDate)\r\n"
+		        	//		+ " VALUES (?,?,?,?,?,?,?,GETDATE())";
 		            int status = jdbcTemplate.update(query, parameters);
 		            if (status > 0) {
 		                result="Contractor Renewal approved/rejected successfully";
@@ -1175,7 +1246,8 @@ public String approveRejectContRenew(ApproveRejectContRenewDto dto) {
 public synchronized boolean updateContStatusByTransactionId(String transactionId, String status) {
 	boolean res=false;
 	Object[] object=new Object[]{status,transactionId};
-	String query= "update CMSContractorRegistration set STATUS=? where CONTRACTORREGID=?";
+	String query = updateContStatusByTransactionId();
+	//String query= "update CMSContractorRegistration set STATUS=? where CONTRACTORREGID=?";
 	int i = jdbcTemplate.update(query,object);
 	if(i>0){
 		res=true;
@@ -1191,6 +1263,8 @@ public int getWorkFlowTYpeByTransactionId(String transactionId) {
 			+ " join CMSWORKFLOWTYPE cwt on cwt.UnitId = ccr.UnitId  \r\n"
 			+ " join CMSAPPROVERHIERARCHY cah on cah.WorkFlowTypeId=cwt.WorkFlowTypeId\r\n"
 			+ " WHERE ccr.CONTRACTORREGID=?  and cah.ACTION_NAME='Contractor Renewal'";
+	//String query = getWorkFlowTypeByTransactionIdforContReg();
+	
 	log.info("Query to getWorkFlowTYpe "+query);
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
 	if(rs.next()) {
@@ -1209,6 +1283,8 @@ public boolean isLastApprover(String roleName,String unitId) {
 			+ "WHERE cah1.ACTION_NAME = 'Contractor Renewal'  AND cwt1.UnitId=?) \r\n"
 			+ "and cah.ACTION_NAME='Contractor Renewal' and cwt.UnitId=?";
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,unitId);
+	//String query = isLastApprover();
+	
 	if(rs.next()){
 		if(roleName.equals(rs.getString("Role_Name")))
 			status = true;
@@ -1229,6 +1305,8 @@ public boolean isLastApproverForParallel( String transactionId, String roleId,St
     		+ "FROM ApprovedRoles) = \r\n"
     		+ " (SELECT COUNT(*) FROM RequiredApprovers) AND\r\n"
     		+ " EXISTS (SELECT 1 FROM ApprovedRoles WHERE RoleId = ?) THEN 'YES' ELSE 'NO' END AS IsLastApprover";
+   // String query = isLastApproverforParallel();
+   
 
     try {
         // Ensure proper data type conversion
@@ -1253,7 +1331,8 @@ public boolean isLastApproverForParallel( String transactionId, String roleId,St
 public void insertWorkOrderLLWC(String contractorRegId, String contractorId, String unitId, String createdBy) {
     try {
         // Step 1: Fetch all LLWC records for this contractorRegId
-        String fetchSql = "SELECT WONUMBER, WCCODE, LICENCETYPE FROM CMSCONTRACTORREGISTRATIONLLWC WHERE CONTRACTORREGID = ?";
+    	String fetchSql = getWorkorderNumber();
+        //String fetchSql = "SELECT WONUMBER, WCCODE, LICENCETYPE FROM CMSCONTRACTORREGISTRATIONLLWC WHERE CONTRACTORREGID = ?";
         List<Map<String, Object>> records = jdbcTemplate.queryForList(fetchSql, contractorRegId);
 
         if (records == null || records.isEmpty()) {
@@ -1262,8 +1341,8 @@ public void insertWorkOrderLLWC(String contractorRegId, String contractorId, Str
         }
 
         // Step 2: Prepare insert SQL for CMSWORKORDER_LLWC
-        String insertSql = "INSERT INTO CMSWORKORDER_LLWC (WONUMBER, LICENSE_NUMBER, LICENSE_TYPE) VALUES (?, ?, ?)";
-
+        //String insertSql = "INSERT INTO CMSWORKORDER_LLWC (WONUMBER, LICENSE_NUMBER, LICENSE_TYPE) VALUES (?, ?, ?)";
+        String insertSql = insertWorkOrderLLWC();
         // Step 3: Loop through records and insert one by one
         for (Map<String, Object> record : records) {
             try {
@@ -1287,9 +1366,10 @@ public void insertWorkOrderLLWC(String contractorRegId, String contractorId, Str
 }
 @Override
 public Map<String, String> getContractorPreviousDocuments(String contractorRegId, String requestType) {
-    String sql = "select ccr.AADHARDOCNAME,ccr.PANDOCNAME,ccr.PFDOCNAME,ccrp.ATTACHMENTNAME from CMSContractorRegistration ccr\r\n"
-    		+ "join CMSContractorRegPolicy ccrp on ccrp.CONTRACTORREGID=ccr.CONTRACTORREGID\r\n"
-    		+ "where ccr.CONTRACTORREGID=? and ccr.TYPE=?";
+	String sql = getContractorPreviousDocuments();
+	//String sql = "select ccr.AADHARDOCNAME,ccr.PANDOCNAME,ccr.PFDOCNAME,ccrp.ATTACHMENTNAME from CMSContractorRegistration ccr\r\n"
+    //		+ "join CMSContractorRegPolicy ccrp on ccrp.CONTRACTORREGID=ccr.CONTRACTORREGID\r\n"
+    //		+ "where ccr.CONTRACTORREGID=? and ccr.TYPE=?";
 
     return jdbcTemplate.query(sql, rs -> {
         Map<String, String> map = new LinkedHashMap<>();

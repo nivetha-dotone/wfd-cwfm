@@ -22,6 +22,9 @@ public class DotTypeDaoImpl implements DotTypeDao {
 	public String insertWorkflowType() {
 	    return QueryFileWatcher.getQuery("INSERT_WORKFLOWTYPE");
 	}
+	public String getSelectedDotType() {
+	    return QueryFileWatcher.getQuery("GET_SELECTED_DOT_TYPE");
+	}
 	 @Override
 	    public Long findBuidByUnitId(Long unitId) {
 		 String query = findBuidByUnitId();
@@ -41,10 +44,11 @@ public class DotTypeDaoImpl implements DotTypeDao {
 	    }
 	    @Override
 	    public Integer  getSelectedDotType(Long principalEmployerId, Long businessTypeId) {
-	        String sql = "select top 1 gwt.WorkflowType\r\n"
-	        		+ " from GATEPASSWORKFLOWTYPE gwt\r\n"
-	        		+ " join CMSBUUnitMapping cbu on cbu.BUId=gwt.BusinessTypeId \r\n"
-	        		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=cbu.UnitID where cbu.BUId=? and cbu.UnitID=? ORDER BY gwt.WorkflowTypeId DESC;";
+	    	String sql = getSelectedDotType();
+	        //String sql = "select top 1 gwt.WorkflowType\r\n"
+	        //		+ " from GATEPASSWORKFLOWTYPE gwt\r\n"
+	        //		+ " join CMSBUUnitMapping cbu on cbu.BUId=gwt.BusinessTypeId \r\n"
+	        //		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=cbu.UnitID where cbu.BUId=? and cbu.UnitID=? ORDER BY gwt.WorkflowTypeId DESC;";
 
 	        List<Integer> results = jdbcTemplate.query(sql, new Object[]{businessTypeId, principalEmployerId},
 	                (rs, rowNum) -> rs.getInt("WorkflowType"));

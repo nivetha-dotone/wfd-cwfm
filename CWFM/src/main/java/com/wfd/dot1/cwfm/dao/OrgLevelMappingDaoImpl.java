@@ -116,6 +116,9 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
     public String getExistingMappings() {
 	    return QueryFileWatcher.getQuery("GET_EXIST_MAPPINGS");
     }
+    public String getUserWithShortName() {
+	    return QueryFileWatcher.getQuery("GET_USER_WITH_SHORTNAME");
+    }
     
     @Override
     public List<OrgLevelMapping> findAll() {
@@ -425,8 +428,8 @@ public class OrgLevelMappingDaoImpl implements OrgLevelMappingDao {
 		    }
 			@Override
 			public List<OrgLevelMapping> getUserWithShortName(String shortName) {
-				 String query = "select ORGACCTSETID,SHORTNM,LONGDSC from ORGACCTSET where SHORTNM=?";
-
+				// String query = "select ORGACCTSETID,SHORTNM,LONGDSC from ORGACCTSET where SHORTNM=?";
+				 String query = getUserWithShortName();
 				    return jdbcTemplate.query(query, (rs, rowNum) -> {
 				    	OrgLevelMapping user = new OrgLevelMapping();
 				    	 user.setOrgAcctSetId(rs.getLong("ORGACCTSETID"));

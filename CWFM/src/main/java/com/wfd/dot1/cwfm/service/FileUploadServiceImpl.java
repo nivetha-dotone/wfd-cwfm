@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,28 +21,32 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.dao.DepartmentMappingDao;
 import com.wfd.dot1.cwfm.dao.FileUploadDao;
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
+import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.DeptMapping;
+import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
-
+	
+	private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
     @Autowired
     private FileUploadDao fileUploadDao;
 
@@ -253,16 +258,22 @@ public class FileUploadServiceImpl implements FileUploadService {
         result.put("errorData", errorData);
         return result;
     }
-
+    
+    @Transactional
     private Map<String, Object> processDepartmentSubDepartmentUnitMapping(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
-
+        
+        List<DeptMapping> deptList = new ArrayList<>();
+        List<DeptMapping> areaList = new ArrayList<>();
+        
+        Set<String> uniqueDepartments = new HashSet<>();
+        Set<String> uniqueAreas = new HashSet<>();
         String line;
         int rowNum = 0;
 
         String[] fieldNames = {"principalEmployer", "department", "subDepartment"};
-        Set<String> mandatoryFields = Set.of("principalEmployer", "department");
+        Set<String> mandatoryFields = Set.of("principalEmployer", "department","subDepartment");
 
         while ((line = reader.readLine()) != null) {
             rowNum++;
@@ -297,7 +308,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             try {
                 String principalEmployer = fields[0];
                 String department = fields[1];
-                String subDepartment = (fields.length > 2 && !fields[2].isBlank()) ? fields[2] : null;
+                String subDepartment = fields[2];
 
                 // Get unitId from plant code
                 Integer unitId = fileUploadDao.getUnitIdByName(principalEmployer);
@@ -329,16 +340,30 @@ public class FileUploadServiceImpl implements FileUploadService {
                 }
 
              // ✅ Additional check: Only PlantCode + Department (ignore subDepartment)
-                boolean deptOnlyExists = deptMapDao.existsMapping(unitId, departmentId);
-                if (deptOnlyExists && subDepartment == null) {
-                    errorData.add(Map.of("row", rowNum, "error",
-                            "Mapping already exists for PlantCode '" + principalEmployer + "' and Department '" + department + "' (without SubDepartment)"));
-                    continue;
-                }
+               // boolean deptOnlyExists = deptMapDao.existsMapping(unitId, departmentId);
+               // if (deptOnlyExists && subDepartment == null) {
+               //     errorData.add(Map.of("row", rowNum, "error",
+               //             "Mapping already exists for PlantCode '" + principalEmployer + "' and Department '" + department + "' (without SubDepartment)"));
+                //    continue;
+               // }
                 
                 // Insert mapping
                 fileUploadDao.insertUnitDepartmentSubDepartmentMapping(unitId, departmentId, subDepartmentId);
+                
+				
+                // Collect Unique Department
+                if (uniqueDepartments.add(department.toLowerCase())) {
+                    DeptMapping d = new DeptMapping();
+                    d.setDepartment(department);
+                    deptList.add(d);
+                }
 
+                // Collect Unique Area
+                if (subDepartment != null && uniqueAreas.add(subDepartment.toLowerCase())) {
+                    DeptMapping a = new DeptMapping();
+                    a.setSubDepartment(subDepartment);
+                    areaList.add(a);
+                }
                 // ✅ Add success record (like PrincipalEmployer)
                 Map<String, Object> success = new LinkedHashMap<>();
                 success.put("row", rowNum);
@@ -353,8 +378,12 @@ public class FileUploadServiceImpl implements FileUploadService {
                 errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
                 e.printStackTrace();
             }
+           // batchInsertDeptOrgLevelEntry(deptList, "Department");
+           // batchInsertDeptOrgLevelEntry(areaList, "Area");
         }
-
+        batchInsertDeptOrgLevelEntry(deptList, "Department");
+        batchInsertDeptOrgLevelEntry(areaList, "Area");
+        
         Map<String, Object> result = new HashMap<>();
         result.put("successData", successData);
         result.put("errorData", errorData);
@@ -474,14 +503,14 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         return savedData;
     }
-
+    @Transactional
     private Map<String, Object> processPrincipalEmployer(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
 
         String line;
         int rowNum = 0;
-
+        List<PrincipalEmployer> peListForOrgEntry = new ArrayList<>();
         String[] fieldNames = {
             "organization", "code", "name", "address", "managerName",
             "managerAddrs", "businessType", "maxWorkmen", "maxCntrWorkmen",
@@ -559,7 +588,8 @@ public class FileUploadServiceImpl implements FileUploadService {
 
                 // Save to CMSPrincipalEmployerState with unitId and stateId
                 fileUploadDao.savePEState(unitId, stateId);
-
+                peListForOrgEntry.add(p);
+                
                 // Prepare and add to success list
                 Map<String, Object> success = new LinkedHashMap<>();
                 success.put("organization", p.getOrganization());
@@ -584,7 +614,12 @@ public class FileUploadServiceImpl implements FileUploadService {
             } catch (Exception e) {
                 errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
             }
+			/*
+			 * if (fields == null || fields.length == 0) { return null; } else {
+			 * InsertPEOrgLevelEntry(peListForOrgEntry); }
+			 */
         }
+        this.InsertPEOrgLevelEntry(peListForOrgEntry);
 
         Map<String, Object> result = new HashMap<>();
         result.put("successData", successData);
@@ -594,12 +629,13 @@ public class FileUploadServiceImpl implements FileUploadService {
 
 
 
-   
+    @Transactional
     private Map<String, Object> processContractor(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
         String line;
         int rowNum = 0;
+        List<Contractor> ContListForOrgEntry = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String[] fieldNames = {
@@ -738,7 +774,9 @@ public class FileUploadServiceImpl implements FileUploadService {
                 wc.setWcToDtm(fields[19]);
                 wc.setWcTotal(Integer.parseInt(fields[20]));
                 fileUploadDao.savewc(wc);
-
+                
+                 ContListForOrgEntry.add(contractor);
+                
                 Map<String, Object> map = new HashMap<>();
                 map.put("contractorName", contractor.getContractorName());
                 map.put("contractorAddress", contractor.getContractorAddress());
@@ -777,8 +815,14 @@ public class FileUploadServiceImpl implements FileUploadService {
             } catch (Exception e) {
                 errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
             }
+			/*
+			 * if (fields == null || fields.length == 0) { return null; } else {
+			 * InsertContractorOrgLevelEntry(ContListForOrgEntry); }
+			 */
         }
-
+        
+        this.InsertContractorOrgLevelEntry(ContListForOrgEntry);
+        
         Map<String, Object> result = new HashMap<>();
         result.put("successData", successData);
         result.put("errorData", errorData);
@@ -786,14 +830,14 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
 
-    
+    @Transactional
     private Map<String, Object> processWorkorder(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
 
         String line;
         int rowNum = 0;
-
+        List<KTCWorkorderStaging> KTCWorkorderStaging = new ArrayList<>();
         String[] fieldNames = {
             "workOrderNumber", "item", "line", "lineNumber", "serviceCode", "shortText", "deliveryCompletion",
             "itemChangedON", "vendorCode", "vendorName", "vendorAddress", "blockedVendor",
@@ -891,6 +935,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
                 fileUploadDao.saveWorkorderToStaging(staging);
 
+                KTCWorkorderStaging.add(staging);
                 Map<String, Object> rowMap = new LinkedHashMap<>();
                 for (int i = 0; i < fieldNames.length; i++) {
                     rowMap.put(fieldNames[i], fields[i]);
@@ -910,8 +955,12 @@ public class FileUploadServiceImpl implements FileUploadService {
                // ));
             	 errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
             }
+			/*
+			 * if (fields == null || fields.length == 0) { return null; } else {
+			 * InsertWorkorderOrgLevelEntry(KTCWorkorderStaging); }
+			 */
         }
-
+    	InsertWorkorderOrgLevelEntry(KTCWorkorderStaging);
         try {
             fileUploadDao.callWorkorderProcessingSP();
         } catch (Exception e) {
@@ -1392,6 +1441,137 @@ public class FileUploadServiceImpl implements FileUploadService {
         return fileUploadDao.getCSVHeaders(templateType);
     }
 
-	
+	@Transactional
+	public boolean InsertPEOrgLevelEntry(List<PrincipalEmployer> list) {
+
+		 if (list == null || list.isEmpty()) {
+		        return true; // nothing to insert
+		    }
+		 
+	    try {
+	        long orgLevelDefId = fileUploadDao.getOrgLevelDefId("principal employer");
+
+	        if (!logAndCheck("ORGLEVELDEF", orgLevelDefId > 0)) {
+	            return false;
+	        }
+
+	        boolean saved = fileUploadDao.SavePEOrglevelEntry(list, orgLevelDefId);
+
+	        if (!logAndCheck("ORGLEVELENTRY", saved)) {
+	            return false;
+	        }
+
+	        return true;
+
+	    } catch (Exception e) {
+	        log.error("ORGLEVELENTRY Batch Insert FAILED : " + e.getMessage(), e);
+	        return false;
+	    }
+	}
+	@Transactional
+	public boolean InsertContractorOrgLevelEntry(List<Contractor> list) {
+
+		 if (list == null || list.isEmpty()) {
+		        return true; // nothing to insert
+		    }
+		 
+	    try {
+	        long orgLevelDefId = fileUploadDao.getOrgLevelDefId("contractor");
+
+	        if (!logAndCheck("ORGLEVELDEF", orgLevelDefId > 0)) {
+	            return false;
+	        }
+
+	        boolean saved = fileUploadDao.SaveContOrglevelEntry(list, orgLevelDefId);
+
+	        if (!logAndCheck("ORGLEVELENTRY", saved)) {
+	            return false;
+	        }
+
+	        return true;
+
+	    } catch (Exception e) {
+	        log.error("ORGLEVELENTRY Batch Insert FAILED : " + e.getMessage(), e);
+	        return false;
+	    }
+	}
+	@Transactional
+	public boolean InsertWorkorderOrgLevelEntry(List<KTCWorkorderStaging> list) {
+
+		 if (list == null || list.isEmpty()) {
+		        return true; // nothing to insert
+		    }
+		 
+	    try {
+	        long orgLevelDefId = fileUploadDao.getOrgLevelDefId("work order");
+
+	        if (!logAndCheck("ORGLEVELDEF", orgLevelDefId > 0)) {
+	            return false;
+	        }
+
+	        boolean saved = fileUploadDao.SaveWorkorderOrglevelEntry(list, orgLevelDefId);
+
+	        if (!logAndCheck("ORGLEVELENTRY", saved)) {
+	            return false;
+	        }
+
+	        return true;
+
+	    } catch (Exception e) {
+	        log.error("ORGLEVELENTRY Batch Insert FAILED : " + e.getMessage(), e);
+	        return false;
+	    }
+	}
+
+	@Transactional
+	public boolean batchInsertDeptOrgLevelEntry(List<DeptMapping> list, String type) {
+
+	    if (list == null || list.isEmpty()) return true;
+
+	    try {
+	        String orgType = type.equalsIgnoreCase("Department") ? "Department" : "Area";
+	        long orgLevelDefId = fileUploadDao.getOrgLevelDefId(orgType);
+
+	        List<DeptMapping> finalList = new ArrayList<>();
+
+	        for (DeptMapping dm : list) {
+
+	            String name = orgType.equals("Department")
+	                    ? dm.getDepartment()
+	                    : dm.getSubDepartment();
+
+	            if (name == null || name.isBlank()) continue;
+
+	            boolean exists = fileUploadDao.existsInOrgLevelEntry(name, orgLevelDefId);
+
+	            if (!exists) {
+	                finalList.add(dm);   // add only unique & not existing in DB
+	            }
+	        }
+
+	        if (finalList.isEmpty()) {
+	            return true;
+	        }
+
+	        if (orgType.equals("Department")) {
+	            return fileUploadDao.saveDeptOrgLevelEntry(finalList, orgLevelDefId);
+	        } else {
+	            return fileUploadDao.saveAreaOrgLevelEntry(finalList, orgLevelDefId);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
+
+
+
+
+	private boolean logAndCheck(String label, boolean success) {
+	    log.info(label + " : " + (success ? "SUCCESS" : "FAILED"));
+	    return success;
+	}
    }
 

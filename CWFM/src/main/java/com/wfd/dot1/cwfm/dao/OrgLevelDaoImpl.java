@@ -112,6 +112,21 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
  public String dependencyOrglevelUpdatesSql() {
 	    return QueryFileWatcher.getQuery("DEPENDENCY_ORGLEVEL_UPDATE_SQL");
 	}
+ public String getOrgLevelById() {
+	    return QueryFileWatcher.getQuery("GET_ORGLEVEL_BY_ORGDEFID");
+	}
+ public String getAllPrincipalEmployers() {
+	    return QueryFileWatcher.getQuery("GET_ALL_PRINCIPALEMPLOYER");
+	}
+ public String getAllContractors() {
+	    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTORS_FOR ORGLEVEL");
+	}
+ public String getGeneralMasters() {
+	    return QueryFileWatcher.getQuery("GET_GENERALMASTERS_FOR_ORGLEVEL");
+	}
+ public String getAllWorkorders() {
+	    return QueryFileWatcher.getQuery("GET_ALL_WORKORDERS_FOR ORGLEVEL");
+	}
  
     @Override
     public void saveOrgLevel(OrgLevelDefDTO orgLevel) {
@@ -376,7 +391,8 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 			
 			@Override
 			public OrgLevelDefDTO getOrgLevelById(Integer orgLevelDefId) {
-			    String sql = "SELECT ORGLEVELDEFID, NAME FROM ORGLEVELDEF WHERE ORGLEVELDEFID = ?";
+				String sql=getOrgLevelById();
+			   // String sql = "SELECT ORGLEVELDEFID, NAME FROM ORGLEVELDEF WHERE ORGLEVELDEFID = ?";
 			    try {
 			        return jdbcTemplate.queryForObject(
 			            sql,
@@ -396,7 +412,8 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 			@Override
 			public List<PrincipalEmployer> getPrincipalEmployers() {
 				List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
-			    String sql = "SELECT CODE, NAME FROM CMSPRINCIPALEMPLOYER ";
+				String sql=getAllPrincipalEmployers();
+			   // String sql = "SELECT CODE, NAME FROM CMSPRINCIPALEMPLOYER ";
 			    SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 			    while(rs.next()) {
 			        PrincipalEmployer pe = new PrincipalEmployer();
@@ -410,7 +427,8 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 			
 			@Override
 			public List<Contractor> getContractors() {
-			    String sql = "SELECT CODE, NAME FROM CMSCONTRACTOR";
+				String sql=getAllContractors();
+			    //String sql = "SELECT CODE, NAME FROM CMSCONTRACTOR";
 			    return jdbcTemplate.query(sql, (rs, rowNum) -> {
 			        Contractor c = new Contractor();
 			        c.setVendorCode(rs.getString("CODE"));
@@ -420,16 +438,17 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 			}
 			@Override
 			public List<CmsGeneralMaster> getGeneralMasters(String type) {
-			    String sql = "SELECT cmsgm.GMNAME, cmsgm.GMDESCRIPTION \r\n"
-			    		+ "FROM CMSGENERALMASTER cmsgm \r\n"
-			    		+ "JOIN CMSGMTYPE cmsgt ON cmsgt.GMTYPEID = cmsgm.GMTYPEID \r\n"
-			    		+ "WHERE \r\n"
-			    		+ "    cmsgm.ISACTIVE = 1 AND\r\n"
-			    		+ "    (\r\n"
-			    		+ "        (? = 'area' AND cmsgt.GMTYPE = 'area') \r\n"
-			    		+ "        OR \r\n"
-			    		+ "        (? = 'dept' AND cmsgt.GMTYPE LIKE 'Dep%')\r\n"
-			    		+ "    );\r\n";
+				String sql=getGeneralMasters();
+			  //  String sql = "SELECT cmsgm.GMNAME, cmsgm.GMDESCRIPTION \r\n"
+			   // 		+ "FROM CMSGENERALMASTER cmsgm \r\n"
+			   // 		+ "JOIN CMSGMTYPE cmsgt ON cmsgt.GMTYPEID = cmsgm.GMTYPEID \r\n"
+			   // 		+ "WHERE \r\n"
+			  //  		+ "    cmsgm.ISACTIVE = 1 AND\r\n"
+			  //  		+ "    (\r\n"
+			  //  		+ "        (? = 'area' AND cmsgt.GMTYPE = 'area') \r\n"
+			  //  		+ "        OR \r\n"
+			  //  		+ "        (? = 'dept' AND cmsgt.GMTYPE LIKE 'Dep%')\r\n"
+			 //   		+ "    );\r\n";
 			    		
 			    return jdbcTemplate.query(sql, new Object[]{type, type}, (rs, rowNum) -> {
 			        CmsGeneralMaster gm = new CmsGeneralMaster();
@@ -440,7 +459,8 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 			}
 			@Override
 			public List<Workorder> getWorkorders() {
-			    String sql = "select SAP_WORKORDER_NUM,NAME from CMSWORKORDER where VALIDDT>GETDATE()";
+				String sql=getAllWorkorders();
+			   // String sql = "select SAP_WORKORDER_NUM,NAME from CMSWORKORDER where VALIDDT>GETDATE()";
 			    return jdbcTemplate.query(sql, (rs, rowNum) -> {
 			    	Workorder w = new Workorder();
 			        w.setSapWorkorderNumber(rs.getString("SAP_WORKORDER_NUM"));

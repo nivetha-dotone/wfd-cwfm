@@ -179,7 +179,7 @@ table.ControlLayout td {
     <div id="principalEmployerContent">
     <div class="tabs-container">
    
-              <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" style="float: right;" onclick="loadCommonList('/contractor/contRegList','Contractor Registration List')">Cancel</button>
+              <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" style="float: right;" onclick="loadCommonList('/contractor/contRegList','Contractor Master')">Cancel</button>
     		
         <div class="tabs">
             <button class="active" data-target="tab1" onclick="showTabOther('tab1')">Basic Information</button>

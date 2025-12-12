@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -14,33 +15,42 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
+import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
 import com.wfd.dot1.cwfm.pojo.CMSWorkorderLN;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
+import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 import com.wfd.dot1.cwfm.pojo.Workorder;
+import com.wfd.dot1.cwfm.service.FileUploadServiceImpl;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
 public class FileUploadDaoImpl implements FileUploadDao {
+	private static final Logger log = LoggerFactory.getLogger(FileUploadDaoImpl.class);
 	@Autowired
     private JdbcTemplate jdbcTemplate;
 	
@@ -134,6 +144,75 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	 public String isAadharNumberExistsInGatepass() {
 		    return QueryFileWatcher.getQuery("IS_AADAHAR_EXISTS_IN_GATEPASS");
 		}
+	 public String saveFileUploadGeneralMaster() {
+		    return QueryFileWatcher.getQuery("SAVE_FILEUPLOAD_GENERALMASTER");
+		}
+	 public String saveFileUploadWorkorder() {
+		    return QueryFileWatcher.getQuery("SAVE_FILEUPLOAD_WORKORDER");
+		}
+	 public String saveFileUploadWorkorderLN() {
+		    return QueryFileWatcher.getQuery("SAVE_FILEUPLOAD_WORKORDERLN");
+		}
+	 public String saveFileUploadWorkorderTyp() {
+		    return QueryFileWatcher.getQuery("SAVE_FILEUPLOAD_WORKORDERTYP");
+		}
+	 public String getWorkorderIdBySapNumber() {
+		    return QueryFileWatcher.getQuery("GET_WORKORDER_BY_SAP_NUMBER");
+		}
+	 public String getdepartmentIdByUnitId() {
+		    return QueryFileWatcher.getQuery("GET_DEPARTMENTID_BY_UNITID");
+		}
+	 public String getAreaByDeptID() {
+		    return QueryFileWatcher.getQuery("GET_AREA_BY_DEPARTMENTID");
+		}
+	 public String getTradeIdByUnitId() {
+		    return QueryFileWatcher.getQuery("GET_TRADEID_BY_UNITID");
+		}
+	 public String getSkillIdByTradeId() {
+		    return QueryFileWatcher.getQuery("GET_SKILLID_BY_TRADEID");
+		}
+	 public String getGeneralMastersId() {
+		    return QueryFileWatcher.getQuery("GET_GENERALMASTERID");
+		}
+	 public String getGMTypeId() {
+		    return QueryFileWatcher.getQuery("GET_GMTYPEID");
+		}
+	 public String insertGeneralMaster() {
+		    return QueryFileWatcher.getQuery("INSERT_GENERALMASTER");
+		}
+	 public String getGMID() {
+		    return QueryFileWatcher.getQuery("GET_GMID");
+		}
+	 public String existsUnitTradeSkillMapping() {
+		    return QueryFileWatcher.getQuery("GET_EXISTS_UNIT_TRADE_SKILL_MAPPING");
+		}
+	 public String insertUnitTradeSkillMapping() {
+		    return QueryFileWatcher.getQuery("INSERT_FILEUPLOAD_TRADE_SKILL_MAPPING");
+		}
+	 public String insertUnitDepartmentSubDepartmentMapping() {
+		    return QueryFileWatcher.getQuery("INSERT_FILEUPLOAD_UNIT_AREA_MAPPING");
+		}
+	 public String getOrgLevelDefId() {
+		    return QueryFileWatcher.getQuery("GET_ORGLEVEL_DEFID");
+		}
+	 public String SavePEOrglevelEntry() {
+		    return QueryFileWatcher.getQuery("SAVE_PE_ORGLEVELENTRY");
+		}
+	 public String SaveContOrglevelEntry() {
+		    return QueryFileWatcher.getQuery("SAVE_CONT_ORGLEVELENTRY");
+		}
+	 public String SaveWorkorderOrglevelEntry() {
+		    return QueryFileWatcher.getQuery("SAVE_WORKORDER_ORGLEVELENTRY");
+		}
+	 public String saveDeptOrgLevelEntry() {
+		    return QueryFileWatcher.getQuery("SAVE_DEPARTMENT_ORGLEVELENTRY");
+		}
+	 public String saveAreaOrgLevelEntry() {
+		    return QueryFileWatcher.getQuery("SAVE_AREA_ORGLEVELENTRY");
+		}
+	 public String existsInOrgLevelEntry() {
+		    return QueryFileWatcher.getQuery("IS_ORGLEVEL_EXISTS_IN_ORGLEVELENTRY");
+		}
     @Override
     public void saveData(String[] data) {
     	 String rowData = String.join(",", data); // Convert array to CSV format
@@ -146,8 +225,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
     @Override
     public void saveGeneralMaster(CmsGeneralMaster gm) {
         
-    	//String sql=saveGeneralMasterTemplate();
-         String sql = "insert into CMSGENERALMASTER(GMNAME,GMDESCRIPTION,GMTYPEID,UPDATEDBY) values (?,?,?,'Admin')";
+    	String sql=saveFileUploadGeneralMaster();
+         //String sql = "insert into CMSGENERALMASTER(GMNAME,GMDESCRIPTION,GMTYPEID,UPDATEDBY) values (?,?,?,'Admin')";
         jdbcTemplate.update(sql, gm.getGmName(), gm.getGmDescription(), gm.getGmTypeId());
     }
 
@@ -310,8 +389,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	@Override
 	public Long saveWorkorder(Workorder workorder) {
 		 KeyHolder keyHolder = new GeneratedKeyHolder();
-
-		    String sql = "insert into CMSWORKORDER(UNITID,CONTRACTORID,name,VALIDFROM,VALIDDT,TYPEID,DEPID,SECID,GLCODE,COSTCENTER,STATUS,RELEASED_DATE,SAP_WORKORDER_NUM)values(2,2,'nam',?,?,1,1,1,?,?,1,?,?)";
+		 String sql=saveFileUploadWorkorder();
+		    //String sql = "insert into CMSWORKORDER(UNITID,CONTRACTORID,name,VALIDFROM,VALIDDT,TYPEID,DEPID,SECID,GLCODE,COSTCENTER,STATUS,RELEASED_DATE,SAP_WORKORDER_NUM)values(2,2,'nam',?,?,1,1,1,?,?,1,?,?)";
 
 		    jdbcTemplate.update(connection -> {
 		        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -331,7 +410,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
 	@Override
 	public void saveWorkorderLN(CMSWorkorderLN woln) {
-		 String sql = "insert into CMSWORKORDERLN(WORKORDERID,ITEM_NUM,DELIVERY_COMPLETED_SW,CHANGED_ON,JOB,RATE,QTY,PM_ORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,SE_ENTRY_CREATED_ON,SE_ENTRY_UPDATED_ON)values(?,?,?,?,?,?,?,?,?,?,?,?)";
+		 String sql=saveFileUploadWorkorderLN();
+		// String sql = "insert into CMSWORKORDERLN(WORKORDERID,ITEM_NUM,DELIVERY_COMPLETED_SW,CHANGED_ON,JOB,RATE,QTY,PM_ORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,SE_ENTRY_CREATED_ON,SE_ENTRY_UPDATED_ON)values(?,?,?,?,?,?,?,?,?,?,?,?)";
 		 		
 		    jdbcTemplate.update(sql,
 		    		//woln.getw(),
@@ -353,7 +433,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
 	@Override
 	public void saveWorkorderTyp(ContractorWorkorderTYP wotyp) {
-		 String sql = "insert into CMSWORKORDERTYP(name,SAP_TYPE,SHORT_DESC)values('nam',?,?)";
+		String sql=saveFileUploadWorkorderTyp();
+		//String sql = "insert into CMSWORKORDERTYP(name,SAP_TYPE,SHORT_DESC)values('nam',?,?)";
 	 		
 		    jdbcTemplate.update(sql,
 		    		//wotyp.getName(),
@@ -363,7 +444,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		    );
 	}
 	public Long getWorkorderIdBySapNumber(String sapWorkorderNumber) {
-	    String sql = "SELECT workorderid FROM CMSWORKORDER WHERE sapWorkorderNumber = ?";
+		String sql=getWorkorderIdBySapNumber();
+	    //String sql = "SELECT workorderid FROM CMSWORKORDER WHERE sapWorkorderNumber = ?";
 	    try {
 	        return jdbcTemplate.queryForObject(sql, new Object[]{sapWorkorderNumber}, Long.class);
 	    } catch (EmptyResultDataAccessException e) {
@@ -899,31 +981,34 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	//}
 	@Override
 	public Integer getdepartmentIdByUnitId(Integer unitId, String department) {
-		
-		String sql=" select udm.departmentid from UnitDepartmentMapping udm\r\n"
-				+ "join CMSGENERALMASTER cgm on  cgm.GMID = udm.departmentId where udm.principalEmployerId=? and cgm.GMNAME=?";
+		String sql=getdepartmentIdByUnitId();
+		//String sql=" select udm.departmentid from UnitDepartmentMapping udm\r\n"
+		//		+ "join CMSGENERALMASTER cgm on  cgm.GMID = udm.departmentId where udm.principalEmployerId=? and cgm.GMNAME=?";
 		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, department.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
 	@Override
 	public Integer getAreaByDeptID(Integer unitId, Integer departmentId, String area) {
-		String sql = "select udm.subDepartmentId from UnitDepartmentMapping udm\r\n"
-				+ "join CMSGENERALMASTER cgm on  cgm.GMID = udm.subDepartmentId where udm.principalEmployerId=? and udm.departmentId=? and cgm.GMNAME=?";
+		String sql=getAreaByDeptID();
+		//String sql = "select udm.subDepartmentId from UnitDepartmentMapping udm\r\n"
+				//+ "join CMSGENERALMASTER cgm on  cgm.GMID = udm.subDepartmentId where udm.principalEmployerId=? and udm.departmentId=? and cgm.GMNAME=?";
 	
 		List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, departmentId,area.trim());
 	    return result.isEmpty() ? null : result.get(0);
 	}
 	@Override
 	public Integer getTradeIdByUnitId(Integer unitId, String trade) {
-		String sql="select utm.TradeId from UnitTradeSkillMapping utm\r\n"
-				+ "join CMSGENERALMASTER cgm on  cgm.GMID = utm.TradeId where utm.principalEmployerId=? and cgm.GMNAME=?";
+		String sql=getTradeIdByUnitId();
+		//String sql="select utm.TradeId from UnitTradeSkillMapping utm\r\n"
+				//+ "join CMSGENERALMASTER cgm on  cgm.GMID = utm.TradeId where utm.principalEmployerId=? and cgm.GMNAME=?";
 		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, trade.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
 	@Override
 	public Integer getSkillIdByTradeId(Integer unitId, Integer tradeId, String skill) {
-		String sql="select utm.SkillId from UnitTradeSkillMapping utm\r\n"
-				+ "join CMSGENERALMASTER cgm on  cgm.GMID = utm.SkillId where utm.principalEmployerId=? and TradeId=? and cgm.GMNAME=?";
+		String sql=getSkillIdByTradeId();
+		//String sql="select utm.SkillId from UnitTradeSkillMapping utm\r\n"
+		//		+ "join CMSGENERALMASTER cgm on  cgm.GMID = utm.SkillId where utm.principalEmployerId=? and TradeId=? and cgm.GMNAME=?";
 		 List<Integer> result = jdbcTemplate.queryForList(sql, Integer.class,unitId, tradeId,skill.trim());
 		    return result.isEmpty() ? null : result.get(0);
 		}
@@ -931,7 +1016,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    @Override
 	    public Integer getGeneralMasterId(String gmType, String gmName) {
 	        try {
-	            String sql = "SELECT GM.GMID  FROM CMSGENERALMASTER GM  JOIN CMSGMTYPE GT ON GT.GMTYPEID = GM.GMTYPEID  WHERE GT.GMTYPE = ? AND GM.GMNAME = ? and ISACTIVE=1";
+	        	String sql=getGeneralMastersId();
+	            //String sql = "SELECT GM.GMID  FROM CMSGENERALMASTER GM  JOIN CMSGMTYPE GT ON GT.GMTYPEID = GM.GMTYPEID  WHERE GT.GMTYPE = ? AND GM.GMNAME = ? and ISACTIVE=1";
 	            return jdbcTemplate.queryForObject(sql, Integer.class, gmType, gmName);
 	        } catch (EmptyResultDataAccessException e) {
 	            return null;
@@ -941,37 +1027,197 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    @Override
 	    public Integer insertGeneralMaster(String gmType, String gmName) {
 	        // First get the GMTYPEID
-	        String getTypeIdSql = "SELECT GMTYPEID FROM CMSGMTYPE WHERE GMTYPE = ?";
+	    	String getTypeIdSql=getGMTypeId();
+	    	String insertSql=insertGeneralMaster();
+	    	String fetchIdSql=getGMID();
+	    	
+	       // String getTypeIdSql = "SELECT GMTYPEID FROM CMSGMTYPE WHERE GMTYPE = ?";
 	        Integer gmTypeId = jdbcTemplate.queryForObject(getTypeIdSql, Integer.class, gmType);
 
-	        String insertSql = "INSERT INTO CMSGENERALMASTER ( GMNAME,GMDESCRIPTION,GMTYPEID,UPDATEDBY) VALUES (?, ?, ?,'Admin')";
+	        //String insertSql = "INSERT INTO CMSGENERALMASTER ( GMNAME,GMDESCRIPTION,GMTYPEID,UPDATEDBY) VALUES (?, ?, ?,'Admin')";
 	        jdbcTemplate.update(insertSql, gmName,gmName,gmTypeId);
 
 	        // Return newly inserted GMID
-	        String fetchIdSql = " SELECT GMID FROM CMSGENERALMASTER \r\n"
-	        		+ "	            WHERE GMNAME = ? AND GMTYPEID = ? and ISACTIVE=1 ORDER BY GMID DESC ";
+	       // String fetchIdSql = " SELECT GMID FROM CMSGENERALMASTER \r\n"
+	        //		+ "	            WHERE GMNAME = ? AND GMTYPEID = ? and ISACTIVE=1 ORDER BY GMID DESC ";
 	        return jdbcTemplate.queryForObject(fetchIdSql, Integer.class, gmName, gmTypeId);
 	    }
 
 	    @Override
 	    public boolean existsUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId) {
-	        String sql = "SELECT COUNT(*) FROM UnitTradeSkillMapping  WHERE PrincipalEmployerId = ? AND TRADEID = ? AND SKILLID =?";
+	    	String sql=existsUnitTradeSkillMapping();
+	        //String sql = "SELECT COUNT(*) FROM UnitTradeSkillMapping  WHERE PrincipalEmployerId = ? AND TRADEID = ? AND SKILLID =?";
 	        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, unitId, tradeId, skillId);
 	        return count != null && count > 0;
 	    }
 
 	    @Override
 	    public void insertUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId) {
-	        String sql = "INSERT INTO UnitTradeSkillMapping (PrincipalEmployerId, TRADEID, SKILLID) VALUES (?, ?, ?)";
+	    	String sql=insertUnitTradeSkillMapping();
+	      //  String sql = "INSERT INTO UnitTradeSkillMapping (PrincipalEmployerId, TRADEID, SKILLID) VALUES (?, ?, ?)";
 	        jdbcTemplate.update(sql, unitId, tradeId, skillId);
 	    }
 	    
 	    @Override
 	    public void insertUnitDepartmentSubDepartmentMapping(Integer unitId, Integer departmentId, Integer subDepartmentId) {
-	        String sql = "INSERT INTO UnitDepartmentMapping (principalEmployerId, departmentId, subDepartmentId) VALUES (?, ?, ?)";
+	    	String sql=insertUnitDepartmentSubDepartmentMapping();
+	    	//String sql = "INSERT INTO UnitDepartmentMapping (principalEmployerId, departmentId, subDepartmentId) VALUES (?, ?, ?)";
 	        jdbcTemplate.update(sql, unitId, departmentId, subDepartmentId);
 	    }
-	
+	    @Override
+	    public long getOrgLevelDefId(String name) {
+	    	String sql=getOrgLevelDefId();
+	       // String sql = "SELECT ORGLEVELDEFID FROM ORGLEVELDEF WHERE LOWER(NAME) = LOWER(?)";
+
+	        try {
+	            return jdbcTemplate.queryForObject(sql, new Object[]{name}, Long.class);
+	        } catch (EmptyResultDataAccessException e) {
+	            return 0;   // Not found
+	        }
+	    }
+
+		
+		@Override
+		public boolean SavePEOrglevelEntry(List<PrincipalEmployer> list, long orgLevelDefId) {
+			String sql=SavePEOrglevelEntry();
+		   // String sql = "INSERT INTO ORGLEVELENTRY " +
+		    //        "(ORGLEVELDEFID, NAME, DESCRIPTION, INACTIVE, UPDATE_DTM, UPDATEDBYUSRACCTID, VERSION) " +
+		   //         "VALUES (?, ?, ?, 1, getdate(), 0, NULL)";
+
+		    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+		        @Override
+		        public void setValues(PreparedStatement ps, int i) throws SQLException {
+		            PrincipalEmployer pe = list.get(i);
+
+		            ps.setLong(1, orgLevelDefId);
+		            ps.setString(2, pe.getCode());
+		            ps.setString(3, pe.getName()); 
+		        }
+
+		        @Override
+		        public int getBatchSize() {
+		            return list.size();
+		        }
+		    });
+
+		    return true;
+		}
+		@Override
+		public boolean SaveContOrglevelEntry(List<Contractor> list, long orgLevelDefId) {
+			String sql=SaveContOrglevelEntry();
+		   // String sql = "INSERT INTO ORGLEVELENTRY " +
+		    //        "(ORGLEVELDEFID, NAME, DESCRIPTION, INACTIVE, UPDATE_DTM, UPDATEDBYUSRACCTID, VERSION) " +
+		    //        "VALUES (?, ?, ?, 1, getdate(), 0, NULL)";
+
+		    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+		        @Override
+		        public void setValues(PreparedStatement ps, int i) throws SQLException {
+		        	Contractor con = list.get(i);
+
+		            ps.setLong(1, orgLevelDefId);
+		            ps.setString(2, con.getContractorCode()); // Using Address as DESCRIPTION
+		            ps.setString(3, con.getContractorName());
+		           
+		        }
+
+		        @Override
+		        public int getBatchSize() {
+		            return list.size();
+		        }
+		    });
+
+		    return true;
+		}
+
+		@Override
+		public boolean SaveWorkorderOrglevelEntry(List<KTCWorkorderStaging> list, long orgLevelDefId) {
+			String sql=SaveWorkorderOrglevelEntry();
+		   // String sql = "INSERT INTO ORGLEVELENTRY " +
+		   //         "(ORGLEVELDEFID, NAME, DESCRIPTION, INACTIVE, UPDATE_DTM, UPDATEDBYUSRACCTID, VERSION) " +
+		  //          "VALUES (?, ?, ?, 1, getdate(), 0, NULL)";
+
+		    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+		        @Override
+		        public void setValues(PreparedStatement ps, int i) throws SQLException {
+		        	KTCWorkorderStaging con = list.get(i);
+
+		            ps.setLong(1, orgLevelDefId);
+		            ps.setString(2, con.getWorkOrderNumber());
+		            ps.setString(3, con.getWorkOrderType()); // Using Address as DESCRIPTION
+		        }
+
+		        @Override
+		        public int getBatchSize() {
+		            return list.size();
+		        }
+		    });
+
+		    return true;
+		}
+		@Override
+		public boolean saveDeptOrgLevelEntry(List<DeptMapping> list, long orgLevelDefId) {
+			String sql=saveDeptOrgLevelEntry();
+		   // String sql = "INSERT INTO ORGLEVELENTRY " +
+		    //        "(ORGLEVELDEFID, NAME, DESCRIPTION, INACTIVE, UPDATE_DTM, UPDATEDBYUSRACCTID, VERSION) " +
+		    //        "VALUES (?, ?, ?, 1, getdate(), 0, NULL)";
+
+		    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+		        @Override
+		        public void setValues(PreparedStatement ps, int i) throws SQLException {
+		        	DeptMapping area = list.get(i);
+
+		            ps.setLong(1, orgLevelDefId);
+		            ps.setString(2, area.getDepartment());
+		            ps.setString(3, area.getDepartment()); 
+		        }
+
+		        @Override
+		        public int getBatchSize() {
+		            return list.size();
+		        }
+		    });
+
+		    return true;
+		}
+		@Override
+		public boolean saveAreaOrgLevelEntry(List<DeptMapping> list, long orgLevelDefId) {
+			String sql=saveAreaOrgLevelEntry();
+		   //String sql = "INSERT INTO ORGLEVELENTRY " +
+		   //       "(ORGLEVELDEFID, NAME, DESCRIPTION, INACTIVE, UPDATE_DTM, UPDATEDBYUSRACCTID, VERSION) " +
+		    //      "VALUES (?, ?, ?, 1, getdate(), 0, NULL)";
+
+		    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+		        @Override
+		        public void setValues(PreparedStatement ps, int i) throws SQLException {
+		        	DeptMapping dept = list.get(i);
+
+		            ps.setLong(1, orgLevelDefId);
+		            ps.setString(2, dept.getSubDepartment());
+		            ps.setString(3, dept.getSubDepartment()); 
+		        }
+
+		        @Override
+		        public int getBatchSize() {
+		            return list.size();
+		        }
+		    });
+
+		    return true;
+		}
+		@Override
+		public boolean existsInOrgLevelEntry(String name, long orgLevelDefId) {
+			String sql=existsInOrgLevelEntry();
+		   // String sql = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE NAME = ? AND ORGLEVELDEFID = ?";
+		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name, orgLevelDefId);
+		    return count != null && count > 0;
+		}
+
+		
 	}
 
 

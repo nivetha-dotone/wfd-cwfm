@@ -453,7 +453,7 @@ label {
     	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" value="${GatePassObj.aadhaarNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </c:if>
     	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter 12-digit Aadhar number (e.g., 1234 5678 9012)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.aadharNumberRegax"/></span>
     </div>
     	 <label id="error-aadhar" style="color: red;display: none;">Please enter a valid 12-digit Aadhar number</label>
     </td>
@@ -487,7 +487,7 @@ label {
                 	<input id="firstName" name="firstName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.firstName  }" autocomplete="off">
                 </c:if>
                 <div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter First Name (e.g., John)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.firstNameRegax"/></span>
        </div>
                 	<label id="error-firstName" style="color: red;display: none;">Please enter a valid First Name.</label>
                 </td>
@@ -502,7 +502,7 @@ label {
                  	<input id="lastName" name="lastName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.lastName }" autocomplete="off">
                  </c:if>
                  <div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Lass Name (e.g., Leo)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.lastNameRegax"/></span>
     </div>
                 	 <label id="error-lastName" style="color: red;display: none;">Please enter a valid Last Name.</label>
                 </td>
@@ -515,7 +515,7 @@ label {
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <td>    	<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30" autocomplete="off"  >
 					 <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Age is Minimum 18 Years and Above</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.dateOfBirthRegax"/></span>
                                 </div>
 					  <label id="error-dateOfBirth" style="color: red;display: none;">Please enter a valid Date Of Birth</label>
 			</td>
@@ -544,7 +544,7 @@ label {
                 		<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.relationName }" autocomplete="off">
                 	</c:if>
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Relation Name (e.g., Mass)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.fatherHusbandNameRegax"/></span>
     </div>
                 	<label id="error-relationName" style="color: red;display: none;">Please enter a valid Father / Husband name</label>
                 </td>
@@ -557,7 +557,7 @@ label {
                 		<input id="idMark" name="idMark" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${ GatePassObj.idMark }" autocomplete="off">
                 	</c:if>
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Id Mark (e.g, A mole on Face)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.idMarkRegax"/></span>
     </div>
                 	<label id="error-idMark"style="color: red;display: none;">Please enter a valid ID Mark</label>
                 </td>
@@ -572,7 +572,7 @@ label {
                 		<input id="mobileNumber" name="mobileNumber" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" value="${GatePassObj.mobileNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 	</c:if>
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter 10 digit Mobile number (e.g., 9989098909)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.mobileNumberRegax"/></span>
     </div>
                 	<label id="error-mobileNumber" style="color: red;display: none;">Please enter a valid Mobile Number</label>
                 </td>
@@ -602,7 +602,7 @@ label {
 
                 </c:if>
                 <div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Address (e.g., D.No-3-114,Banglore,514806)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.addressRegax"/></span>
     </div>
                 	<label id="error-address" style="color: red;display: none;">Please enter a valid Address</label>
                 </td>
@@ -733,7 +733,7 @@ label {
                             <td>
                             	<input id="natureOfJob" name="natureOfJob" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${not empty GatePassObj.natureOfJob ? GatePassObj.natureOfJob : ''}">
                             	  <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter NatureOfJob(e.g.,Supplier)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.natureOfJobRegax"/></span>
                                 </div>
                             	  <label id="error-natureOfJob"style="color: red;display: none;">Please enter a valid Nature of Job</label>
                             </td>
@@ -798,7 +798,7 @@ label {
                             	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" value="${GatePassObj.uanNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </c:if>
                             <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Uan (e.g.,123456789012)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.uanNumberRegax"/></span>
                                 </div>
                             		<label id="error-uanNumber"style="color: red;display: none;">Please enter a valid UAN Number</label>
                             </td>
@@ -815,7 +815,7 @@ label {
                             
                             	</c:if>
                             	 <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Within Last 6 Months from Today</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.healthCheckUpDateRegax"/></span>
                                 </div>
                             		<label id="error-healthCheckDate"style="color: red;display: none;">Please enter a valid Health Check Up Date</label>
                             	</td>
@@ -832,7 +832,7 @@ label {
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.pfNumber }" autocomplete="off">
                             </c:if>
                              <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter PF (e.g., CMPPF12345)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.pfNumberRegax"/></span>
                                 </div>
                             		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
                             </td>
@@ -847,7 +847,7 @@ label {
                             
                             	</c:if>
                             	<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter ESIC (e.g., 1234567890)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.esicNumberRegax"/></span>
                                 </div>
                             		<label id="error-esicNumber"style="color: red;display: none;">Please enter a valid ESIC Number</label>
                             	</td>
@@ -863,7 +863,7 @@ label {
                         		<input id="doj" name="doj" class="datetimepickerformat1" style="width: 100%; height: 20px;" type="text" size="30" maxlength="30"    value="${ GatePassObj.doj}" autocomplete="off">
                         	</c:if>
                         	 <div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Within Future 15 Days from Today</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.dateOfJoiningRegax"/></span>
                                 </div>
 					  <label id="error-doj" style="color: red;display: none;">Please enter a valid Date Of Joining</label>
 			</td>
@@ -955,7 +955,7 @@ label {
 				
 				</c:if>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter IFSC Code (e.g., PUNJ0123456)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.ifscCodeRegax"/></span>
                                 </div>
 				<label id="error-ifscCode"style="color: red;display: none;">Please enter a valid IFSC Code</label>
 				</td>
@@ -968,7 +968,7 @@ label {
 				<input style="width: 100%;height: 20px;" type="text" size="30" id="accountNumber" name="accountNumber"   value="${GatePassObj.accountNumber  }"  autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
 				</c:if>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Account Number (e.g., 123456789012345)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.accountNumberRegax"/></span>
                                 </div>
 				<label id="error-accountNumber"style="color: red;display: none;">Please enter a valid Account Number</label>
 				</td>
@@ -984,7 +984,7 @@ label {
 					<input style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" id="emergencyName" name="emergencyName"    maxlength="30"  value="${GatePassObj.emergencyName }" autocomplete="off"/>
 				</c:if>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Emergency Name (e.g., Rama)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.emergencyContactNameRegax"/></span>
                                 </div>
 					<label id="error-emergencyName"style="color: red;display: none;">Please enter a valid Emergency Name</label>
 				</td>			
@@ -998,7 +998,7 @@ label {
 				<input style="width: 100%;height: 20px;" type="text" size="30" id="emergencyNumber" name="emergencyNumber"    maxlength="10"   value="${GatePassObj.emergencyNumber }"  autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
 				</c:if>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Emergency Mobile Number (e.g., 9989909890)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.emergencyContactNumberRegax"/></span>
                                 </div>
 					<label id="error-emergencyNumber"style="color: red;display: none;">Please enter a valid Emergency Number</label>
 				</td>				
@@ -1058,7 +1058,7 @@ label {
 			
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="basic" id="basic" autocomplete="off"  value="${not empty GatePassObj.basic ? GatePassObj.basic : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Basic (e.g., 10000.00)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.basicRegax"/></span>
                                 </div>
 				<label id="error-basic"style="color: red;display: none;">Enter valid Basic</label>
 				</td>						
@@ -1067,14 +1067,14 @@ label {
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.da"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text" size="30" name="da" id="da" autocomplete="off"  value="${not empty GatePassObj.da ? GatePassObj.da : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter DA (e.g., 10000.00)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.daRegax"/></span>
                                 </div>
 				<label id="error-da"style="color: red;display: none;">Enter valid DA</label>
 				</td>				
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.hra"/></label></th>
 				<td ><input style="width: 100%;height: 20px;" type="text" size="30" name="hra"  id="hra" autocomplete="off" value="${not empty GatePassObj.hra ? GatePassObj.hra : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter HRA (e.g., 20000.00)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.hraRegax"/></span>
                                 </div>
 				<label id="error-hra"style="color: red;display: none;">Enter valid HRA</label>
 				</td>				
@@ -1085,14 +1085,14 @@ label {
 				<td>
 				<input style="width: 100%;height: 20px;" type="text" size="30" name="washingAllowance" id="washingAllowance" autocomplete="off" value="${not empty GatePassObj.washingAllowance ? GatePassObj.washingAllowance : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Washing Allowance (e.g., 10000.00)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.washingAllowanceRegax"/></span>
                                 </div>
 				<label id="error-washingAllowance"style="color: red;display: none;">Enter valid Washing Allowance</label>
 				</td>				
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.otherAllowance"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="otherAllowance" id="otherAllowance" autocomplete="off"  value="${not empty GatePassObj.otherAllowance ? GatePassObj.otherAllowance : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Other Allowance (e.g., 10000.00)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.otherAllowanceRegax"/></span>
                                 </div>
 				<label id="error-otherAllowance"style="color: red;display: none;">Enter valid Other Allowance</label>
 				</td>				
@@ -1101,7 +1101,7 @@ label {
 			<th><label class="custom-label"><span class="required-field"></span><spring:message code="label.uniformAllowance"/></label></th>
 				<td><input style="width: 100%;height: 20px;" type="text" size="30" name="uniformAllowance" id="uniformAllowance" autocomplete="off" value="${not empty GatePassObj.uniformAllowance ? GatePassObj.uniformAllowance : ''}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')"   onblur="formatToTwoDecimalPlaces(this)"/>
 				<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Uniform Allowance (e.g., 10000.00)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.uniformAllowanceRegax"/></span>
                                 </div>
 				<label id="error-uniformAllowance"style="color: red;display: none;">Enter valid Uniform Allowance</label>
 				</td>				

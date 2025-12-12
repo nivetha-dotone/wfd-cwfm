@@ -391,7 +391,7 @@ textarea {
             <button data-target="tab3" onclick="showTabNew('tab3')">Other Information</button>
             <button data-target="tab4" onclick="showTabNew('tab4')">Wages</button>
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
-            <button data-target="tab6" onclick="showTabNew('tab6')">Previous Documents</button>
+            <!-- <button data-target="tab6" onclick="showTabNew('tab6')">Previous Documents</button> -->
           <!--   <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> -->
         </div>
          <div class="action-buttons" >
@@ -717,21 +717,21 @@ textarea {
                     <tr>
                 		<td style="color:black"><spring:message code="label.profilePhoto"/></td>
                 <td>
-                  <a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.PHOTO}')">Download Photo</a>
+                  <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.PHOTO}')">Download Photo</a>
                 </td>
             		</tr> 
             		
                    <tr>
                 		<td style="color:black"><spring:message code="label.aadharDocument"/></td>
                 <td>
-                   <a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.AADHAR}')">Download Aadhar Document</a>
+                   <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.AADHAR}')">Download Aadhar Document</a>
                 </td>
             		</tr>
             		
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>
-                    <a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.POLICE}')">Download Police Verification Document</a>
+                    <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.POLICE}')">Download Police Verification Document</a>
                 </td>
                  <th><label class="custom-label"><spring:message code="label.policeVerificationDate"/></label></th>
                         	<td>
@@ -743,7 +743,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.bankDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.BANK}')">Download Bank Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.BANK}')">Download Bank Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -752,7 +752,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.trainingDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.TRAINING}')">Download Training Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.TRAINING}')">Download Training Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -761,7 +761,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.otherDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.OTHER}')">Download Other Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.OTHER}')">Download Other Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -770,7 +770,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.idProof2Document"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.IDPROOF}')">Download ID Proof2 Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.IDPROOF}')">Download ID Proof2 Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -779,7 +779,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.medicalDcocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.MEDICAL}')">Download Medical Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.MEDICAL}')">Download Medical Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -788,7 +788,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.educationDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.EDUCATION}')">Download Education Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.EDUCATION}')">Download Education Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -797,7 +797,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.form11Document"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.transactionId}', '${GatePassObj.createdBy}','${LatestDocs.FORM11}')">Download Form11 Document</a>
+                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.FORM11}')">Download Form11 Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -866,7 +866,7 @@ textarea {
         </tbody>
                 </table>
             </div> --%>
-            <div id="tab6" class="tab-content">
+            <%-- <div id="tab6" class="tab-content">
   <div class="card-body p-3">
         <table class="table table-bordered table-striped align-middle">
             <thead class="table-light">
@@ -885,13 +885,13 @@ textarea {
                                 <td style="color:black;">${doc.DOCTYPE}</td>
                                 <td>
                                     <a href="javascript:void(0);" 
-                                      onclick="downloadPreviousFile('${transactionId}', '${doc.FILENAME}')"
+                                      onclick="downloadPreviousFile('${oldTransactionId}', '${doc.FILENAME}')"
                                        class="text-primary text-decoration-underline">
                                         ${doc.FILENAME}
                                     </a>
                                 </td>
                                 <td style="color:black;">
-                                    <%-- <span class="badge bg-info text-dark">V${doc.VERSIONNO}</span> --%>
+                                    <span class="badge bg-info text-dark">V${doc.VERSIONNO}</span>
                                     <span>V${doc.VERSIONNO}</span>
                                 </td>
                             </tr>
@@ -903,7 +903,7 @@ textarea {
                                 <td></td> <!-- Empty cell to visually group -->
                                 <td>
                                     <a href="javascript:void(0);" 
-                                       onclick="downloadPreviousFile('${transactionId}', '${doc.FILENAME}')"
+                                       onclick="downloadPreviousFile('${oldTransactionId}', '${doc.FILENAME}')"
                                        class="text-primary text-decoration-underline">
                                         ${doc.FILENAME}
                                     </a>
@@ -918,7 +918,7 @@ textarea {
             </tbody>
         </table>
     </div>
-</div>
+</div> --%>
         </f:form>
     </div>
    

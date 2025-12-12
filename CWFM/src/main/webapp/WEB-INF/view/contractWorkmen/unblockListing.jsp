@@ -227,7 +227,7 @@
      <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
      <div id="messageDiv" style="font-weight: bold; margin-top: 10px;"></div>
                          <div class="table-container">
-  <table id="workmenTable" class="display nowrap" style="width:100%" cellspacing="0" cellpadding="0">
+  <table id="workmenTable"  cellspacing="0" cellpadding="0">
   <thead>
     <tr>
       <th><input type="checkbox" id="selectAllAadharWorkmenCheckbox" onchange="toggleSelectAllAadharWorkmen()"></th>

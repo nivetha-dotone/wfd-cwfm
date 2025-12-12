@@ -350,7 +350,7 @@ label {
                 <td>
                 	<input id="contractorNameId" name="contractorName" style="width: 100%;height: 20px; text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Contractor Name (e.g., John)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.firstNameRegax"/></span>
        </div>
                 	<label id="error-contractorname" style="color: red;display: none;">Contractor name is required</label>
                 </td>
@@ -370,7 +370,7 @@ label {
                 <td>
                 	<input id="emailId" name="email" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Email Address (e.g., John@gmail.com)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.emailAddressRegax"/></span>
        </div>
                 	<label id="error-email" style="color: red;display: none;">Email is required</label>
                 </td>
@@ -378,7 +378,7 @@ label {
                 <td>
                 	<input id="mobileId" name="mobile" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" autocomplete="off">
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Mobile Number (e.g., 9989909890)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.mobileNumberRegax"/></span>
        </div>
                 	<label id="error-mobile"style="color: red;display: none;">Mobile number is required</label>
                 </td>
@@ -390,7 +390,7 @@ label {
                 <td>
                 	<input id="aadharId" name="aadhar" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off">
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter 12-digit Aadhar Number (e.g., 1234 5678 9012)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.aadharNumberRegax"/></span>
     </div>
                 	<label id="error-aadhar" style="color: red;display: none;">Aadhar Number is required</label>
                 </td>
@@ -430,7 +430,7 @@ label {
                 <td>
                 	<input id="addressId" name="address" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter Address (e.g., D.No-3-114,Banglore,514806)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.addressRegax"/></span>
     </div>
                 	<label id="error-address" style="color: red;display: none;">Address is required</label>
                 </td>
@@ -441,7 +441,7 @@ label {
                 <td>
                 	<input id="pfNumId" name="pfNum" style="width: 100%;height: 20px;text-transform: uppercase;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;">Enter PF Number (e.g., AS12345A1234)</span>
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.pfRegax"/></span>
     </div>
                 	<label id="error-pfnumber" style="color: red;display: none;">PF Number is required</label>
                 </td>
@@ -449,7 +449,7 @@ label {
                 <td>
                 	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Nature Of Work (e.g.,Supplier)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.natureOfJobRegax"/></span>
                                 </div>
                 	<label id="error-natureOfWork" style="color: red;display: none;">Nature Of Work is required</label>
                 </td>
@@ -460,7 +460,7 @@ label {
                 <td>
                 	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Manager Name (e.g.,Mask)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.managerNameRegax"/></span>
                                 </div>
                 	<label id="error-managername" style="color: red;display: none;">Manager name is required</label>
                 </td>
@@ -468,7 +468,7 @@ label {
                 <td>
                 	<input id="locofWorkId" name="locofWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Location Of Work (e.g.,Hyderabad)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.locationOfWorkRegax"/></span>
                                 </div>
                 	<label id="error-locofwork"style="color: red;display: none;">Location Of Work is required</label>
                 </td>
@@ -479,7 +479,7 @@ label {
                 <td>
                 	<input id="totalStrengthId" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter Total Strength (e.g.,100)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.totalStrengthRegax"/></span>
                                 </div>
                 	<label id="error-totalStrength" style="color: red;display: none;">Total Strength is required</label>
                 </td>
@@ -487,7 +487,7 @@ label {
                 <td>
                 	<input id="rcMaxEmpId" name="rcMaxEmp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
-                                    <span style="color: #666; font-size: 11px;">Enter RC Max Employees (e.g.,100)</span>
+                                    <span style="color: #666; font-size: 11px;"><spring:message code="label.rcMaxEmployeesRegax"/></span>
                                 </div>
                 	<label id="error-rcmaxemployees" style="color: red;display: none;">RC Max Employees is required</label>
                 </td>

@@ -519,6 +519,13 @@ public class GatePassMain {
 	public void setNewDot(String newDot) {
 		this.newDot = newDot;
 	}
+	private String oldTransactionId;
+	public String getOldTransactionId() {
+		return oldTransactionId;
+	}
+	public void setOldTransactionId(String oldTransactionId) {
+		this.oldTransactionId = oldTransactionId;
+	}
 	
 	}
 	

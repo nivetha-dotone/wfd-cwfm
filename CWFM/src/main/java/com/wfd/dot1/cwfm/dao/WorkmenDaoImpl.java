@@ -565,10 +565,14 @@ public class WorkmenDaoImpl implements WorkmenDao{
 		log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
 		return listDto;
 	}
+	public String getWorkFlowTypeId() {
+		return QueryFileWatcher.getQuery("GET_WORKFLOWTYPEID");
+	}
 	@Override
 public int getWorkFlowTypeId(String unitId, String actionId) {
-	String query = "select distinct cwt.WorkflowTypeId from CMSWORKFLOWTYPE cwt \r\n"
-			+ "join CMSAPPROVERHIERARCHY cah on cah.WorkFlowTypeId=cwt.WorkFlowTypeId where cwt.UnitId=? and cah.Action_id=?";
+		String query = getWorkFlowTypeId();
+	//String query = "select distinct cwt.WorkflowTypeId from CMSWORKFLOWTYPE cwt \r\n"
+	//		+ "join CMSAPPROVERHIERARCHY cah on cah.WorkFlowTypeId=cwt.WorkFlowTypeId where cwt.UnitId=? and cah.Action_id=?";
 	SqlRowSet rs =null;
 	rs = jdbcTemplate.queryForRowSet(query,unitId,actionId);
 	while(rs.next()) {
@@ -938,9 +942,12 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 
 	    return result;
 	}
-
+	public String gatePassTransactionMapping() {
+		return QueryFileWatcher.getQuery("INSERT_GATEPASS_TRANSACTION_MAPPING");
+	}
 	public String gatePassTransactionMapping(GatePassActionDto dto) {
-		 String sql = "insert into GatePassTransactionMapping (TransactionId,GatePassId,GatePassTypeId) VALUES (?,?,?)";
+		 //String sql = "insert into GatePassTransactionMapping (TransactionId,GatePassId,GatePassTypeId) VALUES (?,?,?)";
+		String sql=gatePassTransactionMapping();
         String result=null;
         Object[] parameters = new Object[] {dto.getTransactionId(),dto.getGatePassId(),dto.getGatePassType()};
         try {
@@ -2217,10 +2224,14 @@ public String getNextTransactionId() {
 }
     return transactionId;
 }
+public String createDraftGatepass() {
+	return QueryFileWatcher.getQuery("CREATE_DRAFT_GATEPASS");
+}
 @Override
 public void createDraftGatepass(String transactionId, String userId) {
 	String status = GatePassStatus.DRAFT.getStatus();
-    String sql = "INSERT INTO GATEPASSMAIN (TransactionId, GatePassStatus, UpdatedDate, UpdatedBy) VALUES (?, ?, GETDATE(), ?)";
+	String sql = createDraftGatepass();
+    //String sql = "INSERT INTO GATEPASSMAIN (TransactionId, GatePassStatus, UpdatedDate, UpdatedBy) VALUES (?, ?, GETDATE(), ?)";
     jdbcTemplate.update(sql, transactionId,status, userId);
 }
 public String getGatePassActionListingDetailsQueryNav() {
@@ -2332,10 +2343,16 @@ public List<DeptMapping> getAllSubDepartments(String unitId, String departmentId
 	log.info("Exiting from getAllSkillsBasedOnPE dao method "+areaList.size());
 	return areaList;
 }
-
+public String getTransactionIdByGPId() {
+	return QueryFileWatcher.getQuery("GET_TRANSACTIONID_BY_GPID");
+}
+public String saveIntoCMSPerson() {
+	return QueryFileWatcher.getQuery("SAVE_CMSPERSON");
+}
 @Override
 public String getTransactionIdByGPId(String gatepassid,String gatepasstypeid) {
-	String query="select top 1 TransactionId from GatePassTransactionMapping where GatePassId=? and GatePassTypeId=? order by CreatedDate desc ";
+	String query= getTransactionIdByGPId();
+	//String query="select top 1 TransactionId from GatePassTransactionMapping where GatePassId=? and GatePassTypeId=? order by CreatedDate desc ";
 	String transactionId=null;
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatepassid,gatepasstypeid);
 	if(rs.next()) {
@@ -2346,11 +2363,12 @@ public String getTransactionIdByGPId(String gatepassid,String gatepasstypeid) {
 
 @Override
 public long saveIntoCMSPerson(CMSPerson person) {
-    String sql = "INSERT INTO CMSPERSON (EMPLOYEECODE, FIRSTNAME, RELATIONNAME, LASTNAME, DATEOFBIRTH, DATEOFJOINING, " +
-            "DATEOFTERMINATION, BLOODGROUP, HAZARDOUSAREA, GENDER, ACADEMICS, ACCOMODATION, BANKBRANCH, ACCOUNTNO, " +
-            "EMERGENCYNAME, EMERGENCYNUMBER, MOBILENUMBER, ACCESSLEVEL, ESICNUMBER, UANNUMBER, ISPFELIGIBLE, IDMARK, " +
-            "PANNO, UPDATEDBY, AADHARNUMBER) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	String sql= saveIntoCMSPerson();
+   // String sql = "INSERT INTO CMSPERSON (EMPLOYEECODE, FIRSTNAME, RELATIONNAME, LASTNAME, DATEOFBIRTH, DATEOFJOINING, " +
+   //         "DATEOFTERMINATION, BLOODGROUP, HAZARDOUSAREA, GENDER, ACADEMICS, ACCOMODATION, BANKBRANCH, ACCOUNTNO, " +
+   //         "EMERGENCYNAME, EMERGENCYNUMBER, MOBILENUMBER, ACCESSLEVEL, ESICNUMBER, UANNUMBER, ISPFELIGIBLE, IDMARK, " +
+   //         "PANNO, UPDATEDBY, AADHARNUMBER) " +
+   //         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
     Object terminationValue = 
@@ -2407,13 +2425,16 @@ public long saveIntoCMSPerson(CMSPerson person) {
         return -1;
     }
 }
-
+public String saveIntoCMSPERSONJOBHIST() {
+	return QueryFileWatcher.getQuery("SAVE_CMSPERSONJOBHIST");
+}
 @Override
 public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm, long employeeId) {
 	boolean result = false;
-	 String sql = "INSERT INTO CMSPERSONJOBHIST ( EMPLOYEEID , TRADEID , SKILLID , UNITID , CONTRACTORID , DEPARTMENTID , "
-	 		+ " SUBDEPARTMENTID , WORKORDERID , EICID , VALIDFROM , VALIDTO  ) "
-	 		+ "     VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+	String sql = saveIntoCMSPERSONJOBHIST();
+	// String sql = "INSERT INTO CMSPERSONJOBHIST ( EMPLOYEEID , TRADEID , SKILLID , UNITID , CONTRACTORID , DEPARTMENTID , "
+	// 		+ " SUBDEPARTMENTID , WORKORDERID , EICID , VALIDFROM , VALIDTO  ) "
+	// 		+ "     VALUES (?,?,?,?,?,?,?,?,?,?,?)";
      Object[] parameters = new Object[] {employeeId,gpm.getTrade(),gpm.getSkill(),gpm.getUnitId(),gpm.getContractor(),gpm.getDepartment(),
     		 gpm.getSubdepartment(),gpm.getWorkorder(),gpm.getEic(),gpm.getDoj(), "1/1/3000"};
      try {
@@ -2429,12 +2450,15 @@ public boolean saveIntoCMSPERSONJOBHIST(GatePassMain gpm, long employeeId) {
      }
      return result;
 }
-
+public String saveCMSPERSONSTATUSMM() {
+	return QueryFileWatcher.getQuery("SAVE_CMSPERSONSTATUSMM");
+}
 @Override
 public boolean saveCMSPERSONSTATUSMM(GatePassMain gpm, long employeeId) {
 	
 	boolean result = false;
-	 String sql = "INSERT INTO CMSPERSONSTATUSMM ( EMPLOYEEID , ISACTIVE , VALIDFROM , VALIDTO)  VALUES (?,?,?,? )";
+	String sql = saveCMSPERSONSTATUSMM();
+	// String sql = "INSERT INTO CMSPERSONSTATUSMM ( EMPLOYEEID , ISACTIVE , VALIDFROM , VALIDTO)  VALUES (?,?,?,? )";
     Object[] parameters = new Object[] {employeeId,1,gpm.getDoj(),gpm.getDot()};
     try {
     int status = jdbcTemplate.update(sql, parameters);
@@ -2450,13 +2474,15 @@ public boolean saveCMSPERSONSTATUSMM(GatePassMain gpm, long employeeId) {
     }
     return result;
 }
-
+public String saveCMSPERSONSTATUSMMTerminated() {
+	return QueryFileWatcher.getQuery("SAVE_CMSPERSONSTATUSMM_INACTIVE");
+}
 @Override
 public boolean saveCMSPERSONSTATUSMMTerminated(GatePassMain gpm, long employeeId) {
 	
 	boolean result = false;
-	
-	 String sql = "INSERT INTO CMSPERSONSTATUSMM ( EMPLOYEEID , ISACTIVE , VALIDFROM , VALIDTO)  VALUES (?,?,?,? )";
+	String sql = saveCMSPERSONSTATUSMMTerminated();
+	// String sql = "INSERT INTO CMSPERSONSTATUSMM ( EMPLOYEEID , ISACTIVE , VALIDFROM , VALIDTO)  VALUES (?,?,?,? )";
     Object[] parameters = new Object[] {employeeId,0,gpm.getNewDot(),"1/1/3000"};
     try {
     int status = jdbcTemplate.update(sql, parameters);
@@ -2472,14 +2498,16 @@ public boolean saveCMSPERSONSTATUSMMTerminated(GatePassMain gpm, long employeeId
     return result;
 }
 
-
+public String saveCMSPERSONCUSTDATA() {
+	return QueryFileWatcher.getQuery("SAVE_CMSPERSON_CUSTOMDATA");
+}
 
 @Override
 public boolean saveCMSPERSONCUSTDATA( GatePassMain gp,long employeeId) {
-
-    String sql = "INSERT INTO CMSPERSONCUSTOMDATA "
-            + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
-            + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
+	String sql = saveCMSPERSONCUSTDATA() ;
+    //String sql = "INSERT INTO CMSPERSONCUSTOMDATA "
+    //        + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
+    //        + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
 
     // Fetch all active custom definitions
     String defSql = "SELECT CSTMDEFID, CSTMDEFNAME FROM CMSPERSONCUSTOMDATADEFINITION WHERE ISACTIVE = 1";
@@ -2693,10 +2721,13 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdForApprove(St
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
 }
-
+public String getPersonIdFromCmsPerson() {
+	return QueryFileWatcher.getQuery("GET_PERSONID_FROM_CMSPERSON");
+}
 @Override
 public long getPersonIdFromCmsPerson(String gatePassId) {
-	String query="select EMPLOYEEID from cmsperson where EMPLOYEECODE=?";
+	String query= getPersonIdFromCmsPerson();
+	//String query="select EMPLOYEEID from cmsperson where EMPLOYEECODE=?";
 	long personId = 0;
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
 	if(rs.next()) {
@@ -2704,13 +2735,22 @@ public long getPersonIdFromCmsPerson(String gatePassId) {
 	}
 	return personId;
 }
-
+public String getCustomDefID() {
+	return QueryFileWatcher.getQuery("GET_CUSTOM_DEFID_CMSPERSONCUSTOMDATADEFINITION");
+}
+public String getMaxRefID() {
+	return QueryFileWatcher.getQuery("GET_MAX_REFID_CMSPERSONCUSTOMDATA");
+}
+public String updateEffectiveTill() {
+	return QueryFileWatcher.getQuery("UPDATE_EFFECTIVE_TILL_CUSTOM_DATA");
+}
 @Override
 public boolean updateCmsPersonCustDataEffectiveTill(long personId) {
 
     // 1. Get CSTMDEFID for Status
-    String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
-                  + "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'Status'";
+	String defSql = getCustomDefID();
+    //String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
+    //              + "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'Status'";
 
     Integer defId = jdbcTemplate.queryForObject(defSql, Integer.class);
 
@@ -2719,8 +2759,9 @@ public boolean updateCmsPersonCustDataEffectiveTill(long personId) {
     }
 
     // 2. Get latest REFID
-    String refSql = "SELECT MAX(REFID) FROM CMSPERSONCUSTOMDATA "
-                  + "WHERE CSTMDEFID = ? AND EMPLOYEEID = ?";
+    String refSql = getMaxRefID();
+   // String refSql = "SELECT MAX(REFID) FROM CMSPERSONCUSTOMDATA "
+   //               + "WHERE CSTMDEFID = ? AND EMPLOYEEID = ?";
 
     Long refId = jdbcTemplate.queryForObject(refSql, Long.class, defId, personId);
 
@@ -2729,17 +2770,24 @@ public boolean updateCmsPersonCustDataEffectiveTill(long personId) {
     }
 
     // 3. Update EFFECTIVETILL
-    String updateSql = "UPDATE CMSPERSONCUSTOMDATA "
-                     + "SET EFFECTIVETILL = CONVERT(date, GETDATE() - 1) "
-                     + "WHERE REFID = ?";
+    String updateSql = updateEffectiveTill();
+    //String updateSql = "UPDATE CMSPERSONCUSTOMDATA "
+    //                 + "SET EFFECTIVETILL = CONVERT(date, GETDATE() - 1) "
+    //                 + "WHERE REFID = ?";
 
     return jdbcTemplate.update(updateSql, refId) > 0;
 }
-
+public String getCustomDefIDforGPtype() {
+	return QueryFileWatcher.getQuery("GET_CUSTOMDEFID_FOR_GP_TYPE");
+}
+public String insertIntoCustData() {
+	return QueryFileWatcher.getQuery("INSERT_CUSTOM_DATA");
+}
 @Override
 public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus) {
-	String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
-			+ "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'GatePassType'";
+	String defSql = getCustomDefIDforGPtype();
+	//String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
+	//		+ "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'GatePassType'";
 
 	Integer defId = jdbcTemplate.queryForObject(defSql, Integer.class);
 
@@ -2749,9 +2797,10 @@ public boolean insertIntoCustData(String updatedBy,long personId,String gatePass
 	
 	
 	boolean result = false;
-	String sql = "INSERT INTO CMSPERSONCUSTOMDATA "
-            + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
-            + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
+	String sql = insertIntoCustData();
+	//String sql = "INSERT INTO CMSPERSONCUSTOMDATA "
+    //        + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
+    //        + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
 
    Object[] parameters = new Object[] {personId,defId,gatePassStatus,updatedBy};
    try {
@@ -2767,32 +2816,40 @@ public boolean insertIntoCustData(String updatedBy,long personId,String gatePass
    }
    return result;
 }
-
+public String isPersonActiveInStatusMM() {
+	return QueryFileWatcher.getQuery("IS_PERSON_ACTIVE_IN_STATUSMM");
+}
 @Override
 public boolean isPersonActiveInStatusMM(long personId) {
-
-    String sql = "SELECT COUNT(1) "
-               + "FROM CMSPERSONSTATUSMM "
-               + "WHERE EMPLOYEEID = ? "
-               + "  AND GETDATE() BETWEEN VALIDFROM AND VALIDTO "
-               + "  AND ISACTIVE = 1";
+	String sql = isPersonActiveInStatusMM();
+   // String sql = "SELECT COUNT(1) "
+    //           + "FROM CMSPERSONSTATUSMM "
+    //           + "WHERE EMPLOYEEID = ? "
+    //           + "  AND GETDATE() BETWEEN VALIDFROM AND VALIDTO "
+    //           + "  AND ISACTIVE = 1";
 
     Integer count = jdbcTemplate.queryForObject(sql, Integer.class, personId);
 
     return count != null && count > 0;
 }
-
+public String getActivePersonStatusIds() {
+	return QueryFileWatcher.getQuery("GET_ACTIVE_PERSON_STATUS_ID");
+}
+public String getInactivePersonStatusIds() {
+	return QueryFileWatcher.getQuery("GET_INACTIVE_PERSON_STATUS_ID");
+}
 @Override
 public PersonStatusIds getPersonStatusIds(long personId) {
 
     PersonStatusIds ids = new PersonStatusIds();
 
     // Fetch Active ID
-    String activeSql = "SELECT PERSONSTATUSMMID "
-                     + "FROM CMSPERSONSTATUSMM "
-                     + "WHERE EMPLOYEEID = ? "
-                     + "  AND GETDATE() BETWEEN VALIDFROM AND VALIDTO "
-                     + "  AND ISACTIVE = 1";
+    String activeSql = getActivePersonStatusIds();
+  //  String activeSql = "SELECT PERSONSTATUSMMID "
+   //                  + "FROM CMSPERSONSTATUSMM "
+   //                  + "WHERE EMPLOYEEID = ? "
+  //                   + "  AND GETDATE() BETWEEN VALIDFROM AND VALIDTO "
+ //                    + "  AND ISACTIVE = 1";
 
     try {
         Long activeId = jdbcTemplate.queryForObject(activeSql, Long.class, personId);
@@ -2802,11 +2859,12 @@ public PersonStatusIds getPersonStatusIds(long personId) {
     }
 
     // Fetch Inactive ID
-    String inactiveSql = "SELECT PERSONSTATUSMMID "
-                       + "FROM CMSPERSONSTATUSMM "
-                       + "WHERE EMPLOYEEID = ? "
-                       + "  AND VALIDTO = '3000-01-01' "
-                       + "  AND ISACTIVE = 0";
+    String inactiveSql = getInactivePersonStatusIds();
+    //String inactiveSql = "SELECT PERSONSTATUSMMID "
+     //                  + "FROM CMSPERSONSTATUSMM "
+     //                  + "WHERE EMPLOYEEID = ? "
+     //                  + "  AND VALIDTO = '3000-01-01' "
+     //                  + "  AND ISACTIVE = 0";
 
     try {
         Long inactiveId = jdbcTemplate.queryForObject(inactiveSql, Long.class, personId);
@@ -2817,7 +2875,12 @@ public PersonStatusIds getPersonStatusIds(long personId) {
 
     return ids;
 }
-
+public String updateValidtoYesterday() {
+	return QueryFileWatcher.getQuery("UPDATE_ACTIVE_VALID_TO_YESTERDAY");
+}
+public String updateValidfromToday() {
+	return QueryFileWatcher.getQuery("UPDATE_INACTIVE_VALID_FROM_TODAY");
+}
 @Override
 public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
 
@@ -2825,9 +2888,10 @@ public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
 
     // Update active record → VALIDTO = yesterday
     if (activeId != null) {
-        String sqlActive = "UPDATE CMSPERSONSTATUSMM "
-                         + "SET VALIDTO = CONVERT(date, GETDATE() - 1) "
-                         + "WHERE PERSONSTATUSMMID = ?";
+    	 String sqlActive = updateValidtoYesterday() ;
+        //String sqlActive = "UPDATE CMSPERSONSTATUSMM "
+        //                 + "SET VALIDTO = CONVERT(date, GETDATE() - 1) "
+        //                 + "WHERE PERSONSTATUSMMID = ?";
 
         int count1 = jdbcTemplate.update(sqlActive, activeId);
         updated = updated || count1 > 0;
@@ -2835,9 +2899,10 @@ public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
 
     // Update inactive record → VALIDFROM = today
     if (inactiveId != null) {
-        String sqlInactive = "UPDATE CMSPERSONSTATUSMM "
-                           + "SET VALIDFROM = CONVERT(date, GETDATE()) "
-                           + "WHERE PERSONSTATUSMMID = ?";
+    	 String sqlInactive = updateValidfromToday() ;
+       // String sqlInactive = "UPDATE CMSPERSONSTATUSMM "
+       //                    + "SET VALIDFROM = CONVERT(date, GETDATE()) "
+       //                    + "WHERE PERSONSTATUSMMID = ?";
 
         int count2 = jdbcTemplate.update(sqlInactive, inactiveId);
         updated = updated || count2 > 0;
@@ -2845,43 +2910,46 @@ public boolean updatePersonStatusValidity(Long activeId, Long inactiveId) {
 
     return updated;
 }
-
+public String getActiveWorkmenCount() {
+	return QueryFileWatcher.getQuery("GET_ACTIVE_WORKMEN_COUNT");
+}
 
 @Override
 public int getActiveWorkmenCount(String unitId,String contractorId,String gatePassStatus, String gatePassType) {
-	String query="WITH Defs AS ( "
-			+ "    SELECT  "
-			+ "        MAX(CASE WHEN CSTMDEFNAME = 'ContractorId' THEN CSTMDEFID END) AS ContractorDefId, "
-			+ "        MAX(CASE WHEN CSTMDEFNAME = 'UnitId' THEN CSTMDEFID END) AS UnitDefId, "
-			+ "        MAX(CASE WHEN CSTMDEFNAME = 'Status' THEN CSTMDEFID END) AS StatusDefId, "
-			+ "        MAX(CASE WHEN CSTMDEFNAME = 'GatePassType' THEN CSTMDEFID END) AS GatePassTypeDefId "
-			+ "    FROM CMSPERSONCUSTOMDATADEFINITION "
-			+ "), "
-			+ "EmployeeData AS ( "
-			+ "    SELECT  "
-			+ "        E.EMPLOYEEID, "
-			+ "        MAX(CASE WHEN C.CSTMDEFID = D.ContractorDefId THEN C.CUSTOMDATATEXT END) AS ContractorValue, "
-			+ "        MAX(CASE WHEN C.CSTMDEFID = D.UnitDefId THEN C.CUSTOMDATATEXT END) AS UnitValue, "
-			+ "        MAX(CASE WHEN C.CSTMDEFID = D.StatusDefId THEN C.CUSTOMDATATEXT END) AS StatusValue, "
-			+ "        MAX(CASE WHEN C.CSTMDEFID = D.GatePassTypeDefId THEN C.CUSTOMDATATEXT END) AS GatePassValue "
-			+ "    FROM CMSPERSONCUSTOMDATA C "
-			+ "    CROSS JOIN Defs D "
-			+ "    JOIN ( "
-			+ "        SELECT DISTINCT EMPLOYEEID  "
-			+ "        FROM CMSPERSONCUSTOMDATA "
-			+ "    ) E ON E.EMPLOYEEID = C.EMPLOYEEID "
-			+ "    GROUP BY E.EMPLOYEEID "
-			+ ") "
-			+ "SELECT COUNT(DISTINCT ED.EMPLOYEEID) AS ActiveEmployeeCount "
-			+ "FROM EmployeeData ED "
-			+ "JOIN CMSPERSONSTATUSMM S "
-			+ "    ON S.EMPLOYEEID = ED.EMPLOYEEID "
-			+ "    AND S.ISACTIVE = 1 "
-			+ "WHERE ED.ContractorValue = ? "
-			+ "  AND ED.UnitValue = ? "
-			+ "  AND ED.StatusValue in ('3','4') "
-			+ "  AND ED.GatePassValue =?; "
-			+ "";
+	String query = getActiveWorkmenCount() ;
+	//String query="WITH Defs AS ( "
+			//+ "    SELECT  "
+			//+ "        MAX(CASE WHEN CSTMDEFNAME = 'ContractorId' THEN CSTMDEFID END) AS ContractorDefId, "
+			//+ "        MAX(CASE WHEN CSTMDEFNAME = 'UnitId' THEN CSTMDEFID END) AS UnitDefId, "
+			//+ "        MAX(CASE WHEN CSTMDEFNAME = 'Status' THEN CSTMDEFID END) AS StatusDefId, "
+			//+ "        MAX(CASE WHEN CSTMDEFNAME = 'GatePassType' THEN CSTMDEFID END) AS GatePassTypeDefId "
+			//+ "    FROM CMSPERSONCUSTOMDATADEFINITION "
+			//+ "), "
+			//+ "EmployeeData AS ( "
+			//+ "    SELECT  "
+			//+ "        E.EMPLOYEEID, "
+			//+ "        MAX(CASE WHEN C.CSTMDEFID = D.ContractorDefId THEN C.CUSTOMDATATEXT END) AS ContractorValue, "
+			//+ "        MAX(CASE WHEN C.CSTMDEFID = D.UnitDefId THEN C.CUSTOMDATATEXT END) AS UnitValue, "
+			//+ "        MAX(CASE WHEN C.CSTMDEFID = D.StatusDefId THEN C.CUSTOMDATATEXT END) AS StatusValue, "
+			//+ "        MAX(CASE WHEN C.CSTMDEFID = D.GatePassTypeDefId THEN C.CUSTOMDATATEXT END) AS GatePassValue "
+			//+ "    FROM CMSPERSONCUSTOMDATA C "
+			//+ "    CROSS JOIN Defs D "
+			//+ "    JOIN ( "
+			//+ "        SELECT DISTINCT EMPLOYEEID  "
+			//+ "        FROM CMSPERSONCUSTOMDATA "
+			//+ "    ) E ON E.EMPLOYEEID = C.EMPLOYEEID "
+			//+ "    GROUP BY E.EMPLOYEEID "
+			//+ ") "
+			//+ "SELECT COUNT(DISTINCT ED.EMPLOYEEID) AS ActiveEmployeeCount "
+			//+ "FROM EmployeeData ED "
+			//+ "JOIN CMSPERSONSTATUSMM S "
+			//+ "    ON S.EMPLOYEEID = ED.EMPLOYEEID "
+			//+ "    AND S.ISACTIVE = 1 "
+			//+ "WHERE ED.ContractorValue = ? "
+			//+ "  AND ED.UnitValue = ? "
+			//+ "  AND ED.StatusValue in ('3','4') "
+			//+ "  AND ED.GatePassValue =?; "
+			//+ "";
 	
 	
 	int activeCount = 0;
@@ -2892,9 +2960,13 @@ public int getActiveWorkmenCount(String unitId,String contractorId,String gatePa
 	return activeCount;
 	
 }
+public String getLLDeploymentCountByUnitId() {
+	return QueryFileWatcher.getQuery("GET_LL_DEPLOYMENTCOUNT_BY_UNITID");
+}
 @Override
 public int getLLDeploymentCountByUnitId(String unitId) {
-	String query ="  select COUNT_NO from CMS_LL_DEPLOYMENT_COUNT where UNIT_ID=? ";
+	String query = getLLDeploymentCountByUnitId();
+	//String query ="  select COUNT_NO from CMS_LL_DEPLOYMENT_COUNT where UNIT_ID=? ";
 	int llCount = 0;
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId);
 	if(rs.next()) {
@@ -2904,17 +2976,17 @@ public int getLLDeploymentCountByUnitId(String unitId) {
 	
 }
 
-
-
-
-
+public String getPreviousDocuments() {
+	return QueryFileWatcher.getQuery("GET_PREVIOUS_DOCUMENTS");
+}
 
 @Override
 public Map<String, String> getPreviousDocuments(String transactionId) {
-    String sql = "SELECT AadharDocName, PhotoName, BankDocName, PoliceVerificationDocName, " +
-                 "IdProof2DocName, MedicalDocName, EducationDocName, Form11DocName, " +
-                 "TrainingDocName, OtherDocName " +
-                 "FROM GATEPASSMAIN WHERE TransactionId = ?";
+	String  sql = getPreviousDocuments();
+   // String sql = "SELECT AadharDocName, PhotoName, BankDocName, PoliceVerificationDocName, " +
+   //              "IdProof2DocName, MedicalDocName, EducationDocName, Form11DocName, " +
+   //              "TrainingDocName, OtherDocName " +
+   //              "FROM GATEPASSMAIN WHERE TransactionId = ?";
 
     return jdbcTemplate.query(sql, rs -> {
         Map<String, String> map = new LinkedHashMap<>();
@@ -2934,27 +3006,41 @@ public Map<String, String> getPreviousDocuments(String transactionId) {
         return map;
     }, transactionId);
     }
+
+public String getRenewalDocs() {
+	return QueryFileWatcher.getQuery("GET_RENEWAL_DOCUMENTS");
+}
+
 @Override
 public List<Map<String, Object>> getRenewalDocs(String transactionId) {
-    String sql = "SELECT DOCTYPE, FILENAME, VERSIONNO " +
-                 "FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ? ORDER BY VERSIONNO ASC";
+	String sql = getRenewalDocs();
+    //String sql = "SELECT DOCTYPE, FILENAME, VERSIONNO " +
+    //             "FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ? ORDER BY VERSIONNO ASC";
     return jdbcTemplate.queryForList(sql, transactionId);
+}
+public String getLLlicenseExistsAndCount() {
+	return QueryFileWatcher.getQuery("GET_LL_LICENSE_EXISTS_COUNT");
+}
+public String getWCESIClicenseExistsAndCount() {
+	return QueryFileWatcher.getQuery("GET_WC_ESIC_LICENSE_EXISTS_COUNT");
 }
 @Override
 public int licenseExistsAndCount(String unitId,String contractorId,String workorderId,String licenseType,String licenseId) {
 	String query=null;
 	if(licenseType.equals("LL")) {
-		query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
-				+ "  from CMSCONTRACTOR_WC ccwc \r\n"
-				+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
-				+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
-				+ "  and ccwc.LICENCE_TYPE='LL' and ccwc.WCID=? ";
+		 query = getLLlicenseExistsAndCount() ;
+		//query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
+		//		+ "  from CMSCONTRACTOR_WC ccwc \r\n"
+		//		+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
+		//		+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
+		//		+ "  and ccwc.LICENCE_TYPE='LL' and ccwc.WCID=? ";
 	}else {
-	 query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
-			+ "  from CMSCONTRACTOR_WC ccwc \r\n"
-			+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
-			+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
-			+ "  and ccwc.LICENCE_TYPE in ('WC','ESIC')  and ccwc.WCID=? ";
+		 query = getWCESIClicenseExistsAndCount() ;
+	// query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
+	//		+ "  from CMSCONTRACTOR_WC ccwc \r\n"
+	//		+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
+	//		+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
+	//		+ "  and ccwc.LICENCE_TYPE in ('WC','ESIC')  and ccwc.WCID=? ";
 	}
 	int licenseCount=0;
 	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId,licenseId);
@@ -2962,6 +3048,12 @@ public int licenseExistsAndCount(String unitId,String contractorId,String workor
 		licenseCount = rs.getInt("WC_TOTAL");
 	}
 	return licenseCount;
+}
+public String selectMaxVesionFromGatepass() {
+	return QueryFileWatcher.getQuery("GET_MAX_VERSION_DOCS_FROM_GATEPASS");
+}
+public String saveRenewDocuments() {
+	return QueryFileWatcher.getQuery("SAVE_RENEW_DOCUMENTS");
 }
 @Override
 public void saveRenewedDocuments(String transactionId, String userId,
@@ -2972,13 +3064,15 @@ public void saveRenewedDocuments(String transactionId, String userId,
                                  List<String> documentTypes,String filePath) {
     try {
         // ✅ Determine next version number
-        String versionSql = "SELECT MAX(VERSIONNO)+ 1 FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ?";
+    	String versionSql = selectMaxVesionFromGatepass();
+        //String versionSql = "SELECT MAX(VERSIONNO)+ 1 FROM GATEPASSDOCUMENTS WHERE TRANSACTIONID = ?";
         Integer currentVersion = jdbcTemplate.queryForObject(versionSql, Integer.class, transactionId);
 
         // If no version found, start from 2 (since version 1 is from GATEPASSMAIN)
         int nextVersion = (currentVersion == null) ? 2 : currentVersion + 1;
-        String insertSql = "INSERT INTO GATEPASSDOCUMENTS (TRANSACTIONID, DOCTYPE, FILENAME, VERSIONNO, USERID, FILEPATH) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String insertSql = saveRenewDocuments();
+       // String insertSql = "INSERT INTO GATEPASSDOCUMENTS (TRANSACTIONID, DOCTYPE, FILENAME, VERSIONNO, USERID, FILEPATH) " +
+        //        "VALUES (?, ?, ?, ?, ?, ?)";
 
 // Ensure folder exists
 File folder = new File(filePath);
@@ -3150,10 +3244,12 @@ public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String u
 	log.info("Exiting from getGatePassListingDetails dao method "+listDto.size());
 	return listDto;
 }
-
+public String getTransactionIdByGatePassId() {
+	return QueryFileWatcher.getQuery("GET_TRANSACTIONID_BY_GATEPASSID");
+}
 public String getTransactionIdByGatePassId(String gatePassId) {
-
-    String sql = "SELECT TransactionId FROM GATEPASSMAIN WHERE GatePassId = ?";
+	String sql = getTransactionIdByGatePassId();
+    //String sql = "SELECT TransactionId FROM GATEPASSMAIN WHERE GatePassId = ?";
 
     try {
         return jdbcTemplate.queryForObject(sql, new Object[]{gatePassId}, String.class);

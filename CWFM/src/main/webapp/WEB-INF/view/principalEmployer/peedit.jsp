@@ -221,7 +221,7 @@ table.ControlLayout td {
     
             <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="savePeDocuments()">Save</button>
 
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','PrincipalEmployer')">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/principalEmployer/list','Principal Employer')">Cancel</button>
      </div> 
     </div>
 <!-- <div class="tabs-container">

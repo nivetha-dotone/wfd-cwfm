@@ -237,7 +237,7 @@ table.ControlLayout td {
             <button data-target="tab2" onclick="showTabOther('tab2')">License Information</button>
         </div>
        <div class="action-buttons" > 
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','WorkOrder')">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workorders/list','Work Order')">Cancel</button>
        </div>
      </div>
 

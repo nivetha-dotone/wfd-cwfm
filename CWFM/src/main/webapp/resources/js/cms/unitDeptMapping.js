@@ -69,6 +69,11 @@ function deleteRow(button) {
             isValid = false;
             return;
         }
+        if (!subDepartmentId) {
+            alert("Please select Sub-Department in row " + (index + 1));
+            isValid = false;
+            return;
+        }
 
         // 🔹 If SubDepartment is selected without Department (should not happen now, but safe check)
         if (!departmentId && subDepartmentId) {
@@ -80,7 +85,7 @@ function deleteRow(button) {
 
         // 🔹 Duplicate Check
         let key;
-        if (!subDepartmentId || subDepartmentId === "0") {
+        /*if (!subDepartmentId || subDepartmentId === "0") {
             // Case 1: No SubDepartment → check PE + Dept
             key = principalEmployerId + "-" + departmentId;
             if (seen.has(key)) {
@@ -90,7 +95,7 @@ function deleteRow(button) {
                 row.style.backgroundColor = "lightcoral";
                 return;
             }
-        } else {
+        } else {*/
             // Case 2: With SubDepartment → check PE + Dept + SubDept
             key = principalEmployerId + "-" + departmentId + "-" + subDepartmentId;
             if (seen.has(key)) {
@@ -100,7 +105,7 @@ function deleteRow(button) {
                 row.style.backgroundColor = "lightcoral";
                 return;
             }
-        }
+       /* }*/
         seen.add(key);
 
         // 🔹 Push valid row
@@ -130,7 +135,7 @@ function deleteRow(button) {
     }))
     .then(msg => {
         alert("Saved successfully: " + msg);
-       loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+       loadCommonList('/departmentMapping/existinglist', 'Department Area Mapping');
     })
     .catch(err => {
         console.error("Error saving:", err);
@@ -164,7 +169,7 @@ function deleteRow(button) {
 	}
 	
 	function goBackToDeptMappingList() {
-    	 loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+    	 loadCommonList('/departmentMapping/existinglist', 'Department Area Mapping');
     }
     
     function redirectToTradeSkillMappingAdd() {
@@ -287,7 +292,7 @@ function deleteRow(button) {
     }))
     .then(msg => {
         alert("Saved successfully: " + msg);
-        loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+        loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Skill Mapping');
     })
     .catch(err => {
         console.error("Error saving:", err);
@@ -296,7 +301,7 @@ function deleteRow(button) {
 }
 
 function goBackToTradeMappingList() {
-    	 loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+    	 loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Skill Mapping');
     }
     
 function deleteSelectedDeptMappings() {
@@ -330,13 +335,13 @@ function deleteSelectedDeptMappings() {
     success: function(response) {
         if (response.status === "success") {
             alert(response.message);
-            loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+            loadCommonList('/departmentMapping/existinglist', 'Department Area Mapping');
         } else if (response.status === "partial") {
             alert(response.message + "\nDeleted: " + response.deleted.length + ", Skipped: " + response.skipped.length);
-            loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+            loadCommonList('/departmentMapping/existinglist', 'Department Area Mapping');
         } else {
             alert(response.message);
-            loadCommonList('/departmentMapping/existinglist', 'Department Mapping');
+            loadCommonList('/departmentMapping/existinglist', 'Department Area Mapping');
         }
         // reload table or refresh UI here
     },
@@ -378,13 +383,13 @@ $.ajax({
     success: function(response) {
         if (response.status === "success") {
             alert(response.message);
-             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Skill Mapping');
         } else if (response.status === "partial") {
             alert(response.message + "\nDeleted: " + response.deleted.length + ", Skipped: " + response.skipped.length);
-             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Skill Mapping');
         } else {
             alert(response.message);
-             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Mapping');
+             loadCommonList('/departmentMapping/existingTradeSkilllist', 'Trade Skill Mapping');
         }
         // reload table or refresh UI here
     },

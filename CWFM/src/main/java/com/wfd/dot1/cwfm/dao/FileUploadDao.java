@@ -2,6 +2,7 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
@@ -11,6 +12,7 @@ import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
+import com.wfd.dot1.cwfm.pojo.DeptMapping;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
@@ -111,10 +113,23 @@ public interface FileUploadDao {
 
     void insertUnitTradeSkillMapping(Integer unitId, Integer tradeId, Integer skillId);
 
-	void insertUnitDepartmentSubDepartmentMapping(Integer unitId, Integer departmentId, Integer subDepartmentId);	
+	void insertUnitDepartmentSubDepartmentMapping(Integer unitId, Integer departmentId, Integer subDepartmentId);
 
-	
+	long getOrgLevelDefId(String name);
 
+	boolean SavePEOrglevelEntry(List<PrincipalEmployer> list, long orgLevelDefId);
+
+	boolean SaveContOrglevelEntry(List<Contractor> list, long orgLevelDefId);
+
+	boolean SaveWorkorderOrglevelEntry(List<KTCWorkorderStaging> list, long orgLevelDefId);
+
+	boolean saveDeptOrgLevelEntry(List<DeptMapping> finalList, long orgLevelDefId);
+
+	boolean saveAreaOrgLevelEntry(List<DeptMapping> finalList, long orgLevelDefId);
+
+	//void insertOrgLevelEntry(String name, long orgLevelDefId);
+
+	boolean existsInOrgLevelEntry(String name, long orgLevelDefId);	
 
 
 }

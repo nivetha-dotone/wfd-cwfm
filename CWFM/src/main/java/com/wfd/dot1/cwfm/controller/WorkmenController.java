@@ -1086,13 +1086,17 @@ public class WorkmenController {
      			transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.CANCEL.getStatus());
      		}
       		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
-      		String oldTransactionId = gatePassMainObj.getTransactionId();
       		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
 
     		 request.setAttribute("mode", mode);
+    		 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
     		 if(null != gatePassMainObj.getPhotoName()) {
-    			 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+
+
+           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+
            		 request.setAttribute("imagePath", profilePicFilePath);
            		}
     		//Get All GeneralMaster
@@ -1151,6 +1155,8 @@ public class WorkmenController {
     		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
+    		// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1212,6 +1218,8 @@ public class WorkmenController {
     		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
+    		// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1274,6 +1282,8 @@ public class WorkmenController {
        		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
     		 request.setAttribute("mode", mode);
+    		// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1339,6 +1349,8 @@ public class WorkmenController {
     		request.setAttribute("GatePassObj", gatePassMainObj);
           
     		 request.setAttribute("mode", mode);
+    		 //String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1402,6 +1414,8 @@ public class WorkmenController {
     		request.setAttribute("GatePassObj", gatePassMainObj);
 
     		 request.setAttribute("mode", mode);
+    		 //String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1779,7 +1793,7 @@ public class WorkmenController {
 //	 List<DeptMapping> Subdept = workmenService.getAllSubDepartments(gatePassMainObj.getUnitId(),gatePassMainObj.getDepartment());
 //	 request.setAttribute("Subdept", Subdept);
 	 
-List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
+    List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMainObj.getUnitId());
 	 
 	 List<PersonOrgLevel> dept = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
  	List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
@@ -1916,14 +1930,13 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
     	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
         MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
     	try {
-    		
-        		
-        		transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.RENEW.getStatus());
-        		
-        		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
-        		String oldTransactionId = gatePassMainObj.getTransactionId();
-        		gatePassMainObj.setTransactionId(transactionId);
-        		request.setAttribute("GatePassObj", gatePassMainObj);
+
+    		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+    		transactionId = gatePassMainObj.getTransactionId();
+    		request.setAttribute("GatePassObj", gatePassMainObj);
+    		 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
+    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -2645,10 +2658,13 @@ List<DeptMapping> departments = workmenService.getAllDepartmentsOnPE(gatePassMai
 
         String status = workmenService.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
 if (status.contains("Unique")) {
-	boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber);
-	if(!valid) {
-		status = "Invalid";
-	}
+	
+	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
+	  if(!valid)
+	  { 
+		  status = "Invalid"; 
+		  }
+	 
 }
         Map<String, String> result = new HashMap<>();
         result.put("status", status);   // "Unique", "Exists_Gatepass_Draft", etc.

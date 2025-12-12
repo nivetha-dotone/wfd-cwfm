@@ -80,24 +80,31 @@ return null;
         return list.stream().collect(Collectors.toMap(Workorder::getSapWorkorderNumber, wo -> wo));
     }
 	
-
+	 public String getWorkorderLicenseInfo() {
+		    return QueryFileWatcher.getQuery("GET_WORKORDER_LICENSE_INFO");
+		}
+	 
 	@Override
 	public List<Workorder> getWorkorderLicenseInfo(String workorderId) {
-	    String sql = "select cwln.JOB,cmssm.SERVICECODE,cmsgm1.gmname as TRADE,cmsgm2.gmname as SKILL,cwln.QTY,cwln.RATE,"
-	    		+ "cwln.SERVICE_LN_ITEM_NUM,cwln.WBS_ELEMENT,cwln.UOM from CMSWORKORDERLN cwln "
-	    		+ "join CMSSERVICEMASTER cmssm on cmssm.SERVICEID=cwln.SERVICEID "
-	    		+ "join CMSGENERALMASTER cmsgm1 on cmsgm1.GMID=cmssm.TRADEID "
-	    		+ "join CMSGENERALMASTER cmsgm2 on cmsgm2.GMID=cmssm.SKILLID where cwln.WORKORDERID=?";
+		String sql=getWorkorderLicenseInfo();
+	  //  String sql = "select cwln.JOB,cmssm.SERVICECODE,cmsgm1.gmname as TRADE,cmsgm2.gmname as SKILL,cwln.QTY,cwln.RATE,"
+	   // 		+ "cwln.SERVICE_LN_ITEM_NUM,cwln.WBS_ELEMENT,cwln.UOM from CMSWORKORDERLN cwln "
+	   // 		+ "join CMSSERVICEMASTER cmssm on cmssm.SERVICEID=cwln.SERVICEID "
+	   // 		+ "join CMSGENERALMASTER cmsgm1 on cmsgm1.GMID=cmssm.TRADEID "
+	   // 		+ "join CMSGENERALMASTER cmsgm2 on cmsgm2.GMID=cmssm.SKILLID where cwln.WORKORDERID=?";
 	    return jdbcTemplate.query(sql, new Object[]{workorderId}, new BeanPropertyRowMapper<>(Workorder.class));
 	}
-
+	public String getWorkOrdersByContractorIdAndUnitId() {
+	    return QueryFileWatcher.getQuery("GET_WORKORDERS_BY_CONTRACTORID_AND_UNITID");
+	}
 	@Override
 	public List<Workorder> getWorkOrdersByContractorIdAndUnitId(String contractorId, String unitId) {
 		log.info("Entering into getAllWorkordersBasedOnPEAndContractor dao method "+unitId+" "+contractorId);
 		List<Workorder> woList= new ArrayList<Workorder>();
-		String query="select cmwo.WORKORDERID, SAP_WORKORDER_NUM as WORKORDERNUMBER,cwln.JOB as JOB,cwty.SAP_TYPE as WORKORDERTYPE,SECID,VALIDFROM,VALIDDT,UNITID,cmwo.STATUS  from CMSWORKORDER cmwo\r\n"
-				+ "	join CMSWORKORDERLN cwln on cwln.WORKORDERID=cmwo.WORKORDERID\r\n"
-				+ "	join CMSWORKORDERTYP cwty on cwty.TYPEID = cmwo.TYPEID WHERE cmwo.CONTRACTORID=? and cmwo.UNITID=?";
+		String query =getWorkOrdersByContractorIdAndUnitId();
+		//String query="select cmwo.WORKORDERID, SAP_WORKORDER_NUM as WORKORDERNUMBER,cwln.JOB as JOB,cwty.SAP_TYPE as WORKORDERTYPE,SECID,VALIDFROM,VALIDDT,UNITID,cmwo.STATUS  from CMSWORKORDER cmwo\r\n"
+		//		+ "	join CMSWORKORDERLN cwln on cwln.WORKORDERID=cmwo.WORKORDERID\r\n"
+		//		+ "	join CMSWORKORDERTYP cwty on cwty.TYPEID = cmwo.TYPEID WHERE cmwo.CONTRACTORID=? and cmwo.UNITID=?";
 		log.info("Query to getAllWorkordersBasedOnPEAndContractor "+query);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorId,unitId);
 		while(rs.next()) {

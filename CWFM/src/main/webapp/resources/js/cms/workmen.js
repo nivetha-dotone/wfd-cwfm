@@ -988,6 +988,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 		 const approvercomments = $("#approvercomments").val().trim();
     if (approvercomments === "" && status==5) {
         $("#error-approvercomments").show();
+        alert("Comments Required in Documents");
         isValid = false;
     }else{
 		$("#error-approvercomments").hide();
@@ -1409,6 +1410,7 @@ function approveRejectCancel(status,gatePassType){
 	 const approvercomments = $("#approvercomments").val().trim();
    if (approvercomments === "" && status==5) {
        $("#error-approvercomments").show();
+       alert("Comments Required in Documents");
        isValid = false;
    }else{
 	$("#error-approvercomments").hide();
@@ -1500,6 +1502,7 @@ if(isValid){
 		 const approvercomments = $("#approvercomments").val().trim();
 	   if (approvercomments === "" && status==5 ) {
 	       $("#error-approvercomments").show();
+	       alert("Comments Required in Documents");
 	       isValid = false;
 	   }else{
 		$("#error-approvercomments").hide();
@@ -1590,6 +1593,7 @@ if(isValid){
 			 const approvercomments = $("#approvercomments").val().trim();
 		   if (approvercomments === "" && status==5) {
 		       $("#error-approvercomments").show();
+		       alert("Comments Required in Documents");
 		       isValid = false;
 		   }else{
 			$("#error-approvercomments").hide();
@@ -1681,6 +1685,7 @@ let isValid=true;
  const approvercomments = $("#approvercomments").val().trim();
 					   if (approvercomments === "" && status==5 ) {
 					       $("#error-approvercomments").show();
+					       alert("Comments Required in Documents");
 					       isValid = false;
 					   }else{
 $("#error-approvercomments").hide();
@@ -1772,6 +1777,7 @@ function approveRejectDeblacklist(status,gatePassType){
 			 const approvercomments = $("#approvercomments").val().trim();
 		if (approvercomments === "" && status==5) {
 		    $("#error-approvercomments").show();
+		    alert("Comments Required in Documents");
 		    isValid = false;
 		}else{
 			$("#error-approvercomments").hide();
@@ -1871,10 +1877,10 @@ function redirectToWorkmenCancelView(mode) {
 	if(mode === "add"){
 	 												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 
-	 												   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
-	 												       alert("Cancel request already created.");
-	 												       return;
-	 												   }}
+	 												    if (gatePassType.toLowerCase() === "cancel" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
+                                                       alert("Cancel request already created.");
+                                                      return;
+                                                   }}
 
 
     var xhr = new XMLHttpRequest();
@@ -1898,10 +1904,11 @@ function redirectToWorkmenBlockView(mode) {
  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
- 												   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
- 												       alert("Block request already created.");
- 												       return;
- 												   }
+ 												   if (gatePassType.toLowerCase() === "block" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
+                                                       alert("Block request already created.");
+                                                      return;
+                                                   }
+
 												   }
  var xhr = new XMLHttpRequest();
  xhr.onreadystatechange = function() {
@@ -1924,10 +1931,10 @@ function redirectToWorkmenBlockView(mode) {
   var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
   												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
-  												   if ((gatePassType.toLowerCase() !== "block" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
-  												       alert("UnBlock request already created.");
-  												       return;
-  												   }}
+  												    if (gatePassType.toLowerCase() === "block" && (status.toLowerCase() === "approval pending")) {
+                                                       alert("UnBlock request already created.");
+                                                      return;
+                                                   }}
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
       if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1949,10 +1956,10 @@ function redirectToWorkmenBlockView(mode) {
 	var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 													   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
-													   if ((gatePassType.toLowerCase() !== "create" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
-													       alert("Black request already created.");
-													       return;
-													   }}
+													    if (gatePassType.toLowerCase() === "blacklist" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
+                                                       alert("Blacklist request already created.");
+                                                      return;
+                                                   }}
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1974,10 +1981,10 @@ function redirectToWorkmenBlockView(mode) {
 	  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 	  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
-	  												   if ((gatePassType.toLowerCase() !== "blacklist" &&  status.toLowerCase() !== "approved")||(gatePassType.toLowerCase() !== "renew" &&  status.toLowerCase() !== "approved")) {
-	  												       alert("Deblack request already created.");
-	  												       return;
-	  												   }}
+	  												    if (gatePassType.toLowerCase() === "blacklist" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
+                                                       alert("DeBlack request already created.");
+                                                      return;
+                                                   }}
 	  var xhr = new XMLHttpRequest();
 	  xhr.onreadystatechange = function() {
 	      if (xhr.readyState == 4 && xhr.status == 200) {
@@ -2854,6 +2861,7 @@ function approveRejectRenew(status,gatePassType){
 	 const approvercomments = $("#approvercomments").val().trim();
    if (approvercomments === "" && status==5) {
        $("#error-approvercomments").show();
+       alert("Comments Required in Documents");
        isValid = false;
    }else{
 	$("#error-approvercomments").hide();

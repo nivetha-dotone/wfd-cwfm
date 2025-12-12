@@ -271,9 +271,9 @@ function performAjaxRequest(url) {
             }
 
             var csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "CONTRACTORREGID,UNITCODE,CODE,CONTRACTORNAME,STATUS,TYPE\n"; // Add headers here
+            csvContent += "CONTRACTORREGID,VENDORCODE,CONTRACTORNAME,STATUS,REQUESTTYPE\n"; // Add headers here
             selectedRows.forEach(function(row) {
-                var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6),td:nth-child(7)'); // Adjust column indices as needed
+                var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6)'); // Adjust column indices as needed
                 var rowArray = [];
                 rowData.forEach(function(cell) {
                     rowArray.push(cell.innerText);
@@ -295,7 +295,7 @@ function exportCSVFormat() {
             }
 
             var csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "CONTRACTORREGID,UNITCODE,CODE,CONTRACTORNAME,STATUS\n"; // Add headers here
+             csvContent += "CONTRACTORREGID,VENDORCODE,CONTRACTORNAME,STATUS,REQUESTTYPE\n"; // Add headers here
             selectedRows.forEach(function(row) {
                 var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6)'); // Adjust column indices as needed
                 var rowArray = [];
@@ -1007,7 +1007,7 @@ function validateRenewFormData() {
     xhr.onload = function () {
         if (xhr.status === 200) {
             alert("Contractor saved successfully!");
-            loadCommonList('/contractor/contRegList', 'Contractor Registration');
+            loadCommonList('/contractor/contRegList', 'Contractor Master');
         } else {
             alert("Failed to save contractor.");
             console.error("Error:", xhr.status, xhr.responseText);
@@ -1374,3 +1374,10 @@ document.addEventListener('click', function (e) {
             alert("Unable to open file.");
         });
 }
+ function toggleSelectAll() {
+            var selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            var checkboxes = document.querySelectorAll('input[name="selectedWOs"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }

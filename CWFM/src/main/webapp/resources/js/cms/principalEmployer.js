@@ -326,9 +326,9 @@ console.log(formData);
             }
 
             var csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAXCNTRWORKMEN,BOCWAPPLICABILITY,ISMWAPPLICABILITY,CODE,ORGANIZATION,PFCODE,LICENSENUMBER,WCNUMBER,ESICNUMBER,PTREGNO,LWFREGNO,FACTORYLICENCENUMBER,ISRCAPPLICABLE,RCNUMBER,ATTACHMENTNM,STATEID,ISACTIVE,UPDATEDTM,UPDATEDBY\n"; // Add headers here
+            csvContent += "NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAXCNTRWORKMEN,BOCWAPPLICABILITY,ISMWAPPLICABILITY,CODE,ORGANIZATION,PFCODE,LICENSENUMBER,WCNUMBER,ESICNUMBER,PTREGNO,LWFREGNO,FACTORYLICENCENUMBER,ISRCAPPLICABLE,RCNUMBER,ATTACHMENTNM,STATEID\n"; // Add headers here
             selectedRows.forEach(function(row) {
-                var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10), td:nth-child(11), td:nth-child(12), td:nth-child(13), td:nth-child(14), td:nth-child(15), td:nth-child(16), td:nth-child(17), td:nth-child(18), td:nth-child(19), td:nth-child(20), td:nth-child(21), td:nth-child(22), td:nth-child(23), td:nth-child(24), td:nth-child(25), td:nth-child(26)'); // Adjust column indices as needed
+                var rowData = row.parentNode.parentNode.querySelectorAll('td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10), td:nth-child(11), td:nth-child(12), td:nth-child(13), td:nth-child(14), td:nth-child(15), td:nth-child(16), td:nth-child(17), td:nth-child(18), td:nth-child(19), td:nth-child(20), td:nth-child(21), td:nth-child(22), td:nth-child(23)'); // Adjust column indices as needed
                 var rowArray = [];
                 rowData.forEach(function(cell) {
                     rowArray.push(cell.innerText);

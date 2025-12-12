@@ -50,12 +50,20 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 	 public String getAllbilleicView() {
 		    return QueryFileWatcher.getQuery("GET_BILL_EIC_VIEW");
 		}
-	 
-	
-	 
+	 public String getActionIdForBills() {
+		    return QueryFileWatcher.getQuery("GET_ACTIONID_FOR_BILLS");
+		}
+	 public String saveBillQuery() {
+		    return QueryFileWatcher.getQuery("SAVE_BILL");
+		}
 	 public String getMaxId() {
 			return QueryFileWatcher.getQuery("GET_MAX_WC_TNX_ID");
 		}
+	 public String saveBillCMSWageCostWorkFlowQuery() {
+			return QueryFileWatcher.getQuery("SAVE_BILL_CMSWAGECOST_WORKFLOW");
+		}
+	
+	 
 		
 		@Override
 		public String generateWCTransactionId() {
@@ -157,10 +165,11 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 
 		@Override
 		public String getActionIdForBill() {
+			String sql=getActionIdForBills();
 			String r=null;
-			String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
-			   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
-			   		+ "		    where cgt.GMTYPE='ACTION' and cgm.GMNAME like 'Bill%'";
+			//String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
+			//   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
+			//   		+ "		    where cgt.GMTYPE='ACTION' and cgm.GMNAME like 'Bill%'";
 			   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 			   while(rs.next()) {
 			   r=rs.getString("GMID");
@@ -175,6 +184,8 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 		   String sql =" select cgm.GMID,cgm.GMNAME from CMSGENERALMASTER cgm\r\n"
 		   		+ "		    join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID\r\n"
 		   		+ "		    where cgt.GMTYPE='MODULE' and cgm.GMNAME like 'Bill%'";
+		    //String sql=saveBillQuery();
+
 		   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 		   while(rs.next()) {
 		   dto.setModuleId(rs.getString("GMID"));
@@ -185,6 +196,8 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 		            "WorkOrderNumber, StartDate, EndDate, Services, CreatedBy, CreatedDate, UpdatedDate, " +
 		            "WOValidFrom, WOValidTo, BillType, UpdatedBy, Comments, PreComments, ActionPlan,ActionId,ModuleId) " +
 		            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), ?, ?, ?, ?, ?, ?, ?,?,?)";
+		  // String query=saveBillCMSWageCostWorkFlowQuery();
+		  
 
 		    // Formatter to parse dd-MM-yyyy format coming from JSP
 		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -262,7 +275,7 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 				//query=this.getAllBVRForSquential();
 				
 				query = "select wcw.WCTransID,wcw.UnitCode,wcw.ContractorCode,wcw.ContractorName,cwo.SAP_WORKORDER_NUM \r\n"
-						+ "as WorkOrderNumber ,cgm.GMNAME as Services,wcw.StartDate,wcw.EndDate,wcw.Status \r\n"
+						+ "as WorkOrderNumber ,cgm.GMNAME as Services,CONVERT(VARCHAR(10), wcw.StartDate, 120) AS StartDate,CONVERT(VARCHAR(10), wcw.EndDate, 120) AS EndDate,wcw.Status \r\n"
 						+ "from cmswagecostworkflow wcw \r\n"
 						+ "join CMSGENERALMASTER cgm on cgm.GMID =wcw.Services \r\n"
 						+ "join CMSWORKORDER cwo on cwo.WORKORDERID=wcw.WorkOrderNumber \r\n"
@@ -308,8 +321,8 @@ public class BillVerificationDaoImpl implements BillVerificationDao {
 						+ "    wcw.ContractorName,\r\n"
 						+ "    cwo.SAP_WORKORDER_NUM AS WorkOrderNumber,\r\n"
 						+ "    cgm.GMNAME AS Services,\r\n"
-						+ "    wcw.StartDate,\r\n"
-						+ "    wcw.EndDate,\r\n"
+						+ "    CONVERT(VARCHAR(10), wcw.StartDate, 120) AS StartDate,CONVERT(VARCHAR(10), wcw.EndDate, 120) AS EndDate,\r\n"
+						//+ "    wcw.EndDate,\r\n"
 						+ "    wcw.Status\r\n"
 						+ "FROM cmswagecostworkflow wcw\r\n"
 						+ "JOIN CMSGENERALMASTER cgm \r\n"
@@ -427,16 +440,30 @@ public CMSWageCostDTO getIndividualBVRDetails(String transactionId) {
 	return d;
 	
 }
+
+public String saveFile() {
+	return QueryFileWatcher.getQuery("SAVE_BILL_REPORT_FILE");
+}
+public String findByTransactionIdAndType() {
+	return QueryFileWatcher.getQuery("FIND_TRANSACTIONID_AND_REPORTTYPE");
+}
+public String saveChecklist() {
+	return QueryFileWatcher.getQuery("SAVE_CHECKLIST");
+}
+public String fetchChecklistByTransactionId() {
+	return QueryFileWatcher.getQuery("FETCH_CHECKLIST_BY_TRANSACTIONID");
+}
 @Override
 public void saveFile(BillReportFile file) {
-	
-	String sql = "INSERT INTO BillReportFiles (TransactionId, ReportType, ReportName, FileName) VALUES (?, ?, ?, ?)";
+	String sql =saveFile();
+	//String sql = "INSERT INTO BillReportFiles (TransactionId, ReportType, ReportName, FileName) VALUES (?, ?, ?, ?)";
     jdbcTemplate.update(sql, file.getTransactionId(), file.getReportType(), file.getReportName(), file.getFileName());
 
 }
 @Override
 public List<BillReportFile> findByTransactionIdAndType(Long transactionId, String reportType) {
-    String sql = "SELECT * FROM BillReportFiles WHERE TransactionId = ? AND ReportType = ?";
+	String sql =findByTransactionIdAndType();
+    //String sql = "SELECT * FROM BillReportFiles WHERE TransactionId = ? AND ReportType = ?";
     return jdbcTemplate.query(sql, new Object[]{transactionId, reportType}, (rs, rowNum) -> {
         BillReportFile f = new BillReportFile();
         f.setId(rs.getInt("ID"));
@@ -449,9 +476,9 @@ public List<BillReportFile> findByTransactionIdAndType(Long transactionId, Strin
 }
 @Override
 public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransId, String userId) {
-    String sql = "INSERT INTO BillChecklist (wcTransId, checklistId, statusValue, licenseNumber, validUpto, createdBy) " +
-                 "VALUES (?, ?, ?, ?, ?, ?)";
-
+   // String sql = "INSERT INTO BillChecklist (wcTransId, checklistId, statusValue, licenseNumber, validUpto, createdBy) " +
+   //              "VALUES (?, ?, ?, ?, ?, ?)";
+	String sql =saveChecklist();
     for (ChecklistItemDTO item : checklistItems) {
         jdbcTemplate.update(sql,
             wcTransId,
@@ -465,8 +492,9 @@ public void saveChecklist(List<ChecklistItemDTO> checklistItems, String wcTransI
 }
 @Override
 public List<ChecklistItemDTO> fetchChecklistByTransactionId(String wcTransId) {
-    String query = "SELECT bc.CHECKPOINTNAME, cgm.GMDESCRIPTION as statusValue, bcl.licenseNumber, bcl.validUpto FROM BillChecklist bcl "
-    		+ " join BillConfigHrChecklist bc on bc.ID=bcl.checklistId  join CMSGENERALMASTER cgm on cgm.GMID = bcl.statusValue WHERE wcTransId = ?";
+	String query =fetchChecklistByTransactionId();
+    //String query = "SELECT bc.CHECKPOINTNAME, cgm.GMDESCRIPTION as statusValue, bcl.licenseNumber, bcl.validUpto FROM BillChecklist bcl "
+    //		+ " join BillConfigHrChecklist bc on bc.ID=bcl.checklistId  join CMSGENERALMASTER cgm on cgm.GMID = bcl.statusValue WHERE wcTransId = ?";
     SqlRowSet rs = jdbcTemplate.queryForRowSet(query,wcTransId);
     List<ChecklistItemDTO> list = new ArrayList<ChecklistItemDTO>();
     try {

@@ -192,7 +192,7 @@
 			<thead>
 				<tr>
 					<td  ><input type="checkbox"
-						id="contractorCheckbox" onchange="toggleSelectAllAadharWorkmen()">
+						id="selectAllCheckbox" onchange="toggleSelectAll()">
 					</td>
 					<!-- Add more table headers for each column -->
 					<th class="header-text" onclick="sortTable(1)"><spring:message code="label.contractorRegistrationId"/><span

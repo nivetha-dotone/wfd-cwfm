@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.pojo.CMSContractorRegistrationLLWC;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
 public class ContractorRegistrationLLWCDAOImpl implements ContractorRegistrationLLWCDAO {
@@ -17,26 +18,39 @@ public class ContractorRegistrationLLWCDAOImpl implements ContractorRegistration
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    public String getNextCONTRACTORREGLLWCID() {
+	    return QueryFileWatcher.getQuery("GET_NEXT_CONTRACTORREGLLWCID");
+	}
+    public String getWOIDandWCCODEexists() {
+	    return QueryFileWatcher.getQuery("GET_COUNT_WOID_WCCODE_CONTREGID");
+	}
+    public String insertLLWCRecords() {
+	    return QueryFileWatcher.getQuery("INSERT_CONTRACTOR_REGISTRATION_LLWC");
+	}
+    
     @Override
     public int getNextId() {
-        String sql = "SELECT ISNULL(MAX(CONTRACTORREGLLWCID), 0) + 1 FROM CMSContractorRegistrationLLWC";
+    	String sql=getNextCONTRACTORREGLLWCID();
+       // String sql = "SELECT ISNULL(MAX(CONTRACTORREGLLWCID), 0) + 1 FROM CMSContractorRegistrationLLWC";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
     @Override
     public boolean exists(long regId, int woId, String wcCode) {
-        String sql = "SELECT COUNT(*) FROM CMSContractorRegistrationLLWC " +
-                     "WHERE CONTRACTORREGID = ? AND WOID = ? AND WCCODE = ?";
+    	String sql=getWOIDandWCCODEexists();
+        //String sql = "SELECT COUNT(*) FROM CMSContractorRegistrationLLWC " +
+        //             "WHERE CONTRACTORREGID = ? AND WOID = ? AND WCCODE = ?";
         Integer count = jdbcTemplate.queryForObject(sql, new Object[]{regId, woId, wcCode}, Integer.class);
         return count != null && count > 0;
     }
 
     @Override
     public void insertLLWCRecords(List<CMSContractorRegistrationLLWC> records) {
-        String sql = "INSERT INTO CMSContractorRegistrationLLWC (" +
-                " CONTRACTORREGID, CONTRACTORID, UNITID, " +
-                "WOID, LICENCETYPE, WONUMBER, WCCODE, STATUS, DELETESW, CREATEDDTM, CREATEDBY, UPDATEDDTM, UPDATEDBY" +
-                ") VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    	String sql=insertLLWCRecords();
+       // String sql = "INSERT INTO CMSContractorRegistrationLLWC (" +
+        //        " CONTRACTORREGID, CONTRACTORID, UNITID, " +
+        //        "WOID, LICENCETYPE, WONUMBER, WCCODE, STATUS, DELETESW, CREATEDDTM, CREATEDBY, UPDATEDDTM, UPDATEDBY" +
+       //         ") VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {

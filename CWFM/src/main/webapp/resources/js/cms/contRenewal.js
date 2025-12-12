@@ -595,6 +595,7 @@ function searchContRenewBasedOnPE() {
 											 const approvercomments = $("#approvercomments").val().trim();
 										if (approvercomments === "" && status==5) {
 										    $("#error-approvercomments").show();
+										    alert("Comments Required in Comments");
 										    isValid = false;
 										}else{
 											$("#error-approvercomments").hide();

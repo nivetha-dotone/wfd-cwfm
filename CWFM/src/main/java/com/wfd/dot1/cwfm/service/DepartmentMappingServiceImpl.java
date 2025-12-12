@@ -24,22 +24,22 @@ public class DepartmentMappingServiceImpl implements DepartmentMappingService {
 	    	 int subDeptId = mapping.getSubDepartmentId(); // primitive int
 
 	         // Case 1: Principal Employer + Department (no sub-department)
-	         if (subDeptId == 0) {
-	            boolean exists = deptMapDao.existsMapping(
-	                    mapping.getPrincipalEmployerId(),
-	                    mapping.getDepartmentId()
-	            );
-	            if (exists) {
-	                String principalEmployerName = deptMapDao.getPrincipalEmployerNameById(mapping.getPrincipalEmployerId());
-	                String departmentName = deptMapDao.getDepartmentNameById(mapping.getDepartmentId());
+	      //   if (subDeptId == 0) {
+	       //     boolean exists = deptMapDao.existsMapping(
+	       //             mapping.getPrincipalEmployerId(),
+	       //             mapping.getDepartmentId()
+	       //     );
+	       //     if (exists) {
+	       //         String principalEmployerName = deptMapDao.getPrincipalEmployerNameById(mapping.getPrincipalEmployerId());
+	       //         String departmentName = deptMapDao.getDepartmentNameById(mapping.getDepartmentId());
 
-	                throw new RuntimeException("Mapping already exists for Principal Employer: "
-	                        + principalEmployerName + " and Department: " + departmentName);
-	            }
-	        }
+	       //         throw new RuntimeException("Mapping already exists for Principal Employer: "
+	         //               + principalEmployerName + " and Department: " + departmentName);
+	        //    }
+	      //  }
 
 	        // Case 2: Principal Employer + Department + SubDepartment
-	        else {
+	       // else {
 	            boolean trioExists = deptMapDao.trioexistsMapping(
 	                    mapping.getPrincipalEmployerId(),
 	                    mapping.getDepartmentId(),
@@ -55,7 +55,7 @@ public class DepartmentMappingServiceImpl implements DepartmentMappingService {
 	                        + " and SubDepartment: " + subDepartmentName);
 	            }
 	        }
-	    }
+	    //}
 
 	    // ✅ Save only if no duplicates were found
 	    deptMapDao.save(mappings);

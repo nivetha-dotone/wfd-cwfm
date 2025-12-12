@@ -81,6 +81,9 @@ public class UserDAOImpl implements UserDAO {
     public String doesUserExist() {
 	    return QueryFileWatcher.getQuery("DOES_USER_EXIST");
     }
+    public String getUserWithUserAccount() {
+	    return QueryFileWatcher.getQuery("GET_USER_WITH_USERACCOUNT");
+    }
     private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$";
 
     @Override
@@ -331,7 +334,8 @@ public boolean doesUserExist(String userAccount) {
 }
 @Override
 public List<MasterUser> getUserWithUserAccount(String userAccount) {
-    String query = "SELECT userid,userAccount, password,EmailId, FirstName, LastName, ContactNumber, Status FROM MASTERUSER WHERE userAccount = ?";
+	String query = getUserWithUserAccount();
+    //String query = "SELECT userid,userAccount, password,EmailId, FirstName, LastName, ContactNumber, Status FROM MASTERUSER WHERE userAccount = ?";
 
     return jdbcTemplate.query(query, (rs, rowNum) -> {
         MasterUser user = new MasterUser();

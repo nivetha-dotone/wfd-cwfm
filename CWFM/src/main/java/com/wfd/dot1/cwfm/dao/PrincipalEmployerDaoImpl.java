@@ -53,6 +53,9 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	    public String getDocumentById() {
 		    return QueryFileWatcher.getQuery("GET_DOCUMENT_BY_ID");
 		}
+	    public String getAllDepartmentsForAdmin() {
+		    return QueryFileWatcher.getQuery("GET_AAL_DEPARTMENTS_FOR_ADMIN");
+		}
 	 
 	@Override
 	public List<PrincipalEmployer> getAllPrincipalEmployer(String userAccount) {
@@ -178,7 +181,8 @@ public class PrincipalEmployerDaoImpl implements PrincipalEmployerDao {
 	public List<PrincipalEmployer> getAllDepartmentForAdmin() {
 		log.info("Entering into getAllPrincipalEmployerForAdmin dao method ");
 		List<PrincipalEmployer> peList= new ArrayList<PrincipalEmployer>();
-		String query = "select GMID,GMNAME from CMSGENERALMASTER cgm join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID where cgt.GMTYPE='Department'";
+		String query = getAllDepartmentsForAdmin();
+		//String query = "select GMID,GMNAME from CMSGENERALMASTER cgm join CMSGMTYPE cgt on cgt.GMTYPEID=cgm.GMTYPEID where cgt.GMTYPE='Department'";
 		log.info("Query to getAllPrincipalEmployerForAdmin "+query);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query);
 		while(rs.next()) {

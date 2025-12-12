@@ -506,7 +506,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 			//approver logic needs to be added
 			 GatePassMain gatePassMain = workmenDao.getIndividualContractWorkmenDetailsByGatePassId(dto.getGatePassId());
-			if(( (gatePassMain.getGatePassAction().equals(GatePassType.CREATE.getStatus()) || gatePassMain.getGatePassAction().equals(GatePassType.RENEW.getStatus()) ) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
+
+			if((gatePassMain.getGatePassAction().equals(GatePassType.CREATE.getStatus()) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
+					||(gatePassMain.getGatePassAction().equals(GatePassType.RENEW.getStatus()) && gatePassMain.getGatePassStatus().equals(GatePassStatus.APPROVED.getStatus()))
 					||dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()) || dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())
 					) {
 				
