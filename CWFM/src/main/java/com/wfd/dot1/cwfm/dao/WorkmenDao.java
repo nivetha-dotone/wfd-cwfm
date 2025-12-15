@@ -211,4 +211,6 @@ public interface WorkmenDao {
 
 	public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId) ;
 
+	GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId);
+
 }

@@ -866,7 +866,7 @@ public class WorkmenController {
 			
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassUnblockDeblackListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLOCK.getStatus(),GatePassType.BLOCK.getStatus()," ");
+    			listDto= workmenService.getGatePassUnblockDeblackListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.UNBLOCK.getStatus(),GatePassType.BLOCK.getStatus()," ");
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.UNBLOCK.getStatus());
@@ -961,7 +961,7 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
-    			listDto= workmenService.getGatePassUnblockDeblackListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.BLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus()," ");
+    			listDto= workmenService.getGatePassUnblockDeblackListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.DEBLACKLIST.getStatus(),GatePassType.BLACKLIST.getStatus()," ");
         		
 			}else {	
 				listDto = workmenService.getGatePassActionListingForApprovers(principalEmployerId,deptId,user,GatePassType.DEBLACKLIST.getStatus());
@@ -1768,7 +1768,7 @@ public class WorkmenController {
 	});
 
 	
-	GatePassMain gpm = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
+	GatePassMain gpm = workmenService.getIndividualContractWorkmenDetailsByGatePassIdRenew(gatePassId);
 	GatePassMain gatePassMainObj = workmenService.getIndividualContractWorkmenDraftDetails(gpm.getTransactionId());
 	String transactionId= workmenService.generateTransactionId();
 	gpm.setTransactionId(transactionId);
@@ -1932,11 +1932,13 @@ public class WorkmenController {
     	try {
 
     		gatePassMainObj = workmenService.getIndividualContractWorkmenDetailsByGatePassId(gatePassId);
-    		transactionId = gatePassMainObj.getTransactionId();
+    		String oldTransactionId=gatePassMainObj.getTransactionId();
+   		 	gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		transactionId=workmenService.getTransactionIdByGPId(gatePassId, GatePassType.RENEW.getStatus());
+    		gatePassMainObj.setTransactionId(transactionId);
     		request.setAttribute("GatePassObj", gatePassMainObj);
-    		 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
-    		 gatePassMainObj.setOldTransactionId(oldTransactionId);
-
+    		 
+    		 
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -2659,11 +2661,11 @@ public class WorkmenController {
         String status = workmenService.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
 if (status.contains("Unique")) {
 	
-	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
-	  if(!valid)
-	  { 
-		  status = "Invalid"; 
-		  }
+//	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
+//	  if(!valid)
+//	  { 
+//		  status = "Invalid"; 
+//		  }
 	 
 }
         Map<String, String> result = new HashMap<>();

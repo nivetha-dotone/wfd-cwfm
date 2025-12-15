@@ -2693,6 +2693,7 @@ function redirectToWorkmenRenewEdit() {
 	xhr.onreadystatechange = function() {
 	if (xhr.readyState == 4 && xhr.status == 200) {
 			document.getElementById("mainContent").innerHTML = xhr.responseText;
+			setDateRange();
 	}
 	};
 	xhr.open("GET", "/CWFM/contractworkmen/renew/" + gatePassId, true);

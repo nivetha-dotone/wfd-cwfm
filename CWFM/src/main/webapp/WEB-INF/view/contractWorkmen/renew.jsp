@@ -607,7 +607,7 @@ label {
 								<c:forEach var="pe" items="${PrincipalEmployer}">
 								
                 					<option value="${pe.id}"
-									${GatePassObj.principalEmployer eq pe.id ? 'selected="selected"':''}>
+									${GatePassObj.unitId eq pe.id ? 'selected="selected"':''}>
 									${pe.description}</option>
             					</c:forEach>
 							
@@ -724,7 +724,7 @@ label {
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
 								<c:if test="${pe.licenceType eq 'WC' || pe.licenceType eq 'ESIC'}">
-                					<option value="${pe.wcId}"  ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
+                					<option value="${pe.wcId}"  ${GatePassObj.wcEsicNo eq pe.wcCode ? 'selected="selected"' : ''}>
 									${pe.wcCode}</option>
 									</c:if>
             					</c:forEach>
@@ -738,7 +738,7 @@ label {
                                 <c:forEach var="pe" items="${Wcs}">
 								<c:if test="${pe.licenceType eq 'LL'}">
                 					<option value="${pe.wcId}"
-									${GatePassObj.llNo eq pe.wcId ? 'selected="selected"':''}>
+									${GatePassObj.llNo eq pe.wcCode ? 'selected="selected"':''}>
 									${pe.wcCode}</option>
 									</c:if>
             					</c:forEach>

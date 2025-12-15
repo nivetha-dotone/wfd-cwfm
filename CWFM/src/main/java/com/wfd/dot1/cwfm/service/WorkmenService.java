@@ -134,6 +134,8 @@ public interface WorkmenService {
 
 	public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId);
 
+	public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId);
+
 	
 
 	

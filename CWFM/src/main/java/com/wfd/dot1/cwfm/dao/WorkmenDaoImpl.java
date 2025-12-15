@@ -3358,4 +3358,87 @@ public String getAadharStatus(String aadharNumber) {
 	return null;
 }
 
+public String getContractWorkmenDetailsByGpIdRenew() {
+	return QueryFileWatcher.getQuery("GET_CONTRACT_WORKMEN_DETAILS_BY_GPID_RENEW");
+}
+@Override
+public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId) {
+	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
+	GatePassMain dto = null;
+	String query = getContractWorkmenDetailsByGpIdRenew();
+	log.info("Query to getIndividualContractWorkmenDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
+	if(rs.next()) {
+		dto = new GatePassMain();
+		dto.setTransactionId(rs.getString("TransactionId"));
+		dto.setGatePassId(rs.getString("GatePassId"));
+		dto.setUnitId(rs.getString("peId"));
+		dto.setGatePassAction(rs.getString("GatePassTypeId"));
+		dto.setGatePassStatus(rs.getString("GatePassStatus"));
+		dto.setAadhaarNumber(rs.getString("AadharNumber"));
+		dto.setFirstName(rs.getString("FirstName"));
+		dto.setLastName(rs.getString("LastName"));
+		dto.setDateOfBirth(rs.getString("DOB"));
+		dto.setGender(rs.getString("Gender"));
+		dto.setRelationName(rs.getString("RelativeName"));
+		dto.setIdMark(rs.getString("IdMark"));
+		dto.setMobileNumber(rs.getString("MobileNumber"));
+		dto.setMaritalStatus(rs.getString("MaritalStatus"));
+		dto.setPrincipalEmployer(rs.getString("UnitId"));
+		dto.setContractor(rs.getString("ContractorId"));
+		dto.setWorkorder(rs.getString("WorkorderId"));
+		dto.setTrade(rs.getString("TradeId"));
+		dto.setSkill(rs.getString("SkillId"));
+		dto.setDepartment(rs.getString("DepartmentId"));
+		dto.setSubdepartment(rs.getString("AreaId"));
+		dto.setEic(rs.getString("EicId"));
+		dto.setNatureOfJob(rs.getString("NatureOfJob"));
+		dto.setWcEsicNo(rs.getString("WcEsicNo"));
+		dto.setHazardousArea(rs.getString("HazardousArea"));
+		dto.setAccessArea(rs.getString("AccessAreaId"));
+		dto.setUanNumber(rs.getString("UanNumber"));
+		dto.setHealthCheckDate(rs.getString("HealthCheckDate"));
+		dto.setPfNumber(rs.getString("pfnumber"));
+		dto.setEsicNumber(rs.getString("esicNumber"));
+		dto.setBloodGroup(rs.getString("BloodGroupId"));
+		dto.setAccommodation(rs.getString("Accommodation"));
+		dto.setAcademic(rs.getString("AcademicId"));
+		dto.setTechnical(rs.getString("Technical"));
+		dto.setIfscCode(rs.getString("IfscCode"));
+		dto.setAccountNumber(rs.getString("AccountNumber"));
+		dto.setEmergencyName(rs.getString("EmergencyContactName"));
+		dto.setEmergencyNumber(rs.getString("EmergencyContactNumber"));
+		dto.setWageCategory(rs.getString("WorkmenWageCategoryId"));
+		dto.setBonusPayout(rs.getString("BonusPayoutId"));
+		dto.setZone(rs.getString("ZoneId"));
+		dto.setBasic(new BigDecimal(rs.getString("Basic")));
+		dto.setDa(new BigDecimal(rs.getString("DA")));
+		dto.setHra(new BigDecimal(rs.getString("HRA")));
+		dto.setWashingAllowance(new BigDecimal(rs.getString("WashingAllowance")));
+		dto.setOtherAllowance(new BigDecimal(rs.getString("OtherAllowance")));
+		dto.setUniformAllowance(new BigDecimal(rs.getString("UniformAllowance")));
+		dto.setPfCap(rs.getString("PfCap"));
+		dto.setCreatedBy(rs.getString("UpdatedBy"));
+		dto.setAadharDocName(rs.getString("AadharDocName"));
+		dto.setPhotoName(rs.getString("PhotoName"));
+		dto.setPoliceVerificationDocName(rs.getString("PoliceVerificationDocName"));
+		dto.setBankDocName(rs.getString("BankDocName"));
+		dto.setIdProof2DocName(rs.getString("IdProof2DocName"));
+		dto.setMedicalDocName(rs.getString("MedicalDocName"));
+		dto.setForm11DocName(rs.getString("Form11DocName"));
+		dto.setOtherDocName(rs.getString("OtherDocName"));
+		dto.setTrainingDocName(rs.getString("TrainingDocName"));
+		dto.setEducationDocName(rs.getString("EducationDocName"));
+		dto.setComments(rs.getString("Comments"));
+		dto.setAddress(rs.getString("Address"));
+		dto.setDoj(rs.getString("DOJ"));
+		dto.setPfApplicable(rs.getString("pfapplicable"));
+		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
+		dto.setDot(rs.getString("DOT"));
+		dto.setLlNo(rs.getString("LLNo"));
+	}
+	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
+	return dto;
+}
+
 }

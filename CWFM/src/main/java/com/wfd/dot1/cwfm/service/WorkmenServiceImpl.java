@@ -1069,5 +1069,9 @@ public class WorkmenServiceImpl implements WorkmenService{
 
 	        return workmenDao.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
 	    }
+	@Override
+	public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId) {
+		return workmenDao.getIndividualContractWorkmenDetailsByGatePassIdRenew(gatePassId);
+	}
 	}
 
