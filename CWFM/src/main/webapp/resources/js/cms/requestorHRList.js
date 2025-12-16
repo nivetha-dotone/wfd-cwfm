@@ -313,70 +313,158 @@ function hrViewRequestorDetails(buttonEl) {
   }
 }
 
-async function hrUpdateRequest() {
-  const status = document.getElementById("hrStatusSelect").value
-  const remark = document.getElementById("hrRemarkText").value.trim()
-  const newAttachmentsInput = document.getElementById("hrNewAttachments")
-  const newFiles = newAttachmentsInput.files
+// async function hrUpdateRequest() {
+//   const status = document.getElementById("hrStatusSelect").value
+//   const remark = document.getElementById("hrRemarkText").value.trim()
+//   const newAttachmentsInput = document.getElementById("hrNewAttachments")
+//   const newFiles = newAttachmentsInput.files
 
-  if (!status) {
-    alert("Please select a status (Approved or Rejected).")
-    return
-  }
+//   if (!status) {
+//     alert("Please select a status (Approved or Rejected).")
+//     return
+//   }
 
-  if (!remark) {
-    alert("Please enter a remark.")
-    return
-  }
+//   if (!remark) {
+//     alert("Please enter a remark.")
+//     return
+//   }
 
-  if (!hrCurrentTransactionId) {
-    alert("No transaction selected.")
-    return
-  }
+//   if (!hrCurrentTransactionId) {
+//     alert("No transaction selected.")
+//     return
+//   }
 
-  const statusText = status === "true" ? "Approved" : "Rejected"
-  const confirmed = window.confirm(`Are you sure you want to update this request as ${statusText}?`)
-  if (!confirmed) {
-    return
-  }
+//   const statusText = status === "true" ? "Approved" : "Rejected"
+//   const confirmed = window.confirm(`Are you sure you want to update this request as ${statusText}?`)
+//   if (!confirmed) {
+//     return
+//   }
 
-  const updateData = {
-    status: status === "true",
-    reMark: remark,
-    transactionId: hrCurrentTransactionId,
-  }
+//   const updateData = {
+//     status: status === "true",
+//     reMark: remark,
+//     transactionId: hrCurrentTransactionId,
+//   }
 
-  const formData = new FormData()
-  formData.append("data", JSON.stringify(updateData))
+//   const formData = new FormData()
+//   formData.append("data", JSON.stringify(updateData))
 
-  for (let i = 0; i < newFiles.length; i++) {
-    formData.append("files", newFiles[i])
-  }
+//   for (let i = 0; i < newFiles.length; i++) {
+//     formData.append("files", newFiles[i])
+//   }
 
-  const modal = document.getElementById("hrModalContent")
-  modal.classList.add("loading")
+//   const modal = document.getElementById("hrModalContent")
+//   modal.classList.add("loading")
 
-  try {
-    const response = await fetch(hrUpdateEndpoint, {
-      method: "PUT",
-      body: formData,
-    })
+//   try {
+//     const response = await fetch(hrUpdateEndpoint, {
+//       method: "PUT",
+//       body: formData,
+//     })
 
-    modal.classList.remove("loading")
+//     modal.classList.remove("loading")
 
-    if (!response.ok) {
-      const message = await hrExtractErrorMessage(response)
-      throw new Error(message)
+//     if (!response.ok) {
+//       const message = await hrExtractErrorMessage(response)
+//       throw new Error(message)
+//     }
+
+//     alert("Request updated successfully!")
+//     hrCloseModal()
+
+
+//   } catch (error) {
+//     modal.classList.remove("loading")
+//     console.error("Update failed:", error)
+//     alert("Failed to update request. Please try again.")
+//   }
+// }
+
+
+function hrUpdateRequest() {
+    const status = document.getElementById("hrStatusSelect").value;
+    const remark = document.getElementById("hrRemarkText").value.trim();
+    const newAttachmentsInput = document.getElementById("hrNewAttachments");
+    const newFiles = newAttachmentsInput.files;
+
+    if (!status) {
+        alert("Please select a status (Approved or Rejected).");
+        return;
     }
 
-    alert("Request updated successfully!")
-    hrCloseModal()
-    hrRefreshTable()
-  } catch (error) {
-    modal.classList.remove("loading")
-    console.error("Update failed:", error)
-    alert("Failed to update request. Please try again.")
-  }
+    if (!remark) {
+        alert("Please enter a remark.");
+        return;
+    }
+
+    if (!hrCurrentTransactionId) {
+        alert("No transaction selected.");
+        return;
+    }
+
+    const statusText = status === "true" ? "Approved" : "Rejected";
+    const confirmed = confirm(`Are you sure you want to update this request as ${statusText}?`);
+    if (!confirmed) return;
+
+    // Prepare JSON
+    const updateData = {
+        status: status === "true",
+        reMark: remark,
+        transactionId: hrCurrentTransactionId
+    };
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(updateData));
+
+    // Attach new files
+    for (let i = 0; i < newFiles.length; i++) {
+        formData.append("files", newFiles[i]);
+    }
+
+    const modal = document.getElementById("hrModalContent");
+    modal.classList.add("loading");
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", hrUpdateEndpoint, true);
+
+    xhr.onload = function () {
+        modal.classList.remove("loading");
+        console.log("XHR Status:", xhr.status);
+        console.log("Response:", xhr.responseText);
+
+        if (xhr.status === 200) {
+            console.log("HR Request updated successfully.");
+
+            // Store success message
+            sessionStorage.setItem("successMessage", "HR Request updated successfully!");
+
+            // Close modal
+            hrCloseModal();
+
+            // Redirect via AJAX (same as your Gatepass logic)
+            loadCommonList('/requestor/getListHRequestor', 'Requestor List');
+        }
+        else if (xhr.status === 400) {
+            const msg = xhr.responseText.trim();
+            console.error("Validation error:", msg);
+            showLicenseError(msg);
+            return;
+        }
+        else {
+            console.error("Server error:", xhr.status, xhr.responseText);
+            sessionStorage.setItem("errorMessage", "Failed to update HR request!");
+            alert("Failed to update request.");
+        }
+    };
+
+    xhr.onerror = function () {
+        modal.classList.remove("loading");
+        console.error("Network error");
+        sessionStorage.setItem("errorMessage", "Failed to update HR request!");
+        alert("Network error occurred.");
+    };
+
+    xhr.send(formData);
 }
 
 async function hrExtractErrorMessage(response) {

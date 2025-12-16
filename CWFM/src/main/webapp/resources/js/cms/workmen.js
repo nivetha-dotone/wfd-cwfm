@@ -1931,7 +1931,7 @@ function redirectToWorkmenBlockView(mode) {
   var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
   												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 												   if(mode === "add"){
-  												    if (gatePassType.toLowerCase() === "block" && (status.toLowerCase() === "approval pending")) {
+  												    if (gatePassType.toLowerCase() === "unblock" && (status.toLowerCase() === "approval pending" || status.toLowerCase() === "approval pending")) {
                                                        alert("UnBlock request already created.");
                                                       return;
                                                    }}
@@ -1981,7 +1981,7 @@ function redirectToWorkmenBlockView(mode) {
 	  var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
 	  												   var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 													   if(mode === "add"){
-	  												    if (gatePassType.toLowerCase() === "blacklist" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
+	  												    if (gatePassType.toLowerCase() === "deblacklist" && (status.toLowerCase() === "approved" || status.toLowerCase() === "approval pending")) {
                                                        alert("DeBlack request already created.");
                                                       return;
                                                    }}

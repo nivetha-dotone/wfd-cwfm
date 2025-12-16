@@ -23,10 +23,16 @@ function showLoading(text = "Processing your request...", subtext = "Please wait
     buttons.forEach((btn) => (btn.disabled = true))
   }
 }
-function validateName(input) {
-  // Remove any characters that are NOT letters or spaces
-  input.value = input.value.replace(/[^A-Za-z\s]/g, '');
+function validateNamePASS(input) {
+    // Allow only letters and spaces
+    input.value = input.value.replace(/[^A-Za-z\s]/g, '');
+
+    // Limit to 40 characters
+    if (input.value.length > 40) {
+        input.value = input.value.substring(0, 40);
+    }
 }
+
 
   
 function formatName2() {
@@ -254,199 +260,283 @@ function extractKeyInfo(text) {
   return summary
 }
 
+// function saveRequester() {
+//   console.log("  ========== SAVE REQUESTER FUNCTION STARTED ==========")
+//   console.log("  Function called at:", new Date().toISOString())
+//   console.log("  Browser info:", navigator.userAgent)
+
+//   const requiredElements = [
+//     "principalEmployer",
+//     "contractor",
+//     "name",
+//     "aadharNumber",
+//     "department",
+//     "academic",
+//     "additionalQualification",
+//     "shortNote",
+//     "attachCV",
+//   ]
+
+//   console.log("  Checking if all required elements exist:")
+//   const missingElements = []
+//   requiredElements.forEach((id) => {
+//     const element = document.getElementById(id)
+//     if (!element) {
+//       missingElements.push(id)
+//       console.error("  Missing element:", id)
+//     } else {
+//       console.log("  Element found:", id, "- Value:", element.value || element.files?.length || "N/A")
+//     }
+//   })
+
+//   if (missingElements.length > 0) {
+//     console.error("  CRITICAL ERROR: Missing elements:", missingElements)
+//     alert("Form elements are missing. Please refresh the page and try again.")
+//     return
+//   }
+
+//   console.log("  All elements found, proceeding with validation")
+
+//   if (!confirm("Are you sure you want to add this new request? Please click OK to confirm.")) {
+//     console.log("  User cancelled the save operation")
+//     return
+//   }
+
+//   try {
+//     if (validateForm()) {
+//       console.log("  Form validation passed, building form data")
+
+//       showLoading("Saving requester data...", "Please wait while we process your information")
+
+//       const formData = new FormData()
+
+//       const principalEmployerValue = document.getElementById("principalEmployer").value
+//       const contractorValue = document.getElementById("contractor").value
+//       const nameValue = document.getElementById("name").value
+//       const aadharValue = document.getElementById("aadharNumber").value
+//       const departmentValue = document.getElementById("department").value
+//       const academicValue = document.getElementById("academic").value
+//       const additionalQualValue = document.getElementById("additionalQualification").value
+//       const shortNoteValue = document.getElementById("shortNote").value
+//       const fileInput = document.getElementById("attachCV")
+
+//       console.log("  Form values collected:", {
+//         principalEmployer: principalEmployerValue,
+//         contractor: contractorValue,
+//         name: nameValue,
+//         aadhar: aadharValue,
+//         department: departmentValue,
+//         academic: academicValue,
+//         additionalQual: additionalQualValue,
+//         shortNote: shortNoteValue,
+//         hasFile: fileInput.files.length > 0,
+//         fileName: fileInput.files[0]?.name || "No file",
+//       })
+
+//       const requesterData = {
+//         transactionId: generateTransactionId(),
+//         prEmpId: Number.parseInt(principalEmployerValue) || 0,
+//         contractorId: Number.parseInt(contractorValue) || 432,
+//         name: nameValue || "",
+//         aadharNumber: aadharValue || "",
+//         forPostId: Number.parseInt(departmentValue) || 546,
+//         academicId: Number.parseInt(academicValue) || 0,
+//         additionalQualification: additionalQualValue || "",
+//         attachmentCv: fileInput.files[0]?.name || "",
+//         shortNote: shortNoteValue || "",
+//         status: null, // Always null as per requirement
+//         updatedBy: "${sessionScope.loginuser.userAccount}" || "system",
+//       }
+
+//       console.log("  JSON data prepared:", JSON.stringify(requesterData, null, 2))
+
+//       formData.append("request", JSON.stringify(requesterData))
+
+//       if (fileInput.files[0]) {
+//         formData.append("attachCV", fileInput.files[0])
+//         console.log("  File attached:", fileInput.files[0].name, "Size:", fileInput.files[0].size, "bytes")
+//       }
+
+//       console.log("  FormData contents:")
+//       for (const pair of formData.entries()) {
+//         if (pair[1] instanceof File) {
+//           console.log("  FormData -", pair[0] + ":", "FILE -", pair[1].name, pair[1].size + " bytes")
+//         } else {
+//           console.log("  FormData -", pair[0] + ":", pair[1])
+//         }
+//       }
+
+//       console.log("  Creating XMLHttpRequest...")
+
+//       // Submit via AJAX
+//       const xhr = new XMLHttpRequest()
+//       const url = "/CWFM/requestor/saveRequestor"
+//       console.log("  Target URL:", url)
+
+//       xhr.open("POST", url, true)
+//       console.log("  XMLHttpRequest opened")
+
+//       xhr.onloadstart = () => {
+//         console.log("  XMLHttpRequest - Load started")
+//       }
+
+//       xhr.onprogress = (e) => {
+//         if (e.lengthComputable) {
+//           const progress = Math.round((e.loaded / e.total) * 100)
+//           console.log("  XMLHttpRequest - Progress:", progress + "%")
+//           showLoading("Uploading data...", `Progress: ${progress}%`)
+//         }
+//       }
+
+//       xhr.onload = () => {
+//         console.log("  ========== AJAX RESPONSE RECEIVED ==========")
+//         console.log("  Status:", xhr.status)
+//         console.log("  Status Text:", xhr.statusText)
+//         console.log("  Response Headers:", xhr.getAllResponseHeaders())
+//         console.log("  Response Text:", xhr.responseText)
+//         console.log("  Response Type:", xhr.responseType)
+
+//         hideLoading()
+
+        
+//         if (xhr.status === 200) {
+//           console.log("  SUCCESS - Request completed successfully")
+//           alert("Requester saved successfully!")
+//           resetFormData()
+//           sessionStorage.setItem("successMessage", "Gatepass saved successfully!");
+//           loadCommonList('/requestor/getRequestorList', 'Requestor List');
+//         } else if (xhr.status === 0) {
+//           console.error("  ERROR - Network error or CORS issue")
+//           alert("Network error. Please check if the server is running and accessible.")
+          
+//         } else {
+//           console.error("  ERROR - Server returned error status")
+//           alert("Error saving requester. Status: " + xhr.status + ". Response: " + xhr.responseText)
+//         }
+//       }
+
+//       xhr.onerror = () => {
+//         console.error("  ========== AJAX ERROR OCCURRED ==========")
+//         console.error("  Network error occurred")
+//         console.error("  Status:", xhr.status)
+//         console.error("  Ready State:", xhr.readyState)
+//         hideLoading()
+//         alert("Network error. Please check your connection and server status.")
+//       }
+
+//       xhr.ontimeout = () => {
+//         console.error("  XMLHttpRequest - Timeout occurred")
+//         hideLoading()
+//         alert("Request timeout. Please try again.")
+//       }
+
+//       xhr.onreadystatechange = () => {
+//         console.log(
+//           "  Ready state changed to:",
+//           xhr.readyState,
+//           "(" + ["UNSENT", "OPENED", "HEADERS_RECEIVED", "LOADING", "DONE"][xhr.readyState] + ")",
+//         )
+//       }
+
+//       xhr.timeout = 30000 // 30 seconds
+
+//       console.log("  Sending AJAX request...")
+//       console.log("  Request will timeout after 30 seconds")
+//       xhr.send(formData)
+//       console.log("  XMLHttpRequest.send() called")
+//     } else {
+//       console.log("  Form validation failed - stopping execution")
+//     }
+//   } catch (error) {
+//     console.error("  ========== JAVASCRIPT ERROR IN SAVE FUNCTION ==========")
+//     console.error("  Error:", error)
+//     console.error("  Stack trace:", error.stack)
+//     hideLoading()
+//     alert("An error occurred while processing the form. Please check the console for details.")
+//   }
+
+//   console.log("  ========== SAVE REQUESTER FUNCTION ENDED ==========")
+// }
+
 function saveRequester() {
-  console.log("  ========== SAVE REQUESTER FUNCTION STARTED ==========")
-  console.log("  Function called at:", new Date().toISOString())
-  console.log("  Browser info:", navigator.userAgent)
 
-  const requiredElements = [
-    "principalEmployer",
-    "contractor",
-    "name",
-    "aadharNumber",
-    "department",
-    "academic",
-    "additionalQualification",
-    "shortNote",
-    "attachCV",
-  ]
-
-  console.log("  Checking if all required elements exist:")
-  const missingElements = []
-  requiredElements.forEach((id) => {
-    const element = document.getElementById(id)
-    if (!element) {
-      missingElements.push(id)
-      console.error("  Missing element:", id)
-    } else {
-      console.log("  Element found:", id, "- Value:", element.value || element.files?.length || "N/A")
+    // ---- VALIDATIONS ----
+    if (!validateForm()) {
+        console.error("Validation failed.");
+        return;
     }
-  })
 
-  if (missingElements.length > 0) {
-    console.error("  CRITICAL ERROR: Missing elements:", missingElements)
-    alert("Form elements are missing. Please refresh the page and try again.")
-    return
-  }
+    if (!confirm("Are you sure you want to add this new request?")) {
+        return;
+    }
 
-  console.log("  All elements found, proceeding with validation")
+    // ---- CAPITAL CASE UTILITY ----
+    function toCapitalCase(str) {
+        return str
+            .toLowerCase()
+            .split(" ")
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" ");
+    }
 
-  if (!confirm("Are you sure you want to add this new request? Please click OK to confirm.")) {
-    console.log("  User cancelled the save operation")
-    return
-  }
+    // ---- INPUT VALUES ----
+    const name = toCapitalCase($("#name").val().trim());
+    const shortNote = toCapitalCase($("#shortNote").val().trim());
+    const additionalQualification = toCapitalCase($("#additionalQualification").val().trim());
 
-  try {
-    if (validateForm()) {
-      console.log("  Form validation passed, building form data")
+    const fileInput = $("#attachCV")[0].files[0];
 
-      showLoading("Saving requester data...", "Please wait while we process your information")
-
-      const formData = new FormData()
-
-      const principalEmployerValue = document.getElementById("principalEmployer").value
-      const contractorValue = document.getElementById("contractor").value
-      const nameValue = document.getElementById("name").value
-      const aadharValue = document.getElementById("aadharNumber").value
-      const departmentValue = document.getElementById("department").value
-      const academicValue = document.getElementById("academic").value
-      const additionalQualValue = document.getElementById("additionalQualification").value
-      const shortNoteValue = document.getElementById("shortNote").value
-      const fileInput = document.getElementById("attachCV")
-
-      console.log("  Form values collected:", {
-        principalEmployer: principalEmployerValue,
-        contractor: contractorValue,
-        name: nameValue,
-        aadhar: aadharValue,
-        department: departmentValue,
-        academic: academicValue,
-        additionalQual: additionalQualValue,
-        shortNote: shortNoteValue,
-        hasFile: fileInput.files.length > 0,
-        fileName: fileInput.files[0]?.name || "No file",
-      })
-
-      const requesterData = {
+    // ---- BUILD JSON ----
+    const jsonData = {
         transactionId: generateTransactionId(),
-        prEmpId: Number.parseInt(principalEmployerValue) || 0,
-        contractorId: Number.parseInt(contractorValue) || 432,
-        name: nameValue || "",
-        aadharNumber: aadharValue || "",
-        forPostId: Number.parseInt(departmentValue) || 546,
-        academicId: Number.parseInt(academicValue) || 0,
-        additionalQualification: additionalQualValue || "",
-        attachmentCv: fileInput.files[0]?.name || "",
-        shortNote: shortNoteValue || "",
-        status: null, // Always null as per requirement
-        updatedBy: "${sessionScope.loginuser.userAccount}" || "system",
-      }
+        prEmpId: parseInt($("#principalEmployer").val()) || 0,
+        contractorId: parseInt($("#contractor").val()) || 0,
+        name: name,
+        aadharNumber: $("#aadharNumber").val().trim(),
+        forPostId: parseInt($("#department").val()) || 0,
+        academicId: parseInt($("#academic").val()) || 0,
+        additionalQualification: additionalQualification,
+        attachmentCv: fileInput ? fileInput.name : "",
+        shortNote: shortNote,
+        status: null,
+        updatedBy: $("#loggedUser").val() || "system"
+    };
 
-      console.log("  JSON data prepared:", JSON.stringify(requesterData, null, 2))
 
-      formData.append("request", JSON.stringify(requesterData))
+    const data = new FormData();
+    
+  
+    data.append("request", JSON.stringify(jsonData));
+    if (fileInput) data.append("attachCV", fileInput);
 
-      if (fileInput.files[0]) {
-        formData.append("attachCV", fileInput.files[0])
-        console.log("  File attached:", fileInput.files[0].name, "Size:", fileInput.files[0].size, "bytes")
-      }
 
-      console.log("  FormData contents:")
-      for (const pair of formData.entries()) {
-        if (pair[1] instanceof File) {
-          console.log("  FormData -", pair[0] + ":", "FILE -", pair[1].name, pair[1].size + " bytes")
-        } else {
-          console.log("  FormData -", pair[0] + ":", pair[1])
-        }
-      }
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/requestor/saveRequestor", true);
 
-      console.log("  Creating XMLHttpRequest...")
 
-      // Submit via AJAX
-      const xhr = new XMLHttpRequest()
-      const url = "/CWFM/requestor/saveRequestor"
-      console.log("  Target URL:", url)
-
-      xhr.open("POST", url, true)
-      console.log("  XMLHttpRequest opened")
-
-      xhr.onloadstart = () => {
-        console.log("  XMLHttpRequest - Load started")
-      }
-
-      xhr.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const progress = Math.round((e.loaded / e.total) * 100)
-          console.log("  XMLHttpRequest - Progress:", progress + "%")
-          showLoading("Uploading data...", `Progress: ${progress}%`)
-        }
-      }
-
-      xhr.onload = () => {
-        console.log("  ========== AJAX RESPONSE RECEIVED ==========")
-        console.log("  Status:", xhr.status)
-        console.log("  Status Text:", xhr.statusText)
-        console.log("  Response Headers:", xhr.getAllResponseHeaders())
-        console.log("  Response Text:", xhr.responseText)
-        console.log("  Response Type:", xhr.responseType)
-
-        hideLoading()
-
+    xhr.onload = function () {
         if (xhr.status === 200) {
-          console.log("  SUCCESS - Request completed successfully")
-          alert("Requester saved successfully!")
-          resetFormData()
-        } else if (xhr.status === 0) {
-          console.error("  ERROR - Network error or CORS issue")
-          alert("Network error. Please check if the server is running and accessible.")
-        } else {
-          console.error("  ERROR - Server returned error status")
-          alert("Error saving requester. Status: " + xhr.status + ". Response: " + xhr.responseText)
+            console.log("Requester saved successfully");
+            alert("Requester saved successfully!");
+
+            sessionStorage.setItem("successMessage", "Requester saved successfully!");
+
+            loadCommonList('/requestor/getRequestorList', 'Requestor List');
+        } 
+        else {
+            console.error("Error:", xhr.status, xhr.responseText);
+            alert("Error saving requester: " + xhr.responseText);
         }
-      }
+    };
 
-      xhr.onerror = () => {
-        console.error("  ========== AJAX ERROR OCCURRED ==========")
-        console.error("  Network error occurred")
-        console.error("  Status:", xhr.status)
-        console.error("  Ready State:", xhr.readyState)
-        hideLoading()
-        alert("Network error. Please check your connection and server status.")
-      }
+    xhr.onerror = function () {
+        console.error("Network error");
+        alert("Network error. Try again.");
+    };
 
-      xhr.ontimeout = () => {
-        console.error("  XMLHttpRequest - Timeout occurred")
-        hideLoading()
-        alert("Request timeout. Please try again.")
-      }
-
-      xhr.onreadystatechange = () => {
-        console.log(
-          "  Ready state changed to:",
-          xhr.readyState,
-          "(" + ["UNSENT", "OPENED", "HEADERS_RECEIVED", "LOADING", "DONE"][xhr.readyState] + ")",
-        )
-      }
-
-      xhr.timeout = 30000 // 30 seconds
-
-      console.log("  Sending AJAX request...")
-      console.log("  Request will timeout after 30 seconds")
-      xhr.send(formData)
-      console.log("  XMLHttpRequest.send() called")
-    } else {
-      console.log("  Form validation failed - stopping execution")
-    }
-  } catch (error) {
-    console.error("  ========== JAVASCRIPT ERROR IN SAVE FUNCTION ==========")
-    console.error("  Error:", error)
-    console.error("  Stack trace:", error.stack)
-    hideLoading()
-    alert("An error occurred while processing the form. Please check the console for details.")
-  }
-
-  console.log("  ========== SAVE REQUESTER FUNCTION ENDED ==========")
+    xhr.send(data);
 }
+
 
 function draftRequester() {
   console.log("  Draft button clicked - starting draftRequester function")
@@ -522,74 +612,85 @@ function cancelForm() {
 }
 
 function validateForm() {
-  console.log("  ========== FORM VALIDATION STARTED ==========")
-  let isValid = true
-  const errorLabels = document.querySelectorAll(".error-label")
-  console.log("  Found", errorLabels.length, "error labels")
-  errorLabels.forEach((label) => (label.style.display = "none"))
+  let isValid = true;
+
+  // Hide all errors first
+  document.querySelectorAll(".error-label").forEach((label) => {
+    label.style.display = "none";
+  });
+
+  console.log("===== VALIDATION STARTED =====");
 
   // Validate Principal Employer
-  const principalEmployer = document.getElementById("principalEmployer")
-  console.log("  Validating Principal Employer:", principalEmployer?.value)
+  const principalEmployer = document.getElementById("principalEmployer");
   if (!principalEmployer.value) {
-    console.log("  Principal Employer validation failed")
-    document.getElementById("error-principalEmployer").style.display = "block"
-    isValid = false
+    document.getElementById("error-principalEmployer").style.display = "block";
+    isValid = false;
   }
 
-  // Validate Name (string only)
-  const name = document.getElementById("name")
-  console.log("  Validating Name:", name?.value)
-  if (!name.value.trim() || !/^[a-zA-Z\s]+$/.test(name.value.trim())) {
-    console.log("  Name validation failed:", name.value)
-    document.getElementById("error-name").style.display = "block"
+  // Validate Contractor
+  const contractor = document.getElementById("contractor");
+  if (!contractor.value) {
+    document.getElementById("error-contractor").style.display = "block";
+    isValid = false;
+  }
+
+  // Validate Department
+  const department = document.getElementById("department");
+  if (!department.value) {
+    document.getElementById("error-department").style.display = "block";
+    isValid = false;
+  }
+
+  // Validate Name (letters, spaces, max 20 chars)
+  const name = document.getElementById("name");
+  if (
+    !name.value.trim() ||
+    !/^[A-Za-z\s]+$/.test(name.value.trim()) ||
+    name.value.trim().length > 20
+  ) {
+    document.getElementById("error-name").style.display = "block";
     document.getElementById("error-name").textContent =
-      "Valid name with letters only (no numbers or special characters) is required"
-    isValid = false
+      "Name must contain only letters and spaces (max 20 characters)";
+    isValid = false;
   }
 
   // Validate Aadhar Number (exactly 12 digits)
-  const aadharNumber = document.getElementById("aadharNumber")
-  console.log("  Validating Aadhar:", aadharNumber?.value)
+  const aadharNumber = document.getElementById("aadharNumber");
   if (!aadharNumber.value || !/^\d{12}$/.test(aadharNumber.value)) {
-    console.log("  Aadhar validation failed:", aadharNumber.value)
-    document.getElementById("error-aadharNumber").style.display = "block"
-    document.getElementById("error-aadharNumber").textContent = "Aadhar number must be exactly 12 digits"
-    isValid = false
+    document.getElementById("error-aadharNumber").style.display = "block";
+    document.getElementById("error-aadharNumber").textContent =
+      "Aadhar number must be exactly 12 digits";
+    isValid = false;
   }
 
-  // Validate Academic
-  const academic = document.getElementById("academic")
-  console.log("  Validating Academic:", academic?.value)
+  // Validate Academic Qualification
+  const academic = document.getElementById("academic");
   if (!academic.value) {
-    console.log("  Academic validation failed")
-    document.getElementById("error-academic").style.display = "block"
-    isValid = false
+    document.getElementById("error-academic").style.display = "block";
+    isValid = false;
   }
 
-  // Validate Additional Qualification (maximum 1000 characters)
-  const additionalQual = document.getElementById("additionalQualification")
-  console.log("  Validating Additional Qualification:", additionalQual?.value?.length)
+  // Validate Additional Qualification (max 1000 chars)
+  const additionalQual = document.getElementById("additionalQualification");
   if (additionalQual.value.length > 1000) {
-    console.log("  Additional Qualification validation failed")
-    document.getElementById("error-additionalQualification").style.display = "block"
+    document.getElementById("error-additionalQualification").style.display = "block";
     document.getElementById("error-additionalQualification").textContent =
-      "Additional Qualification cannot exceed 1000 characters"
-    isValid = false
+      "Additional Qualification cannot exceed 1000 characters";
+    isValid = false;
   }
 
-  // Validate CV attachment
-  const attachCV = document.getElementById("attachCV")
-  console.log("  Validating CV attachment:", attachCV?.files?.length)
+  // Validate CV Attachment
+  const attachCV = document.getElementById("attachCV");
   if (!attachCV.files.length) {
-    console.log("  CV attachment validation failed")
-    document.getElementById("error-attachCV").style.display = "block"
-    isValid = false
+    document.getElementById("error-attachCV").style.display = "block";
+    isValid = false;
   }
 
-  console.log("  ========== FORM VALIDATION RESULT:", isValid, "==========")
-  return isValid
+  console.log("===== VALIDATION RESULT:", isValid, "=====");
+  return isValid;
 }
+
 
 function validateBasicFields() {
   console.log("  Starting basic field validation")

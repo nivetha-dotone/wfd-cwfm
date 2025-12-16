@@ -117,9 +117,9 @@ public interface WorkmenDao {
 
 	int getWorkFlowTYpeByTransactionId(String transactionId,String actionId);
 
-	boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId);
+	boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId, String unitId);
 
-	boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId);
+	boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId,String unitId);
 
 	int getWorkFlowTYpeNew(String principalEmployer, String gatePassAction);
 

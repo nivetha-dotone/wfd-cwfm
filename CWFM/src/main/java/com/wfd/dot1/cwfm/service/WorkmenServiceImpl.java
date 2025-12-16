@@ -331,8 +331,8 @@ public class WorkmenServiceImpl implements WorkmenService{
 	    } else {
 	        // Parallel approval
 	        isLastApprover = dto.getGatePassType().equals(GatePassType.CREATE.getStatus())
-	                ? workmenDao.isLastApproverForParallel(dto.getGatePassType(), dto.getTransactionId(), dto.getRoleId())
-	                : workmenDao.isLastApproverForParallelGatePassAction(dto.getGatePassType(), dto.getGatePassId(), dto.getRoleId());
+	                ? workmenDao.isLastApproverForParallel(dto.getGatePassType(), dto.getTransactionId(), dto.getRoleId(),gpm.getUnitId())
+	                : workmenDao.isLastApproverForParallelGatePassAction(dto.getGatePassType(), dto.getGatePassId(), dto.getRoleId(),gpm.getUnitId());
 	    }
 
 	    // If not last approver — don't perform final action

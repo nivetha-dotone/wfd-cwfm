@@ -1893,7 +1893,7 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 	}else {
 		query=this.getAllGatePassActionForParallel();
 		log.info("Query to getGatePassListingForApprovers "+query);
-		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
+		 rs = jdbcTemplate.queryForRowSet(query,gatePassTypeId,workflowTypeId,roleId,gatePassTypeId,roleId,gatePassTypeId,deptId,unitId);
 	}
 	
 	while(rs.next()) {
@@ -1962,7 +1962,7 @@ public String getIsLastApproverForParallel() {
 	return QueryFileWatcher.getQuery("IS_LAST_APPROVER_FOR_PARALLEL");
 }
 @Override
-public boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId) {
+public boolean isLastApproverForParallel(String gatePassTypeId, String transactionId, String roleId,String unitId) {
     boolean status = false;
 
     String query = getIsLastApproverForParallel();
@@ -1972,7 +1972,7 @@ public boolean isLastApproverForParallel(String gatePassTypeId, String transacti
         int actionId = Integer.parseInt(gatePassTypeId);
         int approverRoleId = Integer.parseInt(roleId);
 
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, actionId, transactionId,actionId, approverRoleId);
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, actionId, unitId, transactionId,actionId, approverRoleId);
         if (rs.next()) {
             String result = rs.getString("IsLastApprover");
             status = "YES".equals(result);
@@ -1991,7 +1991,7 @@ public String getIsLastApproverForParallelGatePassAction() {
 	return QueryFileWatcher.getQuery("IS_LAST_APPROVER_FOR_GATEPASS_ACTION");
 }
 @Override
-public boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId) {
+public boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, String gatePassId, String roleId,String unitId) {
     boolean status = false;
 
     String query = getIsLastApproverForParallelGatePassAction();
@@ -2001,7 +2001,7 @@ public boolean isLastApproverForParallelGatePassAction(String gatePassTypeId, St
         int actionId = Integer.parseInt(gatePassTypeId);
         int approverRoleId = Integer.parseInt(roleId);
 
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, actionId, gatePassId,actionId, approverRoleId);
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(query, actionId, unitId,gatePassId,actionId, approverRoleId);
         if (rs.next()) {
             String result = rs.getString("IsLastApprover");
             status = "YES".equals(result);

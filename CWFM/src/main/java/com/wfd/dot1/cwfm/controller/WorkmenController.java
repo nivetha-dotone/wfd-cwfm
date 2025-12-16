@@ -2661,11 +2661,11 @@ public class WorkmenController {
         String status = workmenService.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
 if (status.contains("Unique")) {
 	
-//	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
-//	  if(!valid)
-//	  { 
-//		  status = "Invalid"; 
-//		  }
+	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
+	  if(!valid)
+	  { 
+		  status = "Invalid"; 
+		  }
 	 
 }
         Map<String, String> result = new HashMap<>();
