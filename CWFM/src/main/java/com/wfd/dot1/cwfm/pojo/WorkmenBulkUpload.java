@@ -96,8 +96,16 @@ public class WorkmenBulkUpload {
 	private String createdBy;
 	private String zone;
 	private String idMark;
+	private String bonusPayout;
 	
 	
+	
+	public String getBonusPayout() {
+		return bonusPayout;
+	}
+	public void setBonusPayout(String bonusPayout) {
+		this.bonusPayout = bonusPayout;
+	}
 	public String getZone() {
 		return zone;
 	}

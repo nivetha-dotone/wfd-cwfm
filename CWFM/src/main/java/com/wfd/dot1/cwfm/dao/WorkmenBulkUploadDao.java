@@ -23,4 +23,6 @@ public interface WorkmenBulkUploadDao {
 	
 	public LocalDate workorderValidityCheck(String workorderNumber);
 
+	String getNextTransactionId();
+
 }

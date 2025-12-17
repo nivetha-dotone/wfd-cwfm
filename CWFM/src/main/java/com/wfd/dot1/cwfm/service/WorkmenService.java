@@ -136,6 +136,8 @@ public interface WorkmenService {
 
 	public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId);
 
+	public String saveWorkmenBulkUploadGatePass(GatePassMain gatePassMain);
+
 	
 
 	

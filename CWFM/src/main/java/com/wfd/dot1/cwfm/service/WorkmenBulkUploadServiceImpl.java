@@ -1,5 +1,6 @@
 package com.wfd.dot1.cwfm.service;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Period;
@@ -12,19 +13,36 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfd.dot1.cwfm.controller.CreateEmpFetchByGatePassAPICALL;
 import com.wfd.dot1.cwfm.dao.CommonDao;
 import com.wfd.dot1.cwfm.dao.FileUploadDao;
 import com.wfd.dot1.cwfm.dao.WorkmenBulkUploadDao;
+import com.wfd.dot1.cwfm.dao.WorkmenDao;
+import com.wfd.dot1.cwfm.dto.GatePassStatusLogDto;
+import com.wfd.dot1.cwfm.enums.GatePassStatus;
+import com.wfd.dot1.cwfm.enums.GatePassType;
+import com.wfd.dot1.cwfm.enums.WorkFlowType;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
+import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Service
 public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	
 	@Autowired
     private WorkmenBulkUploadDao workmenUploadDao;
+	
+	@Autowired
+	WorkmenDao workmenDao;
+	
+	@Autowired
+	WorkmenService workmenService;
 	
 	@Autowired
     private FileUploadDao fileUploadDao;
@@ -228,18 +246,125 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	            errorData.add(Map.of("transactionId", txnId, "fieldErrors", fieldErrors));
 	            workmenUploadDao.updateRecordStatusByTransactionId(txnId, combinedErrors);
 	        } else {
-	            workmenUploadDao.saveToGatePassMain(record,createdBy);
-	            successData.add(Map.of("transactionId", txnId));
-	            workmenUploadDao.updateRecordProcessedByTransactionId(txnId);
+	            //workmenUploadDao.saveToGatePassMain(record,createdBy);
+//	            successData.add(Map.of("transactionId", txnId));
+//	            workmenUploadDao.updateRecordProcessedByTransactionId(txnId);
+	           // WorkmenBulkUpload record = workmenUploadDao.getByTransactionId(txnId);
+	            
+	        	String transactionId=workmenUploadDao.getNextTransactionId();
+	        	GatePassMain gatePassMain = new GatePassMain();
+
+	        	// ---- Basic Identity ----
+	        	gatePassMain.setTransactionId(transactionId);
+	        	gatePassMain.setAadhaarNumber(record.getAadhaarNumber());
+	        	gatePassMain.setFirstName(record.getFirstName());
+	        	gatePassMain.setLastName(record.getLastName());
+	        	gatePassMain.setRelationName(record.getRelationName());
+	        	gatePassMain.setIdMark(record.getIdMark());
+	        	gatePassMain.setGender(record.getGender());
+	        	gatePassMain.setMaritalStatus(record.getMaritalStatus());
+
+	        	// ---- Dates ----
+	        	gatePassMain.setDateOfBirth(record.getDateOfBirth());
+	        	gatePassMain.setDoj(record.getDoj());
+	        	gatePassMain.setHealthCheckDate(record.getHealthCheckDate());
+	        	gatePassMain.setPoliceVerificationDate(record.getPoliceVerificationDate());
+
+	        	// ---- Contact ----
+	        	gatePassMain.setMobileNumber(record.getMobileNumber());
+	        	gatePassMain.setEmergencyNumber(record.getEmergencyNumber());
+	        	gatePassMain.setEmergencyName(record.getEmergencyName());
+	        	gatePassMain.setAddress(record.getAddress());
+	        	// ---- Organization Mapping ----
+	        	gatePassMain.setPrincipalEmployer(record.getUnitCode());
+	        	gatePassMain.setContractor(record.getVendorCode());
+	        	gatePassMain.setWorkorder(record.getWorkorderNumber());
+	        	gatePassMain.setTrade(record.getTrade());
+	        	gatePassMain.setSkill(record.getSkill());
+	        	gatePassMain.setDepartment(record.getDepartment());
+	        	gatePassMain.setSubdepartment(record.getArea());
+	        	gatePassMain.setEic(record.getEICNumber());
+
+	        	// ---- Job Details ----
+	        	gatePassMain.setNatureOfJob(record.getNatureOfWork());
+	        	gatePassMain.setHazardousArea(record.getHazardousArea());
+	        	gatePassMain.setAccessArea(record.getAccessArea());
+	        	gatePassMain.setAccommodation(record.getAccommodation());
+
+	        	// ---- PF / ESIC ----
+	        	gatePassMain.setPfApplicable(record.getPfApplicable());
+	        	gatePassMain.setPfNumber(record.getPfNumber());
+	        	gatePassMain.setUanNumber(record.getUanNumber());
+	        	gatePassMain.setEsicNumber(record.getEsicNumber());
+	        	gatePassMain.setWcEsicNo(record.getECnumber());
+
+	        	// ---- Bank ----
+	        	gatePassMain.setIfscCode(record.getBankName());
+	        	gatePassMain.setAccountNumber(record.getAccountNumber());
+
+	        	// ---- Wages ----
+	        	gatePassMain.setBasic(BigDecimal.ZERO);
+	        	gatePassMain.setDa(BigDecimal.ZERO);
+	        	gatePassMain.setHra(BigDecimal.ZERO);
+	        	gatePassMain.setOtherAllowance(BigDecimal.ZERO);
+	        	gatePassMain.setWashingAllowance(BigDecimal.ZERO);
+	        	gatePassMain.setUniformAllowance(BigDecimal.ZERO);
+	        	gatePassMain.setPfCap("0");
+
+	        	// ---- Misc ----
+	        	gatePassMain.setAcademic(record.getAcademic());
+	        	gatePassMain.setTechnical(record.getTechnical());
+	        	gatePassMain.setBloodGroup(record.getBloodGroup());
+	        	gatePassMain.setZone(record.getZone());
+	        	gatePassMain.setLlNo(record.getLLnumber());
+
+	        	// ---- Documents (default empty) ----
+	        	gatePassMain.setAadharDocName("");
+	        	gatePassMain.setPhotoName("");
+	        	gatePassMain.setBankDocName("");
+	        	gatePassMain.setPoliceVerificationDocName("");
+	        	gatePassMain.setMedicalDocName("");
+	        	gatePassMain.setEducationDocName("");
+	        	gatePassMain.setForm11DocName("");
+	        	gatePassMain.setTrainingDocName("");
+	        	gatePassMain.setOtherDocName("");
+
+	        	// ---- Workflow ----
+	        	gatePassMain.setGatePassStatus("4");          // 
+	        	gatePassMain.setGatePassAction("CREATE");
+	        	gatePassMain.setWorkFlowType(0);
+	        	gatePassMain.setCreatedBy(createdBy);
+	        	gatePassMain.setWorkFlowType(1);
+	        	gatePassMain.setUserId(createdBy);
+	        	gatePassMain.setComments(""); 
+	        	gatePassMain.setOnboardingType("regular");
+	        	String saveResult = workmenService.saveWorkmenBulkUploadGatePass(gatePassMain);
+
+	            if (saveResult == null) {
+	                errorData.add(Map.of("transactionId", txnId, "error", "Save failed"));
+	                continue;
+	            }
+
+	            if (saveResult.contains("mandatory")) {
+	                errorData.add(Map.of("transactionId", txnId, "error", "LL and WC is Mandatory"));
+	                workmenUploadDao.updateRecordStatusByTransactionId(txnId, "LL and WC is Mandatory");
+	            } else if (saveResult.contains("exceeded")) {
+	                errorData.add(Map.of("transactionId", txnId, "error", "LL and WC limit exceeded"));
+	                workmenUploadDao.updateRecordStatusByTransactionId(txnId, "LL and WC limit exceeded");
+	            } else {
+	                successData.add(Map.of("transactionId", saveResult));
+	                workmenUploadDao.updateRecordProcessedByTransactionId(txnId);
+	            }
 	        }
 	    }
-
 	    return Map.of("successData", successData, "errorData", errorData);
+	
+
 	}
-
-
 	private boolean isBlank(String val) {
 	    return val == null || val.trim().isEmpty();
 	}
-
+	
+	
+	
 }

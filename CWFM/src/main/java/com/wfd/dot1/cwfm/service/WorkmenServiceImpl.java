@@ -1073,5 +1073,65 @@ public class WorkmenServiceImpl implements WorkmenService{
 	public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId) {
 		return workmenDao.getIndividualContractWorkmenDetailsByGatePassIdRenew(gatePassId);
 	}
+	@Override
+	public String saveWorkmenBulkUploadGatePass(GatePassMain gatePassMain) {
+		String transactionId =null;
+		
+		try {
+	
+			String allowOnboarding = this.workmenCountCheck(gatePassMain);
+			if("allow".equals(allowOnboarding)) {
+			int workFlowTypeId =gatePassMain.getWorkFlowType();
+			gatePassMain.setWorkFlowType(workFlowTypeId);
+			
+			int dotTypeId = workmenDao.getDOTTYpe(gatePassMain.getPrincipalEmployer());
+			gatePassMain.setDotType(dotTypeId);
+			
+			String dot = this.getDOT(gatePassMain);
+			gatePassMain.setDot(dot);
+			gatePassMain.setGatePassAction(GatePassType.CREATE.getStatus());
+			if(workFlowTypeId == WorkFlowType.AUTO.getWorkFlowTypeId()) {
+				gatePassMain.setGatePassStatus(GatePassStatus.APPROVED.getStatus());
+
+				 transactionId = workmenDao.saveGatePass(gatePassMain);
+
+//				EmployeeRequestDTO employeeDTO = employeeMapper.mapFromGatePass(gatePassMain);
+//				String wfdResponse = wfdEmployeeService.createEmployee(employeeDTO);
+//				log.info("WFD Response: {}", wfdResponse);
+
+
+
+				 String gatePassId = workmenDao.updateGatePassIdByTransactionId(transactionId);
+				gatePassMain.setGatePassId(gatePassId);
+				GatePassStatusLogDto dto =new GatePassStatusLogDto();
+				dto.setTransactionId(transactionId);
+				dto.setGatePassId(gatePassId);
+				dto.setGatePassType(GatePassType.CREATE.getStatus());
+				dto.setStatus(Integer.parseInt(GatePassStatus.APPROVED.getStatus()));
+				dto.setComments(gatePassMain.getComments());
+				dto.setUpdatedBy(gatePassMain.getUserId());
+				workmenDao.saveGatePassStatusLog(dto);
+				
+				boolean cmsDone = this.cmsPersonInsert(gatePassMain);
+
+		        if (!cmsDone) {
+		            throw new RuntimeException("CMS Person Insert failed unexpectedly.");
+		        }try {
+		        	String wfdIntegration = this.getWFDIntegration();
+		        	if("yes".equalsIgnoreCase(wfdIntegration)) {
+		        		api.addOnBoardingDetailsActual(dto.getTransactionId());
+		        	}
+		        	}catch(Exception e) {return transactionId;}
+
+				return transactionId;
+			}
+			}else {
+				return allowOnboarding;
+			}
+		}catch(Exception e) {
+			
+		}
+		return transactionId;
+	}
 	}
 
