@@ -528,13 +528,27 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    }
 	 
 	 private Date parseSqlDate(String input) {
+		  if (input == null || input.trim().isEmpty()) {
+		        return null;
+		    }
+
 		    try {
-		        // Adjust to match your CSV date format
-		        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		        input = input.trim();
+
+		        DateTimeFormatter formatter;
+		        if (input.contains(".")) {
+		            formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		        } else if (input.contains("/")) {
+		            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		        } else {
+		            return null;
+		        }
+
 		        LocalDate localDate = LocalDate.parse(input, formatter);
 		        return Date.valueOf(localDate);
+
 		    } catch (Exception e) {
-		        return null; // or throw new RuntimeException("Invalid date: " + input);
+		        return null;
 		    }
 		}
 
@@ -546,7 +560,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	     //		+ "GL_CODE,COST_CENTRE_CODE,JOB_NAME,RATE,QTY,UOM,WORKORDER_RELEASED_SW,PM_WORKORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,WORKORDER_RELEASED_DATE,\r\n"
 	     //		+ "SERVICE_ENTRY_CREATE_DATE,SERVICE_ENTRY_UPDATED_DATE,PURCHASE_ORG_LEVEL,COMPANY_CODE,EIC_NUM,RECORD_CREATED_ON,RECORD_UPDATED_ON,\r\n"
 	     //		+ "RECORD_PROCESSED,RECORD_STATUS,NATURE_OF_JOB)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?,?,?,?,?,null,null,null,null,null,null)\r\n";
-	     jdbcTemplate.update(sql,
+		 int result =jdbcTemplate.update(sql,
 	         workorder.getWorkOrderNumber(),
 	         workorder.getItem(),
 	         workorder.getLine(),
@@ -580,6 +594,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	         workorder.getPurchaseOrgLevel(),
 	         workorder.getCompanycode()
 	     );
+		 
 	 }
 
 	 @Override

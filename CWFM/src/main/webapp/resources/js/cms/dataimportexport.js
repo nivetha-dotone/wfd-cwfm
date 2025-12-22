@@ -325,7 +325,7 @@ function downloadErrorCSV(errorData, uploadedFileName) {
                 headers = ["Trade", "Skill", "Basic", "DA", "Allowance", "From Date", "Unit Code", "Organization"];
                 break;
 
-            case "Data-work order":
+            case "data-work order":
                 headers = ["Work Order Number", "Item", "Line", "Line Number", "Service Code", "Short Text", "Delivery Completion", "Item Changed On", "Vendor Code", "Vendor Name",
                     "Vendor Address", "Blocked Vendor", "Work Order Validity From", "Work Order Validity To", "Work Order Type", "Plant Code", "Section Code", "Department Code",
                     "G/L Code", "Cost Center", "Nature of Job", "Rate / Unit", "Quantity", "Base Unit of Measure", "Work Order Released", "PM Order No", "WBS Element", "Qty Completed",

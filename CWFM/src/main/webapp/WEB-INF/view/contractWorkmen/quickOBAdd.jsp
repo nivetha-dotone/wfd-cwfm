@@ -792,7 +792,8 @@ label {
                                 <c:forEach var="pe" items="${Wcs}">
 								<c:if test="${pe.licenceType eq 'LL'}">
                 					<option value="${pe.wcId}" ${GatePassObj.llNo eq pe.wcId ? 'selected="selected"' : ''}>
-									${pe.wcCode}</option>
+									${pe.wcCode}
+									</option>
 									</c:if>
             					</c:forEach>
                                 </select>

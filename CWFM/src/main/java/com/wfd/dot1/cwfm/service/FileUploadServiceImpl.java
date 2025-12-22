@@ -934,7 +934,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setCompanycode(fields[32]);
 
                 fileUploadDao.saveWorkorderToStaging(staging);
-
+                
                 KTCWorkorderStaging.add(staging);
                 Map<String, Object> rowMap = new LinkedHashMap<>();
                 for (int i = 0; i < fieldNames.length; i++) {
@@ -967,6 +967,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             errorData.add(Map.of("row", "Procedure", "error", "Stored Procedure Failed: " + e.getMessage()));
         }
 
+        fileUploadDao.callWorkorderProcessingSP();
         Map<String, Object> result = new HashMap<>();
         result.put("successData", successData);
         result.put("errorData", errorData);
