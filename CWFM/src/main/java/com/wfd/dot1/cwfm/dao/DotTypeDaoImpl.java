@@ -4,11 +4,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.enums.DotType;
+import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
+import com.wfd.dot1.cwfm.queries.WorkmenQueryBank;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
@@ -36,21 +39,23 @@ public class DotTypeDaoImpl implements DotTypeDao {
 		    }
 	 }
 	    @Override
-	    public void insertWorkflowType(Long businessTypeId, int workflowType, String createdBy) {
-	    	String query = insertWorkflowType();
-	       // String sql = "INSERT INTO GATEPASSWORKFLOWTYPE (BusinessTypeId, WorkflowType, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate) " +
-	          //           "VALUES (?, ?, ?, GETDATE(), ?, GETDATE())";
-	        jdbcTemplate.update(query, businessTypeId, workflowType, createdBy, createdBy);
+	    public void insertWorkflowType(Long principalEmployerId, int workflowType, String createdBy) {
+	    	String sql = "select  gwt.WorkflowType,gwt.WorkflowTypeId	from GATEPASSWORKFLOWTYPE gwt where  gwt.UnitID=? ";
+	    	SqlRowSet rs = jdbcTemplate.queryForRowSet(sql,principalEmployerId);
+			if(rs.next()) {// DOT already exists update otherwise insert
+				String updateQuery = "update GATEPASSWORKFLOWTYPE set WorkflowType=? where WorkflowTypeId=?";
+		       jdbcTemplate.update(updateQuery,  workflowType, rs.getInt("WorkflowTypeId"));
+			}else {
+				String query = insertWorkflowType();
+		        jdbcTemplate.update(query, principalEmployerId, workflowType, createdBy, createdBy);
+			}
+	    	
 	    }
 	    @Override
-	    public Integer  getSelectedDotType(Long principalEmployerId, Long businessTypeId) {
+	    public Integer  getSelectedDotType(Long principalEmployerId) {
 	    	String sql = getSelectedDotType();
-	        //String sql = "select top 1 gwt.WorkflowType\r\n"
-	        //		+ " from GATEPASSWORKFLOWTYPE gwt\r\n"
-	        //		+ " join CMSBUUnitMapping cbu on cbu.BUId=gwt.BusinessTypeId \r\n"
-	        //		+ " join CMSPRINCIPALEMPLOYER cpe on cpe.UNITID=cbu.UnitID where cbu.BUId=? and cbu.UnitID=? ORDER BY gwt.WorkflowTypeId DESC;";
-
-	        List<Integer> results = jdbcTemplate.query(sql, new Object[]{businessTypeId, principalEmployerId},
+	        
+	        List<Integer> results = jdbcTemplate.query(sql, new Object[]{ principalEmployerId},
 	                (rs, rowNum) -> rs.getInt("WorkflowType"));
 
 	            if (results.isEmpty()) {

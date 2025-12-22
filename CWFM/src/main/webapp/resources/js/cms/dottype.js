@@ -1,16 +1,16 @@
 function saveDotSelection() {
     const principalEmployerId = document.getElementById("principalEmployer").value;
-    const businessTypeId = document.getElementById("businessType").value;
+    
     const dotType = document.querySelector('input[name="dotType"]:checked')?.value;
 
-    if (!principalEmployerId || !businessTypeId || !dotType) {
-        alert("Please select Principal Employer, Business Type, and Dot Type.");
+    if (!principalEmployerId  || !dotType) {
+        alert("Please select Principal Employer and Dot Type.");
         return;
     }
 
     const formData = new URLSearchParams();
     formData.append("principalEmployerId", principalEmployerId);
-    formData.append("businessTypeId", businessTypeId);
+    
     formData.append("dotType", dotType);
 
     fetch("/CWFM/dottype/save", {
@@ -42,7 +42,6 @@ function saveDotSelection() {
 
     // ✅ Optional: clear form after success
     document.getElementById("principalEmployer").value = "";
-    document.getElementById("businessType").innerHTML = '<option value="">Please select Business Type</option>';
     document.querySelectorAll('input[name="dotType"]').forEach(el => el.checked = false);
 })
 
@@ -138,16 +137,15 @@ function fetchOrgLevelSavedEntries() {
 
 function onBusinessTypeChange() {
     const principalEmployerId = document.getElementById("principalEmployer").value;
-    const businessTypeId = document.getElementById("businessType").value;
+    
 
-    if (!principalEmployerId || !businessTypeId) return;
+    if (!principalEmployerId ) return;
 
     $.ajax({
         url: '/CWFM/dottype/getDotTypeByEmployerAndBusiness',
         type: 'GET',
         data: {
-            principalEmployerId: principalEmployerId,
-            businessTypeId: businessTypeId
+            principalEmployerId: principalEmployerId
         },
         success: function (dotType) {
             // Uncheck all radio buttons first

@@ -595,7 +595,7 @@ label {
             
                  <option value="">Please select Document Type</option>
                                 <c:forEach var="doc" items="${DocumentType}">
-                					<option value="${doc.gmId}">${doc.gmName}</option>
+                					<option value="${doc.gmName}">${doc.gmName}</option>
             					</c:forEach>
                                 </select>
         </td>

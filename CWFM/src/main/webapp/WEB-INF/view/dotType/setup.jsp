@@ -11,12 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css"> 
-    <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/cms/contractor.js"></script>
-    <script src="resources/js/cms/workorder.js"></script>
-    <script src="resources/js/cms/workmen.js"></script>
     <script src="resources/js/cms/dottype.js"></script>
-   <script src="resources/js/cms/workflow.js"></script>
     <style>
         /* Add your styles here */
         .success {
@@ -257,17 +252,18 @@
 <div class="page-header" method="POST" onsubmit="return validateMasterValue()">
     
    <label for="gmTypeId" style="color: darkcyan;">Principal Employer:</label>
-        <select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getBusinessType(this.value)" required>
+        <!-- <select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getBusinessType(this.value)" required> -->
+        <select class="custom-select" id="principalEmployer" name="principalEmployerId"  onchange="onBusinessTypeChange()" required>
                                 <option value="">Please select Principal Employer</option>
 								<c:forEach var="pe" items="${PrincipalEmployer}">
                 					<option value="${pe.unitId}">${pe.name}</option>
             					</c:forEach>
                                 </select>
         
-        <label for="masterName" style="color: darkcyan;">Business Type</label>
+        <!-- <label for="masterName" style="color: darkcyan;">Business Type</label>
          <select class="custom-select" id="businessType" name="businessTypeId"   onchange="onBusinessTypeChange()" required>
                                 <option value="">Please select Business Type</option>
-                                </select>
+                                </select> -->
        
 
        
@@ -282,7 +278,7 @@
     
 <div style="padding:10px;">
 <h3>DOT Type</h3>
-<table id="dottype">
+<table id="dottype" class="no-dt">
     <c:forEach var="dot" items="${dotTypes}">
         <tr>
             <td>

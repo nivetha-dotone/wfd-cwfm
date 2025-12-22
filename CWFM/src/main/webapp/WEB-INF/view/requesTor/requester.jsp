@@ -492,7 +492,7 @@
                                         </div>
                                         <div id="tab1" class="tab-content active">
 
-                                            <table class="ControlLayout" cellspacing="0" cellpadding="0">
+                                            <table class="ControlLayout no-dt" cellspacing="0" cellpadding="0">
                                                 <tbody>
                                                 <tbody>
                                                     <tr>

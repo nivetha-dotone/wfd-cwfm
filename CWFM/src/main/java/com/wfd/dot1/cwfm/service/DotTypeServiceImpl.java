@@ -17,16 +17,16 @@ public class DotTypeServiceImpl implements DotTypeService {
 	
 	 @Override
 	    public void saveWorkflowType(Long principalEmployerId,Long businessTypeId, int dotType, String createdBy) {
-		 Long buid = dotTypedao.findBuidByUnitId(principalEmployerId);
-		 if (buid == null) {
-			 throw new IllegalStateException("There is no Business Type for this Principal Employer");
-			 }
-	        dotTypedao.insertWorkflowType(buid, dotType, createdBy);
+//		 Long buid = dotTypedao.findBuidByUnitId(principalEmployerId);
+//		 if (buid == null) {
+//			 throw new IllegalStateException("There is no Business Type for this Principal Employer");
+//			 }
+	        dotTypedao.insertWorkflowType(principalEmployerId, dotType, createdBy);
 	    }
 
 	 @Override
 	 public Integer getMappedDotType(Long principalEmployerId, Long businessTypeId) {
-		 Integer  workflowType = dotTypedao.getSelectedDotType(principalEmployerId, businessTypeId);
+		 Integer  workflowType = dotTypedao.getSelectedDotType(principalEmployerId);
 
 		 if (workflowType == null) {
 		        return null;

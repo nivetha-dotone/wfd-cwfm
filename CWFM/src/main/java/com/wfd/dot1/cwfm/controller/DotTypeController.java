@@ -77,14 +77,15 @@ public class DotTypeController {
 	
 	@PostMapping("/save")
 	public  ResponseEntity<String> saveWorkflowType(@RequestParam("principalEmployerId") Long principalEmployerId,
-	                               @RequestParam("businessTypeId") Long businessTypeId,
+	                               
 	                               @RequestParam("dotType") int dotTypeId,
 	                               HttpServletRequest request, HttpServletResponse response ) {
 
 	    // ✅ Get loginuser from session
 		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
 		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
-		String createdBy = user.getUserAccount(); 
+		String createdBy = user.getUserAccount();
+		Long businessTypeId=new Long(0);
 	    // ✅ Convert dotTypeId to DotType enum
 	    DotType selectedDot = Arrays.stream(DotType.values())
 	            .filter(d -> d.getStatus() == dotTypeId)
@@ -105,8 +106,9 @@ public class DotTypeController {
 	@GetMapping("/getDotTypeByEmployerAndBusiness")
 	@ResponseBody
 	public Integer getDotTypeByEmployerAndBusiness(
-	        @RequestParam Long principalEmployerId,
-	        @RequestParam Long businessTypeId) {
+	        @RequestParam Long principalEmployerId
+	       ) {
+		Long businessTypeId=new Long(0);
 	    return dotTypeService.getMappedDotType(principalEmployerId, businessTypeId);
 	}
 }
