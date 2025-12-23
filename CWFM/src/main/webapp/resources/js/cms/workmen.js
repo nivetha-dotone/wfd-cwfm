@@ -686,13 +686,21 @@ function validateEmploymentInformation(){
 	    }
 	}
     
+	const selectedOption = $("#wc").find(":selected");
+	const licenceType = selectedOption.data("licencetype");
 	const esicNumber = $("#esicNumber").val().trim();
-    if (esicNumber === "") {
-        $("#error-esicNumber").show();
-        isValid = false;
-    }else{
-		 $("#error-esicNumber").hide();
+
+	if (licenceType === "ESIC") {
+	    if (esicNumber === "") {
+	        $("#error-esicNumber").show();
+	        isValid = false;
+	    } else {
+	        $("#error-esicNumber").hide();
+	    }
+	} else {
+	    $("#error-esicNumber").hide();
 	}
+
 	const doj = $("#doj").val().trim();
     if (doj === "") {
         $("#error-doj").show();

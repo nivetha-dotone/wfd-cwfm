@@ -720,7 +720,7 @@ label {
                             	  <label id="error-natureOfJob"style="color: red;display: none;">Please enter a valid Nature of Job</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcPolicyesicRegNumber"/></label></th>
-                            <td><select class="custom-select" id="wc" name="wcId" >
+                            <td><%-- <select class="custom-select" id="wc" name="wcId" >
                                 <option value="">Please select WC Policy/ESIC Reg Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
 								<c:if test="${pe.licenceType eq 'WC' || pe.licenceType eq 'ESIC'}">
@@ -728,7 +728,21 @@ label {
 									${pe.wcCode}</option>
 									</c:if>
             					</c:forEach>
-                                </select>
+                                </select> --%>
+                                <select class="custom-select" id="wc" name="wcId">
+    <option value="">Please select WC Policy / ESIC Reg Number</option>
+
+    <c:forEach var="pe" items="${Wcs}">
+        <c:if test="${pe.licenceType eq 'WC' || pe.licenceType eq 'ESIC'}">
+            <option 
+                value="${pe.wcId}"
+                data-licencetype="${pe.licenceType}"
+                ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
+                ${pe.wcCode}
+            </option>
+        </c:if>
+    </c:forEach>
+</select>
                                 <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
                                 </td>
                                 
