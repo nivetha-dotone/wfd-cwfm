@@ -184,6 +184,7 @@ function getWC() {
                 var option = document.createElement("option");
                 option.value = wc.wcId;
                 option.text = wc.wcCode;
+				 option.setAttribute("data-code", wc.licenceType);
 				if (wc.licenceType === "LL") {
 				                    llSelect.appendChild(option);
 				                } else if (wc.licenceType === "WC" || wc.licenceType === "ESIC") {
@@ -692,7 +693,7 @@ function validateEmploymentInformation(){
 
 	if (licenceType === "ESIC") {
 	    if (esicNumber === "") {
-	        $("#error-esicNumber").show();
+	       showEsic();
 	        isValid = false;
 	    } else {
 	        $("#error-esicNumber").hide();
@@ -3644,5 +3645,38 @@ if(valid){
       alert("Unable to open file.");
     });
 }
+function onWcChange(selectElement) {
+
+    // handle empty selection safely
+    if (!selectElement || selectElement.selectedIndex === 0) {
+        hideEsic();
+        return;
+    }
 
 
+	const selectedOption = selectElement.options[selectElement.selectedIndex];
+	    const licenceType = selectedOption.getAttribute("data-code");
+    console.log("Licence Type:", licenceType);
+
+    if (licenceType === "ESIC") {
+        showEsic();
+    } else {
+        hideEsic();
+    }
+}
+
+function showEsic() {
+    document.getElementById("esicNumber").required = true;
+    document.getElementById("esicNumberSection").style.display = "";
+    document.getElementById("esicRequiredStar").style.display = "";
+	document.getElementById("error-esicNumber").style.display = "";
+	$("#error-esicNumber").show();
+}
+
+function hideEsic() {
+    document.getElementById("esicNumber").required = false;
+    document.getElementById("esicNumber").value = "";
+    document.getElementById("error-esicNumber").style.display = "none";
+    document.getElementById("esicNumberSection").style.display = "none";
+    document.getElementById("esicRequiredStar").style.display = "none";
+}

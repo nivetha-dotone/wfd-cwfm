@@ -775,14 +775,14 @@ label {
                             	  <label id="error-natureOfJob"style="color: red;display: none;">Please enter a valid Nature of Job</label>
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcPolicyesicRegNumber"/></label></th>
-                            <td><select class="custom-select" id="wc" name="wcId">
+                            <td><select class="custom-select" id="wc" name="wcId" onchange="onWcChange(this)">
     <option value="">Please select WC Policy / ESIC Reg Number</option>
 
     <c:forEach var="pe" items="${Wcs}">
         <c:if test="${pe.licenceType eq 'WC' || pe.licenceType eq 'ESIC'}">
-            <option 
-                value="${pe.wcId}"
-                data-licencetype="${pe.licenceType}"
+           
+                <option value="${pe.wcId}"
+                 data-code="${pe.licenceType}"
                 ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
                 ${pe.wcCode}
             </option>
@@ -880,7 +880,7 @@ label {
                                 </div>
                             		<label id="error-pfNumber"style="color: red;display: none;">Please enter a valid PF Number</label>
                             </td>
-                            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicNumber"/></label></th>
+                           <%--  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.esicNumber"/></label></th>
                             <td>
                             	<c:if test="${ empty GatePassObj.esicNumber }">
                             		<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="10" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -894,7 +894,34 @@ label {
                                     <span style="color: #666; font-size: 11px;"><spring:message code="label.esicNumberRegax"/></span>
                                 </div>
                             		<label id="error-esicNumber"style="color: red;display: none;">Please enter a valid ESIC Number</label>
-                            	</td>
+                            	</td> --%>
+                            	<th>
+   <label class="custom-label">
+    <span id="esicRequiredStar" class="required-field" style="display:none">*</span>
+    <spring:message code="label.esicNumber"/>
+</label>
+
+
+</th>
+
+<td>
+    <div id="esicNumberSection" style="display:none;">
+    <input id="esicNumber"
+           name="esicNumber"
+           type="text"
+           maxlength="10"
+           autocomplete="off"
+           inputmode="numeric"
+           pattern="[0-9]*"
+           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+    <label id="error-esicNumber" style="color:red;display:none;">
+        Please enter a valid ESIC Number
+    </label>
+</div>
+
+</td>
+                            	
                         </tr>
                         <tr>
                          <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfJoining"/></label></th>
