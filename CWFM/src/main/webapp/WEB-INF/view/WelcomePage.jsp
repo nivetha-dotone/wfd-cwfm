@@ -115,16 +115,16 @@
         document.getElementById("autoSection").style.display = (type === 'auto') ? 'block' : 'none';
     }
 
-function fileUploadTemplateSideBar(){
-	$(".openSidebar").click(function (event) {
-        event.preventDefault();
+    function fileUploadTemplateSideBar() {
         $("#sidebar").css("width", "300px");
-    });
+    }
 
-    $("#closeSidebar").click(function () {
+    // ✅ Delegated close handler (IMPORTANT)
+    $(document).on("click", "#closeSidebar", function () {
         $("#sidebar").css("width", "0");
     });
-}
+
+
 
 function redirectToPEAdd() {
     // Fetch the content of add.jsp using AJAX

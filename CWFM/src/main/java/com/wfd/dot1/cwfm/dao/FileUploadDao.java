@@ -129,7 +129,24 @@ public interface FileUploadDao {
 
 	//void insertOrgLevelEntry(String name, long orgLevelDefId);
 
-	boolean existsInOrgLevelEntry(String name, long orgLevelDefId);	
+	boolean existsInOrgLevelEntry(String name, long orgLevelDefId);
 
+	Long getContractorIdByCode(String contractorCode);	
+
+	boolean hasActiveWorkorder(Long unitId, Long contractorId, String workOrder);
+
+	void updateContractor(Contractor contractor);
+
+	boolean pemmExists(Long contractorId, Long unitId);
+
+	void updatePemm(CMSContrPemm pemm);
+
+	boolean subContractorExists(String contractorCode, Long unitId, String workOrder);
+
+	void updatecsc(CMSSubContractor csc);
+
+	boolean wcExists(Long contractorId, Long unitId, String wcCode);
+
+	void updatewc(CmsContractorWC wc);
 
 }

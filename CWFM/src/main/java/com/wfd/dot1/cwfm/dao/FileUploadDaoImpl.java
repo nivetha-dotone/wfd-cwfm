@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -292,17 +293,17 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	@Override
 	public Long saveContractor(Contractor contractor) {
 	    KeyHolder keyHolder = new GeneratedKeyHolder();
-	    String sql=saveContractorTemplate();
-	    //String sql = "INSERT INTO CMSCONTRACTOR(name, ADDRESS, city, reference, mobilenumber, CODE) VALUES (?, ?, ?, ?, ?, ?)";
+	    //String sql=saveContractorTemplate();
+	    String sql = "INSERT INTO CMSCONTRACTOR(name, ADDRESS, city,ISBLOCKED, CODE) VALUES (?, ?, ?,0, ?)";
 
 	    jdbcTemplate.update(connection -> {
 	        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 	        ps.setString(1, contractor.getContractorName());
 	        ps.setString(2, contractor.getContractorAddress());
 	        ps.setString(3, contractor.getCity());
-	        ps.setString(4, contractor.getReference());
-	        ps.setLong(5, contractor.getMobileNumber());
-	        ps.setString(6, contractor.getContractorCode());
+	        //ps.setString(4, contractor.getReference());
+	        //ps.setLong(5, contractor.getMobileNumber());
+	        ps.setString(4, contractor.getContractorCode());
 	        return ps;
 	    }, keyHolder);
 
@@ -322,9 +323,9 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	
 	@Override
 	public void savePemm(CMSContrPemm pemm) {
-		String sql=savePemmForContTemplate();
-	   // String sql = "INSERT INTO CMSCONTRPEMM (CONTRACTORID, UNITID, MANAGERNM, LICENSENUM, VALIDFROMDT, VALIDTODT, COVERAGE, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, LOCOFWORK, PERIODSTARTDT, PERIODENDDT, PFCODE, PFNUM, PFAPPLYDT, ESIWC, ESIVALIDFROM, ESIVALIDTO) " +
-	    //             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		//String sql=savePemmForContTemplate();
+	    String sql = "INSERT INTO CMSCONTRPEMM (CONTRACTORID, UNITID, MANAGERNM, LICENSENUM, VALIDFROMDT, VALIDTODT, COVERAGE, TOTALSTRENGTH, MAXNOEMP, NATUREOFWORK, PFNUM, PFAPPLYDT, ESIWC, ESIVALIDFROM, ESIVALIDTO) " +
+	                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	    jdbcTemplate.update(connection -> {
 	        PreparedStatement ps = connection.prepareStatement(sql);
@@ -332,21 +333,42 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	        ps.setLong(2, pemm.getUnitId());
 	        ps.setString(3, pemm.getManagerNm());
 	        ps.setString(4, pemm.getLicenseNumber());
-	        ps.setDate(5, new java.sql.Date(pemm.getLicenseValidFrom().getTime()));
-	        ps.setDate(6, new java.sql.Date(pemm.getLicenseValidTo().getTime()));
+	        if (pemm.getLicenseValidFrom() != null) {
+	            ps.setTimestamp(5,
+	                new java.sql.Timestamp(pemm.getLicenseValidFrom().getTime()));
+	        } else {
+	            ps.setNull(5, Types.TIMESTAMP);
+	        }
+	        if (pemm.getLicenseValidTo() != null) {
+	            ps.setTimestamp(6,
+	                new java.sql.Timestamp(pemm.getLicenseValidTo().getTime()));
+	        } else {
+	            ps.setNull(6, Types.TIMESTAMP);
+	        }
 	        ps.setString(7, pemm.getCoverage());
 	        ps.setInt(8, pemm.getTotalStrength());
 	        ps.setInt(9, pemm.getMaxNoEmp());
 	        ps.setString(10, pemm.getNatureofWork());
-	        ps.setString(11, pemm.getLocationofWork());
-	        ps.setDate(12, new java.sql.Date(pemm.getPeriodStartDt().getTime()));
-	        ps.setDate(13, new java.sql.Date(pemm.getPeriodEndDt().getTime()));
-	        ps.setString(14, pemm.getPfCode());
-	        ps.setString(15, pemm.getPfNum());
-	        ps.setDate(16, new java.sql.Date(pemm.getPfApplyDt().getTime()));
-	        ps.setString(17, pemm.getEsiwc());
-	        ps.setDate(18, new java.sql.Date(pemm.getEsiValidFrom().getTime()));
-	        ps.setDate(19, new java.sql.Date(pemm.getEsiValidTo().getTime()));
+	        ps.setString(11, pemm.getPfNum());
+	        if (pemm.getPfApplyDt() != null) {
+	            ps.setTimestamp(12,
+	                new java.sql.Timestamp(pemm.getPfApplyDt().getTime()));
+	        } else {
+	            ps.setNull(12, Types.TIMESTAMP);
+	        }
+	        ps.setString(13, pemm.getEsiwc());
+	        if (pemm.getEsiValidFrom() != null) {
+	            ps.setTimestamp(14,
+	                new java.sql.Timestamp(pemm.getEsiValidFrom().getTime()));
+	        } else {
+	            ps.setNull(14, Types.TIMESTAMP);
+	        }
+	        if (pemm.getEsiValidTo() != null) {
+	            ps.setTimestamp(15,
+	                new java.sql.Timestamp(pemm.getEsiValidTo().getTime()));
+	        } else {
+	            ps.setNull(15, Types.TIMESTAMP);
+	        }
 	        return ps;
 	    });
 
@@ -370,9 +392,9 @@ public class FileUploadDaoImpl implements FileUploadDao {
 
     @Override
     public void savecsc(CMSSubContractor csc) {
-    	String sql=saveCMSSUBCONTForContTemplate();
-       // String sql = "insert into CMSSUBCONTRACTOR(CONTRACTOR_ID,WORKORDER_NO,UNITID)values(?,?,?)";
-        jdbcTemplate.update(sql,csc.getContractorId(),csc.getWorkOrderNumber(),csc.getUnitId());
+    	//String sql=saveCMSSUBCONTForContTemplate();
+        String sql = "insert into CMSSUBCONTRACTOR(ID,CONTRACTOR_ID,SUB_CONTRACTOR_ID,WORKORDER_NO,UNITID)values( (SELECT COALESCE(MAX(ID), 0) + 1 FROM CMSSUBCONTRACTOR),?,?,?,?)";
+        jdbcTemplate.update(sql,csc.getContractorId(),csc.getSubContractId(),csc.getWorkOrderNumber(),csc.getUnitId());
     }
 
     @Override
@@ -464,10 +486,9 @@ public class FileUploadDaoImpl implements FileUploadDao {
                 		+ "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State\n";
 
             case "Data-Contractor":
-                return "CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,LICENCSE COVERAGE,"
-                		+ "TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
-                		+ "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,"
-                		+ "Mobile Number,ESI NUMBER,ESI VALID FROM,ESI VALID TO,Organisation,Main Contractor Code,Work Order Number\n";
+                return "Work Order Number,Plant Code,Organisation,Main Contractor Code,Contractor Code,Contractor Name,Contractor Address,City,Contractor Manager Name,Total Workmen Strength,Maximum Number Of Workmen,Labour License Number,License Valid From,License Valid To,"
+                        + "License Coverage,WC Number,WC Valid From,WC Valid To,WC Coverage,ESIC Number,ESIC Valid From,Nature of Work,"
+                        + "PF Number,PF Apply Date";
             case "Data-Work Order":
             	return "Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
                         + "Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code\n";
@@ -1232,7 +1253,94 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		    return count != null && count > 0;
 		}
 
-		
+		@Override
+		public Long getContractorIdByCode(String contractorCode) {
+			//String sql=getUnitIdByPlantCodeAndOrg();
+		    String sql = "select contractorid from CMSCONTRACTOR where CODE= ?";
+		    		
+		    try {
+		        return jdbcTemplate.queryForObject(sql, new Object[]{contractorCode}, Long.class);
+		    } catch (EmptyResultDataAccessException e) {
+		        return null;
+		    }
+		}
+		@Override
+		public boolean hasActiveWorkorder(Long unitId, Long contractorId,String workOrder) {
+
+		    String sql = "SELECT COUNT(1) FROM CMSWORKORDER WHERE UNITID = ? AND CONTRACTORID = ? and name=? AND VALIDDT > GETDATE()";
+
+		    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,unitId,contractorId,workOrder);
+		    return count != null && count > 0;
+		}
+		@Override
+		public void updateContractor(Contractor c) {
+		    jdbcTemplate.update(
+		        "UPDATE CMSCONTRACTOR SET NAME=?, ADDRESS=?, CITY=? WHERE CONTRACTORID=?",
+		        c.getContractorName(),
+		        c.getContractorAddress(),
+		        c.getCity(),
+		        c.getContractorId()
+		    );
+		}
+		@Override
+		public boolean pemmExists(Long contractorId, Long unitId) {
+		    String sql = "SELECT COUNT(*) FROM CMSCONTRPEMM WHERE CONTRACTORID=? AND UNITID=?";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitId) > 0;
+		}
+		@Override
+		public void updatePemm(CMSContrPemm p) {
+		    jdbcTemplate.update(
+		        "UPDATE CMSCONTRPEMM SET MANAGERNM=?, LICENSENUM=?, VALIDFROMDT=?, VALIDTODT=?, COVERAGE=?, TOTALSTRENGTH=?, MAXNOEMP=?, NATUREOFWORK=?,  PFNUM=?, PFAPPLYDT=?, ESIWC=?, ESIVALIDFROM=?, ESIVALIDTO=? WHERE CONTRACTORID=? AND UNITID=?",
+		        p.getManagerNm(),
+		        p.getLicenseNumber(),
+		        p.getLicenseValidFrom(),
+		        p.getLicenseValidTo(),
+		        p.getCoverage(),
+		        p.getTotalStrength(),
+		        p.getMaxNoEmp(),
+		        p.getNatureofWork(),
+		        p.getPfNum(),
+		        p.getPfApplyDt(),
+		        p.getEsiwc(),
+		        p.getEsiValidFrom(),
+		        p.getEsiValidTo(),
+		        p.getContractorId(),
+		        p.getUnitId()
+		    );
+		}
+		@Override
+		public boolean wcExists(Long contractorId, Long unitId,String wcCode) {
+		    String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR_WC WHERE CONTRACTORID=? AND UNITID=? and WC_CODE=?";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitId,wcCode) > 0;
+		}
+		@Override
+		public void updatewc(CmsContractorWC wc) {
+		    jdbcTemplate.update(
+		        "UPDATE CMSCONTRACTOR_WC SET WC_CODE=?, WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0 WHERE CONTRACTORID=? AND UNITID=?",
+		        wc.getWcCode(),
+		        wc.getWcFromDtm(),
+		        wc.getWcToDtm(),
+		        wc.getWcTotal(),
+		        wc.getContractorId(),
+		        wc.getUnitId()
+		    );
+		}
+		@Override
+		public boolean subContractorExists(String contractorCode, Long unitId, String workOrder) {
+		    String sql = "SELECT COUNT(*) FROM CMSSUBCONTRACTOR WHERE CONTRACTOR_ID=? AND UNITID=? AND WORKORDER_NO=?";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorCode, unitId, workOrder) > 0;
+		}
+		@Override
+		public void updatecsc(CMSSubContractor c) {
+		    jdbcTemplate.update(
+		        "UPDATE CMSSUBCONTRACTOR SET SUB_CONTRACTOR_ID=?,WORKORDER_NO=? WHERE CONTRACTOR_ID=? AND UNITID=?",
+		        c.getSubContractId(),
+		        c.getWorkOrderNumber(),
+		        c.getContractorId(),
+		        c.getUnitId()
+		    );
+		}
+
 	}
 
 

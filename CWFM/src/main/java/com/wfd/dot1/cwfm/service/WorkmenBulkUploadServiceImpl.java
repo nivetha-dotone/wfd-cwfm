@@ -81,9 +81,10 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (!isBlank(aadhaar)) {
 	            if (!aadhaar.matches("\\d{12}")) {
 	                fieldErrors.put("aadhaarNumber", "Must be 12 digits");
-	            } else if (workmenUploadDao.isAadharExists(aadhaar)) {
-	                fieldErrors.put("aadhaarNumber", "Duplicate Aadhaar number");
-	            }
+				} /*
+					 * else if (workmenUploadDao.isAadharExists(aadhaar)) {
+					 * fieldErrors.put("aadhaarNumber", "Duplicate Aadhaar number"); }
+					 */
 	        }
 	        String workorderNumber = record.getWorkorderNumber();
 	        LocalDate validTillDate = workmenUploadDao.workorderValidityCheck(workorderNumber);
@@ -117,8 +118,8 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	            fieldErrors.put("Gender", "Only alphabets allowed");
 	        }
 	        if (!isBlank(record.getMaritalStatus()) && !record.getMaritalStatus().matches("[A-Za-z ]+")) {
-	            fieldErrors.put("MaritalStatus", "Only alphabets allowed");
-	        }
+            fieldErrors.put("MaritalStatus", "Only alphabets allowed");
+        }
 	        if (!isBlank(record.getSkill()) && !record.getSkill().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("Skill", "Only alphabets allowed");
 	        }
@@ -315,7 +316,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        	gatePassMain.setAcademic(record.getAcademic());
 	        	gatePassMain.setTechnical(record.getTechnical());
 	        	gatePassMain.setBloodGroup(record.getBloodGroup());
-	        	gatePassMain.setZone(record.getZone());
+	        	gatePassMain.setZone(record.getZone()==null?" ":record.getZone());
 	        	gatePassMain.setLlNo(record.getLLnumber());
 
 	        	// ---- Documents (default empty) ----

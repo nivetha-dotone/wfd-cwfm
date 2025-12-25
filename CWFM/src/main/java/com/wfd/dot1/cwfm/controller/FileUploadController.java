@@ -13,9 +13,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -188,37 +191,30 @@ public class FileUploadController {
             templateInfo.put("description", "Imports Contractor events.");
 
             List<Map<String, String>> fields = new ArrayList<>();
+            fields.add(Map.of("name", "Work Order Number", "type", "Number", "example", "1511234563"));
+            fields.add(Map.of("name", "Plant Code", "type", "Number", "example", "121"));
+            fields.add(Map.of("name", "Organisation", "type", "Text", "example", "Adani Wilmar Ltd Ferozpur"));
+            fields.add(Map.of("name", "Main Contractor Code", "type", "Number", "example", "225046"));
+            fields.add(Map.of("name", "Contractor Code", "type", "Number", "example", "225046"));
             fields.add(Map.of("name", "Contractor Name", "type", "Text", "example", "SSD MANAGEMENT SERVICES PVT LTD"));
             fields.add(Map.of("name", "Contractor Address", "type", "Text", "example", "BLOCK-A| OFFICE NO. 711| MONDEAL HIGHTS| NEAR-PANCHRATNA PARTY PLOT| S.G HIGHWAY| AHMEDABAD|GUJARAT-380015."));
             fields.add(Map.of("name", "City", "type", "Text", "example", "Ahmedabad"));
-            fields.add(Map.of("name", "Plant Code", "type", "Number", "example", "121"));
             fields.add(Map.of("name", "Contractor Manager Name", "type", "Text", "example", "Shubham Kumar"));
-            fields.add(Map.of("name", "License Num", "type", "Text", "example", "FZR00CL7283"));
-            fields.add(Map.of("name", "License Valid From", "type", "Date", "example", "01-01-2025"));
-            fields.add(Map.of("name", "License Valid To", "type", "Date", "example", "31-12-2025"));
+            fields.add(Map.of("name", "Total Workmen Strength", "type", "Number", "example", "65"));
+            fields.add(Map.of("name", "Maximum Number Of Workmen", "type", "Number", "example", "70"));
+            fields.add(Map.of("name", "Labour License Number", "type", "Text", "example", "FZR00CL7283"));
+            fields.add(Map.of("name", "License Valid From", "type", "Date", "example", "2025-01-01"));
+            fields.add(Map.of("name", "License Valid To", "type", "Date", "example", "2026-12-31"));
             fields.add(Map.of("name", "License Coverage", "type", "Number", "example", "80"));
-            fields.add(Map.of("name", "Total Strength", "type", "Number", "example", "65"));
-            fields.add(Map.of("name", "Maximum Number of Workmen", "type", "Number", "example", "70"));
+            fields.add(Map.of("name", "WC Number", "type", "Text", "example", "4010/389322031/00/000"));
+            fields.add(Map.of("name", "WC Valid From", "type", "Date", "example", "2025-04-10"));
+            fields.add(Map.of("name", "WC Valid To", "type", "Date", "example", "2026-04-16"));
+            fields.add(Map.of("name", "WC Coverage", "type", "Number", "example", "80"));
+            fields.add(Map.of("name", "ESIC Number", "type", "Text", "example", "4010/389322031/00/000"));
+            fields.add(Map.of("name", "ESIC Valid From", "type", "Date", "example", "2025-04-17"));
             fields.add(Map.of("name", "Nature of Work", "type", "Text", "example", "Manpower supply"));
-            fields.add(Map.of("name", "Location of Work", "type", "Text", "example", "FEROZEPUR"));
-            fields.add(Map.of("name", "Contractor Validity Start Date", "type", "Date", "example", "01-04-2024"));
-            fields.add(Map.of("name", "Contractor Validity End Date", "type", "Date", "example", "31-12-2025"));
-            fields.add(Map.of("name", "Contractor Id", "type", "Number", "example", "225046"));
-            fields.add(Map.of("name", "PF Code", "type", "Text", "example", "GJAHD2056438000"));
-            fields.add(Map.of("name", "EC/WC Number", "type", "Text", "example", "4010/389322031/00/000"));
-            fields.add(Map.of("name", "EC/WC Validity Start Date", "type", "Date", "example", "17-04-2025"));
-            fields.add(Map.of("name", "EC/WC Validity End Date", "type", "Date", "example", "16-04-2026"));
-            fields.add(Map.of("name", "Coverage", "type", "Number", "example", "80"));
             fields.add(Map.of("name", "PF Number", "type", "Text", "example", "GJAHD2056438000"));
-            fields.add(Map.of("name", "PF Apply Date", "type", "Date", "example", "16-04-2026"));
-            fields.add(Map.of("name", "Reference", "type", "Text", "example", "CODE001"));
-            fields.add(Map.of("name", "Mobile Number", "type", "Number", "example", "9727606073"));
-            fields.add(Map.of("name", "ESI Number", "type", "Text", "example", "4010/389322031/00/000"));
-            fields.add(Map.of("name", "ESI Valid From", "type", "Date", "example", "17-04-2025"));
-            fields.add(Map.of("name", "ESI Valid To", "type", "Date", "example", "16-04-2026"));
-            fields.add(Map.of("name", "Organisation", "type", "Text", "example", "Adani Wilmar Ltd Ferozpur"));
-            fields.add(Map.of("name", "Main Contractor Code", "type", "Number", "example", "225046"));
-            fields.add(Map.of("name", "Work Order Number", "type", "Number", "example", "1511234563"));
+            fields.add(Map.of("name", "PF Apply Date", "type", "Date", "example", "2024-03-16"));
             
             templateInfo.put("fields", fields);
         }else if("Data-Principal Employer".equals(templateType)){
@@ -283,9 +279,9 @@ public class FileUploadController {
             fields.add(Map.of("name", "Bank Name Branch", "type", "Text", "example", "New Joinee"));
             fields.add(Map.of("name", "Account Number", "type", "Number", "example", "New Joinee"));
             fields.add(Map.of("name", "Mobile Number", "type", "Number", "example", "9989546476"));
-            fields.add(Map.of("name", "Emergency Contact Number", "type", "Date", "example", "9989546476"));
-            fields.add(Map.of("name", "Police verification Date Valid To", "type", "Number", "example", "2025-04-09"));
-            fields.add(Map.of("name", "Health chekup Date", "type", "Number", "example", "2025-04-09"));
+            fields.add(Map.of("name", "Emergency Contact Number", "type", "Number", "example", "9989546476"));
+            fields.add(Map.of("name", "Police verification Date Valid To", "type", "Date", "example", "2025-04-09"));
+            fields.add(Map.of("name", "Health chekup Date", "type", "Date", "example", "2025-04-09"));
             fields.add(Map.of("name", "Access Levels", "type", "Text", "example", "L1"));
             fields.add(Map.of("name", "ESIC Number", "type", "Number", "example", "863462900031"));
             fields.add(Map.of("name", "UNIT CODE", "type", "Text", "example", "2024-04-09"));
@@ -293,7 +289,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "EIC Number", "type", "Text", "example", "Master Leo"));
             fields.add(Map.of("name", "EC number", "type", "Number", "example", "0"));
             fields.add(Map.of("name", "UAN Number", "type", "Number", "example", "803367170921"));
-            fields.add(Map.of("name", "Emergency Contact Person", "Number", "Date", "example", "2024-04-09"));
+            fields.add(Map.of("name", "Emergency Contact Person", "type", "Text", "example", "Laxmi"));
             fields.add(Map.of("name", "Is eligible for PF", "type", "Text", "example", "Yes"));
             fields.add(Map.of("name", "SpecializationName", "type", "Text", "example", "General"));
             fields.add(Map.of("name", "Insurance type", "type", "Text", "example", "WC"));
@@ -311,7 +307,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "First Name", "type", "Text", "example", "Harshal"));
             fields.add(Map.of("name", "Last Name", "type", "Text", "example", "Patel"));
             fields.add(Map.of("name", "Father's Name or Husband's Name", "type", "Text", "example", "Patel"));
-            fields.add(Map.of("name", "Date of Birth", "type", "Number", "example", "2002-07-11"));
+            fields.add(Map.of("name", "Date of Birth", "type", "Date", "example", "2002-07-11"));
             fields.add(Map.of("name", "Trade", "type", "Text", "example", "Trade 1"));
             fields.add(Map.of("name", "Skill", "type", "Text", "example", "Skilled"));
             fields.add(Map.of("name", "Nature of Work", "type", "Text", "example", "Supplier"));
@@ -332,9 +328,9 @@ public class FileUploadController {
             fields.add(Map.of("name", "Bank Name Branch", "type", "Text", "example", "New Joinee"));
             fields.add(Map.of("name", "Account Number", "type", "Number", "example", "New Joinee"));
             fields.add(Map.of("name", "Mobile Number", "type", "Number", "example", "9989546476"));
-            fields.add(Map.of("name", "Emergency Contact Number", "type", "Date", "example", "9989546476"));
-            fields.add(Map.of("name", "Police verification Date Valid To", "type", "Number", "example", "2025-04-09"));
-            fields.add(Map.of("name", "Health chekup Date", "type", "Number", "example", "2025-04-09"));
+            fields.add(Map.of("name", "Emergency Contact Number", "type", "Number", "example", "9989546476"));
+            fields.add(Map.of("name", "Police verification Date Valid To", "type", "Date", "example", "2025-04-09"));
+            fields.add(Map.of("name", "Health chekup Date", "type", "Date", "example", "2025-04-09"));
             fields.add(Map.of("name", "Access Levels", "type", "Text", "example", "L1"));
             fields.add(Map.of("name", "ESIC Number", "type", "Number", "example", "863462900031"));
             fields.add(Map.of("name", "UNIT CODE", "type", "Text", "example", "2024-04-09"));
@@ -342,7 +338,7 @@ public class FileUploadController {
             fields.add(Map.of("name", "EIC Number", "type", "Text", "example", "Master Leo"));
             fields.add(Map.of("name", "EC number", "type", "Number", "example", "0"));
             fields.add(Map.of("name", "UAN Number", "type", "Number", "example", "803367170921"));
-            fields.add(Map.of("name", "Emergency Contact Person", "Number", "Date", "example", "2024-04-09"));
+            fields.add(Map.of("name", "Emergency Contact Person", "type", "Text", "example", "Laxmi"));
             fields.add(Map.of("name", "Is eligible for PF", "type", "Text", "example", "Yes"));
             fields.add(Map.of("name", "SpecializationName", "type", "Text", "example", "General"));
             fields.add(Map.of("name", "Insurance type", "type", "Text", "example", "WC"));
@@ -459,6 +455,38 @@ public class FileUploadController {
         String csvContent = fileUploadService.getTemplateCSV(templateType);
         response.getWriter().write(csvContent);
     }
+    @PostMapping("/previewTemplateFile")
+    @ResponseBody
+    public List<Map<String, Object>> previewTemplateFile(
+            @RequestParam MultipartFile file,
+            @RequestParam String templateType) {
+
+        // Parse CSV / Excel
+        List<Map<String, Object>> rows = new ArrayList<>();
+
+        // Example CSV parsing
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(file.getInputStream()))) {
+
+            String[] headers = br.readLine().split(",");
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                Map<String, Object> row = new LinkedHashMap<>();
+
+                for (int i = 0; i < headers.length; i++) {
+                    row.put(headers[i], values.length > i ? values[i] : "");
+                }
+                rows.add(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return rows; // ⚠️ NO DB SAVE
+    }
+
     }
 
     

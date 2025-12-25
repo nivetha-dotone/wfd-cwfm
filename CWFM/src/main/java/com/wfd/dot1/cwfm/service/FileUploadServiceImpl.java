@@ -8,9 +8,12 @@ import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -26,10 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wfd.dot1.cwfm.dao.DepartmentMappingDao;
 import com.wfd.dot1.cwfm.dao.FileUploadDao;
+import com.wfd.dot1.cwfm.dao.WorkmenBulkUploadDao;
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
@@ -53,6 +58,8 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Autowired
 	DepartmentMappingDao deptMapDao;
     
+	@Autowired
+    private WorkmenBulkUploadDao workmenUploadDao;
     @Override
     public void uploadFiles(List<MultipartFile> files) {
         for (MultipartFile file : files) {
@@ -104,10 +111,9 @@ public class FileUploadServiceImpl implements FileUploadService {
                 break;
                 
             case "Data-Contractor":
-                if (!headerLine.equalsIgnoreCase("CONTRACTOR NAME,CONTRACTOR ADDRESS,City,Plant Code,Contractor MANAGER NAME,LICENSE NUM,LICENCSE VALID FROM,LICENCSE VALID TO,"
-                        + "LICENCSE COVERAGE,TOTAL STRENGTH,MAXIMUM NUMBER OF WORKMEN,NATURE OF WORK,LOCATION OF WORK,CONTRACTOR VALIDITY START DATE,CONTRACTOR VALIDITY END DATE,"
-                        + "CONTRACTOR ID,PF CODE,EC/WC number,EC/WC Validity Start Date,EC/WC Validity End Date,Coverage,PF NUMBER,PF APPLY DATE,Reference,Mobile Number,ESI NUMBER,"
-                        + "ESI VALID FROM,ESI VALID TO,Organisation,Main Contractor Code,Work Order Number")) {
+                if (!headerLine.equalsIgnoreCase("Work Order Number,Plant Code,Organisation,Main Contractor Code,Contractor Code,Contractor Name,Contractor Address,City,Contractor Manager Name,Total Workmen Strength,Maximum Number Of Workmen,Labour License Number,License Valid From,License Valid To,"
+                        + "License Coverage,WC Number,WC Valid From,WC Valid To,WC Coverage,ESIC Number,ESIC Valid From,Nature of Work,"
+                        + "PF Number,PF Apply Date")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                  savedData = processContractor(reader);
@@ -627,55 +633,31 @@ public class FileUploadServiceImpl implements FileUploadService {
         return result;
     }
 
-
-
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     private Map<String, Object> processContractor(BufferedReader reader) throws IOException {
         List<Map<String, Object>> successData = new ArrayList<>();
         List<Map<String, Object>> errorData = new ArrayList<>();
         String line;
         int rowNum = 0;
         List<Contractor> ContListForOrgEntry = new ArrayList<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String[] fieldNames = {
-            "contractorName",        // 0
-            "contractorAddress",     // 1
-            "city",                  // 2
-            "managerNm",             // 3
-            "licenseNumber",         // 4
-            "licenseValidFrom",      // 5
-            "licenseValidTo",        // 6
-            "coverage",              // 7
-            "totalStrength",         // 8
-            "maxNoEmp",              // 9
-            "natureofWork",          // 10
-            "locationofWork",        // 11
-            "periodStartDt",         // 12
-            "periodEndDt",           // 13
-            "contractorId",          // 14
-            "pfCode",                // 15
-            "wcCode",                // 16
-            "wcFromDtm",             // 17
-            "wcToDtm",               // 18
-            "wcTotal",               // 19
-            "pfNum",                 // 20
-            "pfApplyDt",             // 21
-            "reference",             // 22
-            "mobileNumber",          // 23
-            "esiwc",                 // 24
-            "esiValidFrom",          // 25
-            "esiValidTo",            // 26
-            "contractorCode",        // 27
-            "workOrderNumber",       // 28
-            "plantCode",             // 29
-            "organization"           // 30
+        		"workOrderNumber","plantCode","organization","contractorCode","contractorId",
+            "contractorName","contractorAddress","city","managerNm","totalStrength","maxNoEmp",
+            "licenseNumber","licenseValidFrom","licenseValidTo","coverage",
+            "wcCode","wcFromDtm","wcToDtm","wcTotal","esiwc","esiValidFrom",
+            "natureofWork","pfNum","pfApplyDt"
         };
+
+        Set<String> mandatoryFields = Set.of(
+            "contractorName","contractorAddress","city","plantCode","managerNm",
+            "totalStrength","maxNoEmp","natureofWork","contractorId","pfNum","pfApplyDt",
+            "organization","contractorCode","workOrderNumber"
+        );
 
         while ((line = reader.readLine()) != null) {
             rowNum++;
             line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
-
             if (line.trim().isEmpty()) continue;
 
             String[] rawFields = line.split(",", -1);
@@ -685,150 +667,327 @@ public class FileUploadServiceImpl implements FileUploadService {
             }
 
             Map<String, String> fieldErrors = new LinkedHashMap<>();
-
-            if (fields.length < 31) {
+            if (fields.length < fieldNames.length) {
                 errorData.add(Map.of("row", rowNum, "error", "Insufficient number of fields"));
                 continue;
             }
 
+            // Check mandatory fields
             for (int i = 0; i < fieldNames.length; i++) {
-                if (fields[i].isBlank()) {
-                    fieldErrors.put(fieldNames[i], " is Mandatory");
+                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
+                    fieldErrors.put(fieldNames[i], "is mandatory");
                 }
             }
+            Date today = new Date();
+            String plantCode = fields[1];
+            String organization = fields[2];
+            String contractorCode = fields[3];
+            String contractorName = fields[5];
+            String workOrder = fields[0];
+            Date llFromDate = parseDateStrict(fields[12], "licenseValidFrom", fieldErrors);
+            Date llToDate   = parseDateStrict(fields[13], "licenseValidTo", fieldErrors);
+            Date pfApplyDate = parseDateStrict(fields[23], "pfApplyDt", fieldErrors);
+            Date esicFromDate = parseDateStrict(fields[20], "esiValidFrom", fieldErrors);
+            String esic = fields[19];
+            String wcCode = fields[15];
+            String wcFrom = fields[16];
+            String wcTo = fields[17];
+            Integer wcTotal = parseIntegerSafe(fields[18]);
+            String llNumber = fields[11];
+            Integer coverageVal = parseIntegerSafe(fields[14]);
+            Integer totalStrength = parseIntegerSafe(fields[9]);
+            Integer maxNoEmp = parseIntegerSafe(fields[10]);
+              // 1️⃣ Either ESIC or ECWC mandatory
+            if ((esic == null || esic.isBlank()) && (wcCode == null || wcCode.isBlank())) {
+                fieldErrors.put("esiwc", "Either ESIC or EC/WC is mandatory");
+                fieldErrors.put("wcCode", "Either ESIC or EC/WC is mandatory");
+            }
+         // 2️⃣ ESIC VALIDATIONS
+            if (esic != null && !esic.isBlank()) {
 
+                // ESIC From Date → mandatory + past date
+                if (fields[20] == null || fields[20].isBlank()) {
+                    fieldErrors.put("esiValidFrom", "ESIC From Date is mandatory");
+                } else {
+                    esicFromDate = parseDateQuiet(fields[20]);
+                    if (esicFromDate == null) {
+                        fieldErrors.put("esiValidFrom", "Invalid date format. Expected yyyy-MM-dd");
+                    } else if (!isPastDate(esicFromDate)) {
+                        fieldErrors.put("esiValidFrom", "ESIC From Date must be a past date");
+                    }
+                }
+            }
+             //  3️⃣ ECWC validations
+            if (wcCode != null && !wcCode.isBlank()) {
+
+                if (wcFrom == null || wcFrom.isBlank()) {
+                    fieldErrors.put("wcFromDtm", "WC From Date is mandatory");
+                } else if (!isValidDate(wcFrom)) {
+                    fieldErrors.put("wcFromDtm", "WC From Date is invalid");
+                }
+
+                if (wcTo == null || wcTo.isBlank()) {
+                    fieldErrors.put("wcToDtm", "WC To Date is mandatory");
+                } else if (!isValidDate(wcTo)) {
+                    fieldErrors.put("wcToDtm", "WC To Date is invalid");
+                }
+
+                Date wcFromDate = parseDateStrict(wcFrom, "wcFromDtm", fieldErrors);
+                Date wcToDate = parseDateStrict(wcTo, "wcToDtm", fieldErrors);
+
+                if (wcFromDate != null && !isPastDate(wcFromDate)) {
+                    fieldErrors.put("wcFromDtm", "WC From Date must be a past date");
+                }
+
+                if (wcToDate != null && !isFutureDate(wcToDate)) {
+                    fieldErrors.put("wcToDtm", "WC To Date must be greater than today");
+                }
+                // 4️⃣ wcTotal > 0 
+                if (wcTotal == null) {
+        	        fieldErrors.put("wcTotal"," Coverage is mandatory when WC Code is provided");
+        	    } else if  (wcTotal <= 0) {
+                    fieldErrors.put("wcTotal", "Coverage must be greater than 0 when WC Code is present");
+                }
+            }
+             //  5️⃣ License validations
+            if (llNumber != null && !llNumber.isBlank()) {
+
+            	if (fields[12] == null || fields[12].isBlank()) {
+                    fieldErrors.put("licenseValidFrom", "License Valid From date is mandatory when License Number is provided");
+                }else if (!isPastDate(llFromDate)) {
+                    fieldErrors.put("licenseValidFrom","License Valid From date must be a past date");
+                    }
+
+            	if (fields[13] == null || fields[13].isBlank()) {
+                    fieldErrors.put("licenseValidTo", "License Valid To date is mandatory when License Number is provided");
+                }else if (!isFutureDate(llToDate)) {
+                    fieldErrors.put("licenseValidTo","License Valid To date must be greater than today");
+                    }
+
+              //   6️⃣ Coverage > 0 
+            	  if (coverageVal == null) {
+            	        fieldErrors.put("coverage","License Coverage is mandatory when License Number is provided");
+            	    } else if (coverageVal <= 0) {
+            	        fieldErrors.put("coverage","License Coverage must be greater than 0 when License Number is provided");
+            	    }
+                }
+           // 7️⃣ Total Strength validation
+            if (fields[9] == null || fields[9].isBlank()) {
+                fieldErrors.put("totalStrength", "Total Strength is mandatory");
+            } else if (totalStrength == null) {
+                fieldErrors.put("totalStrength", "Total Strength must be a valid number");
+            } else if (totalStrength <= 0) {
+                fieldErrors.put("totalStrength", "Total Strength must be greater than 0");
+            }
+
+            // 8️⃣ Max Number of Workmen validation
+            if (fields[10] == null || fields[10].isBlank()) {
+                fieldErrors.put("maxNoEmp", "Max Number of Workmen is mandatory");
+            } else if (maxNoEmp == null) {
+                fieldErrors.put("maxNoEmp", "Max Number of Workmen must be a valid number");
+            } else if (maxNoEmp <= 0) {
+                fieldErrors.put("maxNoEmp", "Max Number of Workmen must be greater than 0");
+            }
+
+            //9 plant code and organization check
+            Long unitId = fileUploadDao.getUnitIdByPlantCodeAndOrg(plantCode, organization);
+            if (unitId == null) {
+            	fieldErrors.put("plantCode" ,"Not found for plantCode and organization ");
+            	fieldErrors.put("organization" ,"Not found for plantCode and organization ");
+            }
+            Long existsContractorId = fileUploadDao.getContractorIdByCode(contractorCode);
+            
+            //10 Work order exists check
+            boolean activeWorkorderExists =fileUploadDao.hasActiveWorkorder(unitId, existsContractorId,workOrder);
+            if (!activeWorkorderExists) {
+            	fieldErrors.put("workOrder" ,"No active workorder exists for this contractor");
+          }
+            
+          //   STOP PROCESSING IF ANY ERROR FOUND
             if (!fieldErrors.isEmpty()) {
-                errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
+                errorData.add(Map.of("row", rowNum,"fieldErrors", fieldErrors));
                 continue;
             }
-
             try {
-                // Step 1: Fetch unitId from CMSPrincipalEmployer
-                String plantCode = fields[3];
-                String organization = fields[28];
-                String contractorCode = fields[29];
-                
-                Long unitId = fileUploadDao.getUnitIdByPlantCodeAndOrg(plantCode, organization);
-                if (unitId == null) {
-                    errorData.add(Map.of(
-                        "row", rowNum,
-                        "error", "No unitId found for plantCode: " + plantCode + " and organization: " + organization
-                    ));
-                    continue;
-                }
-             // Duplicate check for code (contractorCode)
-                if (fileUploadDao.isContractorCodeExists(contractorCode)) {
-                    errorData.add(Map.of(
-                        "row", rowNum,
-                        "error", "Duplicate contractorCode: " + contractorCode + " already exists"
-                    ));
-                    continue;
-                }
-                
+                Long contractorId;
                 // Step 2: Save Contractor
                 Contractor contractor = new Contractor();
-                contractor.setContractorName(fields[0]);
-                contractor.setContractorAddress(fields[1]);
+                contractor.setContractorName(contractorName);
+                contractor.setContractorAddress(fields[6]);
                 contractor.setContractorCode(contractorCode);
-                contractor.setReference(fields[23]);
-                contractor.setCity(fields[2]);
-                contractor.setMobileNumber(Long.parseLong(fields[24]));
-                Long contractorId = fileUploadDao.saveContractor(contractor);
+                contractor.setCity(fields[7]);
+                //Long contractorId = fileUploadDao.saveContractor(contractor);
 
-                // Step 3: Save PEMM (with unitId)
+                if (existsContractorId != null) {
+                    // UPDATE
+                    contractor.setContractorId(String.valueOf(existsContractorId));
+                    fileUploadDao.updateContractor(contractor);
+                     contractorId = existsContractorId;
+                } else {
+                    // INSERT
+                	  contractorId = fileUploadDao.saveContractor(contractor);
+                }
+               
+                // Step 3: Save PEMM
                 CMSContrPemm pemm = new CMSContrPemm();
                 pemm.setContractorId(contractorId);
-                pemm.setUnitId(unitId); // ✅ Save unitId here first
-                pemm.setManagerNm(fields[4]);
-                pemm.setLicenseNumber(fields[5]);
-                pemm.setLicenseValidFrom(dateFormat.parse(fields[6]));
-                pemm.setLicenseValidTo(dateFormat.parse(fields[7]));
-                pemm.setCoverage(fields[8]);
-                pemm.setTotalStrength(Integer.parseInt(fields[9]));
-                pemm.setMaxNoEmp(Integer.parseInt(fields[10]));
-                pemm.setNatureofWork(fields[11]);
-                pemm.setLocationofWork(fields[12]);
-                pemm.setPeriodStartDt(dateFormat.parse(fields[13]));
-                pemm.setPeriodEndDt(dateFormat.parse(fields[14]));
-                pemm.setPfCode(fields[16]);
-                pemm.setPfNum(fields[21]);
-                pemm.setPfApplyDt(dateFormat.parse(fields[22]));
-                pemm.setEsiwc(fields[25]);
-                pemm.setEsiValidFrom(dateFormat.parse(fields[26]));
-                pemm.setEsiValidTo(dateFormat.parse(fields[27]));
-                fileUploadDao.savePemm(pemm);
+                pemm.setUnitId(unitId);
+                pemm.setManagerNm(fields[8]);
+                pemm.setLicenseNumber(llNumber);
+                pemm.setLicenseValidFrom(llFromDate);
+                pemm.setLicenseValidTo(llToDate);
+                pemm.setCoverage(String.valueOf(coverageVal));
+                pemm.setTotalStrength(totalStrength);
+                pemm.setMaxNoEmp(maxNoEmp);
+                pemm.setNatureofWork(fields[21]);
+                pemm.setPfNum(fields[22]);
+                pemm.setPfApplyDt(pfApplyDate);
+                pemm.setEsiwc(esic);
+                pemm.setEsiValidFrom(esicFromDate);
+                if (esic != null && !esic.isBlank()) {
+                    pemm.setEsiValidTo(ESIC_MAX_DATE);   // ESIC present → set ESIC To Date as 01-01-3000
+                } else {
+                    pemm.setEsiValidTo(null);
+                }
+                    if (fileUploadDao.pemmExists(contractorId, unitId)) {
+                        fileUploadDao.updatePemm(pemm);
+                    } else {
+                        fileUploadDao.savePemm(pemm);
+                    }
 
                 // Step 4: Save SubContractor
                 CMSSubContractor csc = new CMSSubContractor();
                 csc.setUnitId(String.valueOf(unitId));
-                csc.setContractorId(fields[15]);
-                csc.setWorkOrderNumber(fields[30]);
-                fileUploadDao.savecsc(csc);
-
-                // Step 5: Save WC with same unitId
+                csc.setSubContractId(fields[4]);
+                csc.setContractorId(contractorCode);
+                csc.setWorkOrderNumber(workOrder);
+                if (fileUploadDao.subContractorExists(contractorCode, unitId, workOrder)) {
+                    fileUploadDao.updatecsc(csc);
+                } else {
+                    fileUploadDao.savecsc(csc);
+                }
+                
+                // Step 5: Save WC
                 CmsContractorWC wc = new CmsContractorWC();
                 wc.setContractorId(String.valueOf(contractorId));
-                wc.setUnitId(String.valueOf(unitId)); // ✅ Use same unitId again
-                wc.setWcCode(fields[17]);
-                wc.setWcFromDtm(fields[18]);
-                wc.setWcToDtm(fields[19]);
-                wc.setWcTotal(Integer.parseInt(fields[20]));
-                fileUploadDao.savewc(wc);
-                
-                 ContListForOrgEntry.add(contractor);
-                
+                wc.setUnitId(String.valueOf(unitId));
+                wc.setWcCode(wcCode);
+                wc.setWcFromDtm(wcFrom);
+                wc.setWcToDtm(wcTo);
+                wc.setWcTotal(wcTotal != null ? wcTotal : 0);
+                if (fileUploadDao.wcExists(contractorId, unitId,wcCode)) {
+                    fileUploadDao.updatewc(wc);
+                } else {
+                    fileUploadDao.savewc(wc);
+                }
+                ContListForOrgEntry.add(contractor);
+
                 Map<String, Object> map = new HashMap<>();
+                map.put("workOrderNumber", csc.getWorkOrderNumber());
+                map.put("plantCode", plantCode);
+                map.put("organization", organization);
+                map.put("contractorCode", contractor.getContractorCode());
+                map.put("contractorId", csc.getContractorId());
                 map.put("contractorName", contractor.getContractorName());
                 map.put("contractorAddress", contractor.getContractorAddress());
                 map.put("city", contractor.getCity());
                 map.put("managerNm", pemm.getManagerNm());
+                map.put("totalStrength", pemm.getTotalStrength());
+                map.put("maxNoEmp", pemm.getMaxNoEmp());
                 map.put("licenseNumber", pemm.getLicenseNumber());
                 map.put("licenseValidFrom", pemm.getLicenseValidFrom());
                 map.put("licenseValidTo", pemm.getLicenseValidTo());
                 map.put("coverage", pemm.getCoverage());
-                map.put("totalStrength", pemm.getTotalStrength());
-                map.put("maxNoEmp", pemm.getMaxNoEmp());
-                map.put("natureofWork", pemm.getNatureofWork());
-                map.put("locationofWork", pemm.getLocationofWork());
-                map.put("periodStartDt", pemm.getPeriodStartDt());
-                map.put("periodEndDt", pemm.getPeriodEndDt());
-                map.put("contractorId", csc.getContractorId());
-                map.put("pfCode", pemm.getPfCode());
                 map.put("wcCode", wc.getWcCode());
                 map.put("wcFromDtm", wc.getWcFromDtm());
                 map.put("wcToDtm", wc.getWcToDtm());
                 map.put("wcTotal", wc.getWcTotal());
-                map.put("pfNum", pemm.getPfNum());
-                map.put("pfApplyDt", pemm.getPfApplyDt());
-                map.put("reference", contractor.getReference());
-                map.put("mobileNumber", contractor.getMobileNumber());
                 map.put("esiwc", pemm.getEsiwc());
                 map.put("esiValidFrom", pemm.getEsiValidFrom());
-                map.put("esiValidTo", pemm.getEsiValidTo());
-                map.put("contractorCode", contractor.getContractorCode());
-                map.put("workOrderNumber", csc.getWorkOrderNumber());
-                map.put("plantCode", plantCode);
-                map.put("organization", organization);
+                map.put("natureofWork", pemm.getNatureofWork());
+                map.put("pfNum", pemm.getPfNum());
+                map.put("pfApplyDt", pemm.getPfApplyDt());
 
                 successData.add(map);
-
-            } catch (Exception e) {
+            }  catch (Exception e) {
                 errorData.add(Map.of("row", rowNum, "error", "Exception while processing row: " + e.getMessage()));
             }
-			/*
-			 * if (fields == null || fields.length == 0) { return null; } else {
-			 * InsertContractorOrgLevelEntry(ContListForOrgEntry); }
-			 */
         }
-        
         this.InsertContractorOrgLevelEntry(ContListForOrgEntry);
-        
+
         Map<String, Object> result = new HashMap<>();
         result.put("successData", successData);
         result.put("errorData", errorData);
         return result;
     }
 
+    // Helper method
+    private Date parseDateStrict(String value, String fieldName, Map<String, String> fieldErrors) {
+        if (value == null || value.isBlank()) return null;
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            return sdf.parse(value.trim());
+        } catch (Exception e) {
+            fieldErrors.put(fieldName, "Invalid date format. Expected yyyy-MM-dd");
+            return null;
+        }
+    }
+
+    private boolean isValidDate(String value) {
+        if (value == null || value.isBlank()) return false;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            sdf.parse(value.trim());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    private boolean isPastDate(Date inputDate) {
+        if (inputDate == null) return false;
+
+        LocalDate input = inputDate.toInstant()
+                                   .atZone(ZoneId.systemDefault())
+                                   .toLocalDate();
+
+        LocalDate today = LocalDate.now();
+
+        return input.isBefore(today);
+    }
+
+    private boolean isFutureDate(Date date) {
+        return date.after(new Date());
+    }
+    private Date parseDateQuiet(String dateStr) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    private Integer parseIntegerSafe(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null; // or 0 if business allows
+        }
+        return Integer.parseInt(value.trim());
+    }
+
+//    private boolean isValidFutureMaxDate(Date date) {
+//        Calendar cal = Calendar.getInstance();
+//        cal.set(3000, Calendar.JANUARY, 1, 0, 0, 0);
+//        return date.equals(cal.getTime());
+//    }
+    private static final Date ESIC_MAX_DATE;
+    static {
+        try {
+            ESIC_MAX_DATE = new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-01");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Transactional
     private Map<String, Object> processWorkorder(BufferedReader reader) throws IOException {
@@ -1046,10 +1205,26 @@ public class FileUploadServiceImpl implements FileUploadService {
             Integer academicId = fileUploadDao.getGeneralMasterId(fields[18]);
             Integer wcecId = fileUploadDao.getWCECId(fields[32],unitId,contractorId);
             Integer workorderId = fileUploadDao.getWorkorderId(fields[14],unitId,contractorId);
-            Integer zoneId = fileUploadDao.getGeneralMasterId(fields[40]);
+            //Integer maritalStatusId = fileUploadDao.getGeneralMasterId(fields[16]);
             Integer genderId = fileUploadDao.getGeneralMasterId(fields[10]);
             Integer eicId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
             Integer LlNumber = fileUploadDao.getLlNumber(fields[38],unitId,contractorId);
+            Integer zoneId = null;
+
+         // Normalize the value safely
+         String zoneValue = (fields.length > 40 && fields[40] != null)
+                 ? fields[40].replaceAll("[\"\\u00A0]", "").trim()
+                 : "";
+
+         // Only validate if something is truly entered
+         if (!zoneValue.isBlank()) {
+             zoneId = fileUploadDao.getGeneralMasterId(zoneValue);
+
+             if (zoneId == null) {
+                 fieldErrors.put("zone", "Invalid or not found");
+             }
+         }
+
 
 
             if (tradeId == null) fieldErrors.put("trade", "There is no mapping found for Trade and Principal Employee");
@@ -1059,18 +1234,27 @@ public class FileUploadServiceImpl implements FileUploadService {
             if (bloodGroupId == null) fieldErrors.put("bloodGroup", "Invalid or not found");
             if (areaId == null) fieldErrors.put("area", "There is no mapping found for Area and Principal Employee");
             if (academicId == null) fieldErrors.put("academic", "Invalid or not found");
-            if (zoneId == null) fieldErrors.put("zone", "Invalid or not found");
+            //if (maritalStatusId == null) fieldErrors.put("maritalStatus", "Invalid or not found");
             if (genderId == null) fieldErrors.put("Gender", "Invalid or not found");
             if (eicId == null) fieldErrors.put("EIC", "Invalid or not found");
             if (LlNumber == null) fieldErrors.put("LlNumber", "Invalid or not found");
             if (wcecId == null) fieldErrors.put("WCESIC", "Invalid or not found");
-
+            if (unitId == null) fieldErrors.put("unitCode", "Invalid or not found");
+            if (contractorId == null) fieldErrors.put("vendorCode", "Invalid or not found");
+         // Duplicate aadhar check
+            String aadharNumber = fields[8];
+            boolean aadharNumberExists = workmenUploadDao.isAadharExists(aadharNumber);
+            if (aadharNumberExists) {
+            	fieldErrors.put("aadharNumber", "Duplicate aadharNumber: " + aadharNumber + " already exists");
+            }
+            
             if (!fieldErrors.isEmpty()) {
                 errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
             }
 
             try {
+                
                 WorkmenBulkUpload staging = new WorkmenBulkUpload();
                 staging.setFirstName(fields[0]);
                 staging.setLastName(fields[1]);
@@ -1080,7 +1264,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setSkill(String.valueOf(skillId));
                 staging.setNatureOfWork(fields[6]);
                 staging.setHazardousArea(fields[7]);
-                staging.setAadhaarNumber(fields[8]);
+                staging.setAadhaarNumber(aadharNumber);
                 staging.setVendorCode(String.valueOf(contractorId));
                 staging.setGender(String.valueOf(genderId));
                 staging.setDoj(fields[11]);
@@ -1112,7 +1296,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setInsuranceType(fields[37]);
                 staging.setLLnumber(String.valueOf(LlNumber));
                 staging.setAddress(fields[39]);
-                staging.setZone(String.valueOf(zoneId));
+                staging.setZone(zoneId!=null?String.valueOf(zoneId):" ");
                 staging.setIdMark(fields[41]);
 
                 fileUploadDao.saveWorkmenBulkUploadToStaging(staging);
@@ -1287,20 +1471,19 @@ public class FileUploadServiceImpl implements FileUploadService {
                 if (!fields[40].isBlank() && zone == null) fieldErrors.put("zone", "Invalid or not found");
    
             */
-            
+                 // Duplicate aadhar check
+                    String aadharNumber = fields[8];
+                    boolean aadharNumberExists = fileUploadDao.isAadharNumberExists(aadharNumber);
+                    if (aadharNumberExists) {
+                    	fieldErrors.put("aadharNumber", "Duplicate aadharNumber: " + aadharNumber + " already exists");
+                    }
+
             if (!fieldErrors.isEmpty()) {
                 errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
             }
 
             try {
-            	 String aadharNumber = fields[8];
-
-                 // Duplicate plantCode check
-                 if (fileUploadDao.isAadharNumberExists(aadharNumber)) {
-                     errorData.add(Map.of("row", rowNum, "error", "Duplicate aadharNumber: " + aadharNumber + " already exists"));
-                     continue;
-                 }
                 WorkmenBulkUpload staging = new WorkmenBulkUpload();
                 staging.setFirstName(fields[0]);
                 staging.setLastName(fields[1]);
@@ -1342,7 +1525,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setInsuranceType(fields[37]);
                 staging.setLLnumber(LLNumber!=null?String.valueOf(LLNumber):null);
                 staging.setAddress(fields[39]);
-                staging.setZone(zoneId!=null?String.valueOf(zoneId):null);
+                staging.setZone(zoneId!=null?String.valueOf(zoneId):" ");
                 staging.setIdMark(fields[41]);
 
                 int transactionId = fileUploadDao.saveWorkmenBulkDraftUploadToStaging(staging); // RETURN the transaction ID

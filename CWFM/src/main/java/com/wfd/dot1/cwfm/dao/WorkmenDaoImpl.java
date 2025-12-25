@@ -744,7 +744,7 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 										gpm.getZone()!=null?gpm.getZone():' ',
 												gpm.getWageCategory()!=null?gpm.getWageCategory():' ',gpm.getBonusPayout()!=null?gpm.getBonusPayout():' ',
 														gpm.getDepartment()!=null?gpm.getDepartment():' ',gpm.getSubdepartment()!=null?gpm.getSubdepartment():' ',
-															gpm.getTrade()!=null?gpm.getTrade():' ',gpm.getSkill()!=null?gpm.getSkill():' '};
+															gpm.getTrade()!=null?gpm.getTrade():' ',gpm.getSkill()!=null?gpm.getSkill():' ',gpm.getMaritalStatus()!=null?gpm.getMaritalStatus():' '};
 		log.info("Query to getAllGeneralMastersForGatePass "+query);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,obj);
 		while(rs.next()) {

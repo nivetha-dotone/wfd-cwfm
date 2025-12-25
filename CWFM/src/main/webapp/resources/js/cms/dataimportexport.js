@@ -333,10 +333,10 @@ function downloadErrorCSV(errorData, uploadedFileName) {
                 break;
 
             case "data-contractor":
-                headers = ["Contractor Name", "Contractor Address", "City", "Plant Code", "Contractor Manager Name", "License Num", "License Valid From", "License Valid To",
-                    "License Coverage", "Total Strength", "Maximum Number of Workmen", "Nature of Work", "Location of Work", "Contractor Validity Start Date", "Contractor Validity End Date",
-                    "Contractor Id", "PF Code", "EC/WC Number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF Number", "PF Apply Date", "Reference", "Mobile Number",
-                    "ESI Number", "ESI Valid From", "ESI Valid To", "Organisation", "Main Contractor Code", "Work Order Number"];
+                headers = ["Work Order Number","Plant Code","Organisation","Main Contractor Code","Contractor Code","Contractor Name", "Contractor Address", "City", 
+                "Contractor Manager Name", "Total Workmen Strength", "Maximum Number Of Workmen", "Labour License Number", "License Valid From",
+                    "License Valid To", "License Coverage", "WC Number", "WC Valid From", "WC Valid To", "WC Coverage", "ESIC Number",
+                    "ESIC Valid From", "Nature of Work", "PF Number", "PF Apply Date"];
                 break;
 
             case "data-principal employer":
@@ -546,8 +546,8 @@ function downloadErrorCSV(errorData, uploadedFileName) {
             fieldMap = ["workOrderNumber", "item", "line", "lineNumber", "serviceCode", "shortText", "deliveryCompletion","itemChangedON", "vendorCode", "vendorName", "vendorAddress", "blockedVendor","workOrderValiditiyFrom", "workOrderValiditiyTo", "workOrderType", "plantcode", "sectionCode","departmentCode", "GLCode", "costCenter", "natureofJob", "rateUnit", "quantity", "baseUnitofMeasure","workOrderReleased", "PMOrderNo", "WBSElement", "qtyCompleted", "workOrderReleaseDate","serviceEntryCreatedDate", "serviceEntryUpdatedDate", "purchaseOrgLevel",  "companycode"];
         } 
         else if (templateType === "Data-Contractor") {
-            headers = ["CONTRACTOR NAME", "CONTRACTOR ADDRESS", "City", "Contractor MANAGER NAME", "LICENSE NUM", "LICENCSE VALID FROM", "LICENCSE VALID TO", "LICENCSE COVERAGE", "TOTAL STRENGTH", "MAXIMUM NUMBER OF WORKMEN", "NATURE OF WORK", "LOCATION OF WORK", "CONTRACTOR VALIDITY START DATE", "CONTRACTOR VALIDITY END DATE", "CONTRACTOR ID", "PF CODE", "EC/WC number", "EC/WC Validity Start Date", "EC/WC Validity End Date", "Coverage", "PF NUMBER", "PF APPLY DATE", "Reference", "Mobile Number", "ESI NUMBER", "ESI VALID FROM", "ESI VALID TO", "Main Contractor Code", "Work Order Number"];
-            fieldMap = ["contractorName", "contractorAddress", "city", "managerNm", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "totalStrength", "maxNoEmp", "natureofWork", "locationofWork", "periodStartDt", "periodEndDt", "contractorId", "pfCode", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "pfNum", "pfApplyDt", "reference", "mobileNumber", "esiwc", "esiValidFrom", "esiValidTo", "contractorCode", "workOrderNumber"];
+            headers = ["Work Order Number","Plant Code","Organisation","Main Contractor Code","Contractor Code","Contractor Name", "Contractor Address", "City", "Contractor Manager Name", "Total Workmen Strength", "Maximum Number Of Workmen", "Labour License Number", "License Valid From","License Valid To", "License Coverage", "WC Number", "WC Valid From", "WC Valid To", "WC Coverage", "ESIC Number","ESIC Valid From", "Nature of Work", "PF Number", "PF Apply Date"];
+            fieldMap = ["workOrderNumber","plantCode", "organization", "contractorCode", "contractorId", "contractorName", "contractorAddress", "city", "managerNm", "totalStrength", "maxNoEmp", "licenseNumber", "licenseValidFrom", "licenseValidTo", "coverage", "wcCode", "wcFromDtm", "wcToDtm", "wcTotal", "esiwc", "esiValidFrom", "natureofWork", "pfNum", "pfApplyDt"];
         } 
         else if (templateType === "Data-Principal Employer") {
             headers = ["Organization", "Plant Code", "Name", "Address", "Manager Name", "Manager Address", "Business Type", "Max Workmen", "Max Contract Workmen", "BOCW Applicability", "Is MW Applicability", "License Number", "PF Code", "ESWC", "Factory License Number","State"];
