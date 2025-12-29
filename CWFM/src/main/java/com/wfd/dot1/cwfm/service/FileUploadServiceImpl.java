@@ -651,7 +651,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         Set<String> mandatoryFields = Set.of(
             "contractorName","contractorAddress","city","plantCode","managerNm",
-            "totalStrength","maxNoEmp","natureofWork","contractorId","pfNum","pfApplyDt",
+            "totalStrength","maxNoEmp","natureofWork","contractorId",
             "organization","contractorCode","workOrderNumber"
         );
 
@@ -923,17 +923,37 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     // Helper method
     private Date parseDateStrict(String value, String fieldName, Map<String, String> fieldErrors) {
-        if (value == null || value.isBlank()) return null;
 
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            sdf.setLenient(false);
-            return sdf.parse(value.trim());
-        } catch (Exception e) {
-            fieldErrors.put(fieldName, "Invalid date format. Expected yyyy-MM-dd");
+        if (value == null || value.isBlank()) {
             return null;
         }
+
+        String input = value.trim();
+
+        String[] patterns = {
+                "dd/MM/yyyy",
+                "dd-MM-yyyy",
+                "yyyy/MM/dd",
+                "yyyy-MM-dd"
+        };
+
+        for (String pattern : patterns) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+                sdf.setLenient(false); // STRICT parsing
+                return sdf.parse(input);
+            } catch (Exception ignored) {
+                // try next format
+            }
+        }
+
+        fieldErrors.put(
+                fieldName,
+                "Invalid date format. Expected dd/MM/yyyy, dd-MM-yyyy, yyyy/MM/dd, or yyyy-MM-dd"
+        );
+        return null;
     }
+
 
     private boolean isValidDate(String value) {
         if (value == null || value.isBlank()) return false;
@@ -1126,7 +1146,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             errorData.add(Map.of("row", "Procedure", "error", "Stored Procedure Failed: " + e.getMessage()));
         }
 
-        fileUploadDao.callWorkorderProcessingSP();
+       // fileUploadDao.callWorkorderProcessingSP();
         Map<String, Object> result = new HashMap<>();
         result.put("successData", successData);
         result.put("errorData", errorData);
@@ -1713,14 +1733,14 @@ public class FileUploadServiceImpl implements FileUploadService {
 	    if (list == null || list.isEmpty()) return true;
 
 	    try {
-	        String orgType = type.equalsIgnoreCase("Department") ? "Department" : "Area";
+	        String orgType = type.equalsIgnoreCase("Department") ? "Dept" : "Area";
 	        long orgLevelDefId = fileUploadDao.getOrgLevelDefId(orgType);
 
 	        List<DeptMapping> finalList = new ArrayList<>();
 
 	        for (DeptMapping dm : list) {
 
-	            String name = orgType.equals("Department")
+	            String name = orgType.equals("Dept")
 	                    ? dm.getDepartment()
 	                    : dm.getSubDepartment();
 
@@ -1737,7 +1757,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	            return true;
 	        }
 
-	        if (orgType.equals("Department")) {
+	        if (orgType.equals("Dept")) {
 	            return fileUploadDao.saveDeptOrgLevelEntry(finalList, orgLevelDefId);
 	        } else {
 	            return fileUploadDao.saveAreaOrgLevelEntry(finalList, orgLevelDefId);

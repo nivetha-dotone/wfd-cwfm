@@ -1,19 +1,16 @@
 package com.wfd.dot1.cwfm.dao;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoField;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -27,26 +24,21 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
-import com.wfd.dot1.cwfm.dto.OrgLevelEntryDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
 import com.wfd.dot1.cwfm.pojo.CMSWorkorderLN;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
-import com.wfd.dot1.cwfm.pojo.ContractorRegistrationPolicy;
 import com.wfd.dot1.cwfm.pojo.ContractorWorkorderTYP;
 import com.wfd.dot1.cwfm.pojo.DeptMapping;
-import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import com.wfd.dot1.cwfm.pojo.KTCWorkorderStaging;
 import com.wfd.dot1.cwfm.pojo.MimumWageMasterTemplate;
 import com.wfd.dot1.cwfm.pojo.PrincipalEmployer;
 import com.wfd.dot1.cwfm.pojo.WorkmenBulkUpload;
 import com.wfd.dot1.cwfm.pojo.Workorder;
-import com.wfd.dot1.cwfm.service.FileUploadServiceImpl;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Repository
@@ -549,74 +541,161 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	    }
 	 
 	 private Date parseSqlDate(String input) {
-		  if (input == null || input.trim().isEmpty()) {
+
+		    if (input == null || input.trim().isEmpty()) {
 		        return null;
 		    }
 
-		    try {
-		        input = input.trim();
+		    input = input.trim();
 
-		        DateTimeFormatter formatter;
-		        if (input.contains(".")) {
-		            formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		        } else if (input.contains("/")) {
-		            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		        } else {
-		            return null;
+		    List<DateTimeFormatter> formatters = Arrays.asList(
+		            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+		            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+		            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+		            DateTimeFormatter.ofPattern("yyyy/MM/dd")
+		    );
+
+		    for (DateTimeFormatter formatter : formatters) {
+		        try {
+		            LocalDate localDate = LocalDate.parse(input, formatter);
+		            return Date.valueOf(localDate);
+		        } catch (Exception e) {
+		            // try next format
 		        }
-
-		        LocalDate localDate = LocalDate.parse(input, formatter);
-		        return Date.valueOf(localDate);
-
-		    } catch (Exception e) {
-		        return null;
 		    }
+
+		    return null; // invalid date format
 		}
 
-	 @Override
-	 public void saveWorkorderToStaging(KTCWorkorderStaging workorder) {
-		 String sql=saveWorkorderToStaging();
-	     //String sql = "insert into KTC_WORKORDER_STAGING_ON_REQ(WORKORDER_NUM,ITEM_NUM,SVC_LN_ITEM_DEL,SVC_LN_ITEM_NUM,SVC_NUM,SVC_LN_ITEM_NAME,DELV_COMPLETION_SW,ITEM_CHANGED_ON_DATE,\r\n"
-	     //		+ "VENDOR_CODE,VENDOR_NAME,VENDOR_ADDRESS,BLOCKED_PO,WORKORDER_VALID_FROM,WORKORDER_VALID_TO,SAP_WORKORDER_TYPE,UNIT_CODE,SEC_NAME,DEPT_NAME,\r\n"
-	     //		+ "GL_CODE,COST_CENTRE_CODE,JOB_NAME,RATE,QTY,UOM,WORKORDER_RELEASED_SW,PM_WORKORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,WORKORDER_RELEASED_DATE,\r\n"
-	     //		+ "SERVICE_ENTRY_CREATE_DATE,SERVICE_ENTRY_UPDATED_DATE,PURCHASE_ORG_LEVEL,COMPANY_CODE,EIC_NUM,RECORD_CREATED_ON,RECORD_UPDATED_ON,\r\n"
-	     //		+ "RECORD_PROCESSED,RECORD_STATUS,NATURE_OF_JOB)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?,?,?,?,?,null,null,null,null,null,null)\r\n";
-		 int result =jdbcTemplate.update(sql,
-	         workorder.getWorkOrderNumber(),
-	         workorder.getItem(),
-	         workorder.getLine(),
-	         workorder.getLineNumber(),
-	         workorder.getServiceCode(),
-	         workorder.getShortText(),
-	         workorder.getDeliveryCompletion(),
-	         parseSqlDate(workorder.getItemChangedON()),
-	         workorder.getVendorCode(),
-	         workorder.getVendorName(),
-	         workorder.getVendorAddress(),
-	         workorder.getBlockedVendor(),
-	         parseSqlDate(workorder.getWorkOrderValiditiyFrom()),
-	         parseSqlDate(workorder.getWorkOrderValiditiyTo()),
-	         workorder.getWorkOrderType(),
-	         workorder.getPlantcode(),
-	         workorder.getSectionCode(),
-	         workorder.getDepartmentCode(),
-	         workorder.getGLCode(),
-	         workorder.getCostCenter(),
-	         workorder.getNatureofJob(),
-	         workorder.getRateUnit(),
-	         workorder.getQuantity(),
-	         workorder.getBaseUnitofMeasure(),
-	         workorder.getWorkOrderReleased(),
-	         workorder.getPMOrderNo(),
-	         workorder.getWBSElement(),
-	         parseSqlDate(workorder.getWorkOrderReleaseDate()),
-	         parseSqlDate(workorder.getServiceEntryCreatedDate()),
-	         parseSqlDate(workorder.getServiceEntryUpdatedDate()),
-	         workorder.getPurchaseOrgLevel(),
-	         workorder.getCompanycode()
-	     );
-		 
-	 }
+	 private java.sql.Date parseSqlDate(LocalDate date) {
+		    return date == null ? null : java.sql.Date.valueOf(date);
+		}
+
+		private BigDecimal parseBigDecimal(String val) {
+		    if (val == null || val.trim().isEmpty()) {
+		        return null;
+		    }
+		    return new BigDecimal(val);
+		}
+
+//	 @Override
+//	 public void saveWorkorderToStaging(KTCWorkorderStaging workorder) {
+//		 String sql=saveWorkorderToStaging();
+//	     //String sql = "insert into KTC_WORKORDER_STAGING_ON_REQ(WORKORDER_NUM,ITEM_NUM,SVC_LN_ITEM_DEL,SVC_LN_ITEM_NUM,SVC_NUM,SVC_LN_ITEM_NAME,DELV_COMPLETION_SW,ITEM_CHANGED_ON_DATE,\r\n"
+//	     //		+ "VENDOR_CODE,VENDOR_NAME,VENDOR_ADDRESS,BLOCKED_PO,WORKORDER_VALID_FROM,WORKORDER_VALID_TO,SAP_WORKORDER_TYPE,UNIT_CODE,SEC_NAME,DEPT_NAME,\r\n"
+//	     //		+ "GL_CODE,COST_CENTRE_CODE,JOB_NAME,RATE,QTY,UOM,WORKORDER_RELEASED_SW,PM_WORKORDER_NUM,WBS_ELEMENT,QTY_COMPLETED,WORKORDER_RELEASED_DATE,\r\n"
+//	     //		+ "SERVICE_ENTRY_CREATE_DATE,SERVICE_ENTRY_UPDATED_DATE,PURCHASE_ORG_LEVEL,COMPANY_CODE,EIC_NUM,RECORD_CREATED_ON,RECORD_UPDATED_ON,\r\n"
+//	     //		+ "RECORD_PROCESSED,RECORD_STATUS,NATURE_OF_JOB)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,?,?,?,?,?,null,null,null,null,null,null)\r\n";
+//		 int result =jdbcTemplate.update(sql,
+//	         workorder.getWorkOrderNumber(),
+//	         workorder.getItem(),
+//	         workorder.getLine(),
+//	         workorder.getLineNumber(),
+//	         workorder.getServiceCode(),
+//	         workorder.getShortText(),
+//	         workorder.getDeliveryCompletion(),
+//	         parseSqlDate(workorder.getItemChangedON()),
+//	         workorder.getVendorCode(),
+//	         workorder.getVendorName(),
+//	         workorder.getVendorAddress(),
+//	         workorder.getBlockedVendor(),
+//	         parseSqlDate(workorder.getWorkOrderValiditiyFrom()),
+//	         parseSqlDate(workorder.getWorkOrderValiditiyTo()),
+//	         workorder.getWorkOrderType(),
+//	         workorder.getPlantcode(),
+//	         workorder.getSectionCode(),
+//	         workorder.getDepartmentCode(),
+//	         workorder.getGLCode(),
+//	         workorder.getCostCenter(),
+//	         workorder.getNatureofJob(),
+//	         workorder.getRateUnit(),
+//	         workorder.getQuantity(),
+//	         workorder.getBaseUnitofMeasure(),
+//	         workorder.getWorkOrderReleased(),
+//	         workorder.getPMOrderNo(),
+//	         workorder.getWBSElement(),
+//	         parseSqlDate(workorder.getWorkOrderReleaseDate()),
+//	         parseSqlDate(workorder.getServiceEntryCreatedDate()),
+//	         parseSqlDate(workorder.getServiceEntryUpdatedDate()),
+//	         workorder.getPurchaseOrgLevel(),
+//	         workorder.getCompanycode()
+//	     );
+//		 
+//	 }hema code
+		@Override
+		public void saveWorkorderToStaging(KTCWorkorderStaging w) {
+
+		    String sql =
+		        "INSERT INTO KTC_WORKORDER_STAGING_ON_REQ ("
+		      + " WORKORDER_NUM, ITEM_NUM, SVC_LN_ITEM_NUM, SVC_LN_ITEM_DEL, "
+		      + " SVC_NUM, SVC_LN_ITEM_NAME, DELV_COMPLETION_SW, ITEM_CHANGED_ON_DATE, "
+		      + " VENDOR_CODE, VENDOR_NAME, VENDOR_ADDRESS, BLOCKED_PO, "
+		      + " WORKORDER_VALID_FROM, WORKORDER_VALID_TO, SAP_WORKORDER_TYPE, "
+		      + " UNIT_CODE, SEC_NAME, DEPT_NAME, GL_CODE, COST_CENTRE_CODE, "
+		      + " JOB_NAME, RATE, QTY, UOM, WORKORDER_RELEASED_SW, "
+		      + " PM_WORKORDER_NUM, WBS_ELEMENT, QTY_COMPLETED, NATURE_OF_JOB, "
+		      + " WORKORDER_RELEASED_DATE, SERVICE_ENTRY_CREATE_DATE, "
+		      + " SERVICE_ENTRY_UPDATED_DATE, PURCHASE_ORG_LEVEL, COMPANY_CODE, "
+		      + " EIC_NUM, RECORD_CREATED_ON, RECORD_UPDATED_ON, "
+		      + " RECORD_PROCESSED, RECORD_STATUS ) "
+		      + "VALUES ("
+		      + " ?,?,?,?,?,?,?,?,?,?,"
+		      + " ?,?,?,?,?,?,?,?,?,?,"
+		      + " ?,?,?,?,?,?,?,?,?,?,"
+		      + " ?,?,?,?,?,?,?,?,?"
+		      + ")";
+
+		    jdbcTemplate.update(sql,
+		        /* 01 */ w.getWorkOrderNumber(),
+		        /* 02 */ w.getItem(),
+		        /* 03 */ w.getLineNumber(),           // INT → SVC_LN_ITEM_NUM
+		        /* 04 */ w.getLine(),                 // NVARCHAR → SVC_LN_ITEM_DEL
+		        /* 05 */ w.getServiceCode(),
+		        /* 06 */ w.getShortText(),
+		        /* 07 */ w.getDeliveryCompletion(),
+		        /* 08 */ parseSqlDate(w.getItemChangedON()),
+
+		        /* 09 */ w.getVendorCode(),
+		        /* 10 */ w.getVendorName(),
+		        /* 11 */ w.getVendorAddress(),
+		        /* 12 */ w.getBlockedVendor(),
+
+		        /* 13 */ parseSqlDate(w.getWorkOrderValiditiyFrom()),
+		        /* 14 */ parseSqlDate(w.getWorkOrderValiditiyTo()),
+		        /* 15 */ w.getWorkOrderType(),
+		        /* 16 */ w.getPlantcode(),
+		        /* 17 */ w.getSectionCode(),
+		        /* 18 */ w.getDepartmentCode(),
+		        /* 19 */ w.getGLCode(),
+		        /* 20 */ w.getCostCenter(),
+
+		        /* 21 */ w.getNatureofJob(),
+		        /* 22 */ parseBigDecimal(w.getRateUnit()),
+		        /* 23 */ parseBigDecimal(w.getQuantity()),
+		        /* 24 */ w.getBaseUnitofMeasure(),
+		        /* 25 */ w.getWorkOrderReleased(),
+		        /* 26 */ w.getPMOrderNo(),
+		        /* 27 */ w.getWBSElement(),
+
+		        /* 28 */ parseBigDecimal(w.getQtyCompleted()),
+		        /* 29 */ w.getNatureofJob(),
+
+		        /* 30 */ parseSqlDate(w.getWorkOrderReleaseDate()),
+		        /* 31 */ parseSqlDate(w.getServiceEntryCreatedDate()),
+		        /* 32 */ parseSqlDate(w.getServiceEntryUpdatedDate()),
+
+		        /* 33 */ w.getPurchaseOrgLevel(),
+		        /* 34 */ w.getCompanycode(),
+		        /* 35 */ null,                        // EIC_NUM
+
+		        /* 36 */ new Timestamp(System.currentTimeMillis()),
+		        /* 37 */ null,
+		        /* 38 */ "N",
+		        /* 39 */ "NEW"
+		    );
+		}
+
+
 
 	 @Override
 	 public void callWorkorderProcessingSP() {
