@@ -2,9 +2,9 @@ package com.wfd.dot1.cwfm.dao;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.wfd.dot1.cwfm.dto.ApproverStatusDTO;
+import com.wfd.dot1.cwfm.dto.EntryPassStatusDto;
 import com.wfd.dot1.cwfm.dto.GatePassListingDto;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.enums.GatePassType;
@@ -231,7 +232,48 @@ public class EntrypassStatusDaoImpl implements EntrypassStatusDao {
 
 	     return listDto;
 	 }
+	@Override
+	public List<EntryPassStatusDto> getEntryPassStatusReport(String unitId) {
+		String sql = "select  ROW_NUMBER() OVER (\r\n"
+				+ "        ORDER BY TransactionId\r\n"
+				+ "    ) AS SNo,TransactionId,EntryPassNo,UnitId,PrincipalEmployer,ContractWorkmenCode,FirstName,LastName,Department,VendorCode,\r\n"
+				+ " VendorName,WorkOrder,EicNumber,EntryPassAction,EntryPassType,Status, LastApprovers,NextApprovers\r\n"
+				+ " from VW_GATEPASS_APPROVAL_REPORT \r\n"
+				+ " where unitid=?";
 
+   List<EntryPassStatusDto> listDto = new ArrayList<>();
+
+   SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, unitId);
+
+   while (rs.next()) {
+	   EntryPassStatusDto dto = new EntryPassStatusDto();
+	   dto.setTransactionId(rs.getString("TransactionId"));
+	   dto.setEntryPassNo(rs.getString("EntryPassNo"));
+	   dto.setUnitId(rs.getString("UnitId"));
+	   dto.setPrincipalEmployer(rs.getString("PrincipalEmployer"));
+	   dto.setContractWorkmenCode(rs.getString("ContractWorkmenCode"));
+	   dto.setFirstName(rs.getString("FirstName"));
+	   dto.setLastName(rs.getString("LastName"));
+	   dto.setDepartment(rs.getString("Department"));
+	   dto.setVendorCode(rs.getString("VendorCode"));
+	   dto.setVendorName(rs.getString("VendorName"));
+	   dto.setWorkOrder(rs.getString("WorkOrder"));
+	   dto.setEicNumber(rs.getString("EicNumber"));
+	   dto.setEntryPassAction(rs.getString("EntryPassAction"));
+	   dto.setEntryPassType(rs.getString("EntryPassType"));
+	   dto.setStatus(rs.getString("Status"));
+	   dto.setLastApprover(
+			    Optional.ofNullable(rs.getString("LastApprovers")).orElse("-")
+			);
+
+	   dto.setNextApprover(Optional.ofNullable(
+			   rs.getString("NextApprovers")).orElse("-"));
+	   dto.setSno(rs.getString("SNo"));
+       listDto.add(dto);
+   }
+
+   return listDto;
+	}
 
 
 

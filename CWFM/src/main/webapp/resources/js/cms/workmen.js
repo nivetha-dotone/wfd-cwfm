@@ -3680,3 +3680,98 @@ function hideEsic() {
     document.getElementById("esicNumberSection").style.display = "none";
     document.getElementById("esicRequiredStar").style.display = "none";
 }
+
+
+function searchGatePassReportBasedOnPE() {
+					    var principalEmployerId = $('#principalEmployerId').val();
+					    
+						
+					    $.ajax({
+					        url: '/CWFM/entryPassStatus/report',
+					        type: 'POST',
+					        data: {
+					            principalEmployerId: principalEmployerId
+					        },
+					        success: function(response) {
+					            var tableBody = $('#workmenTable tbody');
+								// 🔄 Clear previous DataTable and its config
+								           if ($.fn.DataTable.isDataTable('#workmenTable')) {
+								               $('#workmenTable').DataTable().destroy();
+								           }
+										   tableBody.empty();
+					            if (Array.isArray(response) &&response.length > 0) {
+					                $.each(response, function(index, wo) {
+					                    var row = '<tr  >' +
+												'<td  ><input type="checkbox" name="selectedUnitIds" value="' + wo.transactionId + '"></td>'+
+												'<td  >' + wo.transactionId + '</td>' +
+												 '<td  >' + wo.entryPassNo + '</td>' +
+					                              '<td  >' + wo.contractWorkmenCode+'</td>' +
+												   '<td  >' +wo.firstName + '</td>' +
+												  '<td  >' + wo.lastName + '</td>' +	
+												  '<td  >' + wo.department + '</td>' +	
+												  '<td  >' +wo.vendorCode + '</td>' +	
+												  '<td  >' + wo.vendorName + '</td>' +
+												  '<td  >' + wo.workOrder + '</td>' +
+												  '<td  >' + wo.eicNumber + '</td>' +
+												  '<td  >' + wo.entryPassAction + '</td>' +
+												  '<td  >' +  toCapitalCase(wo.entryPassType) + '</td>' +
+												  '<td  >' + wo.lastApprover + '</td>' +
+												  '<td  >' + wo.nextApprover + '</td>' +
+												  '<td  >' + wo.status + '</td>' +				                             
+					                              '</tr>';
+					                    tableBody.append(row);
+					                });
+									
+					            } 								
+
+																	            // ✅ Always init after rows are drawn
+																	            initWorkmenTable("workmenTable");
+																	        },
+					       
+					        error: function(xhr, status, error) {
+					            console.error("Error fetching data:", error);
+					        }
+					    });
+					}
+					function toggleSelectAll() {
+					           var selectAllCheckbox = document.getElementById('selectAllCheckbox');
+					           var checkboxes = document.querySelectorAll('input[name="selectedUnitIds"]');
+					           checkboxes.forEach(function(checkbox) {
+					               checkbox.checked = selectAllCheckbox.checked;
+					           });
+					       }
+						   
+						   function exportToEntryPassStatusCSV() {
+						       var selectedRows = document.querySelectorAll('input[name="selectedUnitIds"]:checked');
+
+						       if (selectedRows.length === 0) {
+						           alert("Please select at least one record to export.");
+						           return;
+						       }
+
+						       var csvContent = "data:text/csv;charset=utf-8,";
+						       csvContent += "Transaction ID,Entry Pass No,Contract Workmen Code,First Name,Last Name,Department,Vendor Code,Vendor Name,Workorder,Eic Number,Entry Pass Action,Entry Pass Type,Last Approver,Next Approver,Status\n";
+
+						       selectedRows.forEach(function (checkbox) {
+						           var row = checkbox.closest("tr");
+
+						           var rowData = row.querySelectorAll(
+						               "td:nth-child(2), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10), td:nth-child(11), td:nth-child(12), td:nth-child(13), td:nth-child(14), td:nth-child(15), td:nth-child(16)"
+						           );
+
+						           var rowArray = [];
+						           rowData.forEach(function (cell) {
+						               rowArray.push('"' + cell.innerText.replace(/"/g, '""') + '"');
+						           });
+
+						           csvContent += rowArray.join(",") + "\n";
+						       });
+
+						       var encodedUri = encodeURI(csvContent);
+						       var link = document.createElement("a");
+						       link.setAttribute("href", encodedUri);
+						       link.setAttribute("download", "EntryPassStatus.csv");
+						       document.body.appendChild(link);
+						       link.click();
+						       document.body.removeChild(link);
+						   }
