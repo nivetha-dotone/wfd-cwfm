@@ -169,7 +169,11 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
+    .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
 </style>
   
 </head>
@@ -185,7 +189,7 @@
     </div>
 
    <div class="page-header">
-   <div>
+    <div class="page-header-buttons">
         <button type="button" class="btn btn-default"  onclick="addNewRow()">Add New Row</button>
         <button type="submit" class="btn btn-default" onclick="submitOrgLevel()">Save</button>
         <button type="submit" class="btn btn-default" onclick="deleteOrgLevel()">Delete Selected</button>
@@ -226,9 +230,9 @@
                         <td class="checkbox-cell">
                             <input type="checkbox" name="selectedOrgLevels">
                         </td>
-                        <td><input type="text" name="orgLevelName[]" placeholder="Org Level Name" required autocomplete="off"></td>
-                        <td><input type="text" name="shortName[]" placeholder="Short Name" required autocomplete="off"></td>
-                        <td><input type="number" name="hierarchy[]" placeholder="Hierarchy" required autocomplete="off"></td>
+                        <td><input type="text" name="orgLevelName[]" placeholder="Org Level Name" required autocomplete="off" style="text-transform: capitalize;"></td>
+                        <td><input type="text" name="shortName[]" placeholder="Short Name" required autocomplete="off" style="text-transform: capitalize;"></td>
+                        <td><input type="number" name="hierarchy[]" placeholder="Hierarchy" required autocomplete="off" style="text-transform: capitalize;"></td>
                     </tr>
                 </c:if>
             </tbody>

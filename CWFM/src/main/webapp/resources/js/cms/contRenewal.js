@@ -121,8 +121,8 @@ function addRowContNew() {
 
     const row = document.createElement("tr");
     row.innerHTML = `
-        <td><button type="button" class="btn btn-success addRowNew" style="color:white;background-color:green;">+</button></td>
-        <td><button type="button" class="btn btn-danger removeRowNew" style="color:white;background-color:red;">−</button></td>
+        <td><button type="button" class="btn btn-success addRowNew" style="color:blue;background-color:white;">+</button></td>
+        <td><button type="button" class="btn btn-danger removeRowNew" style="color:blue;background-color:white;">−</button></td>
         <td></td>
         <td><input type="text" class="form-control documentNumber" name="documentNumber" /></td>
         <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>

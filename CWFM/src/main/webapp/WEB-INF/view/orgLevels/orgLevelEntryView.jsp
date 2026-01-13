@@ -195,7 +195,7 @@
 <div>
 <label for="orgLevelDefId" style=" color: darkcyan;">Org Level Entry:</label>
 <!-- <label for="orgLevelDefId">Select Organization Level:</label> -->
-<select id="orgLevelDefId" name="orgLevelDefId" onchange="navigateToOrgLevel()">
+<select id="orgLevelDefId" name="orgLevelDefId" onchange="navigateToOrgLevel()" style="padding:3px;color:gray;">
     <option value="">Select Org Level</option>
     <c:forEach items="${orgLevels}" var="level">
          <option value="${level.orgLevelDefId}" 

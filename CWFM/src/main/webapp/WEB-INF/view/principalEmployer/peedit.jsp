@@ -403,7 +403,7 @@ table.ControlLayout td {
             <div class="doc-section" style="margin-bottom: 30px;">
                 <!-- Title and Add Button -->
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h4 style="color: black; margin: 0;">${docType}</h4>
+                    <h4 style="font-size: 87%;font-weight: 700;padding;8px;color: #898989; margin: 0;">${docType}</h4>
                     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="addFile('${docType}')">Add Document</button>
                 </div>
 

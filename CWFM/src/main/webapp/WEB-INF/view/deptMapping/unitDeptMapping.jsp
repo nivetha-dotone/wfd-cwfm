@@ -180,7 +180,7 @@
 
     .btn {
         border-radius: 20px;
-        padding: 5px 13px;
+        padding: 2px 13px;
         margin-top: 0px;
     }
      .tabs-container {
@@ -249,12 +249,12 @@
    </div>
 <f:form id="addAadharOBForm" action="/CWFM/contractworkmen/addAadharOB" modelAttribute="workmenbyAadhar" method="post" autocomplete="off">
 <!-- Dropdown Row -->
-<div id="rowsContainer" style="margin: 10px;">
+<div id="rowsContainer" style="margin: 10px;background-color: #DDF3FF">
 
     <!-- Default Row -->
     <div class="row-block mb-2">
         <!-- <label style="color: darkcyan;">Principal Employer:</label> -->
-        <select class="custom-select" id="principalEmployer" name="principalEmployerId" required>
+        <select class="custom-select" id="principalEmployer" name="principalEmployerId" required style="padding:3px;color:gray;">
             <option value="">Please select Principal Employer</option>
             <c:forEach var="pe" items="${PrincipalEmployer}">
                 <option value="${pe.id}">${pe.description}</option>
@@ -262,7 +262,7 @@
         </select>
 
         <!-- <label style="color: darkcyan;">Department:</label> -->
-        <select class="custom-select" id="department" name="departmentId">
+        <select class="custom-select" id="department" name="departmentId" style="padding:3px;color:gray;">
             <option value="">Please select Department</option>
             <c:forEach var="dept" items="${Department}">
                 <option value="${dept.gmId}">${dept.gmName}</option>
@@ -270,14 +270,14 @@
         </select>
 
         <!-- <label style="color: darkcyan;">Sub Department:</label> -->
-        <select class="custom-select" id="subDepartment" name="subDepartmentId">
+        <select class="custom-select" id="subDepartment" name="subDepartmentId" style="padding:3px;color:gray;">
             <option value="">Please select Sub Department</option>
             <c:forEach var="sub" items="${AreaOptions}">
                 <option value="${sub.gmId}">${sub.gmName}</option>
             </c:forEach>
         </select>
-        <button class="remove-btn" onclick="deleteRow(this)">Delete</button>
-<!-- <button type="button" class="remove-row" onclick="deleteRow()" >Delete</button> -->
+        <button class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteRow(this)">Delete</button>
+<!-- <button type="button" class="remove-btn" onclick="deleteRow()" >Delete</button> -->
         <!-- <button type="button" class="btn btn-danger btn-sm remove-row">Delete</button> -->
     </div>
     

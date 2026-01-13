@@ -169,6 +169,20 @@
             color: #000; /* Change text color to black */
             box-sizing: border-box;
         }
+        .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
+label {
+            color: black;
+            font-weight: bold;
+            font-size: 12px; /* Reduced font size */
+        }
+        select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     </style>
 </head>
 <body>
@@ -182,27 +196,27 @@
             </c:forEach>
         </select>
     
-    
+   <div class="page-header-buttons">
 
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveMapping()">Save</button>
             <%-- <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}"> --%>
     </div>
-
-    <h3 style="color:gray;margin:4px;"><spring:message code="label.existingGeneralMasters"/></h3>
+</div>
+    <h4 style="color:gray;margin:4px;"><spring:message code="label.existingGeneralMasters"/></h4>
      <div style="display: flex; margin-top: 20px;margin-left:18px;">
         <!-- Available Pages -->
         <div>
-            <h3 style=" color: darkcyan;list-style-type:none;"><spring:message code="label.availablePages"/></h3>
+            <h3 style=" color: darkcyan;font-size: 12px;font-weight: bold;list-style-type:none;"><spring:message code="label.availablePages"/></h3>
             <select id="availableBox" multiple style="width: 200px; height: 200px;color:gray;"></select>
         </div>
 
         <div style="margin: 0 20px; display: flex; flex-direction: column; justify-content: center;">
-            <button onclick="addPageToSelected()">Add </button>
+            <button onclick="addPageToSelected()">Add </button><br>
             <button onclick="removePageFromSelected()"> Remove</button>
         </div>
 
         <div>
-            <h3 style=" color: darkcyan;padding-right:80px;"><spring:message code="label.selectedPages"/></h3>
+            <h3 style=" color: darkcyan;font-size: 12px;font-weight: bold;padding-right:80px;"><spring:message code="label.selectedPages"/></h3>
             <select id="selectedBox" multiple style="width: 200px; height: 200px;color:gray;"></select>
         </div>
     </div>

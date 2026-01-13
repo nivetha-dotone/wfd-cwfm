@@ -1155,8 +1155,8 @@ document.addEventListener('click', function (e) {
 		    });
 
 		    row.innerHTML = `
-		        <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
-		        <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
+		        <td><button type="button" class="btn btn-success addRow" style="color:blue;background-color:white;">+</button></td>
+		        <td><button type="button" class="btn btn-danger removeRow" style="color:blue;background-color:white;">−</button></td>
 		        <td>
 		            <select class="form-control woNumber" name="workOrderNumber">
 		                ${workOrderOptions}

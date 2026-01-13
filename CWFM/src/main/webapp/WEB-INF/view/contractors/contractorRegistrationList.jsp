@@ -112,7 +112,7 @@
     }
 
     .page-header > div {
-        display: flex;
+        display: flex-start;
         gap: 10px; /* Space between buttons */
     }
 
@@ -163,12 +163,16 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
+   .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
 </style>
 </head>
 <body>
 	<div class="page-header">
-		 <div>
+		 <div class="page-header-buttons">
     <c:if test="${UserPermission.addRights eq 1 }">
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToContractorReg()">Add</button> 
     </c:if>
@@ -186,7 +190,7 @@
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSVFormat()">Export</button>
     	</c:if>
     </div>
-	</div>
+	</div> 
 	<div class="table-container">
 		<table id="contractorlisttable" cellspacing="0" cellpadding="0">
 			<thead>

@@ -199,7 +199,7 @@
                     <c:forEach var="roleRight" items="${roleRightsForm.roleRights}" varStatus="status">
                         <tr>
                         <td>
-    <select class="roleId form-control form-control-rounded"  name="roleRights[${status.index}].roleId" required>
+    <select class="roleId form-control form-control-rounded"  name="roleRights[${status.index}].roleId" required style="padding:3px;color:gray;">
         <option value="">Select Role</option>
         <c:forEach var="role" items="${roles}">
             <option value="${role.gmId}" <c:if test="${roleRight.roleId == role.gmId}">selected</c:if>>
@@ -209,7 +209,7 @@
     </select>
 </td>
 <td>
-    <select class="pageId form-control form-control-rounded"  name="roleRights[${status.index}].pageId" required>
+    <select class="pageId form-control form-control-rounded"  name="roleRights[${status.index}].pageId" required style="padding:3px;color:gray;">
         <option value="">Select Page</option>
         <c:forEach var="page" items="${pages}">
             <option value="${page.gmId}" <c:if test="${roleRight.pageId == page.gmId}">selected</c:if>>
@@ -264,7 +264,7 @@
     <input type="checkbox" name="roleRights[${status.index}].exportRights" value="1" <c:if test="${roleRight.exportRights}">checked</c:if>>
 </td>
 
-                            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">-</button></td>
+                            <td><button type="button" class="btn btn-danger" style="color:blue;background-color:white;" onclick="removeRow(this)">-</button></td>
                         </tr>
                     </c:forEach>
                     <div id="error-message" style="display: none; color: red; font-weight: bold;"></div>
@@ -272,8 +272,8 @@
             </table>
         </div>
         <div>
-            <button type="button" class="btn btn-primary" onclick="addNewRow1()">Add New Row</button>
-            <button type="button" class="btn btn-success" onclick="saveRoleRights()">Submit</button>
+            <button type="button"  onclick="addNewRow1()" class="btn btn-default process-footer-button-cancel ng-binding" style="margin:6px;">Add New Row</button>
+            <button type="button"  onclick="saveRoleRights()"class="btn btn-default process-footer-button-cancel ng-binding" style="margin:6px;">Submit</button>
         </div>
     </div>
 </form>

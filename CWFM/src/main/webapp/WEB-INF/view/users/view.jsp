@@ -156,6 +156,19 @@ table.ControlLayout td {
     padding: 10px; /* Add padding inside cells for spacing around content */
     vertical-align: top; /* Align the content to the top of the cell */
 }
+.page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
+.page-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Distribute space between search and buttons */
+        padding: 8px; /* Adjust padding */
+        background-color: #FFFFFF; /* White background */
+        border-bottom: 1px solid #ccc; /* Subtle border for separation */
+    }
     </style>
 </head>
 
@@ -163,7 +176,9 @@ table.ControlLayout td {
     
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
+<div class="page-header-buttons">
   <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToUserList()">Return</button>
+</div>
 </div>
    <form id="userFormID">
     <table class="ControlLayout">
@@ -176,9 +191,9 @@ table.ControlLayout td {
             </tr> --%>
         <tr>
             <th><label class="custom-label"><span class="required-field"></span>First Name:</label></th>
-            <td><input type="text" name="firstName" value="${users.firstName}" style="height: 20px;" size="30" maxlength="30" readonly /></td>
+            <td><input type="text" name="firstName" value="${users.firstName}" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" readonly /></td>
             <th><label class="custom-label"><span class="required-field"></span>Last Name:</label></th>
-            <td><input type="text" name="lastName" value="${users.lastName}" style="height: 20px;" size="30" maxlength="30" readonly  /></td>
+            <td><input type="text" name="lastName" value="${users.lastName}" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" readonly  /></td>
         </tr>
         <tr>
              <th><label class="custom-label"><span class="required-field"></span>Email:</label></th>
@@ -197,8 +212,8 @@ table.ControlLayout td {
     <td>
         <table style="width: 100%;">
             <tr>
-                <th style="text-align: left;">Select</th>
-                <th style="text-align: left;">Role Name</th>
+                <th style="text-align: left;color:darkcyan;">Select</th>
+                <th style="text-align: left;color:darkcyan;">Role Name</th>
             </tr>
             <c:forEach var="role" items="${roles}">
                 <c:set var="isChecked" value="false"/>
@@ -215,7 +230,7 @@ table.ControlLayout td {
                         <input type="checkbox" name="roleIds" value="${role.gmId}" 
                                <c:if test="${isChecked}">checked</c:if> disabled />
                     </td>
-                    <td>${role.gmName}</td>
+                    <td style="font-size: 11.9px;font-weight: 690;font-family: 'Noto Sans', sans-serif;color: #898989;padding: -0.8em .6em .3em;">${role.gmName}</td>
                 </tr>
             </c:forEach>
         </table>

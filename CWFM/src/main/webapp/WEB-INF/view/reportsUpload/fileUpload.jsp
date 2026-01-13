@@ -13,37 +13,50 @@
     <title>Data Import/Export</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
      <script src="resources/js/cms/dataimportexport.js"></script>
+     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+     
     <style>
         /* Styling for arrows and text button */
-        .arrow-container, .button-container {
-            text-align: left;
-            margin: auto;
-            margin-left: 20px; 
-        }
-        .arrow-container {
-            text-align: left;
-            margin: auto;
-            margin-left: 85px;
-             font-weight: bold;
-        }
+        .arrow-container,
+.button-container {
+    text-align: left;
+    margin-left: 20px;
+}
 
-        .arrow, .button {
-         font-family: 'Noto Sans', Arial, sans-serif; /* Font family similar to grid header */
-            font-size: 17px;
-            cursor: pointer;
-            text-decoration: none;
-            color: black;
-            display: inline-block;
-            margin-right: -17px;
-            font-weight:500;;
-            padding: 4px 5px;
-            border: none;
-            background: none;
-            color: darkcyan; 
-            font-size: 23px; /* Adjust icon size */
-            margin-bottom: -14px;
-    /*  font-weight: bold; */
-        }
+.arrow-container {
+    margin-left: 85px;
+    font-weight: bold;
+}
+
+.arrow,
+.button {
+    font-family: 'Noto Sans', Arial, sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    background: none;
+    border: none;
+    outline: none !important;
+    box-shadow: none !important;
+
+    color: darkcyan;
+    font-size: 23px;
+    font-weight: 500;
+    padding: 0;
+}
+
+/* Kill focus/active box completely */
+.arrow:focus,
+.arrow:active,
+.arrow:focus-visible,
+.button:focus,
+.button:active,
+.button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 
         .arrow:hover, .button:hover {
             color: darkgray;
@@ -176,6 +189,9 @@ td {
 }
  #viewtable{
  overflow-x:auto;
+  width: max-content;     /* key for horizontal scroll */
+    min-width: 100%;
+    border-collapse: collapse;
  }
  #templateinfo{
   overflow-y:auto;
@@ -221,7 +237,38 @@ background-color: #DDF3FF; /* Light green for the table header */
     font-family: Arial, sans-serif;
   }
 }
- 
+ .return{
+     color: black;
+    padding: 15px;
+    font-size: medium;
+     padding: 4px 5px;
+    }
+    table.dataTable {
+    width: 100% !important;
+}
+#viewTableContainer{
+    margin-top: 25px;
+    width: 100%;
+    max-height: 450px;      /* vertical scroll height */
+    overflow-x: auto;       /* horizontal scroll */
+    overflow-y: auto;       /* vertical scroll */
+    border: 1px solid #ddd;
+    }
+    /* #viewtable thead th {
+    position: sticky;
+    top: 0;
+    background: #e6f6ff;
+    z-index: 2;
+} */
+
+/* Cell styling */
+#viewtable th,
+#viewtable td {
+    white-space: nowrap;    /* prevents text wrapping */
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+    
     </style>
  <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -234,6 +281,16 @@ background-color: #DDF3FF; /* Light green for the table header */
    function closeTemplateModal() {
        document.getElementById("templateModal").style.display = "none"; // Hide modal
    }
+   function fileUploadTemplateSideBar() {
+	    $("#sidebar").css("width", "300px");
+	}
+
+	$(document).ready(function () {
+	    $("#closeSidebar").on("click", function () {
+	        $("#sidebar").css("width", "0");
+	    });
+	});
+
    </script>
 
 </head>
@@ -243,13 +300,10 @@ background-color: #DDF3FF; /* Light green for the table header */
 <div class="arrow-container">
     <a href="#" class="arrow openSidebar" onclick="fileUploadTemplateSideBar()" style="font-weight: bold;">&#8593;</a> 
     <a href="#" class="arrow openSidebar" onclick="fileUploadTemplateSideBar()" style="font-weight: bold;">&#8595;</a> 
-    <!-- <span class="arrow openSidebar" onclick="fileUploadTemplateSideBar">&#8593;</span> Up Arrow
-    <span class="arrow openSidebar" onclick="fileUploadTemplateSideBar">&#8595;</span> Down Arrow -->
 </div>
 
 <!-- Import/Export Data Button -->
 <div class="button-container">
-    <!-- <button class="button openSidebar" onclick="fileUploadTemplateSideBar()">Import/Export Data</button> -->
     <a href="#" class="button openSidebar" onclick="fileUploadTemplateSideBar()">Import Data</a> 
     <div><br>
     
@@ -272,7 +326,7 @@ background-color: #DDF3FF; /* Light green for the table header */
     </table> --><br>
      <p style="color:grey;"><b>Note:</b></p>
      <p style="color:grey;">1.Should not upload different format as[for (.xlsx) should not upload(.xlx)]</p>
-     <p style="color:grey;">2.only upload file as[for(.csv)]</p>
+     <p style="color:grey;">2.Only upload file as[for(.csv)]</p>
      <p style="color:grey;">3.Do not change first row heading content and order as provided in Templat Information</p>
      <p style="color:grey;">4.All columns should be fill</p>
     </div>
@@ -298,6 +352,7 @@ background-color: #DDF3FF; /* Light green for the table header */
         
     </c:forEach>
 </select>
+<br><br>
               <a href="#" onclick="fetchTemplateInfo()"id="templateinfo">Template Information</a><br><br>
               <a href="#" onclick="viewTemplateInfo()" id="viewtemplate">View Template</a><br><br>
                <a href="#" onclick="downloadTemplateInfo()">Download Template</a>
@@ -328,19 +383,33 @@ background-color: #DDF3FF; /* Light green for the table header */
 </div>
 <!-- View Template Container (Table) -->
 <div id="viewTemplateContainer" style="display: none; margin-top: 20px;">
-   
+
+    <div onclick="loadCommonList('/data/importExport','Master Data Import')">
+   <!--  <a href="#" class="return"  style="color:black;"  onclick="fileUploadTemplateSideBar()" style="margin:5px;">&#8592;</a> -->
+</div>
+<div onclick="loadCommonList('/data/importExport','Master Data Import')">
+    <a href="#"  class="btn btn-default process-footer-button-cancel ng-binding" style="margin:5px;" onclick="loadCommonList('/data/importExport','Master Data Import')">Return</a>
+</div>
+
     <div>
     
    
       <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveFileSidebar()"style="float:right;">Save</button> -->
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="openFileSidebar()"style="float:right;">Open File</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedRows()" style="float:right;margin:3px;margin-right: 6px;">Delete</button>
+       <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="insertRow()" style="float:right;margin:3px;margin-right: 6px;">Insert</button>
+      <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="openFileSidebar()"style="float:right;margin:3px;margin-right: 6px;">Open File</button>
        <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="cancelButton()"style="float:right;">cancel</button>  -->
+       <button onclick="uploadTemplateFile()" class="btn btn-default process-footer-button-cancel ng-binding"style="float:right;margin:3px;margin-right: 6px;">Save</button>
         <h2 style="color: darkcyan;font-size: 1rem;">Template Data</h2> 
         </div>
-    <div id="viewtable">
+    <div id="viewTableContainer">
+    <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
     <table id="viewtable" border="1" style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr id="tableHeaderRow">
+             <th>
+                <input type="checkbox" id="selectAll">
+            </th>
                 <!-- Headers will be set dynamically -->
             </tr>
         </thead>
@@ -352,7 +421,7 @@ background-color: #DDF3FF; /* Light green for the table header */
     <!-- Open File Button -->
     
 </div>
-<div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
+
 <div id="fileUploadSidebar" class="sidebar" style="width: 0;">
     <div class="sidebar-content" id="fileUploadContainer">
         <button class="close-btn" onclick="closeFileSidebar()">&times;</button>
@@ -361,17 +430,17 @@ background-color: #DDF3FF; /* Light green for the table header */
         <h5 style="color:gray;">Max file size is 10240kb. Supported files types are text/csv, application/vnd.ms-excel.</h5>
         
         <!-- File Input -->
-        <input type="file" id="fileInput" accept=".csv" style="margin-top: 10px;color:black;">
+        <input type="file" id="fileInput" onchange="previewFileData()" accept=".csv" style="margin-top: 10px;color:black;">
      
         <!-- Submit File Button -->
-        <button onclick="uploadTemplateFile()" style="background-color: #007bff; color: white; border-radius: 5px; margin-top: 10px;">
+        <button onclick="uploadTemplateFile()"class="btn btn-default process-footer-button-cancel ng-binding"  style="background-color: #007bff; color: white; border-radius: 5px; margin-top: 10px;">
             Upload
         </button>
        
     </div>
-    <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
+    <!-- <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div> -->
     
 </div>
-<div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
+<!-- <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div> -->
 </body>
 </html>

@@ -10,113 +10,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    
-
     <style>
-         body {
-        margin: 0;
-        overflow-x: hidden;
-    }
-
-     #principalEmployerContent {
-        padding: 20px;
-        box-sizing: border-box;
-        overflow-y: auto;
-        height: calc(100vh - 20px);
-    } 
-th label {
-    text-align: left;
-    display: block;
-    font-weight: normal; /* Remove bold effect */
+      body {
+    margin: 0;
+    overflow-x: hidden;
+    font-family: 'Noto Sans', sans-serif;
 }
-     tr {
-        margin-bottom: 10px; /* Adjust the value as needed */
-    }
 
-    /* Add spacing between <td> elements */
-    /* td {
-        padding-bottom: 10px; /* Adjust the value as needed */
-    } */
-    .custom-label {
-    font-family: 'Your-Desired-Font', sans-serif; /* Replace 'Your-Desired-Font' with the actual font name */
+#principalEmployerContent {
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: calc(100vh - 60px); /* Adjust based on header height */
+}
+
+/* .page-header {
+    background-color: #005151;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-family: 'Noto Sans', sans-serif;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+} */
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Distribute space between search and buttons */
+        padding: 8px; /* Adjust padding */
+        background-color: #FFFFFF; /* White background */
+        border-bottom: 1px solid #ccc; /* Subtle border for separation */
+    }
+.header-buttons {
+    float: right;
+    margin-right: 20px;
+    gap:10px;
+}
+
+.tabs {
+    overflow: hidden;
+    border-bottom: 2px solid #005151;
+    margin-bottom: 20px;
+}
+
+.tabs button {
+    background-color: #fff; /* Tab background color */
+    border: 1px solid #ddd; /* Optional: add a border for visibility */
+     border-radius: 3px;
+    outline: none;
+    padding: 5px 10px;/* Reduced height */
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s, color 0.3s;
+    color: #005151; /* Tab text color */
+    font-family: 'Noto Sans', sans-serif;
+     margin-right: 5px;
+}
+  
+
+.tabs button.active {
+    background-color: #005151; /* Active tab background color */
+    color: #fff; /* Active tab text color */
+    border-bottom: 2px solid #fff;
+}
+
+.tab-content {
+    display: none;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.custom-label {
+    font-family: 'Noto Sans', sans-serif;
     text-align: left;
     display: block;
-    /* Add any other styling properties you need */
+    margin-bottom: 5px;
+    color: #898989;/* Label text color */
+    display: inline;
+  padding: .2em .6em .3em;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 1;
+    white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
 }
 
 .custom-input-container {
     padding-left: 10px;
 }
 
-.custom-input {
-    height: 40px; /* Adjust the height as needed */
-    font-family: 'Your-Desired-Font', sans-serif; /* Same font as the label */
-    /* Add any other styling properties you need */
+.custom-input, .custom-input-checkbox {
+    height: 40px;
+    font-family: 'Noto Sans', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.custom-input-checkbox {
-    height: 20px; /* Adjust the height as needed */
-    font-family: 'Your-Desired-Font', sans-serif; /* Same font as the label */
-    /* Add any other styling properties you need */
-}
 .required-field {
-    color: red; /* Change this to your desired color */
-    margin-right: 4px; 
+    color: red;
+    margin-right: 4px;
 }
-        .page-header {
-            background-color: #005151;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            font-size: 20px;
-        }
 
-        .header-buttons {
-            float: right;
-          /*   margin-top: -40px; */
-            margin-right: 10px;
-        }
-        .error-message {
+
+
+table.ControlLayout {
+    border-collapse: separate; /* Ensure spacing is applied correctly */
+    border-spacing: 10px; /* Adjust the value for the desired gap between cells */
+}
+
+table.ControlLayout th,
+table.ControlLayout td {
+    padding: 10px; /* Add padding inside cells for spacing around content */
+    vertical-align: top; /* Align the content to the top of the cell */
+}
+     .error-message {
     color: red;
     font-family: Arial, sans-serif;
     font-size: 12px;
+    font-weight:bold;
 }
  .error {
     background-color: #ffcccc; /* Light red background */
-} 
-.custom-select {
-    display: inline-block;
-    width: 85%; /* Reduced the width to 50%, adjust as needed */
-    height: 25px;
-    padding: 5px;
-    font-size: 12px;
-    font-family: Arial, sans-serif;
-    line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
-
-    .custom-select:focus {
-        border-color: #80bdff;
-        outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-      .page-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; /* Distribute space between search and buttons */
-        padding: 8px; /* Adjust padding */
-        background-color: #FFFFFF; /* White background */
-        border-bottom: 1px solid #ccc; /* Subtle border for separation */
-    }
-
-    .page-header > div {
-        display: flex;
-        gap: 10px; /* Space between buttons */
-    }
+  .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
     </style>
 </head>
 
@@ -124,8 +155,9 @@ th label {
     
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
+ <div class="page-header-buttons">
 <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="resetPassword()">Reset Password</button>
-
+</div>
 </div>
 
 <form id="resetPasswordForm" autocomplete="off">
@@ -140,7 +172,7 @@ th label {
             <th><label class="custom-label"><span class="required-field">*</span>New Password:</label></th>
            <!--  <td><input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" /></td> -->
          <td>
-                <input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;" size="30" maxlength="30" onkeyup="validateResetPassword()" autocomplete="off"/>
+                <input type="password" id="resetNewPassword" name="newPassword" style="height: 20px;padding:5px;" size="30" maxlength="30" onkeyup="validateResetPassword()" autocomplete="off"/>
                 <span id="resetPasswordMessage" style="color: red;"></span> 
                 
             </td>

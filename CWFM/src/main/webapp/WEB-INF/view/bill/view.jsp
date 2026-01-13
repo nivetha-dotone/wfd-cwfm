@@ -503,8 +503,9 @@ label {
                    
         <tbody>
             <c:forEach var="file" items="${kronosFiles}">
-    <tr>
-        <td style="color:black;">${file.reportName}
+    <tr style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;">
+       <%--  <td style="font-family: Arial, sans-serif;display: block; text-align: left;color:grey;">${file.reportName} --%>
+       <td  >${file.reportName}
        <a href="#" onclick="openFile('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
     </tr>
 </c:forEach>
@@ -521,7 +522,7 @@ label {
             <tbody>
             	<c:forEach var="file" items="${statutoryFiles}">
     <tr>
-        <td style="color:black;">${file.reportName} : 
+        <td style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;">${file.reportName} : 
         
         
         <a href="#" onclick="openFile('${file.reportType}','${file.transactionId }','${file.fileName}')">Download</a></td>
@@ -535,7 +536,7 @@ label {
         <div id="tab4" class="tab-content">
             <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;color:black;">
                <thead>
-               <tr>
+               <tr style="color: #898989;font-weight: bold;">
                
                	<td>Check points </td>
                	<td>Status Y/N </td>
@@ -545,7 +546,7 @@ label {
                </thead>    
             <tbody>
 				<c:forEach var="item" items="${checklistItems}">
-            <tr>
+            <tr style="color: #898989;">
         <td>${item.id}</td>
         <td>${item.statusValue}</td>
         <td>${item.licenseNumber}</td>

@@ -321,7 +321,7 @@ label {
             <button data-target="tab2" onclick="showTabNew('tab2')">License Information</button>
             <button data-target="tab3" onclick="showTabNew('tab3')">Work Order Information</button>
            <button data-target="tab5" onclick="showTabNew('tab5')">Comments</button>
-           <button data-target="tab4" onclick="showTabNew('tab4')">Previous Documents</button>
+           <!-- <button data-target="tab4" onclick="showTabNew('tab4')">Previous Documents</button> -->
         </div>
          <div class="action-buttons" >
              <% if (user != null && !"Contractor".equals(roleName)) { %>
@@ -522,7 +522,7 @@ label {
  <div  class="tab-content "><spring:message code="label.additionalDocumets"/></div>
             <div id="tab2" class="tab-content  ">
             <div id="validationMessages" style="color: red; font-weight: bold; padding: 10px;"></div>
-            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;">
+            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
                    
         <thead>
             <tr style=" border: 1px solid #ddd;">
@@ -539,14 +539,14 @@ label {
         </thead>
       <tbody id="licenseBody">
     <c:forEach var="item" items="${policies}">
-                    <tr>
+                    <tr style=" border: 1px solid #ddd;background-color: ${status.index % 2 == 0 ? '#f9f9f9' : '#ffffff'};">
                       
-                    <td style="color:black;text-align:center">${item.documentType }</td>
-                    <td style="color:black;text-align:center">${item.documentNumber }</td>
-                    <td style="color:black;text-align:center">${item.coverage }</td>
-                    <td style="color:black;text-align:center">${item.validFrom }</td >
-                    <td style="color:black;text-align:center">${item.validTo}</td>
-                    <td style="color:black;text-align:center">
+                    <td style="color:#2c2c2c;text-align:center">${item.documentType }</td>
+                    <td style="color:#2c2c2c;text-align:center">${item.documentNumber }</td>
+                    <td style="color:#2c2c2c;text-align:center">${item.coverage }</td>
+                    <td style="color:#2c2c2c;text-align:center">${item.validFrom }</td >
+                    <td style="color:#2c2c2c;text-align:center">${item.validTo}</td>
+                    <td style="color:#2c2c2c;text-align:center">
                      ${item.fileName}
                      </td>
                     </tr>
@@ -559,7 +559,7 @@ label {
 
     <!-- ✅ TAB 3 – LLWC -->
    <div id="tab3" class="tab-content  ">
-        <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;">
+        <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
             <thead>
                 <tr style=" border: 1px solid #ddd;">
                     <th><label class="custom-label">Work Order Number</label></th>
@@ -571,7 +571,7 @@ label {
             </thead>
             <tbody>
                 <c:forEach var="ll" items="${llwcRecords}">
-                    <tr>
+                    <tr style=" border: 1px solid #ddd;background-color: ${status.index % 2 == 0 ? '#f9f9f9' : '#ffffff'};">
                         <td><input type="text" value="${ll.workOrderNumber}" readonly></td>
                         <td><input type="text" value="${ll.licenseType}" readonly></td>
                         <td><input type="text" value="${ll.wcCode}" readonly></td>

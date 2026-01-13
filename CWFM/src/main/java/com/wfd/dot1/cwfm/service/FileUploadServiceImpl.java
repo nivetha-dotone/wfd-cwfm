@@ -90,28 +90,28 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         switch (templateType) {
             case "Data-General Master":
-                if (!headerLine.equalsIgnoreCase("GMNAME,GMDESCRIPTION,GMTYPEID")) {
+                if (!headerLine.equalsIgnoreCase("GM Name,GM Description,GM Type ID")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processGeneralMaster(reader);
                 break;
                 
             case "Data-Trade Skill":
-                if (!headerLine.equalsIgnoreCase("PLANT CODE,TRADE,SKILL")) {
+                if (!headerLine.equalsIgnoreCase("Plant Code,Trade,Skill")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processTradeSkillUnitMapping(reader);
                 break;
                 
             case "Data-Department Area":
-                if (!headerLine.equalsIgnoreCase("PLANT CODE,DEPARTMENT,SUBDEPARTMENT")) {
+                if (!headerLine.equalsIgnoreCase("Plant Code,Department,Sub Department")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processDepartmentSubDepartmentUnitMapping(reader);
                 break;
                 
             case "Data-Contractor":
-                if (!headerLine.equalsIgnoreCase("Work Order Number,Plant Code,Organisation,Main Contractor Code,Contractor Code,Contractor Name,Contractor Address,City,Contractor Manager Name,Total Workmen Strength,Maximum Number Of Workmen,Labour License Number,License Valid From,License Valid To,"
+                if (!headerLine.equalsIgnoreCase("Work Order Number,Plant Code,Organisation,Main Contractor Code,Contractor Code,Contractor Name,Contractor Address,City,Contractor Manager Name,Total Workmen Strength,Maximum Number of Workmen,Labour License Number,License Valid From,License Valid To,"
                         + "License Coverage,WC Number,WC Valid From,WC Valid To,WC Coverage,ESIC Number,ESIC Valid From,Nature of Work,"
                         + "PF Number,PF Apply Date")) {
                     throw new Exception("File can not upload due to incorrect format.");
@@ -119,7 +119,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                  savedData = processContractor(reader);
                 break;
             case "Data-Work Order":
-                if (!headerLine.equalsIgnoreCase("Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code")) {
+                if (!headerLine.equalsIgnoreCase("Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed On,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validity From,Work Order Validity To,Work Order Type,Plant Code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate/Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company Code")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processWorkorder(reader);
@@ -131,28 +131,28 @@ public class FileUploadServiceImpl implements FileUploadService {
                 // savedData = saveMinimumWage(reader);
                 break;
             case "Data-Principal Employer":
-                if (!headerLine.equalsIgnoreCase("ORGANISATION,PLANTCODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAX CONTRACT WORKMEN,BOCWAPPLICABILITY,"
-                        + "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State")) {
+                if (!headerLine.equalsIgnoreCase("Organization,Plant Code,Name,Address,Manager Name,Manager Address,Business Type,Max Workmen,Max Contract Workmen,BOCW Applicability,"
+                        + "Is MW Applicability,License Number,PF Code,ESWC,Factory License Number,State")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                  savedData = processPrincipalEmployer(reader);
                 break;
             case "Data-Workmen Bulk Upload":
                 if (!headerLine.equalsIgnoreCase("First Name*,Last Name*,Father's Name or Husband's Name*,Date of Birth*,Trade*,Skill*,Nature of Work*,Hazardous Area*,"
-                		+ "Aadhar/Id proof number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
-                		+ "Technical Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Name Branch,Account Number,"
-                		+ "Mobile Number,Emergency Contact Number*,Police verification Date Valid To,Health chekup Date,Access Levels*,ESIC Number,UNIT CODE*,Organization name,"
-                		+ "EIC Number*,EC number*,UAN Number,Emergency Contact Person*,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark*")) {
+                		+ "Aadhar/Id Proof Number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
+                		+ "Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Branch Name,Account Number,"
+                		+ "Mobile Number,Emergency Contact Number*,Police Verification Date,Health Chekup Date,Access Levels*,ESIC Number,Unit Code*,Organization Name,"
+                		+ "EIC Number*,EC Number*,UAN Number,Emergency Contact Person*,Is Eligible for PF,SpecializationName,Insurance Type,LL Number,Address,Zone,IdMark*")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processworkmenbulkupload(reader);
                 break;
             case "Data-Workmen Bulk Upload Draft":
                 if (!headerLine.equalsIgnoreCase("First Name,Last Name,Father's Name or Husband's Name,Date of Birth,Trade,Skill,Nature of Work,Hazardous Area,"
-                		+ "Aadhar/Id proof number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
-                		+ "Technical Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Name Branch,Account Number,"
-                		+ "Mobile Number,Emergency Contact Number,Police verification Date Valid To,Health chekup Date,Access Levels,ESIC Number,UNIT CODE,Organization name,"
-                		+ "EIC Number,EC number,UAN Number,Emergency Contact Person,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark")) {
+                		+ "Aadhar/Id Proof Number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
+                		+ "Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Branch Name,Account Number,"
+                		+ "Mobile Number,Emergency Contact Number,Police Verification Date,Health Chekup Date,Access Levels,ESIC Number,Unit Code,Organization Name,"
+                		+ "EIC Number,EC Number,UAN Number,Emergency Contact Person,Is Eligible for PF,SpecializationName,Insurance Type,LL Number,Address,Zone,IdMark")) {
                     throw new Exception("File can not upload due to incorrect format.");
                 }
                 savedData = processworkmenbulkuploaddraft(reader);
@@ -1099,9 +1099,9 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setGLCode(fields[18]);
                 staging.setCostCenter(fields[19]);
                 staging.setNatureofJob(fields[20]);
-                staging.setRateUnit(fields[21]);
-                staging.setQuantity(fields[22]);
-                staging.setBaseUnitofMeasure(fields[23]);
+                staging.setRateUnit((fields[21] == null || fields[21].trim().isEmpty()) ? "0" : fields[21].trim());
+                staging.setQuantity((fields[22] == null || fields[22].trim().isEmpty()) ? "0" : fields[22].trim());
+                staging.setBaseUnitofMeasure(fields[23] != null ? fields[23] :" ");
                 staging.setWorkOrderReleased(fields[24]);
                 staging.setPMOrderNo(fields[25]);
                 staging.setWBSElement(fields[26]);
@@ -1228,7 +1228,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             //Integer maritalStatusId = fileUploadDao.getGeneralMasterId(fields[16]);
             Integer genderId = fileUploadDao.getGeneralMasterId(fields[10]);
             Integer eicId = fileUploadDao.geteicId(fields[12],unitId,fields[31]);
-            Integer LlNumber = fileUploadDao.getLlNumber(fields[38],unitId,contractorId);
+           // Integer LlNumber = fileUploadDao.getLlNumber(fields[38],unitId,contractorId);
             Integer zoneId = null;
 
          // Normalize the value safely
@@ -1245,6 +1245,19 @@ public class FileUploadServiceImpl implements FileUploadService {
              }
          }
 
+         Integer llNumber = null;
+
+         String llValue = (fields.length > 38 && fields[38] != null)
+        	        ? fields[38].replaceAll("[\"\\u00A0]", "").trim()
+        	        : "";
+
+         if (!llValue.isBlank()) {
+             llNumber = fileUploadDao.getLlNumber(llValue, unitId, contractorId);
+
+             if (llNumber == null) {
+                 fieldErrors.put("llNumber", "Invalid or not found");
+             }
+         }
 
 
             if (tradeId == null) fieldErrors.put("trade", "There is no mapping found for Trade and Principal Employee");
@@ -1257,7 +1270,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             //if (maritalStatusId == null) fieldErrors.put("maritalStatus", "Invalid or not found");
             if (genderId == null) fieldErrors.put("Gender", "Invalid or not found");
             if (eicId == null) fieldErrors.put("EIC", "Invalid or not found");
-            if (LlNumber == null) fieldErrors.put("LlNumber", "Invalid or not found");
+           // if (LlNumber == null) fieldErrors.put("LlNumber", "Invalid or not found");
             if (wcecId == null) fieldErrors.put("WCESIC", "Invalid or not found");
             if (unitId == null) fieldErrors.put("unitCode", "Invalid or not found");
             if (contractorId == null) fieldErrors.put("vendorCode", "Invalid or not found");
@@ -1314,7 +1327,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setPfApplicable(fields[35]);
                 staging.setSpecializationName(fields[36]);
                 staging.setInsuranceType(fields[37]);
-                staging.setLLnumber(String.valueOf(LlNumber));
+                staging.setLLnumber(String.valueOf(llNumber!=null?String.valueOf(llNumber):" "));
                 staging.setAddress(fields[39]);
                 staging.setZone(zoneId!=null?String.valueOf(zoneId):" ");
                 staging.setIdMark(fields[41]);

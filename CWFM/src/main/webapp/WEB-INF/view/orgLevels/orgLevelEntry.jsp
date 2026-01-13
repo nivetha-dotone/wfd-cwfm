@@ -193,8 +193,8 @@
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
 <div>
-<label for="orgLevelDefId">Org Level:</label>
-<select id="orgLevelDefId" name="orgLevelDefId" onchange="loadOrgLevelEntries()">
+<label for="orgLevelDefId" style=" color: darkcyan;">Org Level:</label>
+<select id="orgLevelDefId" name="orgLevelDefId" onchange="loadOrgLevelEntries()"  style="color:gray;">
     <option value="">Select Org Level</option>
     <c:forEach items="${orgLevels}" var="level">
         <option value="${level.orgLevelDefId}">${level.name}</option>
@@ -202,6 +202,9 @@
 </select>
  <!-- <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportOrgLevelEntryCSV()">Export</button> -->
 </div>
+ <div class="page-header-buttons">
+ <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgEntries()">Save</button>
+ </div>
 </div>
 <!-- Form for Adding/Editing Entries -->
 <h3 style=" color: darkcyan;padding:10px;">Add Entry</h3>
@@ -209,15 +212,15 @@
     <input type="hidden" name="orgLevelEntryId" id="orgLevelEntryId" value="0" />
 
     <label for="entryName" style="color: darkcyan;padding:10px;">Entry Name:</label>
-<select id="entryName" name="entryName" style="padding:3px;">
+<select id="entryName" name="entryName" style="padding:3px;color:gray;">
     <option value="">Select Entry Name</option>
 </select>
 
-<label for="description" style="color: darkcyan;">Description:</label>
+<label for="description" style="color: darkcyan;margin-left:15px;">Description:</label>
 <!-- Description text field (read-only) -->
-<input type="text" id="description" name="description" readonly />
+<input type="text" id="description" name="description" readonly style="color:gray;" />
 
-    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgEntries()">Save</button>
+    <!-- <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgEntries()">Save</button> -->
     <div id="formErrorMessage" class="error-message" style="display:none; color:red; font-weight:bold;"></div>
 </div>
 

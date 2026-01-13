@@ -232,7 +232,11 @@
     background-color: #ffe5e5;
     border-top: none;
 }
-    
+     .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
     </style>
   <script src="resources/js/cms/workflow.js"></script>
  <!--  <script>
@@ -310,22 +314,23 @@
                             <option value="${pe.gmId}">${pe.gmName}</option>
                         </c:forEach> --%>
                     </select>
-
+<div class="page-header-buttons">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Export</button>
          <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/workflow/list','Workflow')">Cancel</button>
           <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
+    </div>
 
   <div style="padding:10px;">
 
-    <h3>Workflow Type</h3>
+    <h3 style=" color: darkcyan;">Workflow Type</h3>
     <label><input type="radio" name="workflowType" value="1" onchange="toggleHierarchyColumn()"> Auto</label>
     <label><input type="radio" name="workflowType" value="2" onchange="toggleHierarchyColumn()"> Sequential</label>
     <label><input type="radio" name="workflowType" value="3" onchange="toggleHierarchyColumn()"> Parallel</label>
 
-    <h3>Approver Hierarchy</h3>
-    <button type="button" onclick="addRow()">Add New Row</button>
-    <button type="button" onclick="deleteSelected()">Delete Selected</button>
+    <h3 style="color: darkcyan;">Approver Hierarchy</h3>
+    <button type="button" onclick="addRow()" class="btn btn-default process-footer-button-cancel ng-binding" style="margin:6px;">Add New Row</button>
+    <button type="button" onclick="deleteSelected()" class="btn btn-default process-footer-button-cancel ng-binding" style="margin:6px;">Delete Selected</button>
     <br><br>
 
     <table id="approverTable" border="1" class="no-dt">
@@ -362,7 +367,7 @@
     </table>
 
     <br>
-    <button type="button" onclick="saveWorkflow()">Save Workflow</button>
+    <button type="button" onclick="saveWorkflow()" class="btn btn-default process-footer-button-cancel ng-binding" style="margin:6px;" >Save Workflow</button>
     </div>
 </body>
 </html>

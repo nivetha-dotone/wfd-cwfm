@@ -30,7 +30,7 @@
         label {
             color: black;
             font-weight: bold;
-            font-size: 15px; /* Reduced font size */
+            font-size: 12px; /* Reduced font size */
         }
         body {
             background-color: #FFFFFF;
@@ -46,7 +46,7 @@
         }
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 0px;
         }
          .action-buttons button {
         margin-left: 10px; /* Space between buttons */
@@ -127,7 +127,7 @@
 </head>
 <body>
 <div  class="page-header">
-    <h1 style=" color: darkcyan;padding:4px;">Org Level Mapping</h1>
+    <h3 style=" color: darkcyan;padding:4px;">Org Level Mapping</h3>
    <div  class="action-buttons">
               <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveOrgLevelMapping()">Save</button>
               <button type="submit"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/org-level-mapping/list', 'New')">Cancel</button>

@@ -115,14 +115,14 @@
         document.getElementById("autoSection").style.display = (type === 'auto') ? 'block' : 'none';
     }
 
-    function fileUploadTemplateSideBar() {
+   function fileUploadTemplateSideBar() {
         $("#sidebar").css("width", "300px");
     }
 
     // ✅ Delegated close handler (IMPORTANT)
     $(document).on("click", "#closeSidebar", function () {
         $("#sidebar").css("width", "0");
-    });
+    }); 
 
 
 
@@ -248,6 +248,7 @@ function loadCommonList(path, heading) {
             setDateRange();
             resetSessionTimer();
         }
+        closeDrawer();
     };
     xhttp.open("GET", url, true);
     xhttp.send();
@@ -549,9 +550,9 @@ function addNewRow() {
             <td class="checkbox-cell">
                 <input type="checkbox" name="selectedOrgLevels" data-row-id="${rowId}">
             </td>
-            <td><input type="text" name="orgLevelName[]" id="orgLevelName_${rowId}" placeholder="Org Level Name" required></td>
-            <td><input type="text" name="shortName[]" id="shortName_${rowId}" placeholder="Short Name" required></td>
-            <td><input type="number" name="hierarchy[]" id="hierarchy_${rowId}" placeholder="Hierarchy" required></td>
+            <td><input type="text" name="orgLevelName[]" id="orgLevelName_${rowId}" placeholder="Org Level Name" required style="text-transform: capitalize;"></td>
+            <td><input type="text" name="shortName[]" id="shortName_${rowId}" placeholder="Short Name" required style="text-transform: capitalize;"></td>
+            <td><input type="number" name="hierarchy[]" id="hierarchy_${rowId}" placeholder="Hierarchy" required style="text-transform: capitalize;"></td>
         `;
         tableBody.appendChild(newRow);
     }
@@ -1688,7 +1689,7 @@ function saveUser() {
     // 👉 Apply Capital Case here before validation and saving
     firstName = toCapitalCase(firstName);
     lastName = toCapitalCase(lastName);
-    userAccount = toCapitalCase(userAccount); // Optional: If you want account name capitalized
+   // userAccount = userAccount; // Optional: If you want account name capitalized
 
     let isValid = true;
     document.querySelectorAll(".error-message").forEach(e => e.innerText = "");
@@ -2860,7 +2861,7 @@ table.dataTable {
 .main-menu li > a {
     display: flex;
     align-items: center;
-    color: white;
+    color: whiblackte;
     font-size: 14px;
     text-decoration: none;
     padding: 10px 15px;
@@ -2886,6 +2887,7 @@ table.dataTable {
     margin: 0;
     background: #00796b;
     list-style: none;
+    color:white;
 }
 
 .main-menu .sub-menu li a {
@@ -2912,7 +2914,7 @@ table.dataTable {
 }
 
 /* Content Area */
-.form-content {
+/* .form-content {
     float: left;
     background: #ffffff;
     height: calc(100% - 50px);
@@ -2921,7 +2923,18 @@ table.dataTable {
     width: calc(100% - 60px);
     transition: margin-left 0.3s ease, width 0.3s ease;
     box-sizing: border-box;
+} */
+.form-content {
+    float: left;
+    background: #ffffff;
+    height: calc(100% - 50px);
+    margin-top: 50px;        /* keep space for top header */
+    margin-left: 0px;          /* ← removed the sidebar gap */
+    width: 100%;             /* full width now */
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    box-sizing: border-box;
 }
+
 
 .main-menu.expanded + .form-content {
     margin-left: 250px;
@@ -3064,7 +3077,9 @@ table th {
     color: #005151;
     font-family: Volte Rounded, Noto Sans, sans-serif;
 }
-
+.role-value{
+font-size: 16px;
+}
 /* Show user logo if available, hide initials */
 .user-logo img[src*="user.logo"] {
     display: block;
@@ -3093,7 +3108,7 @@ table th {
 }
 
 .dropdown-content a {
-    color: black;
+    color: white;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
@@ -3162,11 +3177,22 @@ table th {
 .arrow-up, .arrow-down {
     width: 10px;
     height: 8px;
-    filter: invert(100%); /* Turns black arrows white */
+     color: black;
+     font-size: .875rem;
+    font-weight: 500;
+    /* display: flex; */
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;  
+    display: inline-block;
 }
 .home-icon {
-    padding: 10px;
-    cursor: pointer;
+  /*   padding: 10px;
+    padding-top: 2px; */
+     padding: 0;
+    margin: 0; 
+     cursor: pointer;
 }
 
 .home-icon i {
@@ -3263,6 +3289,16 @@ table th {
 #dynamic-menu {
     list-style-type: none;
     padding-left: 0;
+    text-align: left;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+   font-family: 'Noto Sans', sans-serif;
 }
 
 #dynamic-menu li {
@@ -3270,8 +3306,33 @@ table th {
 }
 
 #dynamic-menu a {
-    text-decoration: none;
-    color: white;
+    /* text-decoration: none;
+    color: black;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.125rem;
+    letter-spacing: normal;
+    margin: 0;
+    min-height: 2.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+     position: relative; 
+    border-radius: 7px;
+    text-align:left; */
+     text-decoration: none;
+    color: black;
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.125rem;
+    margin: 0;
+    min-height: 1.75rem;
+
+    display: flex;
+    align-items: center;
+    border-radius: 7px;
+font-family: "Noto Sans Display", "Noto Sans", sans-serif;
+    text-align: left;
 }
 .sidebar-menu {
     list-style: none;
@@ -3283,12 +3344,20 @@ table th {
 }
 
 .nav-link {
+   text-decoration: none;
+    color: black;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.125rem;
+    letter-spacing: normal;
+    margin: 0;
+    min-height: 2.75rem;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    text-decoration: none;
-    padding: 10px;
-    cursor: pointer;
+    align-items: left;
+    position: relative;
+    text-align:left;
+    font-family: 'Noto Sans', sans-serif;
 }
 
 .sub-menu {
@@ -3336,8 +3405,199 @@ table th {
     background-color: #ffe5e5;
     border-top: none;
 }
-        
+  .hamburger-btn{
+    border:none;
+     background-color:#005151; 
+    color:white;
+    font-size:22px;
+   /*  padding:3px 10px; */
+    cursor:pointer;
+     /* margin-bottom: 6px; */
+      padding: 0;
+    margin: 0; 
+}  
+.hamburger-btn:hover,
+.hamburger-btn:focus {
+    background: rgb(0, 81, 81);
+    box-shadow: none;
+}    
     </style>
+    <style>
+.top-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 16px;
+    background:#005151;
+    color:#fff;
+}
+
+/* .hamburger-btn{
+    border:none;
+    background:#004444;
+    color:white;
+    font-size:22px;
+    padding:6px 10px;
+    cursor:pointer;
+} */
+
+.sidebar-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    z-index:98;
+}
+
+.sidebar-drawer{
+    position:fixed;
+    top:0;
+    left:-310px;
+    width:300px;
+    height:100%;
+    background:#fff;
+    box-shadow:2px 0 12px rgba(0,0,0,.25);
+    transition:left .3s ease;
+    z-index:99;
+    overflow-y:auto;
+}
+
+.sidebar-drawer.open{ left:0; }
+.sidebar-backdrop.show{ display:block; }
+
+.sidebar-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:46px 26px;
+    background:white;
+    padding-bottom: 0px;
+}
+.sidebar-header:hover{
+background:white;
+}
+
+.close-btn{
+    border:none;
+    background:white;
+    color: #007bff;
+    font-size:25px;
+    cursor:pointer;
+    margin-left: 181px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.close-btn:hover,
+.close-btn:focus {
+    background: white !important;
+    box-shadow: none;
+}
+.sidebar-menu{ list-style:none; padding:10px; margin:0; }
+.sidebar-menu li{ margin-bottom:6px; }
+
+.sidebar-menu a{
+    display:block;
+    padding:8px 10px;
+    color:black;
+    text-decoration:none;
+}
+
+.sidebar-menu a:hover{     background:#f3f3f3; }
+
+.sub-menu{
+    list-style:none;
+    padding-left:14px;
+    display:none;
+}
+.home-btn{
+  background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    align-items: center;
+    padding: 0;
+    margin: 0; 
+    font-weight: bold;
+    font-size: 22px;
+     /* margin-bottom: 13px; */
+}
+
+.home-btn:hover{
+    background: #005151;
+}
+#adminMenu a{
+ text-decoration: none;
+    color: black;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.125rem;
+    letter-spacing: normal;
+    margin: 0;
+    min-height: 2.75rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: left;
+    /* position: relative; */
+    border-radius: 7px;
+    font-family: "Noto Sans Display", "Noto Sans", sans-serif;
+}
+#adminMenu {
+    list-style-type: none;
+    padding-left: 0;
+    font-family: 'Noto Sans', sans-serif;
+    margin-top:2px;
+}
+ li {
+    margin-bottom: 0px;
+}
+#dynamic-menu .nav-text {
+    flex: 1;                 
+   
+}
+#adminMenu a:hover{     background:#f3f3f3; }
+#dynamic-menu .arrow-up,#adminMenu .arrow-up,
+#dynamic-menu .arrow-down ,#adminMenu .arrow-down{
+    margin-left: auto;
+}
+#dynamic-menu .nav-icon ,#adminMenu .nav-icon{
+    margin-right: 6px;
+}
+.nav-link.active {
+    text-align: left;
+}
+#dynamic-menu li ,#adminMenu li{
+    width: 100%;
+}
+
+#dynamic-menu li > a, #adminMenu li > a{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 14px;
+    text-align: left;
+}
+#dynamic-menu .nav-text,#adminMenu .nav-text {
+    flex-grow: 1; 
+    font-weight: 700;        
+}
+#dynamic-menu .arrow-up,#adminMenu .arrow-up,
+#dynamic-menu .arrow-down ,#adminMenu .arrow-down{
+    display: inline-block;
+    margin-left: auto;     
+}
+.sub-menu a.active {
+    font-weight: 700;
+    background-color: #f3f3f3;
+    border-radius: 6px;
+}
+.left-icons {
+    display: flex;
+    align-items: center;      /* 🔑 fixes refresh jump */
+    gap: 12px;
+}
+
+
+</style>
 </head>
 <body >
 <% 
@@ -3347,7 +3607,7 @@ table th {
 %>
 
     <!-- Top Navigation Bar -->
-    <div class="top-nav">
+    <%-- <div class="top-nav">
     
         <!-- <img src="resources/img/Adani_2012_logo.png" alt="Company Logo" class="logo"> -->
         <div class="heading">Contract Labor Management System</div>
@@ -3382,20 +3642,6 @@ table th {
     </c:when>
 </c:choose>
 
-  <%-- <c:if test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
-    <label for="roleSelect" class="role-label">Role:</label>
-    <div class="role-dropdown">
-        <select id="roleSelect" name="roleId" onchange="changeRole(this.value, this.options[this.selectedIndex].text)" class="role-select">
-            <option value="" disabled selected>Select Role</option>
-            <c:forEach var="role" items="${sessionScope.roles}">
-                <option value="${role.gmId}" 
-                    <c:if test="${role.gmId == sessionScope.selectedRole}">selected</c:if>>
-                    <c:out value="${role.gmName}" />
-                </option>
-            </c:forEach>
-        </select>
-    </div>
-</c:if> --%>
 
     <div class="dropdown">
         <span class="initials-icon">
@@ -3416,10 +3662,15 @@ table th {
     <img src="resources/img/Dot1.png" alt="Dot1 Logo" class="logo dot1">
 </div>
 
+
    
     <!-- Side Navigation Bar -->
    <nav class="main-menu">
+    <button id="sidebar-toggle" style="background-color: rgb(0, 81, 81);"class="hamburger-btn">
+    ☰
+</button>
     <ul id="dynamic-menu" class="sidebar-menu">
+    
         <!-- Admin menu rendering -->
         <c:if test="${sessionScope.isAdmin}">
             <c:forEach var="section" items="${sessionScope.sections}">
@@ -3487,163 +3738,214 @@ table th {
     </ul>
 </nav>
 
-   <%--  <ul id="dynamic-menu" class="sidebar-menu">
-   <c:if test="${sessionScope.roleName eq 'Admin'}">
-    <c:forEach var="section" items="${sections}">
-        <div class="section">
-            <h3>${section.sectionName}</h3>
-            <c:forEach var="page" items="${section.pages}">
-                <div class="page">
-                    <a href="${page.pageUrl}">${page.pageName}</a>
-                </div>
-            </c:forEach>
-        </div>
-    </c:forEach>
-</c:if>
-
-<c:if test="${sessionScope.roleName ne 'Admin'}">
-    <c:forEach var="section" items="${sections}">
-        <div class="section">
-            <h3>${section.sectionName}</h3>
-            <c:forEach var="page" items="${section.pages}">
-                <c:if test="${page.accessibleForRole}">
-                    <div class="page">
-                        <a href="${page.pageUrl}">${page.pageName}</a>
-                    </div>
-                </c:if>
-            </c:forEach>
-        </div>
-    </c:forEach>
-</c:if>
-
-
-
-   
-        </ul> --%>
-    <%-- <nav class="main-menu">
-     <li>
-    <a href="#" class="nav-link" onclick="toggleSubMenu('dynamic-menu')">
-        <i class="fa fa-database nav-icon"></i>
-        <span class="nav-text">Dynamic Menu</span>
-        <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
-        <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
-    </a>
-    <ul class="menu">
-    <c:forEach var="page" items="${rolePages}">
-        <li>
-            <a href="${page.url}" onclick="loadCommonList('${page.url}', '${page.name}')">${page.name}</a>
-        </li>
-    </c:forEach>
-</ul>
-</li>
-        <ul>
-         <!-- New Section for General Management -->
-        <li>
-            <a href="#" class="nav-link" onclick="toggleSubMenu('general-management-sub-menu')">
-                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
-                <span class="nav-text">General Management</span>
-                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-            </a>
-            <ul class="sub-menu" id="general-management-sub-menu">
-              <li><a href="#" onclick="loadCommonList('/generalController/gmType', 'General Type')">General Type</a></li>
-<li><a href="#" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">General Master</a></li>
-<li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
-<li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
-            </ul>
-        </li>
-        
-        <li>
-            <a href="#" class="nav-link" onclick="toggleSubMenu('admin-sub-menu')">
-                <i class="fa fa-cog nav-icon"></i> <!-- Icon for General Management -->
-                <span class="nav-text">Admin</span>
-                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-            </a>
-            <ul class="sub-menu" id="admin-sub-menu">
-              <li><a href="#" onclick="loadCommonList('/org-level/list', 'Org Levels')">Org Levels</a></li>
-<li><a href="#" onclick="loadCommonList('/org-level-entryController/org-level-entry', 'Org Level Entries')">Org Level Entries</a></li>
-<li><a href="#" onclick="loadCommonList('/org-level-mapping/list', 'Org Level Mappings')">Org Level Mappings</a></li>
-            </ul>
-        </li>
-       
-            <li class="main-menu-item" style="margin-top: 20px;">
-    <a href="#" onclick="toggleSubMenu('clms-sub-menu'); return false;" class="mainmenu-link">
-        <i class="fa fa-dashboard nav-icon"></i>
-        <span class="nav-text">CLMS</span>
-         <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="display: none;">
-         <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="display: inline-block;">
-    </a>
-    <ul class="sub-menu" id="clms-sub-menu" style="display: none;">
-        <li><a href="#" onclick="loadCommonList('/principalEmployer/list','Principal Employer')">Principal Employer</a></li>
-        <li><a href="#" onclick="loadCommonList('/contractor/list','Contractor')">Contractor</a></li>
-        <li><a href="#" onclick="loadCommonList('/workOrder/list', 'Work Order')">Work Order</a></li>
-       <!--  <li><a href="#" onclick="loadCommonList('/minimumWage/list', 'Minimum Wage Master')">Minimum Wage Master</a></li> -->
-        <li><a href="#" onclick="loadCommonList('/workmenDetail.jsp', 'Contract Workmen')">Contract Workmen</a></li>
-        <!-- <li><a href="#" onclick="loadCommonList('/workmenWage/list', 'Workmen Wages')">Workmen Wages</a></li> -->
-    </ul>
-</li>
-    
-  <li>
-                <a href="#" class="nav-link" onclick="toggleSubMenu('contractor-sub-menu')">
-                    <i class="fa fa-users nav-icon"></i>
-                    <span class="nav-text">Contractor</span>
-                    <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                    <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-                </a>
-                <ul class="sub-menu" id="contractor-sub-menu">
-                    <li><a href="#" onclick="loadCommonList('/contractor/contReg','Contractor Registration')">Contractor Registration</a></li>
-                    <li><a href="#" onclick="loadContractorRenewal()">Renewal</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="#" class="nav-link" onclick="toggleSubMenu('workmen-onboarding-sub-menu')">
-                    <i class="fa fa-briefcase nav-icon"></i>
-                    <span class="nav-text">Workmen Onboarding</span>
-                    <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
-                    <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
-                </a>
-                <ul class="sub-menu" id="workmen-onboarding-sub-menu">
-                    <li><a href="#" onclick="loadCommonList('/contractworkmen/quickOBList', 'On-Bording List')">List</a></li>
-                    <li><a href="#" onclick="loadQobAdd('/contractworkmen/addQuickOB', 'On-Boarding','${sessionScope.loginuser.userId}')">On-Boarding</a></li>
-                    <li><a href="#" onclick="loadWorkmenRenew()">Renew</a></li>
-                    <li><a href="#" onclick="loadWorkmenBlock()">Block</a></li>
-                    <li><a href="#" onclick="loadWorkmenUnblock()">Unblock</a></li>
-                    <li><a href="#" onclick="loadWorkmenBlacklist()">Blacklist</a></li>
-                    <li><a href="#" onclick="loadWorkmenDeBlacklist()">De-blacklist</a></li>
-                    <li><a href="#" onclick="loadWorkmenCancel()">Cancel</a></li>
-                    <li><a href="#" onclick="loadWorkmenExpat()">Expat</a></li>
-                    <li><a href="#" onclick="loadWorkmenLostDamage()">Lost or Damage</a></li>
-                </ul>
-            </li>
-             <li>
-            <a href="#" onclick="loadCommonList('/billVerification/list', 'Bill Verification')">
-                <i class="fa fa-credit-card nav-icon"></i> <!-- Updated icon for Bill Verification -->
-                <span class="nav-text">Bill Verification</span>
-            </a>
-        </li>
-        <!-- <li>
-            <a href="#" onclick="loadCommonList('/contractor/contReg', 'Contractor Registration')">
-                <i class="fa fa-users nav-icon"></i> Updated icon for Contractor Registration
-                <span class="nav-text">Contractor Registration</span>
-            </a>
-        </li> -->
-        <li>
-            <a href="#" onclick="loadCommonList('/reports/list', 'Reports')">
-                <i class="fa fa-bar-chart nav-icon"></i> <!-- Updated icon for Reports -->
-                <span class="nav-text">Reports</span>
-            </a>
-        </li>
-        </ul>
-    </nav> --%>
+  
     
 
     <!-- Main Content Area -->
     <div id="mainContent" class="form-content">
     
     
+    </div> --%>
+    <!-- TOP NAV -->
+<div class="top-nav">
+    <!-- <button id="sidebar-toggle" class="hamburger-btn">☰</button> -->
+    <div class="left-icons">
+     <div class="home-icon" onclick="openDrawer()"> 
+       <button id="sidebar-toggle" onclick="openDrawer()" class="hamburger-btn">☰</button>
+    </div>
+    <div>
+     <button class="home-btn" onclick="loadDashboardFromHome()">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+       stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/>
+  </svg>
+</button>
+    </div> 
+    </div> 
+     <!-- <div>
+        <button id="sidebar-toggle" onclick="openDrawer()" class="btn home-button" aria-label="Home">
+        <i class="item-icon icon-k-home">: :before</i>
+        </button>
+     </div> -->
+      <!--  <i class="fa fa-bars"></i> -->
+        <!-- <img src="resources/img/Adani_2012_logo.png" alt="Company Logo" class="logo"> -->
+        <div class="heading">Contract Labor Management System</div>
+<c:choose>
+    <c:when test="${not empty sessionScope.roles and sessionScope.roles.size() > 1}">
+        <label for="roleSelect" class="role-label">Role:</label>
+        <div class="role-dropdown">
+            <select id="roleSelect" name="roleId" onchange="changeRole(this.value, this.options[this.selectedIndex].text)" class="role-select">
+                <option value="" disabled selected>Select Role</option>
+                <c:forEach var="role" items="${sessionScope.roles}">
+                    <option value="${role.gmId}" 
+                        <c:if test="${role.gmId == sessionScope.selectedRole}">selected</c:if>>
+                        <c:out value="${role.gmName}" />
+                    </option>
+                </c:forEach>
+            </select>
+        </div>
+    </c:when>
+
+ <%-- <c:when test="${not empty sessionScope.roles and sessionScope.roles.size() == 1}">
+        <c:set var="selectedRole" value="${sessionScope.roles[0].gmId}" scope="session"/>
+        <c:set var="selectedRoleName" value="${sessionScope.roles[0].gmName}" scope="session"/>
+        <div class="role-label">
+            <label for="roleSelect" class="role-label">Role:</label>
+             <c:out value="${selectedRoleName}" />
+        </div>
+        <script>
+            window.onload = function() {
+                changeRole('${selectedRole}', '${selectedRoleName}');
+            };
+        </script>
+    </c:when> --%>
+    <c:when test="${not empty sessionScope.roles and sessionScope.roles.size() == 1}">
+        <c:set var="selectedRole" value="${sessionScope.roles[0].gmId}" scope="session"/>
+        <c:set var="selectedRoleName" value="${sessionScope.roles[0].gmName}" scope="session"/>
+
+        <div class="role-container">
+            <span class="role-label">Role:</span>
+            <span class="role-value">
+                <c:out value="${selectedRoleName}" />
+            </span>
+        </div>
+
+        <script>
+            window.onload = function () {
+                changeRole('${selectedRole}', '${selectedRoleName}');
+            };
+        </script>
+    </c:when>
+</c:choose>
+
+
+    <div class="dropdown">
+        <span class="initials-icon">
+            <c:out value="${sessionScope.userInitials}" />
+        </span>
+        <span class="user-name">
+            <c:out value="${sessionScope.loginuser.firstName}" /> 
+            <c:out value="${sessionScope.loginuser.lastName}" />
+        </span>
+
+        <div class="dropdown-content">
+        
+            <a href="#" onclick="loadChangePassword()">Change Password</a>
+            <a href="#" onclick="loadLogout()">Logout</a>
+        </div>
     </div>
 
+    <img src="resources/img/Dot1.png" alt="Dot1 Logo" class="logo dot1">
+</div>
+
+
+
+<!-- BACKDROP (DIM SCREEN) -->
+<div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+
+<!-- SLIDE-IN SIDEBAR -->
+<div id="sidebarMenu" class="sidebar-drawer">
+
+    <div class="sidebar-header">
+        <span style="font-weight:bold;font-size: medium;">Menu</span>
+        <button id="close-sidebar" onclick="closeDrawer()" class="close-btn">&times;</button>
+    </div>
+
+    <ul id="dynamic-menu" class="sidebar-menu">
+    
+        <!-- Admin menu rendering -->
+        <c:if test="${sessionScope.isAdmin}">
+            <c:forEach var="section" items="${sessionScope.sections}">
+    <li>
+        <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
+            <i class="${section.sectionIcon} nav-icon"></i>
+            <span class="nav-text">${section.sectionName}</span>
+            <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
+            <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
+        </a>
+        <!-- Ensure submenu is correctly set with unique ID -->
+        <ul class="sub-menu" id="sub-menu-${section.sectionId}" style="display: none;">
+            <c:forEach var="page" items="${section.pages}">
+                <a href="#" onclick="loadCommonList('${page.pageUrl}', '${page.pageName}')">${page.pageName}</a>
+                            
+            </c:forEach>
+        </ul>
+    </li>
+</c:forEach>
+
+        </c:if>
+
+        <!-- Non-Admin menu rendering -->
+        <c:if test="${not sessionScope.isAdmin}">
+            <c:forEach var="section" items="${sessionScope.sections}">
+                <li>
+                    <a href="#" class="nav-link" onclick="toggleSubMenu('${section.sectionId}', this)">
+                        <i class="${section.sectionIcon} nav-icon"></i>
+                        <span class="nav-text">${section.sectionName}</span>
+                        <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" id="arrow-up-${section.sectionId}" style="width: 10px; height: 8px; display: none;">
+            <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" id="arrow-down-${section.sectionId}" style="width: 10px; height: 8px; display: inline-block;">
+        </a>
+                    <ul class="sub-menu" id="sub-menu-${section.sectionId}" style="display: none;">
+                        <c:forEach var="page" items="${section.pages}">
+                            <c:if test="${page.accessibleForRole}">
+                                <a href="#" onclick="loadCommonList('${page.pageUrl}', '${page.pageName}')">${page.pageName}</a>
+                            </c:if>
+                        </c:forEach>
+                    </ul>
+                </li>
+            </c:forEach>
+        </c:if>
+    </ul>
+
+
+        <ul id="adminMenu" style="display:none;">
+         <li>
+            <a href="#" class="nav-link" onclick="toggleGeneralManagementSubMenu(this)">
+                <i class="fa fa-user nav-icon"></i> <!-- Icon for General Management -->
+                <span class="nav-text">Administrator Setup</span>
+                <img src="resources/img/uarrow.png" alt="Arrow Up" class="arrow-up" style="width: 10px; height: 8px; display: none;">
+                <img src="resources/img/darrow.png" alt="Arrow Down" class="arrow-down" style="width: 10px; height: 8px; display: inline-block;">
+            </a>
+            <ul class="sub-menu" id="general-management-sub-menu">
+              <li><a href="#" onclick="loadCommonList('/generalController/gmType', 'General Type')">General Type</a></li>
+              <li><a href="#" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">General Master</a></li>
+              <li><a href="#" onclick="loadCommonList('/roleRights/roleRightsList', 'Role Rights')">Role Rights</a></li>
+              <li><a href="#" onclick="loadCommonList('/usersController/userList', 'Users')">Users</a></li>
+              <li><a href="#" onclick="loadCommonList('/generalController/addSection', 'Sections')">Sections</a></li>
+              <li><a href="#" onclick="loadCommonList('/usersController/loadResetPwdPage', 'Reset Password')">Reset Password</a></li>
+<!-- <li><a href="#" onclick="loadCommonList('/api/data/integration', 'Integrations')">Integrations</a></li> -->
+
+            </ul>
+        </li>
+    </ul>
+
+</div>
+
+
+<!-- MAIN CONTENT -->
+<div id="mainContent" class="form-content"></div>
+
+<script>
+const drawer   = document.getElementById("sidebarMenu");
+const backdrop = document.getElementById("sidebar-backdrop");
+function openDrawer() {
+    drawer.classList.add("open");
+    backdrop.classList.add("show");
+}
+
+function closeDrawer() {
+    drawer.classList.remove("open");
+    backdrop.classList.remove("show");
+}
+
+backdrop.onclick = closeDrawer;
+
+function toggleSubMenu(id){
+    const menu = document.getElementById("sub-menu-"+id);
+    menu.style.display = (menu.style.display === "block" ? "none" : "block");
+}
+</script>
     <script>
    
  // Function to toggle the General Management submenu
@@ -3873,16 +4175,13 @@ table th {
         }
 
         // Ensure submenu closes when the sidebar is hovered out
-        const mainMenu = document.querySelector('.main-menu');
-        mainMenu.addEventListener('mouseenter', function() {
-            this.classList.add('expanded');
-        });
+      const mainMenu = document.querySelector('.main-menu');
+    const toggleBtn = document.querySelector('#sidebar-toggle');
 
-        mainMenu.addEventListener('mouseleave', function() {
-            if (!submenuSelected) {
-                this.classList.remove('expanded');
-            }
-        });
+    // 👉 CLICK to expand/collapse sidebar
+    toggleBtn.addEventListener('click', () => {
+        mainMenu.classList.toggle('expanded');
+    });
 
         // Handle submenu selection
         document.querySelectorAll('#clms-sub-menu a').forEach(link => {
@@ -3893,7 +4192,7 @@ table th {
                 setTimeout(() => submenuSelected = false, 300); // Reset after a short delay
             });
         });
-
+        
         function highlightMenuItem(menuItem) {
             const menuItems = document.querySelectorAll('#clms-sub-menu li');
             menuItems.forEach(item => item.classList.remove('active'));
@@ -3915,6 +4214,36 @@ table th {
         function resetSessionTimer() {
             console.log('Session timer reset');
         }
+    });
+    document.addEventListener("click", function (e) {
+
+        // check only submenu links
+        const link = e.target.closest(".sub-menu a");
+        if (!link) return;
+
+        // remove old active
+        document.querySelectorAll(".sub-menu a.active")
+            .forEach(a => a.classList.remove("active"));
+
+        // mark clicked page active
+        link.classList.add("active");
+
+        // OPTIONAL: save for reopen
+        sessionStorage.setItem("activePageName", link.textContent.trim());
+    });
+    window.addEventListener("load", function () {
+        const savedPage = sessionStorage.getItem("activePageName");
+        if (!savedPage) return;
+
+        document.querySelectorAll(".sub-menu a").forEach(link => {
+            if (link.textContent.trim() === savedPage) {
+
+                link.classList.add("active");
+
+                const subMenu = link.closest(".sub-menu");
+                if (subMenu) subMenu.style.display = "block";
+            }
+        });
     });
 
 
@@ -5193,9 +5522,42 @@ function fetchOrgLevelSavedEntries() {
     };
     xhr.send();
 }
-</script>
 
-    
+function loadDashboardFromHome() {
+
+    const roleId   = localStorage.getItem("selectedRoleId");
+    const roleName = localStorage.getItem("selectedRoleName");
+
+    // If role not found, just do nothing (or redirect if needed)
+    if (!roleId || !roleName) {
+        console.warn("No role stored — dashboard cannot load.");
+        return;
+    }
+
+    // First update sidebar exactly like changeRole()
+    fetch('/CWFM/updateRole', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roleId: roleId, roleName: roleName })
+    })
+    .then(res => res.json())
+    .then(data => {
+        updateSidebar(data, roleName);
+
+        // Now fetch the dashboard
+        return fetch('/CWFM/dashboard/getOrgDetails');
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("mainContent").innerHTML = html;
+
+        document.querySelector(".heading").textContent =
+            "Contract Labor Management System";
+    })
+    .catch(err => console.error(err));
+}
+
+</script>
 </body>
 
 </html>

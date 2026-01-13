@@ -75,7 +75,7 @@ function addReportRow(section) {
 
     const row = `
         <div class="report-row">
-            <input type="text" name="${inputName}" placeholder="Enter report name" required />
+            <input type="text" name="${inputName}" placeholder="Enter Report Name" required  style="text-transform: capitalize;"/>
             <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>
         </div>
     `;
@@ -87,7 +87,7 @@ function addChecklistRow() {
     const index = $('.checklist-row').length;
     const row = `
         <div class="checklist-row">
-            <input type="text" name="checklistNames" placeholder="Check Point Name" required />
+            <input type="text" name="checklistNames" placeholder="Check Point Name" required style="text-transform: capitalize;"/>
             <label><input type="checkbox" name="licenseRequired${index}" /> Licence No. Required</label>
             <label><input type="checkbox" name="validUptoRequired${index}" /> Valid Upto Required</label>
             <span class="remove-btn" onclick="$(this).parent().remove()">[Remove]</span>

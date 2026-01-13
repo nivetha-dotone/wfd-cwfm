@@ -69,7 +69,7 @@
 
     table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: collapse; 
     }
 
     td {
@@ -194,7 +194,7 @@
     <button type="submit" id="saveButton" style="display: none;">Save</button>   -->
 
     <div class="table-container">
-    <table border="1">
+    <table >
         <thead>
             <tr>
                 <td>

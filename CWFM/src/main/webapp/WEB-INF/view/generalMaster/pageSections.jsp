@@ -113,6 +113,15 @@
             background-color: #ffffff;
             color: #000;
         }
+        label {
+            color: black;
+            font-weight: bold;
+            font-size: 12px; /* Reduced font size */
+        }
+        select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     </style>
 </head>
 <body>
@@ -132,7 +141,7 @@
             <%-- <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}"> --%>
     </div>
 
-    <h3>Existing General Masters</h3>
+    <h6>Existing General Masters</h6>
      <div style="display: flex; margin-top: 20px;">
         <!-- Available Pages -->
         <div>
@@ -141,7 +150,7 @@
         </div>
 
         <div style="margin: 0 20px; display: flex; flex-direction: column; justify-content: center;">
-            <button onclick="addPageToSelected()">Add </button>
+            <button onclick="addPageToSelected()">Add </button><br>
             <button onclick="removePageFromSelected()"> Remove</button>
         </div>
 

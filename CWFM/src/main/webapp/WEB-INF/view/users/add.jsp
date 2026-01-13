@@ -43,9 +43,18 @@
     z-index: 1000;
 } */
 
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Distribute space between search and buttons */
+        padding: 8px; /* Adjust padding */
+        background-color: #FFFFFF; /* White background */
+        border-bottom: 1px solid #ccc; /* Subtle border for separation */
+    }
 .header-buttons {
     float: right;
     margin-right: 20px;
+    gap:10px;
 }
 
 .tabs {
@@ -139,6 +148,11 @@ table.ControlLayout td {
  .error {
     background-color: #ffcccc; /* Light red background */
 }
+  .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
     </style>
 
 
@@ -149,12 +163,14 @@ table.ControlLayout td {
     
 <!-- <h1>Organization Level Entry</h1> -->
 <div class="page-header">
+		 <div class="page-header-buttons">
  <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveUser()">Save</button>
  <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToUserList()">Cancel</button>
- 
+ </div>
 </div>
+<form id="userFormID" >
 <div id="tab1" class="tab-content active">
-   <form id="userFormID" >
+   
     <table class="ControlLayout">
         <!-- Form fields -->
         <tr>
@@ -203,7 +219,7 @@ table.ControlLayout td {
             </td>
             
             <th><label class="custom-label"><span class="required-field">*</span>User Account:</label></th>
-            <td><input type="text" name="userAccount" style="height: 20px;text-transform: capitalize;" size="30" maxlength="30" autocomplete="new-userAccount"/>
+            <td><input type="text" name="userAccount" style="height: 20px;" size="30" maxlength="30" autocomplete="new-userAccount"/>
             <div style="text-align:right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.userAccountRegax"/></span>
        </div>
@@ -219,8 +235,8 @@ table.ControlLayout td {
                 <table style="width: 100%;">
                 
                     <tr>
-                        <th style="text-align: left;color:black;">Select</th>
-                        <th style="text-align: left;color:black;">Role Name </th>
+                        <th style="text-align: left;color:darkcyan;">Select</th>
+                        <th style="text-align: left;color:darkcyan;">Role Name </th>
                          
                     </tr>
                     
@@ -229,7 +245,7 @@ table.ControlLayout td {
                 <tr>
                
                     <td><input type="checkbox" name="roleIds" value="${role.gmId}" /></td>
-                    <td style="color:black";>${role.gmName}</td>
+                    <td style="font-size: 11.9px;font-weight: 690;font-family: 'Noto Sans', sans-serif;color: #898989;padding: -0.8em .6em .3em;">${role.gmName}</td>
                 </tr>
                 
             </c:forEach>
@@ -242,8 +258,9 @@ table.ControlLayout td {
             </td>
         </tr>
     </table>
+    </div>
 </form>
-</div>
+
 
 
 <!-- Form for Adding/Editing Entries -->

@@ -471,35 +471,34 @@ public class FileUploadDaoImpl implements FileUploadDao {
     public String getCSVHeaders(String templateType) {
         switch (templateType) {
             case "Data-General Master":
-                return "GMNAME,GMDESCRIPTION,GMTYPEID\n";
+                return "GM Name,GM Description,GM Type ID\n";
 
             case "Data-Principal Employer":
-                return "ORGANISATION,PLANTCODE,NAME,ADDRESS,MANAGERNAME,MANAGERADDRS,BUSINESSTYPE,MAXWORKMEN,MAX CONTRACT WORKMEN,BOCWAPPLICABILITY,"
-                		+ "ISMWAPPLICABILITY,LICENSENUMBER,PFCODE,ESWC,FACTORY LICENSE NUMBER,State\n";
+                return "Organization,Plant Code,Name,Address,Manager Name,Manager Address,Business Type,Max Workmen,Max Contract Workmen,BOCW Applicability,"
+                		+ "Is MW Applicability,License Number,PF Code,ESWC,Factory License Number,State\n";
 
             case "Data-Contractor":
-                return "Work Order Number,Plant Code,Organisation,Main Contractor Code,Contractor Code,Contractor Name,Contractor Address,City,Contractor Manager Name,Total Workmen Strength,Maximum Number Of Workmen,Labour License Number,License Valid From,License Valid To,"
+                return "Work Order Number,Plant Code,Organisation,Main Contractor Code,Contractor Code,Contractor Name,Contractor Address,City,Contractor Manager Name,Total Workmen Strength,Maximum Number of Workmen,Labour License Number,License Valid From,License Valid To,"
                         + "License Coverage,WC Number,WC Valid From,WC Valid To,WC Coverage,ESIC Number,ESIC Valid From,Nature of Work,"
-                        + "PF Number,PF Apply Date";
+                        + "PF Number,PF Apply Date\n";
             case "Data-Work Order":
-            	return "Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed ON,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validitiy From,Work Order Validitiy To,Work Order Type,"
-                        + "Plant code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate / Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company_code\n";
+            	return "Work Order Number,Item,Line,Line Number,Service Code,Short Text,Delivery Completion,Item Changed On,Vendor Code,Vendor Name,Vendor Address,Blocked Vendor,Work Order Validity From,Work Order Validity To,Work Order Type,Plant Code,Section Code,Department Code,G/L Code,Cost Center,Nature of Job,Rate/Unit,Quantity,Base Unit of Measure,Work Order Released,PM Order No,WBS Element,Qty Completed,Work Order Release Date,Service Entry Created Date,Service Entry Updated Date,Purchase Org Level,Company Code";
             case "Data-Workmen Bulk Upload":
             	return "First Name*,Last Name*,Father's Name or Husband's Name*,Date of Birth*,Trade*,Skill*,Nature of Work*,Hazardous Area*,"
-                		+ "Aadhar/Id proof number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
-                		+ "Technical Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Name Branch,Account Number,"
-                		+ "Mobile Number,Emergency Contact Number*,Police verification Date Valid To,Health chekup Date,Access Levels*,ESIC Number,UNIT CODE*,Organization name,"
-                		+ "EIC Number*,EC number*,UAN Number,Emergency Contact Person*,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark\n";
+            			+               		"Aadhar/Id Proof Number*,Vendor Code*,Gender*,Date of Joining,Department*,Area,Work Order Number*,PF A/C Number,Marital Status*,"
+            			+              		"Technical/Non Technical*,Academic,Blood Group,Accommodation*,Bank Branch Name,Account Number,"
+            			+               		"Mobile Number,Emergency Contact Number*,Police Verification Date,Health Chekup Date,Access Levels*,ESIC Number,Unit Code*,Organization Name,"
+            			+                		"EIC Number*,EC Number*,UAN Number,Emergency Contact Person*,Is Eligible for PF,SpecializationName,Insurance Type,LL Number,Address,Zone,IdMark*\n";
             case "Data-Workmen Bulk Upload Draft":
               return      "First Name,Last Name,Father's Name or Husband's Name,Date of Birth,Trade,Skill,Nature of Work,Hazardous Area,"
-                		+ "Aadhar/Id proof number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
-                		+ "Technical Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Name Branch,Account Number,"
-                		+ "Mobile Number,Emergency Contact Number,Police verification Date Valid To,Health chekup Date,Access Levels,ESIC Number,UNIT CODE,Organization name,"
-                		+ "EIC Number,EC number,UAN Number,Emergency Contact Person,Is eligible for PF,SpecializationName,Insurance type,LL number,Address,Zone,IdMark\n";
+              		+ "Aadhar/Id Proof Number,Vendor Code,Gender,Date of Joining,Department,Area,Work Order Number,PF A/C Number,Marital Status,"
+              		+ "Technical/Non Technical,Academic,Blood Group,Accommodation,Bank Branch Name,Account Number,"
+              		+ "Mobile Number,Emergency Contact Number,Police Verification Date,Health Chekup Date,Access Levels,ESIC Number,Unit Code,Organization Name,"
+              		+ "EIC Number,EC Number,UAN Number,Emergency Contact Person,Is Eligible for PF,SpecializationName,Insurance Type,LL Number,Address,Zone,IdMark\n";
             case "Data-Trade Skill":
-            	return "PLANT CODE,TRADE,SKILL";
+            	return "Plant Code,Trade,Skill";
             case "Data-Department Area":
-            	return "PLANT CODE,DEPARTMENT,SUBDEPARTMENT";
+            	return "Plant Code,Department,Sub Department";
             default:
                 // fallback/default template
                 return "Template is Not Found to Download";
@@ -546,26 +545,34 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		        return null;
 		    }
 
-		    input = input.trim();
+		    try {
+		        input = input.trim();
+		        DateTimeFormatter formatter;
 
-		    List<DateTimeFormatter> formatters = Arrays.asList(
-		            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-		            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-		            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-		            DateTimeFormatter.ofPattern("yyyy/MM/dd")
-		    );
-
-		    for (DateTimeFormatter formatter : formatters) {
-		        try {
-		            LocalDate localDate = LocalDate.parse(input, formatter);
-		            return Date.valueOf(localDate);
-		        } catch (Exception e) {
-		            // try next format
+		        if (input.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+		            formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		        }
-		    }
+		        else if (input.matches("\\d{2}/\\d{2}/\\d{4}")) {
+		            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		        }
+		        else if (input.matches("\\d{4}-\\d{2}-\\d{2}")) {
+		            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		        }
+		        else if (input.matches("\\d{2}-\\d{2}-\\d{4}")) {
+		            formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		        }
+		        else {
+		            return null; // unsupported format
+		        }
 
-		    return null; // invalid date format
+		        LocalDate localDate = LocalDate.parse(input, formatter);
+		        return Date.valueOf(localDate); // ✅ THIS WAS MISSING
+
+		    } catch (Exception e) {
+		        return null;
+		    }
 		}
+
 
 	 private java.sql.Date parseSqlDate(LocalDate date) {
 		    return date == null ? null : java.sql.Date.valueOf(date);

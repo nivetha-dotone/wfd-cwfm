@@ -515,9 +515,13 @@ function addFile(docType) {
 
     const delBtn = document.createElement("button");
     delBtn.type = "button";
+    delBtn.className  = "btn btn-default process-footer-button-cancel ng-binding";
     delBtn.innerText = "Delete";
     delBtn.style.marginLeft = "5px";
-    delBtn.style.color = "black";
+    delBtn.style.color = "#0176b2";
+    delBtn.onmouseover = function () {
+    delBtn.style.color = "white";
+};
     const preview = document.createElement("span");
     preview.className = "preview";
     preview.style.marginLeft = "10px";

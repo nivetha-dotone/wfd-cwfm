@@ -208,7 +208,7 @@
 </div>
  
 
-   <table border="1"  id="workorderTable" style="width:100%;">
+   <table id="workorderTable" style="width:100%;">
         <thead>
             <tr >
              <td >

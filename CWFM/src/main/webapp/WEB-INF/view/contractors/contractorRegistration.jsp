@@ -428,7 +428,7 @@ label {
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAddress"/></label></th>
                 <td>
-                	<input id="addressId" name="address" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="addressId" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.addressRegax"/></span>
     </div>
@@ -582,8 +582,8 @@ label {
         </thead>
       <tbody id="workOrderBody">
     <tr>
-        <td><button type="button" class="btn btn-success addRow" style="color:white;background-color:green;">+</button></td>
-        <td><button type="button" class="btn btn-danger removeRow" style="color:white;background-color:red;">−</button></td>
+        <td><button type="button" class="btn btn-success addRow" style="color:blue;background-color:white;">+</button></td>
+        <td><button type="button" class="btn btn-danger removeRow" style="color:blue;background-color:white;">−</button></td>
         <td>
             <select class="form-control woNumber" name="workOrderNumber" id="workOrderNumberId">
                

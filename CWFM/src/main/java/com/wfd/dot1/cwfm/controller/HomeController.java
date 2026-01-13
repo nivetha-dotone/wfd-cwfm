@@ -520,4 +520,16 @@ public class HomeController {
 
 
 	}
+	@RequestMapping(path = "/home", method = RequestMethod.GET)
+	public String home(HttpSession session) {
+
+	    MasterUser user = (MasterUser) session.getAttribute("loginuser");
+
+	    if (user == null) {
+	        return "redirect:/UserLogin.jsp";   // Not logged in — go to login
+	    }
+
+	    return "WelcomePage";   // Main page of application
+	}
+
 }

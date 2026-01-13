@@ -203,7 +203,7 @@
 </div>
  
 
-   <table border="1"  id="contractorTable" style="width:100%;">
+   <table id="contractorTable" style="width:100%;">
         <thead>
             <tr>
              <td >

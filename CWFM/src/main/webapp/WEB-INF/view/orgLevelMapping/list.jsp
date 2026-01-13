@@ -188,7 +188,7 @@
     <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="editMapping()">Edit</button>
 </div> -->
 <div class="table-container">
-    <table id="OrgLevelTable" border="1">
+    <table id="OrgLevelTable" >
                 <thead>
                     <tr>
                     <td><input type="checkbox" id="selectAllOrgMapCheckbox" onchange="toggleSelectAllOrgMap()"></td>

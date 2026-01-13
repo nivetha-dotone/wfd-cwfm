@@ -180,7 +180,11 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
+   .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
 </style>
 <script>
 function toggleSelectAllGMTYPE() {
@@ -195,8 +199,9 @@ function toggleSelectAllGMTYPE() {
         <input type="text" class="search-box ng-pristine ng-untouched ng-valid ng-empty" id="searchInput" name="searchQuery" placeholder="GatePass Id Search...">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="searchWorkmenWithGatePassId()">Search</button>
     </form> -->
-     <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveSelectedRows()">Save</button>  
-    
+     <div class="page-header-buttons">
+    <!--  <button id="saveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveSelectedRows()" style="margin-right:10px">Save</button> -->  
+    </div>
     <div>
     <%-- <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','regular')">Save</button> --%>
     

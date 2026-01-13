@@ -423,7 +423,7 @@ label {
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAddress"/></label></th>
                 <td>
-                	<input id="addressId" name="address" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="addressId" name="address" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.addressRegax"/></span>
     </div>
@@ -576,8 +576,8 @@ label {
         </thead>
       <tbody id="licenseBody">
     <tr>
-        <td><button type="button" class="btn btn-success addRowNew" style="color:white;background-color:green;">+</button></td>
-        <td><button type="button" class="btn btn-danger removeRowNew" style="color:white;background-color:red;">−</button></td>
+        <td><button type="button" class="btn btn-success addRowNew" style="color:blue;background-color:white;">+</button></td>
+        <td><button type="button" class="btn btn-danger removeRowNew" style="color:blue;background-color:white;">−</button></td>
        
         <td>
             <select class="form-control documentType" name="documentType" id="documentTypeId">
@@ -598,9 +598,10 @@ label {
     </tr>
 </tbody>
       
-                </table>
+                </table><br>
                 <div class="text-end mt-3">
-    <button type="button" class="btn btn-primary" id="saveButton" onclick="saveTab2AndGoToTab3()">Save</button>
+    <!-- <button type="button" class="btn btn-primary" id="saveButton" onclick="saveTab2AndGoToTab3()">Save</button> -->
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  id="saveButton" onclick="saveTab2AndGoToTab3()">Save</button>
 </div>
                 
             </div>
@@ -625,8 +626,8 @@ label {
                     <div class="button-group">
                        
                         
-                        <button type="button" onclick="moveSelected('availableWorkOrders', 'selectedWorkOrders')">&gt;</button><br><br>
-        <button type="button" onclick="moveSelected('selectedWorkOrders', 'availableWorkOrders')">&lt;</button>
+                        <button type="button" style="color:black;" onclick="moveSelected('availableWorkOrders', 'selectedWorkOrders')">&gt;</button><br><br>
+        <button type="button" style="color:black;" onclick="moveSelected('selectedWorkOrders', 'availableWorkOrders')">&lt;</button>
   
                     </div>
 
@@ -652,8 +653,8 @@ label {
                     <div class="button-group">
                        
                         
-                        <button type="button" onclick="moveSelected('availableLicense', 'selectedLicense')">&gt;</button><br><br>
-        <button type="button" onclick="moveSelected('selectedLicense', 'availableLicense')">&lt;</button>
+                        <button type="button"  style="color:black;" onclick="moveSelected('availableLicense', 'selectedLicense')">&gt;</button><br><br>
+        <button type="button" style="color:black;" onclick="moveSelected('selectedLicense', 'availableLicense')">&lt;</button>
   
                     </div>
 
@@ -664,9 +665,10 @@ label {
                            
                         </select>
                     </div>
-                </div>
+                </div><br>
 <div class="text-end mt-3">
-    <button type="button" class="btn btn-success" onclick="saveWorkOrderInfo()">Save Work Order & License</button>
+    <!-- <button type="button" class="btn btn-success" onclick="saveWorkOrderInfo()">Save Work Order & License</button> -->
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveWorkOrderInfo()">Save Work Order & License</button>
 </div>
 
   </div>

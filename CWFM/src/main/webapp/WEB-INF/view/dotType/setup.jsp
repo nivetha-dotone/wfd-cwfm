@@ -3,6 +3,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -235,7 +236,11 @@
     background-color: #ffe5e5;
     border-top: none;
 }
-    
+    .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}  
     </style>
   <script src="resources/js/cms/workflow.js"></script>
 </head>
@@ -253,7 +258,7 @@
     
    <label for="gmTypeId" style="color: darkcyan;">Principal Employer:</label>
         <!-- <select class="custom-select" id="principalEmployer" name="principalEmployerId" onchange="getBusinessType(this.value)" required> -->
-        <select class="custom-select" id="principalEmployer" name="principalEmployerId"  onchange="onBusinessTypeChange()" required>
+        <select class="custom-select" id="principalEmployer" name="principalEmployerId"  onchange="onBusinessTypeChange()" required style="padding:3px;color:gray;">
                                 <option value="">Please select Principal Employer</option>
 								<c:forEach var="pe" items="${PrincipalEmployer}">
                 					<option value="${pe.unitId}">${pe.name}</option>
@@ -267,9 +272,10 @@
        
 
        
-
+ <div class="page-header-buttons">
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveDotSelection()">Save</button>
          <!-- <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Cancel</button> -->
+         </div>
           <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
     <div id="messageBox" style="display: none; margin: 10px;">
@@ -277,8 +283,8 @@
 </div>
     
 <div style="padding:10px;">
-<h3>DOT Type</h3>
-<table id="dottype" class="no-dt">
+<h4  style="color: darkcyan;">DOT Type</h4>
+<%-- <table id="dottype" class="no-dt">
     <c:forEach var="dot" items="${dotTypes}">
         <tr>
             <td>
@@ -287,8 +293,30 @@
             </td>
         </tr>
     </c:forEach>
-</table>
+</table> --%>
 
+<table id="dottype" class="no-dt">
+    <c:forEach var="dot" items="${dotTypes}" varStatus="st">
+
+        <c:if test="${st.index % 2 == 0}">
+            <tr>
+        </c:if>
+
+        <td style="font-size: 11.9px;font-weight: 690;font-family: 'Noto Sans', sans-serif;color: #898989;padding: -0.8em .6em .3em;">
+            <input type="radio" name="dotType" value="${dot.status}" required />
+            ${dot.name}
+        </td>
+
+        <c:if test="${st.index % 2 == 1}">
+            </tr>
+        </c:if>
+
+    </c:forEach>
+
+    <c:if test="${fn:length(dotTypes) % 2 == 1}">
+        </tr>
+    </c:if>
+</table>
 
 </div>
  

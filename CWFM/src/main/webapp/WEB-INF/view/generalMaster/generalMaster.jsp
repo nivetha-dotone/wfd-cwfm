@@ -152,7 +152,7 @@ function editRow(gmId) {
             flex-direction: column; /* Stack buttons vertically */
         }
     }
-    .header-text-new {
+       .header-text-new {
         font-family: 'Noto Sans', Arial, sans-serif; /* Font family similar to grid header */
         font-size: 14px; /* Adjusted font size to match typical grid header size */
         font-weight: 600; /* Bold text for prominence */
@@ -174,9 +174,10 @@ function editRow(gmId) {
         letter-spacing: normal; /* Letter spacing */
         font-family: 'Noto Sans', sans-serif; /* Font family */
          font-weight: bold;
-        text-align: center; /* Center align text */
+        text-align: left; /* Center align text */
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
+   margin:4px;
     }
    
 
@@ -194,11 +195,16 @@ function editRow(gmId) {
             font-weight: bold;
             font-size: 12px; /* Reduced font size */
         }
+         .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
     </style>
 </head>
 <body>
 <div class="page-header" method="POST" onsubmit="return validateMasterValue()">
-    
+<div class="page-header-buttons"> 
     <label for="gmTypeId" style="color: darkcyan;">Select GM Type:</label>
          <select  style="color:gray;padding:3px;" id="gmTypeId" name="gmTypeId" onchange="fetchGmData()" required>
         <option value="" style="color:gray;"> Select GM Type </option>
@@ -213,18 +219,19 @@ function editRow(gmId) {
 
         <label for="masterValue" style="color: darkcyan;">Master Value:</label>
         <input type="text" id="masterValue" name="masterValue" style="color:gray;  required autocomplete="off">
-
+<div class="page-header-buttons"> 
         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="saveGMMaster()">Save</button>
         <!-- <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/generalController/generalMaster', 'General Master')">Cancel</button> -->
         <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMMasterCSV()">Export</button>
+</div>     
             <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}">
             <input type="hidden" id="existingMasterValues" value="${existingMasterValues.join(',')}">
          <!--  <div id="error-gmMaster" style="display: none; color: red; font-weight: bold;"></div>   -->
           <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
-
-    <h3 style="color:gray;">Existing General Masters</h3>
-    <table border="1"  id="gmTable" class="no-dt">
+</div>
+    <h4 style="color:gray;margin-left:5px;">Existing General Masters</h4>
+    <table id="gmTable" class="no-dt">
         <thead>
             <tr>
             <td>
@@ -258,8 +265,9 @@ function editRow(gmId) {
 
                            <%--  <button type="button" class="btn btn-primary" 
                                     onclick="editRow('${entry.gmId}')">Edit</button> --%>
-                            <button type="button" class="btn btn-danger" 
-                                    onclick="deleteGMManager(${entry.gmId}, ${gmTypeId})">Delete</button>
+                            <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteGMManager(${entry.gmId}, ${gmTypeId})">Delete</button>
+                            <!-- class="btn btn-danger" 
+                                    onclick="deleteGMManager(${entry.gmId}, ${gmTypeId})">Delete</button> --> 
                        
                            <%--  <button type="button" class="btn btn-success" 
                                     onclick="saveRow('${entry.gmId}')">Save</button>

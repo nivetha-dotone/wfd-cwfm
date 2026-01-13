@@ -243,7 +243,7 @@ console.log(userAccount);
 </div>
 <form  >
     <div class="table-container">
-        <table id="UserTable" border="1">
+        <table id="UserTable" >
         <thead>
              <tr>
                 <!-- <th>User ID</th> -->

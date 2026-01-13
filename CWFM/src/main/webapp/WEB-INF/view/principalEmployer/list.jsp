@@ -163,7 +163,11 @@
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
+   .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
 </style>
   
 <script>
@@ -183,9 +187,8 @@ function redirectToPEAdd() {
 </script>
 </head>
 <body>
-<div class="page-header d-flex justify-content-between align-items-center"">
-   
-    <div>
+<div class="page-header">
+		 <div class="page-header-buttons">
     <c:if test="${UserPermission.addRights eq 1 }">
          <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToPEAdd()">Add</button> 
     </c:if>

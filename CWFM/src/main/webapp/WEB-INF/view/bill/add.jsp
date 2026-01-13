@@ -454,12 +454,12 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billStartDate"/></label></th>
                 <td>
-                <input id="billStartDateId" name="billStartDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off" >
+                <input id="billStartDateId" name="billStartDate" style="width: 100%;height: 20px;  color: #495057;" type="date" size="30" maxlength="30" autocomplete="off" >
                 	<label id="error-billStartDate" style="color: red;display: none;">Bill start date is required</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.billEndDate"/></label></th>
                 <td>
-                <input id="billEndDateId" name="billEndDate" style="width: 100%;height: 20px; color: black;" type="date" size="30" maxlength="30" autocomplete="off" >
+                <input id="billEndDateId" name="billEndDate" style="width: 100%;height: 20px; color: #495057;" type="date" size="30" maxlength="30" autocomplete="off" >
                 	<label id="error-billEndDate" style="color: red;display: none;">Bill end date is required</label>
                
                 </td>
@@ -537,7 +537,7 @@ label {
                    
         <tbody>
              <c:forEach var="report" items="${kronosReports}">
-            <tr><td><label>${report.reportName}</label></td>
+            <tr><td><label  style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;">${report.reportName}</label></td>
             <td><input type="file" name="kronosFile_${report.id}" id="kronosFile_${report.id}" onchange="showFileNameBill(this, '${report.id}')"/>
         	<span id="fileName_${report.id}" style="margin-left:10px;color: black;"></span></td></tr>
         </c:forEach>
@@ -552,7 +552,7 @@ label {
                    
             <tbody>
             	<c:forEach var="stat" items="${statutoryReports}">
-           <tr><td> <label>${stat.attachmentName}</label></td>
+           <tr><td> <label  style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;">${stat.attachmentName}</label></td>
             <td><input type="file" name="statutoryFile_${stat.id}" id="statutoryFile_${stat.id}" onchange="showFileNameBill0(this, '${stat.id}')"/>
         	<span id="statfileName_${stat.id}" style="margin-left:10px;color: black;"></span></td></tr>
         </c:forEach>
@@ -563,7 +563,7 @@ label {
         <div id="tab4" class="tab-content">
             <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;color:black;">
                <thead>
-               <tr>
+               <tr style="color: #898989;font-weight: bold;">
                
                	<td>Check points </td>
                	<td>Status Y/N </td>
@@ -573,7 +573,7 @@ label {
                </thead>    
             <tbody>
 				<c:forEach var="item" items="${checklistItems}">
-            <tr><td> <input type="hidden" name="id_${item.id}">${item.checkpointName}</td>
+            <tr style="color: #898989;"><td> <input type="hidden" name="id_${item.id}">${item.checkpointName}</td>
             	<td> <select class="custom-select" id="statusValue" name="statusValue"  >
                                 <option value="">Please select status</option>
 								<c:forEach var="status" items="${ChecklistStatus}">

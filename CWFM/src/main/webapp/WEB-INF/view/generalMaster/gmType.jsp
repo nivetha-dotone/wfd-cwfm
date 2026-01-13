@@ -166,11 +166,15 @@
         letter-spacing: normal; /* Letter spacing */
         font-family: 'Noto Sans', sans-serif; /* Font family */
          font-weight: bold;
-        text-align: center; /* Center align text */
+        text-align: left; /* Center align text */
         padding: 4px; /* Reduced padding for the table header */
         box-sizing: border-box; /* Include padding and border in element's total width and height */
     }
-   
+    .page-header-buttons {
+    margin-left: auto;      /* <<< THIS moves the buttons to the right */
+    display: flex;
+    gap: 10px;
+}
 </style>
 <style>
     #gmTypeName {
@@ -232,15 +236,20 @@
     <input type="text" id="selectedRoleId" value="${sessionScope.selectedRoleId}" />
 </form> --%>
 <div class="page-header">
+ <div class="page-header-buttons"> 
   <label for="gmTypeName"style=" color: darkcyan;">GM Type Name:</label>
   
         <input type="text" id="gmTypeName" name="gmTypeName" required  oninput="convertToUppercase(this)" autocomplete="off"> 
       <%--  <c:if test="${userRights[0].addRights == 0}"> --%>
+      
+		<div class="page-header-buttons">
         <button type="submit"  class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGMTYPE()">Save</button>
    <%-- </c:if>
     <c:if test="${userRights[0].deleteRights == 0}"> --%>
     <button type="submit"   class="btn btn-default process-footer-button-cancel ng-binding" onclick="deleteSelectedGMTYPE()">Delete Selected</button>
     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportGMTYPECSV()">Export</button>
+</div> 
+</div>
 <%-- </c:if> --%>
 <!-- <div>
 <form action="/CWFM/generalController/saveGMType" method="post">
@@ -263,7 +272,7 @@
     </div>
 </div> --%>
 <div class="table-container">
-    <table class="no-dt">
+    <table class="no-dt" cellspacing="0" cellpadding="0">
         <thead>
             <tr>
                 <th class="checkbox-cell">
