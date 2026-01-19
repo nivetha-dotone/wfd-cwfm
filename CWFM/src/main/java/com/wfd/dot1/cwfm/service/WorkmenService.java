@@ -138,6 +138,8 @@ public interface WorkmenService {
 
 	public String saveWorkmenBulkUploadGatePass(GatePassMain gatePassMain);
 
+	String saveProjectGatePass(GatePassMain gatePassMain);
+
 	
 
 	

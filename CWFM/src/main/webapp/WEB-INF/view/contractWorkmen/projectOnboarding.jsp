@@ -643,9 +643,9 @@ label {
             <button data-target="tab5" onclick="showTab('tab5')">Documents</button>
         </div>
          <div class="action-buttons" >
-            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','quick')">Save</button>
+            <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}','project')">Save</button>
            <%--  <button   type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="draftGatePass('${sessionScope.loginuser.userId}')">Draft</button> --%>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToquickonboardingList()">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToProjectOnboardingList()">Cancel</button>
         </div> 
     </div>
 
@@ -661,7 +661,7 @@ label {
             <div id="tab1" class="tab-content active">
     <table cellspacing="0" cellpadding="0">
         <tbody>
-        <input id="gatePassType" name="gatePassType" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="quick" readonly>
+        <input id="gatePassType" name="gatePassType" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="project" readonly>
        <!--  <tr>
     <th><label class="custom-label"><span class="required-field">*</span>Entry Pass Type</label></th>
     <td>
@@ -969,7 +969,7 @@ label {
                                 <label id="error-eic"style="color: red;display: none;">EIC is required</label>
                                 </td>
                         </tr>
-                        <tr>
+                        <%-- <tr>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfJob"/></label></th>
                             <td>
                             	<input id="natureOfJob" name="natureOfJob" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${not empty GatePassObj.natureOfJob ? GatePassObj.natureOfJob : ''}">
@@ -1130,7 +1130,7 @@ label {
                      <!--  <label for="pfApplicable">Yes</label> -->
                       <!-- <label id="error-pfApplicable"style="color: red;display: none;">Please check pfApplicable</label> -->
                      </td>
-                        </tr>
+                        </tr> --%>
                         
                     </tbody>
                 </table>

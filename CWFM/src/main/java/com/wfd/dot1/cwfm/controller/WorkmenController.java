@@ -470,8 +470,13 @@ public class WorkmenController {
             }
             }
             
+            if("project".equals(gatePassMain.getOnboardingType())) {
+            	transactionId = workmenService.saveProjectGatePass(gatePassMain);
+            }else {
+            	transactionId = workmenService.saveGatePass(gatePassMain);
+            }
             
-            transactionId = workmenService.saveGatePass(gatePassMain);
+            
             if (transactionId != null) {
             	if (transactionId.contains("mandatory") || transactionId.contains("exceeded")) {
             		//if user wants we can draft the record
@@ -542,9 +547,17 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+				if("project".equals(type)) {
+					listDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.PROJECT.getStatus(),type);
+				}else {
     			listDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
+				}
     		}else {	
-			listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
+    			if("project".equals(type)) {
+    				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.PROJECT.getStatus(),type);
+				}else {
+					listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
+    		}
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -630,8 +643,10 @@ public class WorkmenController {
     	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	if(gatePassMainObj.getOnboardingType().equals("regular"))
     		return "contractWorkmen/view";
-    	else
+    	else if(gatePassMainObj.getOnboardingType().equals("quick"))
     		return "contractWorkmen/quickOnboardingView";
+    	else
+    		return "contractWorkmen/projectOnboardingView";
     }
     @PostMapping("/approveRejectGatePass")
     public ResponseEntity<String> approveRejectGatePass(@RequestBody ApproveRejectGatePassDto dto,HttpServletRequest request,HttpServletResponse response) {
@@ -2674,4 +2689,78 @@ if (status.contains("Unique")) {
         return result;
     }
 
+    
+    //projectOnboardingList
+    @GetMapping("/projectOnboardingList")
+    public String projectOnboardingList(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/projectOnboardingList");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	  //request.setAttribute("Dept", departments);
+    	  
+		return "contractWorkmen/projectOnboardingList";
+	}
+    
+    @GetMapping("/projectOnboardingCreation")
+    public String projectOnboardingCreation(HttpServletRequest request,HttpServletResponse response) {
+	
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	log.info("Entered into projectOnboardingCreation"+user.getUserId());
+    	
+    	String transactionId= workmenService.generateTransactionId();
+    	request.setAttribute("transactionId", transactionId);
+    	
+    	List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	request.setAttribute("PrincipalEmployer", peList);
+    	  //request.setAttribute("Dept", departments);
+         // request.setAttribute("Subdept", subdepartments);
+          
+        //Skills
+		//List<Skill> skillList = workmenService.getAllSkill();
+		//request.setAttribute("Skills", skillList);
+		
+		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
+
+		// Grouping the CmsGeneralMaster objects by gmType
+		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
+		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+		// Define the types and their corresponding request attribute names
+		Map<String, String> attributeMapping = Map.of(
+		        "GENDER", "GenderOptions",
+		        "BLOODGROUP", "BloodGroup",
+		        "ACCESSAREA", "AccessArea",
+		        "ACADEMICS", "Academics",
+		        "WAGECATEGORY", "WageCategory",
+		        "BONUSPAYOUT", "BonusPayout",
+		        "ZONE", "Zone"
+		);
+
+		// Iterate over the attribute mappings and set the request attributes dynamically
+		attributeMapping.forEach((type, attributeName) -> {
+		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+		    request.setAttribute(attributeName, gmList1);
+		});
+        return "contractWorkmen/projectOnboarding";
+    }
+    
     }

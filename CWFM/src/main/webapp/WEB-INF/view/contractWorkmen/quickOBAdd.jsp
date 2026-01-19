@@ -293,7 +293,248 @@ label {
     color: red;
     font-weight: bold !important;
 }
-        
+
+
+
+@media screen and (max-width: 768px) {
+    table,
+    tbody,
+    tr,
+    th,
+    td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    table tr {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    table th {
+        text-align: left;
+        padding: 5px 0;
+        font-weight: bold;
+        background: none;
+    }
+
+    table td {
+        padding: 5px 0;
+    }
+
+    input,
+    select,
+    textarea
+     {
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 70px;
+    }
+
+    /* button {
+        margin-top: 6px;
+    } */
+
+    label[id^="error-"],
+    #otpMessage,
+    #otpError {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+    }
+
+    #preview,
+    video,
+    canvas {
+        width: 100% !important;
+        height: auto;
+    }
+
+    div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+/* 
+    button[onclick*="openCamera"] {
+        margin-left: 0 !important;
+        margin-top: 6px;
+        width: 100%;
+    } */
+
+/* ///////////////////////////////////////// */
+    
+
+    body {
+        overflow-x: hidden;
+        font-size: 14px;
+    }
+
+    .container,
+    .main-container,
+    .content,
+    .form-container {
+        width: 100% !important;
+        padding: 10px !important;
+        margin: 0 !important;
+    }
+
+    h1, h2, h3 {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    .form-group,
+    .row {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    label {
+        font-size: 13px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100% !important;
+        font-size: 14px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+
+    button,
+    .btn {
+        width: 100%;
+        font-size: 13px;
+        padding: 3px;
+        margin-bottom: 10px;
+    }
+
+    .tabs,
+    .tab-container {
+        flex-direction: column;
+        display: block;
+    }
+
+    .tab {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    .modal,
+    .popup {
+        width: 95% !important;
+        margin: auto;
+    }
+
+    .tabs-container {
+        display: block !important;
+        width: 100%;
+    }
+
+      .tabs {
+        display: flex !important;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        /* gap: 6px;
+        padding-bottom: 6px; */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none; /* Chrome */
+    }
+
+    .tabs button {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: auto;
+        border-radius: 4px;
+    }
+    /* .action-buttons {
+        display: block !important;
+        width: 100%;
+        margin-top: 15px;
+    } */
+
+    /* .action-buttons button {
+        width: 100%;
+        margin: 5px 0;
+        padding: 10px;
+        font-size: 14px;
+        box-sizing: border-box;
+    } */
+
+    
+  input[type="date"] {
+        position: static !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+    input[type="date"] {
+        display: inline-block !important;
+    }
+      #ui-datepicker-div,
+    #ui-datepicker-div table,
+    #ui-datepicker-div thead,
+    #ui-datepicker-div tbody,
+    #ui-datepicker-div tr,
+    #ui-datepicker-div th,
+    #ui-datepicker-div td {
+        /* display: table !important; */
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    #ui-datepicker-div tr {
+        display: table-row !important;
+    }
+
+    #ui-datepicker-div th,
+    #ui-datepicker-div td {
+        display: table-cell !important;
+        padding: 4px !important;
+    }
+
+    /* Keep calendar compact */
+    #ui-datepicker-div {
+        font-size: 12px;
+        z-index: 9999 !important;
+    }
+    
+
+}
+
     </style>
      <%
     MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -449,6 +690,7 @@ label {
             <div id="tab1" class="tab-content active">
     <table cellspacing="0" cellpadding="0">
         <tbody>
+        <input id="gatePassType" name="gatePassType" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="regular" readonly>
        <!--  <tr>
     <th><label class="custom-label"><span class="required-field">*</span>Entry Pass Type</label></th>
     <td>

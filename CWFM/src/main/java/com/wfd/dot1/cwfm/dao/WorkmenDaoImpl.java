@@ -451,10 +451,10 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	private Object[] prepareGatePassParameters(String transId, GatePassMain gatePassMain) {
-		
+		String gatePassType = gatePassMain.getOnboardingType().equals("project")?GatePassType.PROJECT.getStatus():GatePassType.CREATE.getStatus();
 	    return new Object[]{
 	    		transId," ",
-	        GatePassType.CREATE.getStatus(),
+	    		gatePassType,
 	        gatePassMain.getGatePassStatus(),
 	        gatePassMain.getAadhaarNumber(),
 	        gatePassMain.getFirstName(),
@@ -548,6 +548,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 				dto.setGatePassType("Cancel");
 			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassType("Lost/Damage");
+			}else if(gatePassType.equals(GatePassType.PROJECT.getStatus())) {
+				dto.setGatePassType("Project Gatepass");
 			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -586,7 +588,7 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		SqlRowSet rs =null;
 		String query=null;
-		int workflowTypeId = this.getWorkFlowTypeId(unitId, "1");
+		int workflowTypeId = this.getWorkFlowTypeId(unitId, gatePassTypeId);
 		
 		if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 			query=this.getAllGatePassForSquential();
@@ -627,6 +629,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 				dto.setGatePassType("Cancel");
 			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassType("Lost/Damage");
+			}else if(gatePassType.equals(GatePassType.PROJECT.getStatus())) {
+				dto.setGatePassType("Project Gatepass");
 			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -737,15 +741,20 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		log.info("Entering into getAllGeneralMastersForGatePass dao method ");
 		List<CmsGeneralMaster> gmList= new ArrayList<CmsGeneralMaster>();
 		String query = getAllCmsGeneralMasterForGatePass();
-		Object[] obj = new Object[] {gpm.getGender()!=null?gpm.getGender():' ',
-				gpm.getBloodGroup()!=null?gpm.getBloodGroup():' ',
-						gpm.getAccessArea()!=null?gpm.getAccessArea():' ',
-								gpm.getAcademic()!=null?gpm.getAcademic():' ',
-										gpm.getZone()!=null?gpm.getZone():' ',
-												gpm.getWageCategory()!=null?gpm.getWageCategory():' ',gpm.getBonusPayout()!=null?gpm.getBonusPayout():' ',
-														gpm.getDepartment()!=null?gpm.getDepartment():' ',gpm.getSubdepartment()!=null?gpm.getSubdepartment():' ',
-															gpm.getTrade()!=null?gpm.getTrade():' ',gpm.getSkill()!=null?gpm.getSkill():' '
-																	};
+		Object[] obj = new Object[] {
+			    gpm.getGender() != null ? gpm.getGender() : "",
+			    gpm.getBloodGroup() != null ? gpm.getBloodGroup() : "",
+			    gpm.getAccessArea() != null ? gpm.getAccessArea() : "",
+			    gpm.getAcademic() != null ? gpm.getAcademic() : "",
+			    gpm.getZone() != null ? gpm.getZone() : "",
+			    gpm.getWageCategory() != null ? gpm.getWageCategory() : "",
+			    gpm.getBonusPayout() != null ? gpm.getBonusPayout() : "",
+			    gpm.getDepartment() != null ? gpm.getDepartment() : "",
+			    gpm.getSubdepartment() != null ? gpm.getSubdepartment() : "",
+			    gpm.getTrade() != null ? gpm.getTrade() : "",
+			    gpm.getSkill() != null ? gpm.getSkill() : ""
+			};
+
 		log.info("Query to getAllGeneralMastersForGatePass "+query);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,obj);
 		while(rs.next()) {
@@ -1546,7 +1555,6 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 }
 
 private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePassMain) {
-	
     return new Object[]{
     		
         gatePassMain.getGatePassAction(),
