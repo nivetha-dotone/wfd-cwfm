@@ -466,11 +466,11 @@ label {
         overflow-x: auto;
         /* gap: 6px;
         padding-bottom: 6px; */
-        scrollbar-width: none; /* Firefox */
+        scrollbar-width: none; 
     }
 
     .tabs::-webkit-scrollbar {
-        display: none; /* Chrome */
+        display: none; 
     }
 
     .tabs button {
@@ -526,10 +526,39 @@ label {
         padding: 4px !important;
     }
 
-    /* Keep calendar compact */
     #ui-datepicker-div {
         font-size: 12px;
         z-index: 9999 !important;
+    }
+
+     .declaration-row,
+    .declaration-row td {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .declaration-row td {
+        padding: 12px !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        white-space: normal !important;
+    }
+
+    .declaration-row input[type="checkbox"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+        vertical-align: top;
+    }
+
+    .declaration-row b {
+        display: block;
+        font-weight: 500;
+    }
+
+    #acceptError {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
     }
     
 
@@ -690,7 +719,6 @@ label {
             <div id="tab1" class="tab-content active">
     <table cellspacing="0" cellpadding="0">
         <tbody>
-        <input id="gatePassType" name="gatePassType" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="regular" readonly>
        <!--  <tr>
     <th><label class="custom-label"><span class="required-field">*</span>Entry Pass Type</label></th>
     <td>
@@ -1550,13 +1578,19 @@ label {
 			</tr>
 		<tr>
 		</tr>
-      		<tr >    	
-				<td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;"><b>
-				<input type="checkbox" name="acceptCheck" id="acceptCheck"  /> 
-				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
-				</b>
-				<label id="acceptError" style="color: red;display: none;">You must accept the declaration</label></td>
-			</tr>
+      	<tr class="declaration-row">    	
+    <td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;">
+        <b>
+            <input type="checkbox" name="acceptCheck" id="acceptCheck" /> 
+            I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
+        </b>
+
+        <label id="acceptError" style="color: red;display: none;">
+            You must accept the declaration
+        </label>
+    </td>
+</tr>
+
 				<!-- <tr >
 				<td colspan="4"><input type="checkbox" name="acceptCheck" id="acceptCheck"  />
 				<label class="custom-label"> I acceptthe <u>Terms and Conditions</u></label> 
