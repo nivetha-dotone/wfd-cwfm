@@ -28,6 +28,7 @@ import org.springframework.stereotype.Repository;
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
+import com.wfd.dot1.cwfm.pojo.CMSWorkorderLLWC;
 import com.wfd.dot1.cwfm.pojo.CMSWorkorderLN;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -377,8 +378,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	        wc.getWcCode(),
 	        wc.getWcFromDtm(),
 	        wc.getWcToDtm(),
-	        wc.getWcTotal()
-	        //wc.getLicenceType() // if this should be NULL, pass `null` here
+	        wc.getWcTotal(),
+	        wc.getLicenceType() // if this should be NULL, pass `null` here
 	    );
 	}
 
@@ -826,7 +827,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getAadhaarNumber(),
 						 staging.getFirstName(),
 						 staging.getLastName(),
-						 staging.getDateOfBirth(),
+						 parseSqlDate(staging.getDateOfBirth()),
 						 staging.getGender(),
 						 staging.getRelationName(),
 						 staging.getIdMark(),
@@ -845,7 +846,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getHazardousArea(),
 						 staging.getAccessArea(),
 						 staging.getUanNumber(),
-						 staging.getHealthCheckDate(),
+						 parseSqlDate(staging.getHealthCheckDate()),
 						 staging.getBloodGroup(),
 						 staging.getAccommodation(),
 						 staging.getAcademic(),
@@ -855,10 +856,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getEmergencyNumber(),
 						 staging.getEmergencyName(),
 						 staging.getAddress(),
-						 staging.getDoj(),
+						 parseSqlDate(staging.getDoj()),
 						 staging.getPfNumber(),
 						 staging.getEsicNumber(),
-						 staging.getPoliceVerificationDate(),
+						 parseSqlDate(staging.getPoliceVerificationDate()),
 						 staging.getSpecializationName(),
 						 staging.getLLnumber(),
 						 staging.getPfApplicable(),
@@ -882,7 +883,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getAadhaarNumber(),
 						 staging.getFirstName(),
 						 staging.getLastName(),
-						 staging.getDateOfBirth(),
+						 parseSqlDate( staging.getDateOfBirth()),
 						 staging.getGender(),
 						 staging.getRelationName(),
 						 staging.getIdMark(),
@@ -901,7 +902,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getHazardousArea(),
 						 staging.getAccessArea(),
 						 staging.getUanNumber(),
-						 staging.getHealthCheckDate(),
+						 parseSqlDate(staging.getHealthCheckDate()),
 						 staging.getBloodGroup(),
 						 staging.getAccommodation(),
 						 staging.getAcademic(),
@@ -911,10 +912,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getEmergencyNumber(),
 						 staging.getEmergencyName(),
 						 staging.getAddress(),
-						 staging.getDoj(),
+						 parseSqlDate(staging.getDoj()),
 						 staging.getPfNumber(),
 						 staging.getEsicNumber(),
-						 staging.getPoliceVerificationDate(),
+						 parseSqlDate(staging.getPoliceVerificationDate()),
 						 staging.getSpecializationName(),
 						 staging.getLLnumber(),
 						 staging.getPfApplicable(),
@@ -1395,20 +1396,22 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		    );
 		}
 		@Override
-		public boolean wcExists(Long contractorId, Long unitId,String wcCode) {
-		    String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR_WC WHERE CONTRACTORID=? AND UNITID=? and WC_CODE=?";
-		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitId,wcCode) > 0;
+		public boolean wcExists(Long contractorId, Long unitId,String wcCode,String licenceType) {
+		    String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR_WC WHERE CONTRACTORID=? AND UNITID=? and WC_CODE=? AND LICENCE_TYPE = ?";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitId,wcCode,licenceType) > 0;
 		}
 		@Override
 		public void updatewc(CmsContractorWC wc) {
 		    jdbcTemplate.update(
-		        "UPDATE CMSCONTRACTOR_WC SET WC_CODE=?, WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0 WHERE CONTRACTORID=? AND UNITID=?",
+		        "UPDATE CMSCONTRACTOR_WC SET WC_CODE=?, WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0,LICENCE_TYPE=? WHERE CONTRACTORID=? AND UNITID=?",
 		        wc.getWcCode(),
 		        wc.getWcFromDtm(),
 		        wc.getWcToDtm(),
 		        wc.getWcTotal(),
+		        wc.getLicenceType(),
 		        wc.getContractorId(),
 		        wc.getUnitId()
+		        
 		    );
 		}
 		@Override
@@ -1425,6 +1428,26 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		        c.getContractorId(),
 		        c.getUnitId()
 		    );
+		}
+		@Override
+		public void saveWorkorderLLWC(CMSWorkorderLLWC llwc) {
+		    String sql = "INSERT INTO CMSWORKORDER_LLWC(WONUMBER, LICENSE_NUMBER, LICENSE_TYPE)VALUES (?, ?, ?)";
+		    jdbcTemplate.update(sql,llwc.getWorkorderNumber(),llwc.getLicenseNumber(),llwc.getLicenseType());
+		}
+
+		@Override
+		public void updateWorkorderLLWC(CMSWorkorderLLWC llwc) {
+
+		    String sql = "UPDATE CMSWORKORDER_LLWC SET LICENSE_NUMBER = ? WHERE WONUMBER = ? AND LICENSE_TYPE = ?";
+		    jdbcTemplate.update(sql,llwc.getLicenseNumber(),llwc.getWorkorderNumber(),llwc.getLicenseType());
+		}
+
+		@Override
+		public boolean llwcExists(String workOrderNumber, String licenseType) {
+
+		    String sql = "SELECT COUNT(1)FROM CMSWORKORDER_LLWC WHERE WONUMBER = ? AND LICENSE_TYPE = ?";
+		    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,workOrderNumber,licenseType);
+		    return count != null && count > 0;
 		}
 
 	}

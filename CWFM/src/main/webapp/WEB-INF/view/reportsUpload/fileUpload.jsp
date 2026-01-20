@@ -402,8 +402,9 @@ background-color: #DDF3FF; /* Light green for the table header */
        <button onclick="uploadTemplateFile()" class="btn btn-default process-footer-button-cancel ng-binding"style="float:right;margin:3px;margin-right: 6px;">Save</button>
         <h2 style="color: darkcyan;font-size: 1rem;">Template Data</h2> 
         </div>
+        <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
     <div id="viewTableContainer">
-    <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
+    <!-- <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div> -->
     <table id="viewtable" border="1" style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr id="tableHeaderRow">

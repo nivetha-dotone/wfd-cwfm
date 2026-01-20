@@ -7,6 +7,7 @@ import java.util.List;
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
+import com.wfd.dot1.cwfm.pojo.CMSWorkorderLLWC;
 import com.wfd.dot1.cwfm.pojo.CMSWorkorderLN;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -145,8 +146,14 @@ public interface FileUploadDao {
 
 	void updatecsc(CMSSubContractor csc);
 
-	boolean wcExists(Long contractorId, Long unitId, String wcCode);
+	boolean wcExists(Long contractorId, Long unitId, String wcCode,String licenceType);
 
 	void updatewc(CmsContractorWC wc);
+
+	void saveWorkorderLLWC(CMSWorkorderLLWC llwc);
+
+	void updateWorkorderLLWC(CMSWorkorderLLWC llwc);
+
+	boolean llwcExists(String workOrderNumber, String licenseType);
 
 }

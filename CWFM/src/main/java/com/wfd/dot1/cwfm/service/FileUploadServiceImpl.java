@@ -39,6 +39,7 @@ import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.enums.GatePassStatus;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
+import com.wfd.dot1.cwfm.pojo.CMSWorkorderLLWC;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.Contractor;
@@ -868,18 +869,99 @@ public class FileUploadServiceImpl implements FileUploadService {
                 }
                 
                 // Step 5: Save WC
-                CmsContractorWC wc = new CmsContractorWC();
+                CmsContractorWC wc =null;
+                
+                if (llNumber != null && !llNumber.isBlank()) {
+                 wc = new CmsContractorWC();
                 wc.setContractorId(String.valueOf(contractorId));
                 wc.setUnitId(String.valueOf(unitId));
-                wc.setWcCode(wcCode);
-                wc.setWcFromDtm(wcFrom);
-                wc.setWcToDtm(wcTo);
+                wc.setWcCode(llNumber);
+                wc.setWcFromDtm(toSqlDateString(llFromDate));
+                wc.setWcToDtm(toSqlDateString(llToDate));
                 wc.setWcTotal(wcTotal != null ? wcTotal : 0);
-                if (fileUploadDao.wcExists(contractorId, unitId,wcCode)) {
+                wc.setLicenceType("LL");
+                if (fileUploadDao.wcExists(contractorId, unitId,wcCode,"LL")) {
                     fileUploadDao.updatewc(wc);
                 } else {
                     fileUploadDao.savewc(wc);
                 }
+                }
+                
+                if (esic != null && !esic.isBlank()) {
+                     wc = new CmsContractorWC();
+                    wc.setContractorId(String.valueOf(contractorId));
+                    wc.setUnitId(String.valueOf(unitId));
+                    wc.setWcCode(esic);
+                    wc.setWcFromDtm(toSqlDateString(esicFromDate));
+                    wc.setWcToDtm("3000-01-01");
+                    wc.setWcTotal(wcTotal != null ? wcTotal : 0);
+                    wc.setLicenceType("ESIC");
+                    if (fileUploadDao.wcExists(contractorId, unitId,wcCode,"ESIC")) {
+                        fileUploadDao.updatewc(wc);
+                    } else {
+                        fileUploadDao.savewc(wc);
+                    }
+                    }
+                
+                if (wcCode != null && !wcCode.isBlank()) {
+                     wc = new CmsContractorWC();
+                    wc.setContractorId(String.valueOf(contractorId));
+                    wc.setUnitId(String.valueOf(unitId));
+                    wc.setWcCode(wcCode);
+                    wc.setWcFromDtm(wcFrom);
+                    wc.setWcToDtm(wcTo);
+                    wc.setWcTotal(wcTotal != null ? wcTotal : 0);
+                    wc.setLicenceType("WC");
+                    if (fileUploadDao.wcExists(contractorId, unitId,wcCode,"WC")) {
+                        fileUploadDao.updatewc(wc);
+                    } else {
+                        fileUploadDao.savewc(wc);
+                    }
+                    }
+             // Step 6: Save CMSWORKORDER_LL_WC
+
+             // LL
+             if (llNumber != null && !llNumber.isBlank()) {
+                 CMSWorkorderLLWC llwc = new CMSWorkorderLLWC();
+                 llwc.setWorkorderNumber(workOrder);
+                 llwc.setLicenseNumber(llNumber);
+                 llwc.setLicenseType("LL");
+
+                 if (fileUploadDao.llwcExists(workOrder, "LL")) {
+                     fileUploadDao.updateWorkorderLLWC(llwc);
+                 } else {
+                     fileUploadDao.saveWorkorderLLWC(llwc);
+                 }
+             }
+
+             // ESIC
+             if (esic != null && !esic.isBlank()) {
+                 CMSWorkorderLLWC llwc = new CMSWorkorderLLWC();
+                 llwc.setWorkorderNumber(workOrder);
+                 llwc.setLicenseNumber(esic);
+                 llwc.setLicenseType("ESIC");
+
+                 if (fileUploadDao.llwcExists(workOrder, "ESIC")) {
+                     fileUploadDao.updateWorkorderLLWC(llwc);
+                 } else {
+                     fileUploadDao.saveWorkorderLLWC(llwc);
+                 }
+             }
+
+             // WC
+             if (wcCode != null && !wcCode.isBlank()) {
+                 CMSWorkorderLLWC llwc = new CMSWorkorderLLWC();
+                 llwc.setWorkorderNumber(workOrder);
+                 llwc.setLicenseNumber(wcCode);
+                 llwc.setLicenseType("WC");
+
+                 if (fileUploadDao.llwcExists(workOrder, "WC")) {
+                     fileUploadDao.updateWorkorderLLWC(llwc);
+                 } else {
+                     fileUploadDao.saveWorkorderLLWC(llwc);
+                 }
+             }
+
                 ContListForOrgEntry.add(contractor);
 
                 Map<String, Object> map = new HashMap<>();
@@ -988,6 +1070,13 @@ public class FileUploadServiceImpl implements FileUploadService {
             return null;
         }
     }
+    private String toSqlDateString(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return new java.text.SimpleDateFormat("yyyy-MM-dd").format(date);
+    }
+
     private Integer parseIntegerSafe(String value) {
         if (value == null || value.trim().isEmpty()) {
             return null; // or 0 if business allows
@@ -1174,7 +1263,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             "maritalStatus", "technical", "accommodation", "accountNumber", "emergencyNumber",
             "accessArea", "unitCode", "EICNumber", "ECnumber", "emergencyName","idMark"
         );
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        //DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         while ((line = reader.readLine()) != null) {
             rowNum++;
             line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
@@ -1200,18 +1289,18 @@ public class FileUploadServiceImpl implements FileUploadService {
             }
            
             // Validate Date Format
-               String[] dateFields = { fields[3], fields[11], fields[25], fields[26] }; // DOB, DOJ, PoliceVerificationDate, HealthCheckDate
-               String[] dateFieldNames = { "dateOfBirth", "doj", "policeVerificationDate", "healthCheckDate" };
-
-               for (int i = 0; i < dateFields.length; i++) {
-                   if (!dateFields[i].isBlank()) {
-                       try {
-                           LocalDate.parse(dateFields[i], dateFormatter);
-                       } catch (DateTimeParseException e) {
-                           fieldErrors.put(dateFieldNames[i], "Invalid date format, expected yyyy-MM-dd");
-                       }
-                   }
-               }
+//               String[] dateFields = { fields[3], fields[11], fields[25], fields[26] }; // DOB, DOJ, PoliceVerificationDate, HealthCheckDate
+//               String[] dateFieldNames = { "dateOfBirth", "doj", "policeVerificationDate", "healthCheckDate" };
+//
+//               for (int i = 0; i < dateFields.length; i++) {
+//                   if (!dateFields[i].isBlank()) {
+//                       try {
+//                           LocalDate.parse(dateFields[i], dateFormatter);
+//                       } catch (DateTimeParseException e) {
+//                           fieldErrors.put(dateFieldNames[i], "Invalid date format, expected yyyy-MM-dd");
+//                       }
+//                   }
+//               }
 
             // Lookups
             Integer unitId = fileUploadDao.getUnitIdByName(fields[29]);
@@ -1374,7 +1463,7 @@ public class FileUploadServiceImpl implements FileUploadService {
        //     "maritalStatus", "technical", "accommodation", "accountNumber", "emergencyNumber",
        //     "accessArea", "unitCode", "EICNumber", "ECnumber", "emergencyName","idMark"
       //  );
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        //DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         while ((line = reader.readLine()) != null) {
             rowNum++;
             line = line.replaceAll("[\\x00-\\x1F\\x7F]", "");
@@ -1405,19 +1494,19 @@ public class FileUploadServiceImpl implements FileUploadService {
           //  }
            
             // Validate Date Format
-            String[] dateValues = { fields[3], fields[11], fields[25], fields[26] }; // actual values
-            String[] dateFieldNames = { "dateOfBirth", "doj", "policeVerificationDate", "healthCheckDate" };
-
-            for (int i = 0; i < dateValues.length; i++) {
-                String value = dateValues[i];
-                if (!value.isBlank()) {
-                    try {
-                        LocalDate parsed = LocalDate.parse(value, dateFormatter);
-                    } catch (DateTimeException e) {
-                        fieldErrors.put(dateFieldNames[i], "Invalid date format, expected yyyy-MM-dd");
-                    }
-                }
-            }
+//            String[] dateValues = { fields[3], fields[11], fields[25], fields[26] }; // actual values
+//            String[] dateFieldNames = { "dateOfBirth", "doj", "policeVerificationDate", "healthCheckDate" };
+//
+//            for (int i = 0; i < dateValues.length; i++) {
+//                String value = dateValues[i];
+//                if (!value.isBlank()) {
+//                    try {
+//                        LocalDate parsed = LocalDate.parse(value, dateFormatter);
+//                    } catch (DateTimeException e) {
+//                        fieldErrors.put(dateFieldNames[i], "Invalid date format, expected yyyy-MM-dd");
+//                    }
+//                }
+//            }
 
 
             // Lookups
@@ -1698,7 +1787,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 	        if (!logAndCheck("ORGLEVELDEF", orgLevelDefId > 0)) {
 	            return false;
 	        }
-
+	        
 	        boolean saved = fileUploadDao.SaveContOrglevelEntry(list, orgLevelDefId);
 
 	        if (!logAndCheck("ORGLEVELENTRY", saved)) {
