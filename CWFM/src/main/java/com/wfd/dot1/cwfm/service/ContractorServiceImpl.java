@@ -465,4 +465,9 @@ public class ContractorServiceImpl implements ContractorService{
 
         return allDocs;
     }
+	@Override
+	public Contractor getAllContractorProfileDetailForReg(String unitId, String contractorId) {
+		
+		return contrDao.getAllContractorProfileDetailForReg(unitId,contractorId);
+	}
 }

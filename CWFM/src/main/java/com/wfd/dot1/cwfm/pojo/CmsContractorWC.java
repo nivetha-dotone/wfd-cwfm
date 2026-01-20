@@ -142,6 +142,14 @@ public class CmsContractorWC {
 	public void setWcTotal(int wcTotal) {
 		this.wcTotal = wcTotal;
 	}
+	private int activeWorkmenCount;
 	
+	public int getActiveWorkmenCount() {
+		return activeWorkmenCount;
+	}
+
+	public void setActiveWorkmenCount(int activeCount) {
+		this.activeWorkmenCount = activeCount;
+	}
 	
 }
