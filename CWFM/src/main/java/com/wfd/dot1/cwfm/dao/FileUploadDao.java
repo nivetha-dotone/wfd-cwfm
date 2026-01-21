@@ -154,6 +154,6 @@ public interface FileUploadDao {
 
 	void updateWorkorderLLWC(CMSWorkorderLLWC llwc);
 
-	boolean llwcExists(String workOrderNumber, String licenseType);
+	boolean llwcExists(String workOrderNumber, String licenseType, String license);
 
 }

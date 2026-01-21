@@ -1403,14 +1403,15 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		@Override
 		public void updatewc(CmsContractorWC wc) {
 		    jdbcTemplate.update(
-		        "UPDATE CMSCONTRACTOR_WC SET WC_CODE=?, WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0,LICENCE_TYPE=? WHERE CONTRACTORID=? AND UNITID=?",
-		        wc.getWcCode(),
+		        "UPDATE CMSCONTRACTOR_WC SET  WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0 WHERE CONTRACTORID=? AND UNITID=? AND WC_CODE=? AND LICENCE_TYPE=?",
+		        
 		        wc.getWcFromDtm(),
 		        wc.getWcToDtm(),
 		        wc.getWcTotal(),
-		        wc.getLicenceType(),
 		        wc.getContractorId(),
-		        wc.getUnitId()
+		        wc.getUnitId(),
+		        wc.getWcCode(),
+		        wc.getLicenceType()
 		        
 		    );
 		}
@@ -1443,10 +1444,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		}
 
 		@Override
-		public boolean llwcExists(String workOrderNumber, String licenseType) {
+		public boolean llwcExists(String workOrderNumber, String licenseType,String license) {
 
-		    String sql = "SELECT COUNT(1)FROM CMSWORKORDER_LLWC WHERE WONUMBER = ? AND LICENSE_TYPE = ?";
-		    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,workOrderNumber,licenseType);
+		    String sql = "SELECT COUNT(1)FROM CMSWORKORDER_LLWC WHERE WONUMBER = ? AND LICENSE_TYPE = ? and LICENSE_NUMBER=?";
+		    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,workOrderNumber,licenseType,license);
 		    return count != null && count > 0;
 		}
 

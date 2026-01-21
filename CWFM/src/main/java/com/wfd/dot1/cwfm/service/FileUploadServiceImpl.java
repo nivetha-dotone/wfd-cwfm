@@ -880,7 +880,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 wc.setWcToDtm(toSqlDateString(llToDate));
                 wc.setWcTotal(wcTotal != null ? wcTotal : 0);
                 wc.setLicenceType("LL");
-                if (fileUploadDao.wcExists(contractorId, unitId,wcCode,"LL")) {
+                if (fileUploadDao.wcExists(contractorId, unitId,llNumber,"LL")) {
                     fileUploadDao.updatewc(wc);
                 } else {
                     fileUploadDao.savewc(wc);
@@ -896,7 +896,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                     wc.setWcToDtm("3000-01-01");
                     wc.setWcTotal(wcTotal != null ? wcTotal : 0);
                     wc.setLicenceType("ESIC");
-                    if (fileUploadDao.wcExists(contractorId, unitId,wcCode,"ESIC")) {
+                    if (fileUploadDao.wcExists(contractorId, unitId,esic,"ESIC")) {
                         fileUploadDao.updatewc(wc);
                     } else {
                         fileUploadDao.savewc(wc);
@@ -927,7 +927,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                  llwc.setLicenseNumber(llNumber);
                  llwc.setLicenseType("LL");
 
-                 if (fileUploadDao.llwcExists(workOrder, "LL")) {
+                 if (fileUploadDao.llwcExists(workOrder,"LL",llNumber)) {
                      fileUploadDao.updateWorkorderLLWC(llwc);
                  } else {
                      fileUploadDao.saveWorkorderLLWC(llwc);
@@ -941,7 +941,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                  llwc.setLicenseNumber(esic);
                  llwc.setLicenseType("ESIC");
 
-                 if (fileUploadDao.llwcExists(workOrder, "ESIC")) {
+                 if (fileUploadDao.llwcExists(workOrder,"ESIC",esic)) {
                      fileUploadDao.updateWorkorderLLWC(llwc);
                  } else {
                      fileUploadDao.saveWorkorderLLWC(llwc);
@@ -955,7 +955,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                  llwc.setLicenseNumber(wcCode);
                  llwc.setLicenseType("WC");
 
-                 if (fileUploadDao.llwcExists(workOrder, "WC")) {
+                 if (fileUploadDao.llwcExists(workOrder,"WC",wcCode)) {
                      fileUploadDao.updateWorkorderLLWC(llwc);
                  } else {
                      fileUploadDao.saveWorkorderLLWC(llwc);
