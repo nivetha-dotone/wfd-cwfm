@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -205,47 +206,49 @@ public class WorkmenServiceImpl implements WorkmenService{
 			
 		}
 	}
-	public String licenseExistsAndCount(GatePassMain gatePassMain, int activeCount) {
-
-	    String unit = gatePassMain.getPrincipalEmployer();
-	    String contractor = gatePassMain.getContractor();
-	    String workorder = gatePassMain.getWorkorder();
-
-	    int llCount = workmenDao.licenseExistsAndCount(unit, contractor, workorder, "LL", gatePassMain.getLlNo());
-	    int wcCount = workmenDao.licenseExistsAndCount(unit, contractor, workorder, "WC", gatePassMain.getWcEsicNo());
-
-	    // --- Step 1: Mandatory validation ---
-	    boolean llMandatory = (llCount == 0);
-	    boolean wcMandatory = (wcCount == 0);
-
-	    if (llMandatory || wcMandatory) {
-	        if (llMandatory && wcMandatory) {
-	            return "LL and WC/ESIC are mandatory";
-	        }
-	        if (llMandatory) {
-	            return "LL is mandatory";
-	        }
-	        // wcMandatory must be true here
-	        return "WC/ESIC is mandatory";
-	    }
-
-	    // --- Step 2: Capacity check ---
-	    boolean llExceeded = activeCount >= llCount;
-	    boolean wcExceeded = activeCount >= wcCount;
-
-	    if (llExceeded || wcExceeded) {
-	        if (llExceeded && wcExceeded) {
-	            return "LL and WC exceeded";
-	        }
-	        if (llExceeded) {
-	            return "LL exceeded";
-	        }
-	        return "WC exceeded";
-	    }
-
-	    // --- Step 3: All good ---
-	    return "allow";
-	}
+//	public String licenseExistsAndCount(GatePassMain gatePassMain, int activeCount) {
+//
+//	    String unit = gatePassMain.getPrincipalEmployer();
+//	    String contractor = gatePassMain.getContractor();
+//	    String workorder = gatePassMain.getWorkorder();
+//	    
+//	    
+//
+//	    Map<String, Object> llResult =workmenDao.licenseExistsAndCount(unit, contractor, workorder, "LL", gatePassMain.getLlNo());
+//	    Map<String, Object> wcResult = workmenDao.licenseExistsAndCount(unit, contractor, workorder, "WC", gatePassMain.getWcEsicNo());
+//
+//	    // --- Step 1: Mandatory validation ---
+//	    boolean llMandatory = (llCount == 0);
+//	    boolean wcMandatory = (wcCount == 0);
+//
+//	    if (llMandatory || wcMandatory) {
+//	        if (llMandatory && wcMandatory) {
+//	            return "LL and WC/ESIC are mandatory";
+//	        }
+//	        if (llMandatory) {
+//	            return "LL is mandatory";
+//	        }
+//	        // wcMandatory must be true here
+//	        return "WC/ESIC is mandatory";
+//	    }
+//
+//	    // --- Step 2: Capacity check ---
+//	    boolean llExceeded = activeCount >= llCount;
+//	    boolean wcExceeded = activeCount >= wcCount;
+//
+//	    if (llExceeded || wcExceeded) {
+//	        if (llExceeded && wcExceeded) {
+//	            return "LL and WC exceeded";
+//	        }
+//	        if (llExceeded) {
+//	            return "LL exceeded";
+//	        }
+//	        return "WC exceeded";
+//	    }
+//
+//	    // --- Step 3: All good ---
+//	    return "allow";
+//	}
 
 	@Override
 	public List<GatePassListingDto> getGatePassListingDetails(String unitId,String deptId,String userId,String gatePassTypeId,String type) {
@@ -1195,6 +1198,70 @@ public class WorkmenServiceImpl implements WorkmenService{
 		}
 		return transactionId;
 	}
+	
+	public String licenseExistsAndCount(GatePassMain gatePassMain, int activeCount) {
+
+	    String unit = gatePassMain.getPrincipalEmployer();
+	    String contractor = gatePassMain.getContractor();
+	    String workorder = gatePassMain.getWorkorder();
+
+	    Map<String, Object> llResult =
+	            workmenDao.licenseExistsAndCount(unit, contractor, workorder, "LL", gatePassMain.getLlNo());
+
+	    Map<String, Object> wcResult =
+	            workmenDao.licenseExistsAndCount(unit, contractor, workorder, "WC", gatePassMain.getWcEsicNo());
+
+	    boolean llExists = (Boolean) llResult.get("exists");
+	    int llCount = (Integer) llResult.get("count");
+	    Date llExpiry = (Date) llResult.get("expiryDate");
+
+	    boolean wcExists = (Boolean) wcResult.get("exists");
+	    int wcCount = (Integer) wcResult.get("count");
+	    Date wcExpiry = (Date) wcResult.get("expiryDate");
+
+	    Date today = new Date();
+
+	    // ---------- WC Mandatory Logic ----------
+	    boolean wcMandatory =
+	            !wcExists ||
+	            (wcExpiry != null && wcExpiry.before(today)) ||
+	            (wcExpiry != null && !wcExpiry.before(today) && wcCount == 0);
+
+	    // ---------- LL Mandatory Logic ----------
+	    boolean llMandatory =
+	            (llExists && (
+	                (llExpiry != null && llExpiry.before(today)) ||
+	                (llExpiry != null && !llExpiry.before(today) && llCount == 0)
+	            ));
+
+	    // ---------- Mandatory Validation ----------
+	    if (llMandatory || wcMandatory) {
+	        if (llMandatory && wcMandatory) {
+	            return "LL and WC/ESIC are mandatory";
+	        }
+	        if (llMandatory) {
+	            return "LL is mandatory";
+	        }
+	        return "WC/ESIC is mandatory";
+	    }
+
+	    // ---------- Capacity Validation ----------
+	    boolean llExceeded = llExists && activeCount >= llCount;
+	    boolean wcExceeded = wcExists && activeCount >= wcCount;
+
+	    if (llExceeded || wcExceeded) {
+	        if (llExceeded && wcExceeded) {
+	            return "LL and WC exceeded";
+	        }
+	        if (llExceeded) {
+	            return "LL exceeded";
+	        }
+	        return "WC exceeded";
+	    }
+
+	    return "allow";
+	}
+
 	
 	}
 

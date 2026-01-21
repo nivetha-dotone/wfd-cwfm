@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -2962,7 +2962,7 @@ public int getActiveWorkmenCount(String unitId,String contractorId,String gatePa
 	
 	
 	int activeCount = 0;
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorId,unitId,gatePassType);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId);
 	if(rs.next()) {
 		activeCount = rs.getInt("ActiveEmployeeCount");
 	}
@@ -3033,31 +3033,78 @@ public String getLLlicenseExistsAndCount() {
 public String getWCESIClicenseExistsAndCount() {
 	return QueryFileWatcher.getQuery("GET_WC_ESIC_LICENSE_EXISTS_COUNT");
 }
+//@Override
+//public int licenseExistsAndCount(String unitId,String contractorId,String workorderId,String licenseType,String licenseId) {
+//	String query=null;
+//	if(licenseType.equals("LL")) {
+//		 query = getLLlicenseExistsAndCount() ;
+//		
+//	}else {
+//		 query = getWCESIClicenseExistsAndCount() ;
+//	}
+//	int licenseCount=0;
+//	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId,licenseId);
+//	if(rs.next()) {
+//		licenseCount = rs.getInt("WC_TOTAL");
+//	}
+//	return licenseCount;
+//}
+
 @Override
-public int licenseExistsAndCount(String unitId,String contractorId,String workorderId,String licenseType,String licenseId) {
-	String query=null;
-	if(licenseType.equals("LL")) {
-		 query = getLLlicenseExistsAndCount() ;
-		//query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
-		//		+ "  from CMSCONTRACTOR_WC ccwc \r\n"
-		//		+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
-		//		+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
-		//		+ "  and ccwc.LICENCE_TYPE='LL' and ccwc.WCID=? ";
-	}else {
-		 query = getWCESIClicenseExistsAndCount() ;
-	// query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
-	//		+ "  from CMSCONTRACTOR_WC ccwc \r\n"
-	//		+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
-	//		+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
-	//		+ "  and ccwc.LICENCE_TYPE in ('WC','ESIC')  and ccwc.WCID=? ";
-	}
-	int licenseCount=0;
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId,licenseId);
-	if(rs.next()) {
-		licenseCount = rs.getInt("WC_TOTAL");
-	}
-	return licenseCount;
+public Map<String, Object> licenseExistsAndCount(
+        String unitId,
+        String contractorId,
+        String workorderId,
+        String licenseType,
+        String licenseId) {
+	  String query = null;
+	  if(licenseType.equals("LL")) {
+			 query = getLLlicenseExistsAndCount() ;
+			
+		}else {
+			 query = getWCESIClicenseExistsAndCount() ;
+		}
+    Map<String, Object> result = new HashMap<>();
+
+    // ---------- IMPORTANT: Handle LL not mapped ----------
+    if ("LL".equals(licenseType) &&
+        (licenseId == null || licenseId.trim().isEmpty())) {
+
+        result.put("exists", false);
+        result.put("count", 0);
+        result.put("expiryDate", null);
+        return result;
+    }
+
+  
+
+    SqlRowSet rs = jdbcTemplate.queryForRowSet(
+            query,
+           
+            unitId,
+            contractorId,
+            workorderId,
+            licenseId
+    );
+
+    boolean exists = false;
+    int count = 0;
+    Date expiryDate = null;
+
+    if (rs.next()) {
+        exists = rs.getInt("LICENSE_EXISTS") == 1;
+        count = rs.getInt("WC_TOTAL");
+        expiryDate = rs.getDate("WC_TO_DTM");
+    }
+
+    result.put("exists", exists);
+    result.put("count", count);
+    result.put("expiryDate", expiryDate);
+
+    return result;
 }
+
+
 public String selectMaxVesionFromGatepass() {
 	return QueryFileWatcher.getQuery("GET_MAX_VERSION_DOCS_FROM_GATEPASS");
 }

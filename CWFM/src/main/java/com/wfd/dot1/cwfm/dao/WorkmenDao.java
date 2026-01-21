@@ -197,7 +197,7 @@ public interface WorkmenDao {
 
 	int getLLDeploymentCountByUnitId(String unitId);
 
-	int licenseExistsAndCount(String unitId, String contractorId, String workorderId, String licenseType,
+	Map<String, Object> licenseExistsAndCount(String unitId, String contractorId, String workorderId, String licenseType,
 			String licenseId);
 
 	public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String unitId, String deptId, String userId,

@@ -1062,7 +1062,7 @@ label {
                             
                                 <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
                                 </td>
-                                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                                 <th><label class="custom-label"><spring:message code="label.labourLicenseNumber"/></label></th>
                             <td><select class="custom-select" id="ll" name="llId" >
                                 <option value="">Please select Labor License Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
