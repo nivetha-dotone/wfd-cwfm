@@ -156,4 +156,13 @@ public interface FileUploadDao {
 
 	boolean llwcExists(String workOrderNumber, String licenseType, String license);
 
+	boolean isLicenseMappedToOtherContractor(Long contractorId,String licenseNumber,String licenseType);
+
+	boolean codeExistsInOrgLevelEntry(String contractorCode,long orgLevelDefId);
+
+	boolean codeExistsInOrgLevelEntry(List<Contractor> list, long orgLevelDefId);
+
+	boolean workorderExists(String workOrder, String contractorCode, String plantCode, String item, String lines, String lineNumber);
+
+	void updateWorkorderToStaging(KTCWorkorderStaging staging);
 }

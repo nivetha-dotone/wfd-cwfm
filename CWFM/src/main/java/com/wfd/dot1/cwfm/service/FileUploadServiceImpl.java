@@ -199,12 +199,27 @@ public class FileUploadServiceImpl implements FileUploadService {
                 continue;
             }
 
+//            for (int i = 0; i < fieldNames.length; i++) {
+//                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
+//                    fieldErrors.put(fieldNames[i], "is mandatory");
+//                }
+//            }
             for (int i = 0; i < fieldNames.length; i++) {
-                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
-                    fieldErrors.put(fieldNames[i], "is mandatory");
+                String fieldName = fieldNames[i];
+                String value = fields[i];
+
+                if (mandatoryFields.contains(fieldName) && value.isBlank()) {
+                    fieldErrors.put(fieldName, "is mandatory");
+                    continue;
+                }
+
+                // 🔴 Reject special characters
+                if ((fieldName.equals("trade") || fieldName.equals("skill"))
+                        && !value.isBlank()
+                        && !isValidAlphaNumeric(value)) {
+                    fieldErrors.put(fieldName, "invalid value (enter valid value)");
                 }
             }
-
             if (!fieldErrors.isEmpty()) {
                 errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
@@ -302,8 +317,19 @@ public class FileUploadServiceImpl implements FileUploadService {
             }
 
             for (int i = 0; i < fieldNames.length; i++) {
-                if (mandatoryFields.contains(fieldNames[i]) && fields[i].isBlank()) {
-                    fieldErrors.put(fieldNames[i], "is mandatory");
+                String fieldName = fieldNames[i];
+                String value = fields[i];
+
+                if (mandatoryFields.contains(fieldName) && value.isBlank()) {
+                    fieldErrors.put(fieldName, "is mandatory");
+                    continue;
+                }
+
+                // 🔴 Reject special characters
+                if ((fieldName.equals("department") || fieldName.equals("subDepartment"))
+                        && !value.isBlank()
+                        && !isValidAlphaNumeric(value)) {
+                    fieldErrors.put(fieldName, "invalid value (enter valid value)");
                 }
             }
 
@@ -396,7 +422,10 @@ public class FileUploadServiceImpl implements FileUploadService {
         result.put("errorData", errorData);
         return result;
     }
-
+    
+    private boolean isValidAlphaNumeric(String value) {
+        return value != null && value.matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 &\\-/]+$");
+    }
 
     private Map<String, Object> processGeneralMaster(BufferedReader reader) throws IOException {
     	 List<Map<String, Object>> successData = new ArrayList<>();
@@ -689,28 +718,42 @@ public class FileUploadServiceImpl implements FileUploadService {
             Date llToDate   = parseDateStrict(fields[13], "licenseValidTo", fieldErrors);
             Date pfApplyDate = parseDateStrict(fields[23], "pfApplyDt", fieldErrors);
             Date esicFromDate = parseDateStrict(fields[20], "esiValidFrom", fieldErrors);
+            Date wcFromDate = parseDateStrict(fields[16], "wcFromDtm", fieldErrors);
+            Date wcToDate = parseDateStrict(fields[17], "wcToDtm", fieldErrors);
             String esic = fields[19];
             String wcCode = fields[15];
-            String wcFrom = fields[16];
-            String wcTo = fields[17];
             Integer wcTotal = parseIntegerSafe(fields[18]);
             String llNumber = fields[11];
             Integer coverageVal = parseIntegerSafe(fields[14]);
             Integer totalStrength = parseIntegerSafe(fields[9]);
             Integer maxNoEmp = parseIntegerSafe(fields[10]);
-              // 1️⃣ Either ESIC or ECWC mandatory
+            
+            //1.plant exists are not
+            Long unitId = fileUploadDao.getUnitIdByPlantCodeAndOrg(plantCode, organization);
+            if (unitId == null) {
+            	fieldErrors.put("plantCode" ,"Not found for plantCode and organization ");
+            	fieldErrors.put("organization" ,"Not found for plantCode and organization ");
+            }
+            Long existsContractorId = fileUploadDao.getContractorIdByCode(contractorCode);
+            
+            //2 Work order exists check
+            boolean activeWorkorderExists =fileUploadDao.hasActiveWorkorder(unitId, existsContractorId,workOrder);
+            if (!activeWorkorderExists) {
+            	fieldErrors.put("workOrder" ,"No active workorder exists for this contractor");
+          }
+
+              // 3 Either ESIC or ECWC mandatory
             if ((esic == null || esic.isBlank()) && (wcCode == null || wcCode.isBlank())) {
                 fieldErrors.put("esiwc", "Either ESIC or EC/WC is mandatory");
                 fieldErrors.put("wcCode", "Either ESIC or EC/WC is mandatory");
             }
-         // 2️⃣ ESIC VALIDATIONS
+         // 4 ESIC VALIDATIONS
             if (esic != null && !esic.isBlank()) {
 
                 // ESIC From Date → mandatory + past date
                 if (fields[20] == null || fields[20].isBlank()) {
                     fieldErrors.put("esiValidFrom", "ESIC From Date is mandatory");
                 } else {
-                    esicFromDate = parseDateQuiet(fields[20]);
                     if (esicFromDate == null) {
                         fieldErrors.put("esiValidFrom", "Invalid date format. Expected yyyy-MM-dd");
                     } else if (!isPastDate(esicFromDate)) {
@@ -718,39 +761,31 @@ public class FileUploadServiceImpl implements FileUploadService {
                     }
                 }
             }
-             //  3️⃣ ECWC validations
+             //  5 ECWC validations
             if (wcCode != null && !wcCode.isBlank()) {
 
-                if (wcFrom == null || wcFrom.isBlank()) {
-                    fieldErrors.put("wcFromDtm", "WC From Date is mandatory");
-                } else if (!isValidDate(wcFrom)) {
-                    fieldErrors.put("wcFromDtm", "WC From Date is invalid");
+                if (fields[16] == null || fields[16].isBlank()) {
+                    fieldErrors.put("wcFromDtm", "WC From Date is mandatory when WC Code is provided");
                 }
+               else if (!isPastDate(wcFromDate)) {
+                   fieldErrors.put("wcFromDtm", "WC From Date must be a past date");
+               }
 
-                if (wcTo == null || wcTo.isBlank()) {
-                    fieldErrors.put("wcToDtm", "WC To Date is mandatory");
-                } else if (!isValidDate(wcTo)) {
-                    fieldErrors.put("wcToDtm", "WC To Date is invalid");
-                }
-
-                Date wcFromDate = parseDateStrict(wcFrom, "wcFromDtm", fieldErrors);
-                Date wcToDate = parseDateStrict(wcTo, "wcToDtm", fieldErrors);
-
-                if (wcFromDate != null && !isPastDate(wcFromDate)) {
-                    fieldErrors.put("wcFromDtm", "WC From Date must be a past date");
-                }
-
-                if (wcToDate != null && !isFutureDate(wcToDate)) {
+                if (fields[17] == null || fields[17].isBlank()) {
+                    fieldErrors.put("wcToDtm", "WC To Date is mandatory when WC Code is provided");
+                } 
+                else if (!isFutureDate(wcToDate)) {
                     fieldErrors.put("wcToDtm", "WC To Date must be greater than today");
                 }
-                // 4️⃣ wcTotal > 0 
+
+                //  wcTotal > 0 
                 if (wcTotal == null) {
         	        fieldErrors.put("wcTotal"," Coverage is mandatory when WC Code is provided");
         	    } else if  (wcTotal <= 0) {
                     fieldErrors.put("wcTotal", "Coverage must be greater than 0 when WC Code is present");
                 }
             }
-             //  5️⃣ License validations
+             //  6 License validations
             if (llNumber != null && !llNumber.isBlank()) {
 
             	if (fields[12] == null || fields[12].isBlank()) {
@@ -765,7 +800,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                     fieldErrors.put("licenseValidTo","License Valid To date must be greater than today");
                     }
 
-              //   6️⃣ Coverage > 0 
+              //    Coverage > 0 
             	  if (coverageVal == null) {
             	        fieldErrors.put("coverage","License Coverage is mandatory when License Number is provided");
             	    } else if (coverageVal <= 0) {
@@ -790,20 +825,6 @@ public class FileUploadServiceImpl implements FileUploadService {
                 fieldErrors.put("maxNoEmp", "Max Number of Workmen must be greater than 0");
             }
 
-            //9 plant code and organization check
-            Long unitId = fileUploadDao.getUnitIdByPlantCodeAndOrg(plantCode, organization);
-            if (unitId == null) {
-            	fieldErrors.put("plantCode" ,"Not found for plantCode and organization ");
-            	fieldErrors.put("organization" ,"Not found for plantCode and organization ");
-            }
-            Long existsContractorId = fileUploadDao.getContractorIdByCode(contractorCode);
-            
-            //10 Work order exists check
-            boolean activeWorkorderExists =fileUploadDao.hasActiveWorkorder(unitId, existsContractorId,workOrder);
-            if (!activeWorkorderExists) {
-            	fieldErrors.put("workOrder" ,"No active workorder exists for this contractor");
-          }
-            
           //   STOP PROCESSING IF ANY ERROR FOUND
             if (!fieldErrors.isEmpty()) {
                 errorData.add(Map.of("row", rowNum,"fieldErrors", fieldErrors));
@@ -828,7 +849,32 @@ public class FileUploadServiceImpl implements FileUploadService {
                     // INSERT
                 	  contractorId = fileUploadDao.saveContractor(contractor);
                 }
-               
+             //  LICENSE UNIQUENESS VALIDATION — CMSCONTRACTOR_WC ONLY
+
+             // LL
+             if (llNumber != null && !llNumber.isBlank()) {
+                 if (fileUploadDao.isLicenseMappedToOtherContractor(contractorId, llNumber, "LL")) {
+                     
+                	 throw new IllegalArgumentException("LL License number '" + llNumber + "' is already mapped to another contractor");
+                 }
+             }
+
+             // ESIC
+             if (esic != null && !esic.isBlank()) {
+                 if (fileUploadDao.isLicenseMappedToOtherContractor(contractorId, esic, "ESIC")) {
+
+                     throw new IllegalArgumentException("ESIC number '" + esic + "' is already mapped to another contractor");
+                 }
+             }
+
+             // WC
+             if (wcCode != null && !wcCode.isBlank()) {
+                 if (fileUploadDao.isLicenseMappedToOtherContractor(contractorId, wcCode, "WC")) {
+
+                     throw new IllegalArgumentException("WC code '" + wcCode + "' is already mapped to another contractor");
+                 }
+             }
+
                 // Step 3: Save PEMM
                 CMSContrPemm pemm = new CMSContrPemm();
                 pemm.setContractorId(contractorId);
@@ -837,7 +883,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 pemm.setLicenseNumber(llNumber);
                 pemm.setLicenseValidFrom(llFromDate);
                 pemm.setLicenseValidTo(llToDate);
-                pemm.setCoverage(String.valueOf(coverageVal));
+                pemm.setCoverage(coverageVal == null ? "" : String.valueOf(coverageVal));
                 pemm.setTotalStrength(totalStrength);
                 pemm.setMaxNoEmp(maxNoEmp);
                 pemm.setNatureofWork(fields[21]);
@@ -908,8 +954,8 @@ public class FileUploadServiceImpl implements FileUploadService {
                     wc.setContractorId(String.valueOf(contractorId));
                     wc.setUnitId(String.valueOf(unitId));
                     wc.setWcCode(wcCode);
-                    wc.setWcFromDtm(wcFrom);
-                    wc.setWcToDtm(wcTo);
+                    wc.setWcFromDtm(toSqlDateString(wcFromDate));
+                    wc.setWcToDtm(toSqlDateString(wcToDate));
                     wc.setWcTotal(wcTotal != null ? wcTotal : 0);
                     wc.setLicenceType("WC");
                     if (fileUploadDao.wcExists(contractorId, unitId,wcCode,"WC")) {
@@ -977,18 +1023,18 @@ public class FileUploadServiceImpl implements FileUploadService {
                 map.put("totalStrength", pemm.getTotalStrength());
                 map.put("maxNoEmp", pemm.getMaxNoEmp());
                 map.put("licenseNumber", pemm.getLicenseNumber());
-                map.put("licenseValidFrom", pemm.getLicenseValidFrom());
-                map.put("licenseValidTo", pemm.getLicenseValidTo());
+                map.put("licenseValidFrom",toSqlDateString( pemm.getLicenseValidFrom()));
+                map.put("licenseValidTo", toSqlDateString(pemm.getLicenseValidTo()));
                 map.put("coverage", pemm.getCoverage());
                 map.put("wcCode", wc.getWcCode());
                 map.put("wcFromDtm", wc.getWcFromDtm());
                 map.put("wcToDtm", wc.getWcToDtm());
                 map.put("wcTotal", wc.getWcTotal());
                 map.put("esiwc", pemm.getEsiwc());
-                map.put("esiValidFrom", pemm.getEsiValidFrom());
+                map.put("esiValidFrom", toSqlDateString(pemm.getEsiValidFrom()));
                 map.put("natureofWork", pemm.getNatureofWork());
                 map.put("pfNum", pemm.getPfNum());
-                map.put("pfApplyDt", pemm.getPfApplyDt());
+                map.put("pfApplyDt", toSqlDateString(pemm.getPfApplyDt()));
 
                 successData.add(map);
             }  catch (Exception e) {
@@ -1037,17 +1083,17 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
 
-    private boolean isValidDate(String value) {
-        if (value == null || value.isBlank()) return false;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            sdf.setLenient(false);
-            sdf.parse(value.trim());
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//    private boolean isValidDate(String value) {
+//        if (value == null || value.isBlank()) return false;
+//        try {
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//            sdf.setLenient(false);
+//            sdf.parse(value.trim());
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
     private boolean isPastDate(Date inputDate) {
         if (inputDate == null) return false;
 
@@ -1116,9 +1162,9 @@ public class FileUploadServiceImpl implements FileUploadService {
         };
 
         Set<String> mandatoryFields = Set.of(
-            "workOrderNumber", "vendorCode", "vendorName", "vendorAddress",
+            "workOrderNumber", "vendorCode", "vendorName",
             "workOrderValiditiyFrom", "workOrderValiditiyTo",
-            "plantcode", "sectionCode"
+            "plantcode"
         );
 
         //Set<String> numericFields = Set.of("rateUnit", "quantity", "qtyCompleted");
@@ -1163,26 +1209,32 @@ public class FileUploadServiceImpl implements FileUploadService {
                 errorData.add(Map.of("row", rowNum, "fieldErrors", fieldErrors));
                 continue;
             }
-
+            
             try {
-            	 
+            	String plantCode = fields[15];
+                String contractorCode = fields[8];
+                String workOrder = fields[0];
+                String item = fields[1];
+                String lines = fields[2];
+                String lineNumber = fields[3];
+                
                 KTCWorkorderStaging staging = new KTCWorkorderStaging();
-                staging.setWorkOrderNumber(fields[0]);
-                staging.setItem(fields[1]);
-                staging.setLine(fields[2]);
-                staging.setLineNumber(fields[3]);
+                staging.setWorkOrderNumber(workOrder);
+                staging.setItem(item);
+                staging.setLine(lines);
+                staging.setLineNumber(lineNumber);
                 staging.setServiceCode(fields[4]);
                 staging.setShortText(fields[5]);
                 staging.setDeliveryCompletion(fields[6]);
                 staging.setItemChangedON(fields[7]);
-                staging.setVendorCode(fields[8]);
+                staging.setVendorCode(contractorCode);
                 staging.setVendorName(fields[9]);
                 staging.setVendorAddress(fields[10]);
                 staging.setBlockedVendor(fields[11]);
                 staging.setWorkOrderValiditiyFrom(fields[12]);
                 staging.setWorkOrderValiditiyTo(fields[13]);
                 staging.setWorkOrderType(fields[14]);
-                staging.setPlantcode(fields[15]);
+                staging.setPlantcode(plantCode);
                 staging.setSectionCode(fields[16]);
                 staging.setDepartmentCode(fields[17]);
                 staging.setGLCode(fields[18]);
@@ -1201,7 +1253,12 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setPurchaseOrgLevel(fields[31]);
                 staging.setCompanycode(fields[32]);
 
-                fileUploadDao.saveWorkorderToStaging(staging);
+                //fileUploadDao.saveWorkorderToStaging(staging);
+                if (fileUploadDao.workorderExists(workOrder, contractorCode,plantCode,item,lines,lineNumber)) {
+                    fileUploadDao.updateWorkorderToStaging(staging);
+                } else {
+                    fileUploadDao.saveWorkorderToStaging(staging);
+                }
                 
                 KTCWorkorderStaging.add(staging);
                 Map<String, Object> rowMap = new LinkedHashMap<>();
@@ -1261,7 +1318,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             "firstName", "lastName", "relationName", "dateOfBirth", "trade", "skill", "natureOfWork",
             "hazardousArea", "aadhaarNumber", "vendorCode", "gender", "department", "workorderNumber",
             "maritalStatus", "technical", "accommodation", "accountNumber", "emergencyNumber",
-            "accessArea", "unitCode", "EICNumber", "ECnumber", "emergencyName","idMark"
+            "accessArea", "unitCode", "EICNumber", "ECnumber", "emergencyName"
         );
         //DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         while ((line = reader.readLine()) != null) {
@@ -1419,7 +1476,7 @@ public class FileUploadServiceImpl implements FileUploadService {
                 staging.setLLnumber(String.valueOf(llNumber!=null?String.valueOf(llNumber):" "));
                 staging.setAddress(fields[39]);
                 staging.setZone(zoneId!=null?String.valueOf(zoneId):" ");
-                staging.setIdMark(fields[41]);
+                staging.setIdMark(fields[41]==null?"NA":fields[41]);
 
                 fileUploadDao.saveWorkmenBulkUploadToStaging(staging);
 
@@ -1777,30 +1834,31 @@ public class FileUploadServiceImpl implements FileUploadService {
 	@Transactional
 	public boolean InsertContractorOrgLevelEntry(List<Contractor> list) {
 
-		 if (list == null || list.isEmpty()) {
-		        return true; // nothing to insert
-		    }
-		 
+	    if (list == null || list.isEmpty()) {
+	        return true;
+	    }
+
 	    try {
 	        long orgLevelDefId = fileUploadDao.getOrgLevelDefId("contractor");
 
-	        if (!logAndCheck("ORGLEVELDEF", orgLevelDefId > 0)) {
-	            return false;
-	        }
-	        
-	        boolean saved = fileUploadDao.SaveContOrglevelEntry(list, orgLevelDefId);
-
-	        if (!logAndCheck("ORGLEVELENTRY", saved)) {
+	        if (orgLevelDefId <= 0) {
 	            return false;
 	        }
 
-	        return true;
+	        boolean exists = fileUploadDao.codeExistsInOrgLevelEntry(list, orgLevelDefId);
+
+	        if (exists) {
+	            return true; // Data already exists → skip insert
+	        }
+
+	        return fileUploadDao.SaveContOrglevelEntry(list, orgLevelDefId);
 
 	    } catch (Exception e) {
-	        log.error("ORGLEVELENTRY Batch Insert FAILED : " + e.getMessage(), e);
+	        log.error("ORGLEVELENTRY insert failed", e);
 	        return false;
 	    }
 	}
+
 	@Transactional
 	public boolean InsertWorkorderOrgLevelEntry(List<KTCWorkorderStaging> list) {
 
@@ -1871,13 +1929,9 @@ public class FileUploadServiceImpl implements FileUploadService {
 	    }
 	}
 
-
-
-
-
 	private boolean logAndCheck(String label, boolean success) {
 	    log.info(label + " : " + (success ? "SUCCESS" : "FAILED"));
 	    return success;
 	}
+	
    }
-

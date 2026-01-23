@@ -75,7 +75,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (isBlank(record.getLastName())) fieldErrors.put("lastName", "Missing");
 	        if (isBlank(record.getRelationName())) fieldErrors.put("relationName", "Missing");
 	        if (isBlank(record.getAadhaarNumber())) fieldErrors.put("aadhaarNumber", "Missing");
-	        if (isBlank(record.getIdMark())) fieldErrors.put("IdMark", "Missing");
+	        //if (isBlank(record.getIdMark())) fieldErrors.put("IdMark", "Missing");
 	        String aadhaar = record.getAadhaarNumber();
 
 	        if (!isBlank(aadhaar)) {
@@ -120,7 +120,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (!isBlank(record.getMaritalStatus()) && !record.getMaritalStatus().matches("[A-Za-z ]+")) {
             fieldErrors.put("MaritalStatus", "Only alphabets allowed");
         }
-	        if (!isBlank(record.getSkill()) && !record.getSkill().matches("[A-Za-z ]+")) {
+	        if (!isBlank(record.getSkill()) && !record.getSkill().matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 &/\\-]+$")) {
 	            fieldErrors.put("Skill", "Only alphabets allowed");
 	        }
 	        if (!isBlank(record.getNatureOfWork()) && !record.getNatureOfWork().matches("[A-Za-z ]+")) {
@@ -132,13 +132,11 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (!isBlank(record.getAccommodation()) && !record.getAccommodation().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("Accommodation", "Only alphabets allowed");
 	        }
-	        if (!isBlank(record.getAcademic()) && !record.getAcademic().matches("[A-Za-z ]+")) {
-	            fieldErrors.put("Academic", "Only alphabets allowed");
-	        }
-	        if (!isBlank(record.getTechnical()) && !record.getTechnical().matches("[A-Za-z ]+")) {
-	            fieldErrors.put("Technical", "Only alphabets allowed");
-	        }
-	        if (!isBlank(record.getMobileNumber()) && !record.getMobileNumber().matches("^[6-9]\\d{9}$")) {
+	        if (!isBlank(record.getAcademic()) &&!record.getAcademic().matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 &/\\-]+$")) {
+	        	    fieldErrors.put("Academic", "Only alphabets allowed");
+	        }if (!isBlank(record.getTechnical()) &&!record.getTechnical().matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 &/\\-]+$")) {
+	        	    fieldErrors.put("Technical", "Only alphabets allowed");
+	        }if (!isBlank(record.getMobileNumber()) && !record.getMobileNumber().matches("^[6-9]\\d{9}$")) {
 	            fieldErrors.put("MobileNumber", "Must be 10 digits and start with 6-9");
 	        }
 
@@ -230,7 +228,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 		            record.setBloodGroup(String.valueOf(fileUploadDao.getGeneralMasterId(record.getBloodGroup())));
 		            record.setAcademic(String.valueOf(fileUploadDao.getGeneralMasterId(record.getAcademic())));
 		            record.setECnumber(String.valueOf(fileUploadDao.getWCECId(record.getECnumber(),Integer.parseInt(record.getUnitCode()),Integer.parseInt(record.getVendorCode()))));
-		            record.setZone(String.valueOf(fileUploadDao.getGeneralMasterId(record.getZone())));
+		           // record.setZone(String.valueOf(fileUploadDao.getGeneralMasterId(record.getZone())));
 		            record.setGender(String.valueOf(fileUploadDao.getGeneralMasterId(record.getGender())));
 		            record.setEICNumber(String.valueOf(fileUploadDao.geteicId(record.getDepartment(),Integer.parseInt(record.getUnitCode()),record.getEICNumber())));
 		            record.setDepartment(String.valueOf(fileUploadDao.getdepartmentIdByUnitId(Integer.parseInt(record.getUnitCode()),record.getDepartment())));
@@ -316,7 +314,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        	gatePassMain.setAcademic(record.getAcademic());
 	        	gatePassMain.setTechnical(record.getTechnical());
 	        	gatePassMain.setBloodGroup(record.getBloodGroup());
-	        	gatePassMain.setZone(record.getZone()==null?" ":record.getZone());
+	        	gatePassMain.setZone(String.valueOf(record.getZone()!=null?record.getZone():""));
 	        	gatePassMain.setLlNo(record.getLLnumber());
 
 	        	// ---- Documents (default empty) ----

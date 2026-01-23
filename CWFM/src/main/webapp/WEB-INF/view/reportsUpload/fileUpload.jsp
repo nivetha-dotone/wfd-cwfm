@@ -387,7 +387,7 @@ background-color: #DDF3FF; /* Light green for the table header */
     <div onclick="loadCommonList('/data/importExport','Master Data Import')">
    <!--  <a href="#" class="return"  style="color:black;"  onclick="fileUploadTemplateSideBar()" style="margin:5px;">&#8592;</a> -->
 </div>
-<div onclick="loadCommonList('/data/importExport','Master Data Import')">
+<div>
     <a href="#"  class="btn btn-default process-footer-button-cancel ng-binding" style="margin:5px;" onclick="loadCommonList('/data/importExport','Master Data Import')">Return</a>
 </div>
 
