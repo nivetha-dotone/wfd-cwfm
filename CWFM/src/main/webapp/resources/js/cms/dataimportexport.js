@@ -426,6 +426,7 @@ document.getElementById("fileInput").addEventListener("change", function () {
 });
 
 function uploadTemplateFile() {
+	showLoader();
     const templateType = document.getElementById("templateType").value;
 
     // detect manual table data
@@ -476,16 +477,19 @@ function uploadTemplateFile() {
 
         setTimeout(() => messageDiv.style.display = "none", 4000);
         if (result.data?.errorData?.length) {
+			 hideLoader(); 
             renderErrors(result.data.errorData);
             return;
         }
         if (result.data?.successData?.length) {
+			 hideLoader(); 
             renderUploadedData(result.data.successData, templateType);
         }
         closeFileSidebar();
          renderErrors([], null);
     })
     .catch(err => {
+		 hideLoader(); 
         console.error("Network/Server error:", err);
         alert("Server error. Please try again later.");
     });
@@ -974,3 +978,10 @@ document.addEventListener("click", function (e) {
     }
 });
 
+function showLoader() {
+    document.getElementById("loaderOverlay").style.display = "flex";
+}
+
+function hideLoader() {
+    document.getElementById("loaderOverlay").style.display = "none";
+}

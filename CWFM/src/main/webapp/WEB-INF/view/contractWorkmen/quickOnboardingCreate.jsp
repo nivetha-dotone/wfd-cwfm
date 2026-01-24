@@ -1064,7 +1064,7 @@ label {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.uanNumber"/></label></th>
                             <td>
                             <c:if test="${empty GatePassObj.uanNumber }">
-                            	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" inputmode="numeric" pattern="[0-9]*" value="${empty GatePassObj.uanNumber ? '000000000000' : GatePassObj.uanNumber }" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </c:if>
                             
                             <c:if test="${not empty GatePassObj.uanNumber }">
@@ -1098,7 +1098,7 @@ label {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             <c:if test="${empty GatePassObj.pfNumber }">
-                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${empty GatePassObj.pfNumber ? 'New Joinee' : GatePassObj.pfNumber}" />
                             </c:if>
                             
                             <c:if test="${not empty GatePassObj.pfNumber }">
