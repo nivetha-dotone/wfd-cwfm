@@ -694,15 +694,19 @@ function validateEmploymentInformation(){
 	const esicNumber = $("#esicNumber").val().trim();
 
 	if (licenceType === "ESIC") {
-	    if (esicNumber === "") {
-	       showEsic();
-	        isValid = false;
-	    } else {
-	        $("#error-esicNumber").hide();
-	    }
-	} else {
-	    $("#error-esicNumber").hide();
-	}
+    showEsic();
+
+    if (!esicNumber || esicNumber.trim() === "") {
+        $("#error-esicNumber").show();
+        isValid = false;
+    } else {
+        $("#error-esicNumber").hide(); // ✅ hides properly
+    }
+
+} else {
+    $("#error-esicNumber").hide(); // ✅ hides properly
+}
+
 
 	const doj = $("#doj").val().trim();
     if (doj === "") {
@@ -3689,8 +3693,9 @@ function showEsic() {
     document.getElementById("esicNumber").required = true;
     document.getElementById("esicNumberSection").style.display = "";
     document.getElementById("esicRequiredStar").style.display = "";
-	document.getElementById("error-esicNumber").style.display = "";
-	$("#error-esicNumber").show();
+	//document.getElementById("error-esicNumber").style.display = "";
+	//$("#error-esicNumber").show();
+	
 }
 
 function hideEsic() {
