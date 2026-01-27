@@ -1144,10 +1144,10 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		return QueryFileWatcher.getQuery("GET_VALIDITY_OF_WO_WC");
 	}
 	@Override
-	 public Map<String, LocalDate> getValidityDates(String workOrderId, String wcId) {
+	 public Map<String, LocalDate> getValidityDates(String workOrderId, String wcId,String llNo) {
 		 Map<String, LocalDate> validityDates = new HashMap<>();
 		 String query = getValidityOfWoWc();
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(query,workOrderId,wcId);
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(query,workOrderId,wcId,llNo);
 		 while(rs.next()) {
 			 LocalDate validTill = rs.getDate("validTill").toLocalDate();
              String source = rs.getString("source");
@@ -3496,5 +3496,30 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String 
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
 }
+
+@Override
+public GatePassMain getActiveCountDetails(String transactionId) {
+	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
+	GatePassMain dto = null;
+	String query = "SELECT gpm.UnitId,gpm.ContractorId,gpm.WorkorderId,\r\n"
+			+ " gpm.WcEsicNo,gpm.LLNo\r\n"
+			+ " FROM GATEPASSMAIN gpm \r\n"
+			+ " where  gpm.TransactionId=?";
+	log.info("Query to getIndividualContractWorkmenDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
+	if(rs.next()) {
+		dto = new GatePassMain();
+		dto.setTransactionId(transactionId);
+		dto.setPrincipalEmployer(rs.getString("UnitId"));
+		dto.setContractor(rs.getString("ContractorId"));
+		dto.setWorkorder(rs.getString("WorkorderId"));
+		dto.setWcEsicNo(rs.getString("WcEsicNo"));
+		dto.setLlNo(rs.getString("LLNo"));
+	}
+	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
+	return dto;
+}
+
+
 
 }

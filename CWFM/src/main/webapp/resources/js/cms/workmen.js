@@ -1038,7 +1038,15 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
                 }else{
 					loadCommonList('/contractworkmen/projectOnboardingList', 'Project Gatepass List');
 				}
-        } else {
+        }			else if (xhr.status === 400) {  
+							       const msg = xhr.responseText.trim();
+							       console.error("Server validation failed: " + msg);
+								   showLicenseError(msg);
+							       //alert(msg); // or show in UI better
+							       //sessionStorage.setItem("errorMessage", msg);
+								   return;
+							   } 
+		else {
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
 			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");

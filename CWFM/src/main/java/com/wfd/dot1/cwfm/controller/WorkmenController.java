@@ -661,6 +661,9 @@ public class WorkmenController {
          try {
         	 result = workmenService.approveRejectGatePass(dto);
          	if(null!=result) {
+         		if (result.contains("mandatory") || result.contains("exceeded")) {
+                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+                }
          		return new ResponseEntity<>(result,HttpStatus.OK);
          	}
          	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -2666,6 +2669,9 @@ public class WorkmenController {
     	}
     }
     
+    public String getVerhoeffConfig() {
+		return QueryFileWatcher.getQuery("VERHOEFF_CONFIG");
+	}
     @RequestMapping(value = "/checkAadharExistsCreation", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, String> checkAadharExistsCreation(
@@ -2676,11 +2682,14 @@ public class WorkmenController {
         String status = workmenService.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
 if (status.contains("Unique")) {
 	
+	String config = this.getVerhoeffConfig();
+	if("yes".equalsIgnoreCase(config)) {
 	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
 	  if(!valid)
 	  { 
 		  status = "Invalid"; 
 		  }
+	}
 	 
 }
         Map<String, String> result = new HashMap<>();

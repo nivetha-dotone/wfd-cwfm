@@ -88,7 +88,7 @@ public interface WorkmenDao {
 
 	public int getDOTTYpe(String principalEmployer);
 
-	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId);
+	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId, String llNo);
 
 	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId);
 
@@ -212,5 +212,8 @@ public interface WorkmenDao {
 	public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId) ;
 
 	GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId);
+
+	GatePassMain getActiveCountDetails(String transactionId);
+
 
 }

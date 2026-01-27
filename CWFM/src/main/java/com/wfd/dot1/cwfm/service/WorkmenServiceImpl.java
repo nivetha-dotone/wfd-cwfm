@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -275,6 +276,15 @@ public class WorkmenServiceImpl implements WorkmenService{
 	@Override
 	@Transactional
 	public String approveRejectGatePass(ApproveRejectGatePassDto dto) {
+		
+		if((dto.getGatePassType().equals(GatePassType.CREATE.getStatus()) || dto.getGatePassType().equals(GatePassType.RENEW.getStatus()) ) 
+				&& dto.getStatus().equals(GatePassStatus.APPROVED.getStatus())) {
+			 GatePassMain gatePassMain = workmenDao.getActiveCountDetails(dto.getTransactionId());
+			String allowOnboarding = this.workmenCountCheck(gatePassMain);
+			if(!"allow".equals(allowOnboarding)) {
+				return allowOnboarding;
+			}
+		}
 
 	    // Load GatePassMain based on type (CREATE vs others)
 	    GatePassMain gpm =( dto.getGatePassType().equals(GatePassType.CREATE.getStatus()) || dto.getGatePassType().equals(GatePassType.PROJECT.getStatus()))
@@ -648,53 +658,73 @@ public class WorkmenServiceImpl implements WorkmenService{
 		// TODO Auto-generated method stub
 		return workmenDao.getWorkmenDetailBasedOnId(gatePassId);
 	}
-	
-	private String getDOT(GatePassMain gatePassMain) {
-		String dot=null;
-		int dotTypeId = gatePassMain.getDotType();
-		 Map<String, LocalDate>  validityDates = workmenDao.getValidityDates(gatePassMain.getWorkorder(), gatePassMain.getWcEsicNo());
-	        
-		int retirementAge = 60; // Define the retirement age
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dateOfBirth = LocalDate.parse(gatePassMain.getDateOfBirth(), formatter);
-        LocalDate retirementDate = dateOfBirth.plusYears(retirementAge);
-        LocalDate woDate = validityDates.get("WO");
-        LocalDate wcDate = validityDates.get("WC");
-        
-		if(dotTypeId == DotType.LLWCWO.getStatus()) {
-			
-		}else if(dotTypeId == DotType.LLWC.getStatus()) {
-			
-		}else if(dotTypeId == DotType.LLWO.getStatus()) {
-			
-		}else if(dotTypeId == DotType.WCWO.getStatus()) {
-			List<LocalDate> dates = Arrays.asList(retirementDate, woDate, wcDate);
-	        LocalDate earliestDate = dates.stream()
-	             .filter(date -> date != null) 
-	             .min(LocalDate::compareTo)    
-	             .orElse(null); 
-	         dot = earliestDate != null ? earliestDate.format(formatter) : "No valid date available";
-
-		}else if(dotTypeId == DotType.LL.getStatus()) {
-			
-		}else if(dotTypeId == DotType.WC.getStatus()) {
-			List<LocalDate> dates = Arrays.asList(retirementDate, wcDate);
-	        LocalDate earliestDate = dates.stream()
-	             .filter(date -> date != null) 
-	             .min(LocalDate::compareTo)    
-	             .orElse(null);
-	        dot = earliestDate != null ? earliestDate.format(formatter) : "No valid date available";
-		}else if(dotTypeId == DotType.WO.getStatus()) {
-			List<LocalDate> dates = Arrays.asList(retirementDate, woDate);
-	        LocalDate earliestDate = dates.stream()
-	             .filter(date -> date != null) 
-	             .min(LocalDate::compareTo)    
-	             .orElse(null); 
-	        dot = earliestDate != null ? earliestDate.format(formatter) : "No valid date available";
-		}
-		
-		return dot;
+	private String getEarliestDate(List<LocalDate> dates, DateTimeFormatter formatter) {
+	    return dates.stream()
+	            .filter(Objects::nonNull)   // 🔑 LL null? silently ignored
+	            .min(LocalDate::compareTo)
+	            .map(d -> d.format(formatter))
+	            .orElse("No valid date available");
 	}
+
+	private String getDOT(GatePassMain gatePassMain) {
+
+	    String dot = null;
+	    int dotTypeId = gatePassMain.getDotType();
+
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	    // ---------------- Retirement handling ----------------
+	    if (dotTypeId == DotType.RETIRE.getStatus()) {
+	        int retirementAge = 60;
+	        LocalDate dob = LocalDate.parse(gatePassMain.getDateOfBirth(), formatter);
+	        return dob.plusYears(retirementAge).format(formatter);
+	    }
+
+	    // ---------------- Fetch validity dates ----------------
+	    Map<String, LocalDate> validityDates =
+	            workmenDao.getValidityDates(
+	                    gatePassMain.getWorkorder(),
+	                    gatePassMain.getWcEsicNo(),
+	                    gatePassMain.getLlNo()   // may be null
+	            );
+
+	    LocalDate woDate = validityDates.get("WO");
+	    LocalDate wcDate = validityDates.get("WC");
+	    LocalDate llDate = validityDates.get("LL"); // may be null
+
+	    // ---------------- DOT calculation ----------------
+	    if (dotTypeId == DotType.LLWCWO.getStatus()) {
+
+	        dot = getEarliestDate(Arrays.asList(woDate, wcDate, llDate), formatter);
+
+	    } else if (dotTypeId == DotType.LLWC.getStatus()) {
+
+	        dot = getEarliestDate(Arrays.asList(wcDate, llDate), formatter);
+
+	    } else if (dotTypeId == DotType.LLWO.getStatus()) {
+
+	        dot = getEarliestDate(Arrays.asList(woDate, llDate), formatter);
+
+	    } else if (dotTypeId == DotType.WCWO.getStatus()) {
+
+	        dot = getEarliestDate(Arrays.asList(woDate, wcDate), formatter);
+
+	    } else if (dotTypeId == DotType.LL.getStatus()) {
+
+	        dot = getEarliestDate(Collections.singletonList(llDate), formatter);
+
+	    } else if (dotTypeId == DotType.WC.getStatus()) {
+
+	        dot = getEarliestDate(Collections.singletonList(wcDate), formatter);
+
+	    } else if (dotTypeId == DotType.WO.getStatus()) {
+
+	        dot = getEarliestDate(Collections.singletonList(woDate), formatter);
+	    }
+
+	    return dot;
+	}
+
 	@Override
 	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId) {
 		// TODO Auto-generated method stub

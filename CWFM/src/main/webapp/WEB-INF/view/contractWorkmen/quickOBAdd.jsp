@@ -731,6 +731,7 @@ label {
     </td>
 </tr> -->
 <tr>
+ <input id="gatePassType" name="gatePassType" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="regular" readonly>
 	<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.transactionId"/></label></th>
     <td>
     	
