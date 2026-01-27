@@ -870,7 +870,7 @@ textarea {
                             </td>
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.wcPolicyesicRegNumber"/></label></th>
                             <td><input id="wcEsicNo" name="wcEsicNo" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.wcEsicNo }" readonly> </td>
-                       		<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                       		<th><label class="custom-label"><spring:message code="label.labourLicenseNumber"/></label></th>
                             <td><input id="llNo" name="llNo" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.llNo }" readonly> </td>
                       
                         </tr>
