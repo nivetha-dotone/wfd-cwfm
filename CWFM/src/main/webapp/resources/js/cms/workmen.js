@@ -690,14 +690,14 @@ function validateEmploymentInformation(){
 	}
     
 	const selectedOption = $("#wc").find(":selected");
-	const licenceType = selectedOption.data("licencetype");
+	//const licenceType = selectedOption.data("licencetype");
+	const licenceType = selectedOption.attr("data-code");
 	const esicNumber = $("#esicNumber").val().trim();
 
 	if (licenceType === "ESIC") {
-    showEsic();
-
-    if (!esicNumber || esicNumber.trim() === "") {
-        $("#error-esicNumber").show();
+showEsic();
+    if ( esicNumber === "") {
+        $("#error-esicNumber").text("ESIC Number is required").show();
         isValid = false;
     } else {
         $("#error-esicNumber").hide(); // ✅ hides properly
@@ -3702,7 +3702,7 @@ function showEsic() {
     document.getElementById("esicNumberSection").style.display = "";
     document.getElementById("esicRequiredStar").style.display = "";
 	//document.getElementById("error-esicNumber").style.display = "";
-	//$("#error-esicNumber").show();
+	$("#error-esicNumber").hide();
 	
 }
 
