@@ -3080,7 +3080,7 @@ public Map<String, Object> licenseExistsAndCount(
 
     SqlRowSet rs = jdbcTemplate.queryForRowSet(
             query,
-           
+            licenseType,
             unitId,
             contractorId,
             workorderId,
