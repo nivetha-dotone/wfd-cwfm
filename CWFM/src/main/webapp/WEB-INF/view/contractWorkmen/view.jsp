@@ -719,7 +719,7 @@ textarea {
     			<button id="approveButton"  type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('4','regular')">Approve</button>
    				 <button id="rejectButton" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="approveRejectGatePass('5','regular')">Reject</button>
 			<% } %>
-            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="loadCommonList('/contractworkmen/list', 'Quick On-Bording List');">Cancel</button>
+            <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="goBackToonboardingList();">Cancel</button>
         </div> 
     </div>
 

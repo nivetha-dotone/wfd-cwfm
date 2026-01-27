@@ -3502,7 +3502,7 @@ public GatePassMain getActiveCountDetails(String transactionId) {
 	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
 	GatePassMain dto = null;
 	String query = "SELECT gpm.UnitId,gpm.ContractorId,gpm.WorkorderId,\r\n"
-			+ " gpm.WcEsicNo,gpm.LLNo\r\n"
+			+ " gpm.WcEsicNo,gpm.LLNo,gpm.EsicNumber\r\n"
 			+ " FROM GATEPASSMAIN gpm \r\n"
 			+ " where  gpm.TransactionId=?";
 	log.info("Query to getIndividualContractWorkmenDetails "+query);
@@ -3515,6 +3515,7 @@ public GatePassMain getActiveCountDetails(String transactionId) {
 		dto.setWorkorder(rs.getString("WorkorderId"));
 		dto.setWcEsicNo(rs.getString("WcEsicNo"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setEsicNumber(rs.getString("EsicNumber"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 	return dto;

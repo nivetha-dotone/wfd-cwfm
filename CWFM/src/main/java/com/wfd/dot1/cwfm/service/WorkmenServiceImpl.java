@@ -1235,38 +1235,74 @@ public class WorkmenServiceImpl implements WorkmenService{
 	    String contractor = gatePassMain.getContractor();
 	    String workorder = gatePassMain.getWorkorder();
 
+	    // ---------- Fetch Results ----------
 	    Map<String, Object> llResult =
 	            workmenDao.licenseExistsAndCount(unit, contractor, workorder, "LL", gatePassMain.getLlNo());
 
 	    Map<String, Object> wcResult =
 	            workmenDao.licenseExistsAndCount(unit, contractor, workorder, "WC", gatePassMain.getWcEsicNo());
 
+	    Map<String, Object> esicResult = null;
+	    boolean hasEsic =
+	            gatePassMain.getEsicNumber() != null &&
+	            !gatePassMain.getEsicNumber().trim().isEmpty() &&
+	            !"NULL".equalsIgnoreCase(gatePassMain.getEsicNumber().trim());
+
+
+	    if (hasEsic) {
+	        esicResult =
+	                workmenDao.licenseExistsAndCount(unit, contractor, workorder, "ESIC", gatePassMain.getWcEsicNo());
+	    }
+
+	    // ---------- Extract LL ----------
 	    boolean llExists = (Boolean) llResult.get("exists");
 	    int llCount = (Integer) llResult.get("count");
 	    Date llExpiry = (Date) llResult.get("expiryDate");
 
+	    // ---------- Extract WC ----------
 	    boolean wcExists = (Boolean) wcResult.get("exists");
 	    int wcCount = (Integer) wcResult.get("count");
 	    Date wcExpiry = (Date) wcResult.get("expiryDate");
 
+	    // ---------- Extract ESIC ----------
+	    boolean esicExists = false;
+	    int esicCount = 0;
+	    Date esicExpiry = null;
+
+	    if (hasEsic && esicResult != null) {
+	        esicExists = (Boolean) esicResult.get("exists");
+	        esicCount = (Integer) esicResult.get("count");
+	        esicExpiry = (Date) esicResult.get("expiryDate");
+	    }
+
 	    Date today = new Date();
 
-	    // ---------- WC Mandatory Logic ----------
-	    boolean wcMandatory =
+	    // ---------- LL Mandatory ----------
+	    boolean llMandatory =
+	            llExists &&
+	            (
+	                (llExpiry != null && llExpiry.before(today)) ||
+	                (llExpiry != null && !llExpiry.before(today) && llCount == 0)
+	            );
+
+	    // ---------- WC / ESIC Mandatory (either one is enough) ----------
+	    boolean wcInvalid =
 	            !wcExists ||
 	            (wcExpiry != null && wcExpiry.before(today)) ||
 	            (wcExpiry != null && !wcExpiry.before(today) && wcCount == 0);
 
-	    // ---------- LL Mandatory Logic ----------
-	    boolean llMandatory =
-	            (llExists && (
-	                (llExpiry != null && llExpiry.before(today)) ||
-	                (llExpiry != null && !llExpiry.before(today) && llCount == 0)
-	            ));
+	    boolean esicInvalid = hasEsic &&
+	            (
+	                !esicExists ||
+	                (esicExpiry != null && esicExpiry.before(today)) ||
+	                (esicExpiry != null && !esicExpiry.before(today) && esicCount == 0)
+	            );
+
+	    boolean wcEsicMandatory = wcInvalid && esicInvalid;
 
 	    // ---------- Mandatory Validation ----------
-	    if (llMandatory || wcMandatory) {
-	        if (llMandatory && wcMandatory) {
+	    if (llMandatory || wcEsicMandatory) {
+	        if (llMandatory && wcEsicMandatory) {
 	            return "LL and WC/ESIC are mandatory";
 	        }
 	        if (llMandatory) {
@@ -1277,16 +1313,23 @@ public class WorkmenServiceImpl implements WorkmenService{
 
 	    // ---------- Capacity Validation ----------
 	    boolean llExceeded = llExists && activeCount >= llCount;
-	    boolean wcExceeded = wcExists && activeCount >= wcCount;
 
-	    if (llExceeded || wcExceeded) {
-	        if (llExceeded && wcExceeded) {
-	            return "LL and WC exceeded";
+	    boolean wcExceeded =
+	            wcExists && activeCount >= wcCount;
+
+	    boolean esicExceeded =
+	            hasEsic && esicExists && activeCount >= esicCount;
+
+	    boolean wcEsicExceeded = wcExceeded && (!hasEsic || esicExceeded);
+
+	    if (llExceeded || wcEsicExceeded) {
+	        if (llExceeded && wcEsicExceeded) {
+	            return "LL and WC/ESIC exceeded";
 	        }
 	        if (llExceeded) {
 	            return "LL exceeded";
 	        }
-	        return "WC exceeded";
+	        return "WC/ESIC exceeded";
 	    }
 
 	    return "allow";
