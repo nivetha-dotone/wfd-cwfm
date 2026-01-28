@@ -1437,7 +1437,8 @@ label {
             margin-bottom:10px;"></div>
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
-                   <tr>
+                    
+                     <tr>
                    
                       <td>
   <!-- Label -->
@@ -1452,15 +1453,22 @@ label {
 
   <!-- File & Camera Side by Side -->
   <div style="display: flex; align-items: center;">
-    <!--  Choose File -->
-    <input type="file" id="imageFile" name="imageFile" accept="image/*"
-           onchange="previewImage(event,'imageFile','imageFileName')"
-           style="overflow: hidden;"/>
+      <input type="file"
+       id="imageFile"
+       name="imageFile"
+       accept="image/*"
+       onchange="previewImage(event,'imageFile','imageFileName')" />
 
-     
-    <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
-      Use Camera
-    </button>
+<input type="file"
+       id="mobileCameraInput"
+       accept="image/*"
+       capture="environment"
+       style="display:none"
+class="btn btn-default" 
+       onchange="previewImage(event,'mobileCameraInput','imageFileName')" />
+
+<button type="button" class="btn btn-default"  onclick="openCamera()">Use Camera</button>
+  
   </div>
 
   <!-- File Name Display -->
@@ -1483,7 +1491,9 @@ label {
 </td> 
                   
                    
-					</tr><tr>	
+					</tr>
+					
+                  <tr>	
                 		<td>
                 		 	<label for="aadharFile"><span class="required-field">*</span><spring:message code="label.uploadAadharCard"/></label>
        					 	<input type="file" id="aadharFile" name="aadharFile" accept="application/pdf" onchange="displayFileName1('aadharFile', 'aadharFileName')">

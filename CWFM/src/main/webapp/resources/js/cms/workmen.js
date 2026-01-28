@@ -1042,7 +1042,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 							       const msg = xhr.responseText.trim();
 							       console.error("Server validation failed: " + msg);
 								   showLicenseError(msg);
-							       //alert(msg); // or show in UI better
+							       //alertap(msg); // or show in UI better
 							       //sessionStorage.setItem("errorMessage", msg);
 								   return;
 							   } 
@@ -2928,7 +2928,15 @@ if(isValid){
            console.log("Data saved successfully:", xhr.responseText);
 		   sessionStorage.setItem("successMessage", "Gatepass renew request approved/rejected successfully!");
          loadCommonList('/contractworkmen/renewFilter', 'Renew List');
-       } else {
+       } 		 else if (xhr.status === 400) {  
+		 							       const msg = xhr.responseText.trim();
+		 							       console.error("Server validation failed: " + msg);
+		 								   showLicenseError(msg);
+		 							       //alert(msg); // or show in UI better
+		 							       //sessionStorage.setItem("errorMessage", msg);
+		 								   return;
+		 							   }
+	   else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
 		   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass renew request!");
@@ -3183,78 +3191,117 @@ function validatePfForm11Requirement() {
     return true;
 }
 
-let streams;
 
-  function previewImages(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.getElementById("preview");
-        img.src = e.target.result;
-        img.style.display = "block";
-      };
-      reader.readAsDataURL(file);
 
-      // ✅ Show file name
-      document.getElementById("fileNameDisplay").textContent = file.name;
+  
+  
+
+
+let cameraStream = null;
+
+function previewImage(event, inputId, fileNameSpanId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById("preview");
+    const fileNameSpan = document.getElementById(fileNameSpanId);
+
+    preview.innerHTML = "";
+    fileNameSpan.textContent = "";
+
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    fileNameSpan.textContent = file.name;
+
+    if (inputId === "mobileCameraInput") {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("imageFile").files = dt.files;
     }
-  }
 
-  function openCamera() {
+    if (!file.type.startsWith("image/")) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.maxWidth = "100%";
+        img.style.maxHeight = "100%";
+        preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+}
+
+function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function openCamera() {
+
+    if (isMobileDevice()) {
+        document.getElementById("mobileCameraInput").click();
+        return;
+    }
+
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(s => {
-        streams = s;
-        const video = document.getElementById("webcam");
-        video.srcObject = streams;
-        video.style.display = "block";
-        document.getElementById("cameraButtons").style.display = "flex";
-        //document.getElementById("cameraButtons").style.gap = "5px";
-      })
-      .catch(err => {
-        alert("Camera access denied.");
-        console.error(err);
-      });
-  }
+        .then(stream => {
+            cameraStream = stream;
+            const video = document.getElementById("webcam");
+            video.srcObject = stream;
 
-  function captureImage() {
+            video.onloadedmetadata = () => {   
+                video.play();
+                video.style.display = "block";
+                document.getElementById("cameraButtons").style.display = "block";
+            };
+        })
+        .catch(() => {
+            alert("Camera not available or permission denied");
+        });
+}
+function captureImage() {
     const video = document.getElementById("webcam");
     const canvas = document.getElementById("canvas");
-    const previewDiv = document.getElementById("preview");
+
+    if (video.videoWidth === 0) {
+        alert("Camera still loading... Try again.");
+        return;
+    }
+
+    const ctx = canvas.getContext("2d");
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    canvas.toBlob(function(blob) {
-        // Create a File object with a dummy name
-        const file = new File([blob], "captured_profile.png", { type: "image/png" });
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Set this file into a hidden input (or use FormData later)
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        document.getElementById("imageFile").files = dataTransfer.files;
+    canvas.toBlob(blob => {
+        const file = new File([blob], "camera-image.jpg", { type: "image/jpeg" });
 
-        // Preview image
-        const imageUrl = URL.createObjectURL(blob);
-        previewDiv.innerHTML = `<img src="${imageUrl}" alt="Captured Image" style="max-width: 100%; max-height: 100%;">`;
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("imageFile").files = dt.files;
 
-        // Show filename under preview
-        document.getElementById("imageFileName").textContent = file.name;
+        previewImage(
+            { target: document.getElementById("imageFile") },
+            "imageFile",
+            "imageFileName"
+        );
 
         closeCamera();
-    }, "image/png");
+    }, "image/jpeg", 0.95);
+}
+
+function closeCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    document.getElementById("webcam").style.display = "none";
+    document.getElementById("cameraButtons").style.display = "none";
 }
 
 
 
-  function closeCamera() {
-    if (streams) {
-      streams.getTracks().forEach(track => track.stop());
-    }
-    document.getElementById("webcam").style.display = "none";
-    document.getElementById("cameraButtons").style.display = "none";
-  }
   
   function goBackToonboardingList() {
     	 loadCommonList('/contractworkmen/list', 'On-Boarding List');

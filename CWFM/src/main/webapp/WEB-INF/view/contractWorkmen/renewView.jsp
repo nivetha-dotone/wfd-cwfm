@@ -428,6 +428,14 @@ textarea {
     <table cellspacing="0" cellpadding="0">
         <tbody>
        
+                   <div id="licenseError" style="display:none;
+            background:#f8d7da;
+            color:#842029;
+            padding:10px;
+            border-radius:6px;
+            border:1px solid #f5c2c7;
+            margin-bottom:10px;"></div>
+       
             <tr>
             
             <th>
