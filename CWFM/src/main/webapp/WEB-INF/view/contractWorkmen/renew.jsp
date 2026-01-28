@@ -883,7 +883,7 @@ label {
                       <!-- <label id="error-pfApplicable"style="color: red;display: none;">Please check pfApplicable</label> -->
                      </td>
                         </tr>
-                        <tr>
+                        <%-- <tr>
                             <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.pfNumber }" readonly>
@@ -892,8 +892,8 @@ label {
                             <td>
                             	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
                             	</td>
-                        </tr>
-                        <tr>
+                        </tr> --%>
+                       <%--  <tr>
                             <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
                             
                             <td>
@@ -901,7 +901,7 @@ label {
                <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
                disabled />
     </td>
-                        </tr>
+                        </tr> --%>
                     </tbody>
                 </table>
             </div>

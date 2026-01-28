@@ -3887,3 +3887,48 @@ function searchGatePassReportBasedOnPE() {
 							  	 
 							  	return isValid;
 							  }	
+function aadharValidation(){
+	let aadharCheckPassed = false;
+	    const aadharNumber = $("#aadharNumber").val().trim();
+
+		//const transactionId=$("#transactionId").val().trim();
+	    if (aadharNumber === "" || aadharNumber.length !== 12 || isNaN(aadharNumber)) {
+
+	        $("#error-aadhar").show();
+	        isValid = false;
+	    }else{
+			 // $("#error-aadhar").hide();
+			 $.ajax({
+			 				     url: "/CWFM/contractworkmen/checkAadharExistsCreation",
+			 				     type: "GET",
+			 				     data: {
+			 				         aadharNumber: aadharNumber,
+			 				         gatePassId: $("#gatePassId").val(),        // NULL for draft
+			 				         transactionId: $("#transactionId").val()   // always present for draft/renewal
+			 				     },
+			 				     async: false,
+			 				     success: function (response) {
+
+			 						let status = response.status ? response.status.trim() : '';
+			 						if (status !== "Unique" && status !== "Invalid" && status !== "") {
+			 						    $("#error-aadhar").text("Aadhaar already exists").show();
+			 						    aadharCheckPassed = false;
+			 						} else if (status === "Invalid") {
+			 						    $("#error-aadhar").text("Invalid Aadhar Number").show();
+			 						    aadharCheckPassed = false;
+			 						} else {
+			 						    $("#error-aadhar").hide();
+			 						    aadharCheckPassed = true;
+			 						}
+
+			 				     },
+			 				     error: function () {
+			 				         $("#error-aadhar").text("Unable to verify Aadhaar").show();
+			 				         aadharCheckPassed = false;
+			 				     }
+			 				 });
+
+
+			     }
+				 return aadharCheckPassed;
+}

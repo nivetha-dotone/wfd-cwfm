@@ -745,12 +745,35 @@ label {
             <tr>
     <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.aadharNumber"/></label></th>
     <td>
-    <c:if test="${empty GatePassObj.aadhaarNumber }">
-    	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')" size="30" maxlength="12" autocomplete="off">
-    </c:if>
-     <c:if test="${not empty GatePassObj.aadhaarNumber }">
-    	<input id="aadharNumber" name="aadharNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" value="${GatePassObj.aadhaarNumber }" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-    </c:if>
+   <c:if test="${empty GatePassObj.aadhaarNumber}">
+    <input id="aadharNumber"
+           name="aadharNumber"
+           style="width: 100%;height: 20px;"
+           type="text"
+           inputmode="numeric"
+           pattern="[0-9]*"
+           maxlength="12"
+           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+           onblur="aadharValidation()"
+           size="30"
+           autocomplete="off">
+</c:if>
+
+<c:if test="${not empty GatePassObj.aadhaarNumber}">
+    <input id="aadharNumber"
+           name="aadharNumber"
+           style="width: 100%;height: 20px;"
+           type="text"
+           size="30"
+           maxlength="12"
+           value="${GatePassObj.aadhaarNumber}"
+           autocomplete="off"
+           inputmode="numeric"
+           pattern="[0-9]*"
+           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+           onblur="aadharValidation()">
+</c:if>
+
     	    <div style="text-align: right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.aadharNumberRegax"/></span>
     </div>
