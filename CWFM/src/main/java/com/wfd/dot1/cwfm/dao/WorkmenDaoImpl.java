@@ -1933,6 +1933,8 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 			dto.setGatePassType("Cancel");
 		}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 			dto.setGatePassType("Lost/Damage");
+		}else if(gatePassType.equals(GatePassType.RENEW.getStatus())) {
+			dto.setGatePassType("Renew");
 		}
 		String status =rs.getString("GatePassStatus");
 		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -3504,9 +3506,15 @@ public GatePassMain getActiveCountDetails(String transactionId) {
 	String query = "SELECT gpm.UnitId,gpm.ContractorId,gpm.WorkorderId,\r\n"
 			+ " gpm.WcEsicNo,gpm.LLNo,gpm.EsicNumber\r\n"
 			+ " FROM GATEPASSMAIN gpm \r\n"
-			+ " where  gpm.TransactionId=?";
+			+ " where  gpm.TransactionId=?"
+			+ " union "
+			+ " SELECT gpm.UnitId,gpm.ContractorId,gpm.WorkorderId,"
+			+ "	gpm.WcEsicNo,gpm.LLNo,gpm.EsicNumber"
+			+ "	FROM GATEPASSMAIN gpm "
+			+ " join GatePassTransactionMapping gptm on gptm.GatePassId = gpm.GatePassId"
+			+ " where gptm.TransactionId=? and gptm.GatePassTypeId='2' ";
 	log.info("Query to getIndividualContractWorkmenDetails "+query);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId,transactionId);
 	if(rs.next()) {
 		dto = new GatePassMain();
 		dto.setTransactionId(transactionId);
