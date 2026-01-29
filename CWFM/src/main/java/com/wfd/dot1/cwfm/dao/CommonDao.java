@@ -82,4 +82,5 @@ public interface  CommonDao {
 					void deleteOrgLevel(List<Long> orgLevelDefIds);
 					List<OrgLevel> getAllOrgLevels();
 					List<CmsGeneralMaster> getImportOptionsByRole(String roleId);
+					String getGMID(Long gmtypeId, String gmName);
 }

@@ -1,15 +1,17 @@
 package com.wfd.dot1.cwfm.service;
 
-import com.wfd.dot1.cwfm.dto.EmployeeRequestDTO;
-import com.wfd.dot1.cwfm.dto.GatePassToOnBoard;
-import com.wfd.dot1.cwfm.dto.SkillProLevelDateDTO;
-import com.wfd.dot1.cwfm.dto.UpdateEmployeeRequestDTO;
-import com.wfd.dot1.cwfm.pojo.GatePassMain;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.wfd.dot1.cwfm.dto.EmployeeRequestDTO;
+import com.wfd.dot1.cwfm.dto.GatePassToOnBoard;
+import com.wfd.dot1.cwfm.dto.PostSkillWfd;
+import com.wfd.dot1.cwfm.dto.SkillProLevelDateDTO;
+import com.wfd.dot1.cwfm.dto.UpdateEmployeeRequestDTO;
+import com.wfd.dot1.cwfm.pojo.GatePassMain;
 
 
 @Service
@@ -1243,7 +1245,25 @@ public class EmployeeMapper  {
     }
 
 
+    public String postSkillTowfd(Integer gmId){
+        try{
+            PostSkillWfd skills = gatePassToOnBoardService.createSkills(gmId);
 
+            if(skills!=null){
+
+                String skillsInWFD = wfdEmployeeService.createSkillsInWFD(skills);
+                return skillsInWFD;
+
+
+            }else{
+                return "Skill is not present";
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }

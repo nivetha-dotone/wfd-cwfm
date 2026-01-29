@@ -330,7 +330,11 @@ public class ContractorDaoImpl implements ContractorDao{
 		   while(rs.next()) {
 			   contreg.setModuleId(rs.getString("GMID"));
 		   }
-		contreg.setActionId(GatePassType.CONTRACTORRENEWAL.getStatus());
+		   if( "Create".equalsIgnoreCase(contreg.getRequestType())) {
+			   contreg.setActionId(GatePassType.CONTRACTOREGISTRATION.getStatus());
+		   }else {
+			   contreg.setActionId(GatePassType.CONTRACTORRENEWAL.getStatus());
+		   }
 		Object[] parameters = new Object[] {
 			    contreg.getContractorregId(),
 			    contreg.getContractorId(),

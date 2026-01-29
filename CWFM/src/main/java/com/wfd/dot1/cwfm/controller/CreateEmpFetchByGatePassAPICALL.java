@@ -119,6 +119,24 @@ public class CreateEmpFetchByGatePassAPICALL {
     }
 
 
+    @PostMapping("/postSkillInWFD/{gmId}")
+    public ResponseEntity<?> postSkills(@PathVariable Integer gmId){
+        try{
+            String individualOnBoardDetailsByTrnId = employeeMapper.postSkillTowfd(gmId);
+           if(individualOnBoardDetailsByTrnId!=null && individualOnBoardDetailsByTrnId.equals("already in the database")){
+                return  new ResponseEntity<>("already in the database",HttpStatus.BAD_REQUEST);
+            }else if(individualOnBoardDetailsByTrnId!=null ){
+                return new ResponseEntity<>(individualOnBoardDetailsByTrnId,HttpStatus.OK);
+            }
+           else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 
 }

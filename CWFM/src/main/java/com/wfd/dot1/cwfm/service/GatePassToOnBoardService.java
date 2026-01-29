@@ -1,18 +1,17 @@
 package com.wfd.dot1.cwfm.service;
 
 
-import com.wfd.dot1.cwfm.dto.GatePassToOnBoard;
-import com.wfd.dot1.cwfm.dto.SkillProLevelDateDTO;
-import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import com.wfd.dot1.cwfm.dto.GatePassToOnBoard;
+import com.wfd.dot1.cwfm.dto.PostSkillWfd;
+import com.wfd.dot1.cwfm.dto.SkillProLevelDateDTO;
+import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Service
 public class GatePassToOnBoardService  {
@@ -29,8 +28,36 @@ public class GatePassToOnBoardService  {
         return QueryFileWatcher.getQuery("WORKMEN_EXPORT_ONBOARDING_UKG");
     }
 
-  
+    public String getSkillQuery() {
+        return QueryFileWatcher.getQuery("getSkillQuery");
+    }
 
+    public PostSkillWfd createSkills(Integer id){
+        try{
+            log.info("Fetching Skills URL");
+
+            String skillQuery = getSkillQuery();
+
+            SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(skillQuery, id);
+            PostSkillWfd postSkillWfd = null;
+
+            if(sqlRowSet.next()){
+              postSkillWfd=  new PostSkillWfd();
+
+              postSkillWfd.setName(sqlRowSet.getString("GMDESCRIPTION"));
+
+                String gmname = sqlRowSet.getString("GMNAME");
+
+                gmname.trim().charAt(4);
+
+            }
+            log.info("Exit from create skill method");
+            return postSkillWfd;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public GatePassToOnBoard getIndividualOnBoardDetailsByTrnId(String trnsId ){
         try{

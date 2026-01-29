@@ -11,7 +11,7 @@
                     <title>Requestor List</title>
                     <!-- <script src="resources/js/jquery.min.js"></script> -->
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <!-- <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> -->
+                    <link rel="stylesheet" type="text/css" href="resources/css/styles.css">
                     <script src="resources/js/cms/requestorHRList.js"></script>
 
                     <!-- DataTables CSS and JS -->
@@ -136,39 +136,23 @@
         white-space: normal;
         line-height: 1.5;
     } */
-    th {
-        padding: 10px;
-        text-align: left;
-        border: 1px solid #ddd;
-        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
-          font-weight: bold;
-   
-        background-color: #DDF3FF; /* Light green for the table header */
-        color: #005151; /* Text color from side nav bar */
-        cursor: pointer;
-        font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
-        font-size: 0.75rem; /* Decreased font size for table header */
-        line-height: 1.2rem; /* Adjust line-height for better fit */
-        padding: 6px; /* Reduced padding for table header */
-    }
 
-                       
-td{
- padding: 10px;
-        text-align: left;
-        border: 1px solid #ddd;
-        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
-         font-family: 'Noto Sans', sans-serif;
-         
-    color: #898989;/* Label text color */
-  padding: .2em .6em .3em;
-  font-size: 85%;
-  font-weight: 700;
-  line-height: 1;
-    white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
-  }
+                        td {
+                            /* padding: 10px; */
+                            text-align: left;
+                            border: 1px solid #ddd;
+                            /* font-size: 0.875rem; */
+                            font-family: 'Noto Sans', sans-serif;
+                            color: #333;
+                            vertical-align: middle;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                            word-break: break-word;
+                            max-width: 200px;
+                            /* white-space: normal; */
+                            line-height: 1.5;
+                        }
+
                         /* Added responsive max-width for different screen sizes */
                         @media (max-width: 1200px) {
                             td {
