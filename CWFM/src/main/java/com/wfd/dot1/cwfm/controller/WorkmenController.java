@@ -1917,18 +1917,13 @@ public class WorkmenController {
             }
             transactionId = workmenService.renewGatePass(gatePassMain);
             if (transactionId != null) {
-                if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                	//uploadRenewDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
-                }
-                // Upload additional files
-                if (additionalFiles != null && documentTypes != null) {
-                	//uploadRenewAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
-                }  
-                    // ✅ ADD THIS NEW LINE
-                String filePath = ROOT_DIRECTORY + user.getUserId() + "/" + transactionId + "/";
-                    workmenService.saveRenewedDocuments(transactionId, String.valueOf(user.getUserId()), aadharFile, policeFile, profilePic, additionalFiles, documentTypes,filePath);
-
-                
+            	 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
+                     uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+                 }
+                 // Upload additional files
+                 if (additionalFiles != null && documentTypes != null) {
+                     uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
+                 }
                 return new ResponseEntity<>("contractWorkmen/renewList", HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -1958,7 +1953,12 @@ public class WorkmenController {
     		 
     		 
     		 if(null != gatePassMainObj.getPhotoName()) {
-           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+    			 
+           		 String profilePicFilePath =null;
+           		 if(GatePassType.CREATE.getStatus().equals(gatePassMainObj.getGatePassAction()))
+           			 profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+           		 else
+           			 profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
            		}
     		
@@ -1992,21 +1992,21 @@ public class WorkmenController {
     		}
     		
     		 // ✅ Pass versioned documents to JSP
-    		 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
-    	     request.setAttribute("PreviousDocuments", allVersionedDocs);
-    	     
-    	     List<Map<String, Object>> renewDocsList=workmenDao.getRenewalDocs(transactionId);
-    	     Map<String, String> latestDocs = new HashMap<>();
-
-    	     for (Map<String, Object> doc : renewDocsList) {
-    	         String docType = doc.get("DOCTYPE").toString();   // PHOTO
-    	         String fileName = doc.get("FILENAME").toString(); // photo_V2.jpg
-
-    	         latestDocs.put(docType, fileName);  // Store latest version filename
-    	     }
-
-    	     // Send to JSP
-    	     request.setAttribute("LatestDocs", latestDocs);
+//    		 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
+//    	     request.setAttribute("PreviousDocuments", allVersionedDocs);
+//    	     
+//    	     List<Map<String, Object>> renewDocsList=workmenDao.getRenewalDocs(transactionId);
+//    	     Map<String, String> latestDocs = new HashMap<>();
+//
+//    	     for (Map<String, Object> doc : renewDocsList) {
+//    	         String docType = doc.get("DOCTYPE").toString();   // PHOTO
+//    	         String fileName = doc.get("FILENAME").toString(); // photo_V2.jpg
+//
+//    	         latestDocs.put(docType, fileName);  // Store latest version filename
+//    	     }
+//
+//    	     // Send to JSP
+//    	     request.setAttribute("LatestDocs", latestDocs);
     	     
     	     
     	}catch(Exception e) {

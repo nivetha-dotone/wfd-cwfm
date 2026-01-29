@@ -520,7 +520,7 @@ textarea {
     <td></td>
     <td>
                    		 <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
-        					<img class="target" src="/imageinline/${GatePassObj.createdBy }/${GatePassObj.transactionId}/${LatestDocs.PHOTO }" alt="Image" style="max-width: 100%; height: auto;">
+        					<img class="target" src="${imagePath }" alt="Image" style="max-width: 100%; height: auto;">
     					</div></td></tr></table>
 </div>
 
@@ -721,25 +721,28 @@ textarea {
             <div id="tab5" class="tab-content">
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
                     <tbody>
-                     
+                     <c:set var="txnId"
+       value="${GatePassObj.gatePassAction eq '1'
+               ? GatePassObj.oldTransactionId
+               : GatePassObj.transactionId}" />
                     <tr>
                 		<td style="color:black"><spring:message code="label.profilePhoto"/></td>
                 <td>
-                  <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.PHOTO}')">Download Photo</a>
+                <a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','${GatePassObj.photoName}')">Download Photo</a>
                 </td>
             		</tr> 
             		
                    <tr>
                 		<td style="color:black"><spring:message code="label.aadharDocument"/></td>
                 <td>
-                   <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.AADHAR}')">Download Aadhar Document</a>
+                   <a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','aadhar')">Download Aadhar Document</a>
                 </td>
             		</tr>
             		
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>
-                    <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.POLICE}')">Download Police Verification Document</a>
+                    <a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','police')">Download Police Verification Document</a>
                 </td>
                  <th><label class="custom-label"><spring:message code="label.policeVerificationDate"/></label></th>
                         	<td>
@@ -751,7 +754,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.bankDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.BANK}')">Download Bank Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','bank')">Download Bank Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -760,7 +763,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.trainingDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.TRAINING}')">Download Training Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','training')">Download Training Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -769,7 +772,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.otherDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.OTHER}')">Download Other Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','other')">Download Other Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -778,7 +781,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.idProof2Document"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.IDPROOF}')">Download ID Proof2 Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','id2')">Download ID Proof2 Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -787,7 +790,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.medicalDcocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.MEDICAL}')">Download Medical Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','medical')">Download Medical Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -796,7 +799,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.educationDocument"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.EDUCATION}')">Download Education Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','education')">Download Education Document</a>
                 		</td>
             		</tr>
       				</c:if>
@@ -805,7 +808,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.form11Document"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}','${LatestDocs.FORM11}')">Download Form11 Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','form11)">Download Form11 Document</a>
                 		</td>
             		</tr>
       				</c:if>

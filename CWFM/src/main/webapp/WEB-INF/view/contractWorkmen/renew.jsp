@@ -737,7 +737,7 @@ label {
            
                 <option value="${pe.wcId}"
                  data-code="${pe.licenceType}"
-                ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
+                ${GatePassObj.wcEsicNo eq pe.wcCode ? 'selected="selected"' : ''}>
                 ${pe.wcCode}
             </option>
         </c:if>

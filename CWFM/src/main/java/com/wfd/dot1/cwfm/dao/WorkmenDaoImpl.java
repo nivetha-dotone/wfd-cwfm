@@ -3243,7 +3243,11 @@ private Object[] prepareRenewGatePassParameters1(String transId, GatePassMain ga
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
         				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
-        gatePassMain.getUserId(),gatePassMain.getLlNo(),transId
+        gatePassMain.getUserId(),gatePassMain.getLlNo(),
+        gatePassMain.getAadharDocName(),gatePassMain.getPhotoName(),gatePassMain.getBankDocName(),
+        gatePassMain.getPoliceVerificationDocName(),gatePassMain.getIdProof2DocName(),gatePassMain.getMedicalDocName(),
+        gatePassMain.getEducationDocName(),gatePassMain.getForm11DocName(),gatePassMain.getTrainingDocName(),gatePassMain.getOtherDocName(),
+        transId
     };
 }
 @Override

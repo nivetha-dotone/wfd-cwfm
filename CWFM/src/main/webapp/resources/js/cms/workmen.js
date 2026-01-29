@@ -2369,7 +2369,7 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName + ''  + wo.lastName + '</td>' +
+										                          '<td  >' + wo.firstName + ' '  + wo.lastName + '</td>' +
 																
 																											  
 																
@@ -2457,7 +2457,7 @@ function previewImage(event, inputId, displayId) {
 																											'<td  ><input type="checkbox" name="selectedWOs" value="' + wo.gatePassId + '"></td>'+
 																											'<td  >' + wo.transactionId + '</td>' +
 																											'<td  >' + wo.gatePassId + '</td>' +
-										                          '<td  >' + wo.firstName +''+ wo.lastName + '</td>' +
+										                          '<td  >' + wo.firstName +' '+ wo.lastName + '</td>' +
 																
 																'<td  >' + wo.aadhaarNumber + '</td>' +	
 																'<td  >' + wo.contractorName + '</td>' +	
