@@ -844,6 +844,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	        // 🔹 Additional insert into CMSContractorWC ONLY for 'Create'
 	        if (requestType.equalsIgnoreCase("Create")) {
 	            saveContractorWC(policies, contreg);
+	            saveWorkorderLLWC(policies);
 	            System.out.println("✅ Additional policies saved in CMSContractorWC for CREATE request.");
 	        }
 
@@ -1496,6 +1497,20 @@ public int getWorkorderActiveWorkmenCount(String contractorId, String unitId, St
     String sql =getWorkorderActiveWorkmenCount();
     Integer count = jdbcTemplate.queryForObject(sql,Integer.class,contractorId,unitId,workorderId);
     return count != null ? count : 0;
+}
+
+public void saveWorkorderLLWC(List<ContractorRegistrationPolicy> policies) {
+	 String sql= "INSERT INTO CMSWORKORDER_LLWC (" +
+           "[WONUMBER],[LICENSE_NUMBER],[LICENSE_TYPE]) " +
+          "VALUES (?,?,?)";
+
+   for (ContractorRegistrationPolicy policy : policies) {
+       jdbcTemplate.update(sql,
+    		   policy.getSapWoNumber(),
+    		   policy.getDocumentNumber(),
+           policy.getDocumentType()              // LICENCE_TYPE
+    		   );
+   }
 }
 
 }

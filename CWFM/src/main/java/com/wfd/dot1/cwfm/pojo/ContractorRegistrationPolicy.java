@@ -100,6 +100,12 @@ public class ContractorRegistrationPolicy {
 	}
 	private boolean isPanIndia;
 	private boolean isSubApplicable;
-	
+	private String sapWoNumber;
+	public String getSapWoNumber() {
+		return sapWoNumber;
+	}
+	public void setSapWoNumber(String sapWoNumber) {
+		this.sapWoNumber = sapWoNumber;
+	}
 
 }

@@ -962,8 +962,14 @@ function validateRenewFormData() {
     $("#workOrderBody tr").each(function () {
         const row = $(this);
 
-        const policy = {
-            woNumber: row.find(".woNumber").val(),
+		const woSelect = row.find(".woNumber");
+
+		    const woId = woSelect.val();
+		    const woName = woSelect.find("option:selected").data("woname");
+
+		    const policy = {
+		    woNumber: woId,        // existing (ID)
+		    sapWoNumber: woName,        // ⭐ NEW
             natureOfJob: row.find(".natureOfJob").val(),
             documentType: row.find(".documentType").val(),
             documentNumber: row.find(".documentNumber").val(),
@@ -1208,7 +1214,7 @@ document.addEventListener('click', function (e) {
 		                const option = document.createElement("option");
 		                option.value = workOrder.workorderId;
 		                option.text = workOrder.name;
-
+						option.setAttribute("data-woname", workOrder.name);
 		                // Append the options to all work order dropdowns
 		                woSelects.forEach(select => {
 		                    select.appendChild(option);
