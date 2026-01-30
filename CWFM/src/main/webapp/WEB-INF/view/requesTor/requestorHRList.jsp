@@ -11,7 +11,7 @@
                     <title>Requestor List</title>
                     <!-- <script src="resources/js/jquery.min.js"></script> -->
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <link rel="stylesheet" type="text/css" href="resources/css/styles.css">
+                    <!-- <link rel="stylesheet" type="text/css" href="resources/css/styles.css"> -->
                     <script src="resources/js/cms/requestorHRList.js"></script>
 
                     <!-- DataTables CSS and JS -->
@@ -136,23 +136,39 @@
         white-space: normal;
         line-height: 1.5;
     } */
+    th {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+          font-weight: bold;
+   
+        background-color: #DDF3FF; /* Light green for the table header */
+        color: #005151; /* Text color from side nav bar */
+        cursor: pointer;
+        font-family: 'Volte Rounded', 'Noto Sans', sans-serif;
+        font-size: 0.75rem; /* Decreased font size for table header */
+        line-height: 1.2rem; /* Adjust line-height for better fit */
+        padding: 6px; /* Reduced padding for table header */
+    }
 
-                        td {
-                            /* padding: 10px; */
-                            text-align: left;
-                            border: 1px solid #ddd;
-                            /* font-size: 0.875rem; */
-                            font-family: 'Noto Sans', sans-serif;
-                            color: #333;
-                            vertical-align: middle;
-                            word-wrap: break-word;
-                            overflow-wrap: break-word;
-                            word-break: break-word;
-                            max-width: 200px;
-                            /* white-space: normal; */
-                            line-height: 1.5;
-                        }
-
+                       
+td{
+ padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+        font-size: 0.875rem; /* Smaller text size matching the side nav bar */
+         font-family: 'Noto Sans', sans-serif;
+         
+    color: #898989;/* Label text color */
+  padding: .2em .6em .3em;
+  font-size: 85%;
+  font-weight: 700;
+  line-height: 1;
+    white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  }
                         /* Added responsive max-width for different screen sizes */
                         @media (max-width: 1200px) {
                             td {
@@ -289,6 +305,7 @@
                         .pagination button:hover:not(:disabled) {
                             background-color: #f0f0f0;
                         }
+
 
                         .pagination button.active {
                             background-color: #eef0f3;
@@ -549,7 +566,7 @@
 
                             .hr-modal-content {
                                 width: 95%;
-                                margin: 1% auto;
+                                margin: 18% auto;
                             }
 
                             .hr-update-buttons {
@@ -579,6 +596,40 @@
                                 min-height: 300px;
                             }
                         }
+
+
+                        .btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.66666667;
+  border-radius: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.btn-default {
+  color: var(--zed_sys_color_action_enabled);
+  border-color: var(--zed_sys_color_action_enabled);
+  background-color: var(--zed_sys_color_background);
+}
+
+.btn:hover,
+.btn:focus {
+  color: var(--zed_sys_color_action_hover);
+  border-color: var(--zed_sys_color_focus);
+}
                     </style>
                 </head>
 
@@ -761,9 +812,9 @@
                                         placeholder="Enter your remark here..." rows="4"></textarea>
                                 </div>
                                 <div class="hr-update-buttons">
-                                    <button type="button" class="hr-btn hr-btn-success"
+                                    <button type="button" class=".btn btn-default"
                                         onclick="hrUpdateRequest()">Update Request</button>
-                                    <button type="button" class="hr-btn" onclick="hrCloseModal()">Cancel</button>
+                                    <button type="button" class=".btn btn-default" onclick="hrCloseModal()">Cancel</button>
                                 </div>
                             </div>
                         </div>
