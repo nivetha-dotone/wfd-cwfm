@@ -1187,7 +1187,7 @@ document.addEventListener('click', function (e) {
 		        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
 		        <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
 		        <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
-		        <td><input type="file" class="form-control attachment" name="attachment" /></td>
+		        <td><input type="file" class="form-control attachment" name="attachment" accept="application/pdf"/></td>
 		    `;
 
 			// Clone the documentType dropdown from the first row
