@@ -1155,10 +1155,23 @@ document.addEventListener('click', function (e) {
 		    const row = document.createElement("tr");
 
 		    // Generate the Work Order options from the global array
-		    let workOrderOptions = '<option value="">Select</option>';
+		  /*  let workOrderOptions = '<option value="">Select</option>';
 		    globalWorkOrders.forEach(workOrder => {
 		        workOrderOptions += `<option value="${workOrder.workorderId}">${workOrder.name}</option>`;
-		    });
+		    });*/
+			
+			// Generate the Work Order options from the global array
+			let workOrderOptions = '<option value="">Select</option>';
+
+			globalWorkOrders.forEach(workOrder => {
+			    workOrderOptions += `
+			        <option 
+			            value="${workOrder.workorderId}" 
+			            data-woname="${workOrder.name}">
+			            ${workOrder.name}
+			        </option>`;
+			});
+
 
 		    row.innerHTML = `
 		        <td><button type="button" class="btn btn-success addRow" style="color:blue;background-color:white;">+</button></td>
