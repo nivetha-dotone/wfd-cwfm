@@ -334,6 +334,10 @@ function setDates(selectElement){
 }
 
 function saveBtn() {
+	let basicValid = validateBillFormData();
+    if (!basicValid) return;
+   let filesValid = validateMandatoryFiles();
+    if (!filesValid) return;
     const formData = new FormData();
 	const unitSelect = document.getElementById("unitId");
 		 const unitId = unitSelect?.value;
@@ -576,5 +580,150 @@ function showFileNameBill(input, id) {
 						}
 						}//eofunc
 						
-						
-						
+function validateBillFormData() {
+    let isValid = true;
+    const vendorCode = $("#contractor").val().trim();
+    if (vendorCode === "") {
+        $("#error-contractor").show();
+        isValid = false;
+    }else{
+		 $("#error-contractor").hide();
+	}
+    const principalemployer = $("#unitId").val().trim();
+    if (principalemployer === "") {
+        $("#error-principalEmployer").show();
+        isValid = false;
+    }else{
+		$("#error-principalEmployer").hide();
+	}
+    
+	/*const billStartDate = $("#billStartDateId").val().trim();
+	if (billStartDate === "") {
+	  $("#error-billStartDate").show();
+	  isValid = false;
+	  }else{
+	$("#error-billStartDate").hide();
+	}
+    const billEndDate = $("#billEndDateId").val().trim();
+	  if (billEndDate === "") {
+		$("#error-billEndDate").show();
+		isValid = false;
+		}else{
+		 $("#error-billEndDate").hide();
+	}*/
+	const billStartDateStr = $("#billStartDateId").val().trim();
+const billEndDateStr   = $("#billEndDateId").val().trim();
+
+const today = new Date();
+today.setHours(0, 0, 0, 0); // normalize
+
+let startDate = null;
+let endDate = null;
+
+/* ---------- Bill Start Date ---------- */
+if (billStartDateStr === "") {
+    $("#error-billStartDate").text("Bill Start Date is required").show();
+    isValid = false;
+} else {
+    startDate = new Date(billStartDateStr);
+    startDate.setHours(0, 0, 0, 0);
+
+    // must be strictly past date
+    if (startDate >= today) {
+        $("#error-billStartDate")
+            .text("Bill Start Date must be a past date")
+            .show();
+        isValid = false;
+    } else {
+        $("#error-billStartDate").hide();
+    }
+}
+
+/* ---------- Bill End Date ---------- */
+if (billEndDateStr === "") {
+    $("#error-billEndDate").text("Bill End Date is required").show();
+    isValid = false;
+} else {
+    endDate = new Date(billEndDateStr);
+    endDate.setHours(0, 0, 0, 0);
+
+    // can be past or today, NOT future
+    if (endDate > today) {
+        $("#error-billEndDate")
+            .text("Bill End Date cannot be a future date")
+            .show();
+        isValid = false;
+    } else {
+        $("#error-billEndDate").hide();
+    }
+}
+
+/* ---------- End Date > Start Date ---------- */
+if (startDate && endDate) {
+    if (endDate <= startDate) {
+        $("#error-billEndDate")
+            .text("Bill End Date must be greater than Bill Start Date")
+            .show();
+        isValid = false;
+    }
+}
+
+	const workorderCode = $("#workorder").val().trim();
+      if (workorderCode === "") {
+		 $("#error-workorder").show();
+		 isValid = false;
+	   }else{
+		 $("#error-workorder").hide();
+		}												  	  
+	 const billType = $("#billType").val().trim();
+	  if (billType === "") {
+		  $("#error-billType").show();
+           isValid = false;
+           }else{
+           $("#error-billType").hide();
+         }	
+ const billCategory = $("#billCategory").val().trim();
+    if (billCategory === "") {
+        $("#error-billCategory").show();
+        isValid = false;
+    }else{
+		 $("#error-billCategory").hide();
+	}
+    return isValid;
+}				
+function validateMandatoryFiles() {
+
+    let isValid = true;
+
+    // Hide errors initially
+    $("#error-kronosFile").hide();
+    $("#error-statutoryFile").hide();
+
+    // ===== Validate Kronos Files =====
+    $("input[type='file'][name^='kronosFile_']").each(function () {
+        if (this.files.length === 0) {
+            isValid = false;
+        }
+    });
+
+    if (!isValid) {
+        $("#error-kronosFile").show();
+    }
+
+    // Reset for statutory check
+    let statutoryValid = true;
+
+    // ===== Validate Statutory Files =====
+    $("input[type='file'][name^='statutoryFile_']").each(function () {
+        if (this.files.length === 0) {
+            statutoryValid = false;
+        }
+    });
+
+    if (!statutoryValid) {
+        $("#error-statutoryFile").show();
+    }
+
+    return isValid && statutoryValid;
+}
+			

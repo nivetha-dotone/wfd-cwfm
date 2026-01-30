@@ -390,8 +390,13 @@ public class ContractorDaoImpl implements ContractorDao{
 
            status  = jdbcTemplate.update(query, parameters);
            if (status > 0 && "Create".equalsIgnoreCase(contreg.getRequestType())) {
+        boolean	  contExists= this.contractorExistsForPeContractor(contreg.getContractorId(),contreg.getUnitId());
+        	   if(contExists) {
+        		   updateContractorPemm(contreg);
+        	   }else {
         	    saveContractorPemm(contreg);
         	}
+           }
 
 
            return contreg.getContractorregId();
@@ -1078,8 +1083,10 @@ public class ContractorDaoImpl implements ContractorDao{
 	        policy.setDocumentNumber(rs.getString("WCCODE"));
 	        policy.setNatureOfJob(rs.getString("NATUREOFID"));
 	        policy.setCoverage(rs.getInt("WCTOTAL"));
-	        policy.setValidFrom(rs.getString("WCFROMDTM"));
-	        policy.setValidTo(rs.getString("WCTODTM"));
+	        //policy.setValidFrom(rs.getString("WCFROMDTM"));
+	        //policy.setValidTo(rs.getString("WCTODTM"));
+	        policy.setValidFrom(rs.getTimestamp("WCFROMDTM") != null? rs.getTimestamp("WCFROMDTM").toLocalDateTime().toLocalDate().toString(): "");
+	        policy.setValidTo(rs.getTimestamp("WCTODTM") != null? rs.getTimestamp("WCTODTM").toLocalDateTime().toLocalDate().toString(): "");
 	        policy.setFileName(rs.getString("ATTACHMENTNAME"));
 	        policy.setUnitId(rs.getString("UNITID"));
 	        return policy;
@@ -1099,7 +1106,9 @@ public class ContractorDaoImpl implements ContractorDao{
 	        record.setLicenseType(rs.getString("LICENCETYPE"));
 	        record.setWorkOrderNumber(rs.getString("WONUMBER"));
 	        record.setWcCode(rs.getString("WCCODE"));
-	        record.setCreatedDtm(rs.getTimestamp("CREATEDDTM"));
+	        //record.setCreatedDtm(rs.getTimestamp("CREATEDDTM"));
+	        Timestamp createdTs = rs.getTimestamp("CREATEDDTM");
+	        record.setCreatedDtm(createdTs == null? null: Timestamp.valueOf(createdTs.toLocalDateTime().toLocalDate().atStartOfDay()));
 	        record.setCreatedBy(rs.getString("CREATEDBY"));
 	        return record;
 	    });
@@ -1515,6 +1524,55 @@ public void saveWorkorderLLWC(List<ContractorRegistrationPolicy> policies) {
            policy.getDocumentType()              // LICENCE_TYPE
     		   );
    }
+}
+@Override
+public boolean contractorExistsForPeContractor(String contractorId, Long unitid) {
+    String sql = "select count(*)  from CMSCONTRPEMM where CONTRACTORID=? and UNITID=?";
+Integer count = jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitid);
+return count != null && count > 0;
+}
+@Override
+public void updateContractorPemm(ContractorRegistration contreg) {
+
+    String sql ="UPDATE CMSCONTRPEMM SET MANAGERNM = ?,TOTALSTRENGTH = ?,MAXNOEMP = ?,NATUREOFWORK = ?,LOCOFWORK = ?, PFNUM = ?,RCVALIDATED = ?,PERIODSTARTDT = ?,PERIODENDDT = ?, PFAPPLYDT = ? WHERE CONTRACTORID = ? AND UNITID = ?";
+
+    try {
+        jdbcTemplate.update(
+            sql,
+            contreg.getManagerName(),
+            contreg.getTotalStrength() != null ? Integer.parseInt(contreg.getTotalStrength()) : null,
+            contreg.getRcMaxEmp() != null ? Integer.parseInt(contreg.getRcMaxEmp()) : null,
+            contreg.getNatureOfWork(),
+            contreg.getLocofWork(),
+            contreg.getPfNum(),
+            (contreg.getRcVerified() != null &&
+             (contreg.getRcVerified().equalsIgnoreCase("Y")
+              || contreg.getRcVerified().equalsIgnoreCase("YES")))
+                ? "Y" : "N",
+            contreg.getContractFrom() != null ? java.sql.Date.valueOf(contreg.getContractFrom()) : null,
+            contreg.getContractTo() != null ? java.sql.Date.valueOf(contreg.getContractTo()) : null,
+            contreg.getPfApplyDate() != null ? java.sql.Date.valueOf(contreg.getPfApplyDate()) : null,
+
+            // WHERE condition values (LAST)
+            contreg.getContractorId(),
+            contreg.getUnitId()
+        );
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+@Override
+public ApproveRejectContRenewDto getContractorRenewComments(String contractorRegId) {
+	String sql ="select top 1 comments,ContractorRegId from CONTRENEWAPPROVALSTATUS where ContractorRegId=? order by LastUpdatedDate desc";
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(sql,contractorRegId);
+	ApproveRejectContRenewDto cont = new ApproveRejectContRenewDto();
+	while(rs.next()) {
+		cont.setComments(rs.getString("comments"));		
+		cont.setTransactionId(rs.getString("ContractorRegId"));
+	}
+	return cont;
 }
 
 }

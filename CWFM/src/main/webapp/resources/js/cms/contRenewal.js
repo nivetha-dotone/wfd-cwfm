@@ -514,8 +514,18 @@ function populateTab3Data(contractorId, unitId, vendorCode, contractorregId) {
 function saveWorkOrderInfo() {
     const selectedWOs = Array.from(document.getElementById("selectedWorkOrders").options)
         .map(opt => opt.value);
+        
+        if (!selectedWOs || selectedWOs.length === 0) {
+        alert("Please select at least one Work Order.");
+        return; // ⛔ stop execution
+    }
     const licenseId = 		Array.from(document.getElementById("selectedLicense").options)
 		        .map(opt => opt.value);
+		        
+		        if (!licenseId || licenseId.length === 0) {
+        alert("Please select at least one License.");
+        return; // ⛔ stop execution
+    }
     const contractorRegId = document.getElementById("contractorregId").value;
 	const selectedOption = $("#vendorCodeId option:selected");
 	const contractorId =  selectedOption.val();

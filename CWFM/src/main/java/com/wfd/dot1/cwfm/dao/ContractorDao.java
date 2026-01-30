@@ -112,6 +112,12 @@ public interface ContractorDao {
 
 	public Contractor getAllContractorProfileDetailForReg(String unitId, String contractorId);
 
+	public void updateContractorPemm(ContractorRegistration reg);
+
+	public boolean contractorExistsForPeContractor(String contractorId, Long unitId);
+
+	public ApproveRejectContRenewDto getContractorRenewComments(String contractorRegId);
+
 	   
 	}
 
