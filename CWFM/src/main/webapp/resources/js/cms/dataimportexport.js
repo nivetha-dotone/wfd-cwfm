@@ -593,7 +593,7 @@ const tableBody = document.getElementById("tableBody");
         // ☑ Row Checkbox
         const cbTd = document.createElement("td");
         cbTd.style.border = "1px solid #ddd";
-        cbTd.style.textAlign = "center";
+        cbTd.style.textAlign = "left";
 
         const cb = document.createElement("input");
         cb.type = "checkbox";
@@ -612,7 +612,7 @@ const tableBody = document.getElementById("tableBody");
         const slTd = document.createElement("td");
         slTd.textContent = index + 1;
         slTd.style.border = "1px solid #ddd";
-        //slTd.style.textAlign = "center";
+        slTd.style.textAlign = "center";
         tr.appendChild(slTd);
 
         // 📌 Data cells
