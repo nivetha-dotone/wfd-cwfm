@@ -520,7 +520,11 @@ textarea {
     <td></td>
     <td>
                    		 <div id="preview" style="display: flex; flex-direction: column; justify-content: flex-end; height: 200px; width: 200px; border: 1px solid #ccc;">
-        					<img class="target" src="${imagePath }" alt="Image" style="max-width: 100%; height: auto;">
+        					<c:set var="txnId"
+       value="${GatePassObj.gatePassAction eq '1'
+               ? GatePassObj.oldTransactionId
+               : GatePassObj.transactionId}" />
+        					<img class="target" src="/imageinline/${GatePassObj.createdBy }/${txnId}/${GatePassObj.photoName }" alt="Image" style="max-width: 100%; height: auto;">
     					</div></td></tr></table>
 </div>
 
@@ -808,7 +812,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.form11Document"/></td>
                 		<td>
-                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','form11)">Download Form11 Document</a>
+                    	<a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','form11')">Download Form11 Document</a>
                 		</td>
             		</tr>
       				</c:if>
