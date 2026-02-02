@@ -744,7 +744,7 @@ textarea {
             		<tr>
                 		<td style="color:black"><spring:message code="label.trainingDocument"/></td>
                 		<td>
-                    	 <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}', 'training')">View Training Document</a>
+                    	 <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}', '${GatePassObj.createdBy}', 'training')">Download Training Document</a>
                 		</td>
             		</tr>
       				</c:if>

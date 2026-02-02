@@ -1405,7 +1405,7 @@ label {
            style="overflow: hidden;"/>
 
      
-    <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
+    <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="openCamera()">
       Use Camera
     </button>
   </div>
