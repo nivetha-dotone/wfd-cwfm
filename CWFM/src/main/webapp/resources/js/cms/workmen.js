@@ -874,8 +874,9 @@ function fileUpload(){
         var aadharFile = $("#aadharFile").prop("files")[0];
         var policeFile = $("#policeFile").prop("files")[0];
 		var profilePic =$("imageFile").prop("files")[0];
+		var appointmentFile = $("#appointmentFile").prop("files")[0];
         // Validate the files (optional)
-        if (!validateFiles(aadharFile, policeFile,profilePic)) {
+        if (!validateFiles(aadharFile, policeFile,profilePic,appointmentFile)) {
             isValid=false; // Stop the upload if validation fails
         }
 
@@ -889,6 +890,8 @@ function fileUpload(){
         }
 		if(profilePic){
 			formData.append("profilePic",profilePic);
+		}if(appointmentFile){
+			formData.append("appointmentFile",appointmentFile);
 		}
 
         // Submit the form data using AJAX
@@ -909,7 +912,7 @@ function fileUpload(){
         });
    return isValid;
 }
-function validateFiles(aadharFile, policeFile, profilePc) {
+function validateFiles(aadharFile, policeFile, profilePc,appointmentFile) {
     let valid = true;
 
     // Aadhar File - Mandatory & Size check
@@ -933,7 +936,16 @@ function validateFiles(aadharFile, policeFile, profilePc) {
     } else {
         $("#policeError").text("");
     }
-
+//appointment File - Mandatory & Size check
+ if (!appointmentFile) {
+        $("#appointmentError").text("Appointment Letter is required").addClass("error-bold");
+        valid = false;
+    } else if (appointmentFile.size > 5 * 1024 * 1024) {
+        $("#appointmentError").text("Police file must be less than 5MB").addClass("error-bold");
+        valid = false;
+    } else {
+        $("#appointmentError").text("");
+    }
 // Police Verification Date - Mandatory  check
 const policeVerificationDate = $("#policeVerificationDate").val().trim();
     if (policeVerificationDate === "") {
@@ -1084,9 +1096,10 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     var aadharFile = $("#aadharFile").prop("files")[0];
     var policeFile = $("#policeFile").prop("files")[0];
 	var profilePic = $("#imageFile").prop("files")[0];
+	var appointmentFile = $("#appointmentFile").prop("files")[0];
 
     // Validate the files (optional)
-    if (!validateFiles(aadharFile, policeFile,profilePic)) {
+    if (!validateFiles(aadharFile, policeFile,profilePic,appointmentFile)) {
         documentValid = false; // Stop the upload if validation fails
     }
 
@@ -1215,6 +1228,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
         if (aadharFile) data.append("aadharFile", aadharFile);
         if (policeFile) data.append("policeFile", policeFile);
 		if(profilePic) data.append("profilePic",profilePic);
+		if(appointmentFile) data.append("appointmentFile",appointmentFile);
 
     	const additionalFields = document.querySelectorAll('.document-field');
         additionalFields.forEach((field) => {
@@ -2750,9 +2764,9 @@ function renewGatePass(userId) {
     var aadharFile = $("#aadharFile").prop("files")[0];
     var policeFile = $("#policeFile").prop("files")[0];
 	var profilePic = $("#imageFile").prop("files")[0];
-	
+	var appointmentFile = $("#appointmentFile").prop("files")[0];
     // Validate the files (optional)
-    if (!validateFiles(aadharFile, policeFile,profilePic)) {
+    if (!validateFiles(aadharFile, policeFile,profilePic,appointmentFile)) {
         documentValid = false; // Stop the upload if validation fails
     }
 
@@ -2853,6 +2867,9 @@ function renewGatePass(userId) {
 		
 		if(profilePic){
 			data.append("profilePic",profilePic);
+		}
+		if(appointmentFile){
+			data.append("appointmentFile",appointmentFile);
 		}
 		
     	const additionalFields = document.querySelectorAll('.document-field');

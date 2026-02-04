@@ -721,7 +721,12 @@ textarea {
                    <a href="#" onclick="viewDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','aadhar')">Download Aadhar</a>
                 </td>
             		</tr>
-            		
+            		<tr>
+                		<td style="color:black"><spring:message code="label.appointmentDocument"/></td>
+                <td>
+                   <a href="#" onclick="viewDoc('${GatePassObj.transactionId}','${GatePassObj.createdBy }','appointment')">Download Appointment Document</a>
+                </td>
+            		</tr>
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>

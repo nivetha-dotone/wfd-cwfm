@@ -373,6 +373,7 @@ public class WorkmenController {
     public String uploadDocuments( MultipartFile aadharFile,
                                          MultipartFile policeFile,
                                          MultipartFile profilePic,
+                                         MultipartFile appointmentFile,
                                          String userId,
                                          String gatePassId) {
 
@@ -403,6 +404,11 @@ public class WorkmenController {
             	String profilePicPath = directoryPath +profilePic.getOriginalFilename();
             	saveFile(profilePic,profilePicPath);
             }
+            //Save appointment PDF
+            if (!appointmentFile.isEmpty()) {
+                String appointmentFilePath = directoryPath + "appointment.pdf";
+                saveFile(appointmentFile, appointmentFilePath);
+            }
 
             // Return success message
             return "success";
@@ -427,6 +433,7 @@ public class WorkmenController {
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "appointmentFile", required = false) MultipartFile appointmentFile,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -448,6 +455,7 @@ public class WorkmenController {
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
             gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
+            gatePassMain.setAppointmentDocName(appointmentFile!=null && !appointmentFile.isEmpty() ? "appointment":"");
          // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
@@ -491,7 +499,7 @@ public class WorkmenController {
                      //       .body(new ObjectMapper().writeValueAsString(errorResponse));
                 }else {
                 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                    uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+                    uploadDocuments(aadharFile, policeFile,profilePic,appointmentFile ,String.valueOf(user.getUserId()), transactionId);
                 }
                 // Upload additional files
                 if (additionalFiles != null && documentTypes != null) {
@@ -695,7 +703,7 @@ public class WorkmenController {
 
             // Determine file path
             String filePath;
-            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") ||
+            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") || docType.equals("appointment")||
                 docType.equals("training") || docType.equals("other") || docType.equals("id2") ||
                 docType.equals("medical") || docType.equals("education") || docType.equals("form11")) {
                 filePath = ROOT_DIRECTORY + userId + "/" + transactionId + "/" + docType + ".pdf";
@@ -1567,6 +1575,7 @@ public class WorkmenController {
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "appointmentFile", required = false) MultipartFile appointmentFile,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -1588,7 +1597,8 @@ public class WorkmenController {
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
             gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
-         // Mapping document types to their corresponding setter methods
+            gatePassMain.setAppointmentDocName(appointmentFile!=null && !appointmentFile.isEmpty() ? "appointment":"");
+            // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
             docTypeSetterMap.put("Id2", gatePassMain::setIdProof2DocName);
@@ -1919,10 +1929,15 @@ public class WorkmenController {
 
 	 request.setAttribute("Subdept", subdepSet);
 	 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
-	 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(oldTransactionId, user.getUserId());
+	 if(null != gatePassMainObj.getPhotoName()) {
+   		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+   		 request.setAttribute("imagePath", profilePicFilePath);
+   		}
+		 
+	 //List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(oldTransactionId, user.getUserId());
 
      // ✅ Pass versioned documents to JSP
-     request.setAttribute("PreviousDocuments", allVersionedDocs);
+     //request.setAttribute("PreviousDocuments", allVersionedDocs);
 
 
     return "contractWorkmen/renew";
@@ -1934,6 +1949,7 @@ public class WorkmenController {
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "appointmentFile", required = false) MultipartFile appointmentFile,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -1955,6 +1971,7 @@ public class WorkmenController {
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
             gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
+            gatePassMain.setAppointmentDocName(appointmentFile!=null && !appointmentFile.isEmpty() ? "appointment":"");
          // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
@@ -1978,9 +1995,10 @@ public class WorkmenController {
             }
             transactionId = workmenService.renewGatePass(gatePassMain);
             if (transactionId != null) {
-            	 //String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassMain.getGatePassId());
-            	 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                     uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+
+            	// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassMain.getGatePassId());
+            	 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty() && appointmentFile!=null && !appointmentFile.isEmpty()) {
+                     uploadDocuments(aadharFile, policeFile,profilePic,appointmentFile, String.valueOf(user.getUserId()), transactionId);
                  }
                  // Upload additional files
                  if (additionalFiles != null && documentTypes != null) {

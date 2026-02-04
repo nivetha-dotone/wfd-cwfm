@@ -360,6 +360,13 @@ public class GatePassMain {
 	private String form11DocName;
 	private String trainingDocName;
 	private String otherDocName;
+	private String appointmentDocName;
+	public String getAppointmentDocName() {
+		return appointmentDocName;
+	}
+	public void setAppointmentDocName(String appointmentDocName) {
+		this.appointmentDocName = appointmentDocName;
+	}
 	public String getAadharDocName() {
 		return aadharDocName;
 	}

@@ -1205,7 +1205,12 @@ label {
        					 	  <span id="aadharFileName" style="margin-left: 10px;color:black;"></span> 
         					<div id="aadharError"></div> <!-- Error message for Aadhar file -->
                 		</td>
-
+                       <td>
+                		 	<label for="appointmentFile"><span class="required-field">*</span><spring:message code="label.uploadappointmentCard"/></label>
+       					 	<input type="file" id="appointmentFile" name="appointmentFile" accept="application/pdf" onchange="displayFileName1('appointmentFile', 'appointmentFileName')">
+       					 	  <span id="appointmentFileName" style="margin-left: 10px;color:black;"></span> 
+        					<div id="appointmentError"></div> <!-- Error message for appointment file -->
+                		</td>
                 </tr>  		
            <tr>
                 	  <td>

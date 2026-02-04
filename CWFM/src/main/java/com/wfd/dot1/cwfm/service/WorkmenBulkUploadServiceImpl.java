@@ -132,7 +132,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        if (!isBlank(record.getAccommodation()) && !record.getAccommodation().matches("[A-Za-z ]+")) {
 	            fieldErrors.put("Accommodation", "Only alphabets allowed");
 	        }
-	        if (!isBlank(record.getAcademic()) &&!record.getAcademic().matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 &/\\-]+$")) {
+	        if (!isBlank(record.getAcademic()) &&!record.getAcademic().matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 ,.()&|/\\-]+$")) {
 	        	    fieldErrors.put("Academic", "Only alphabets allowed");
 	        }if (!isBlank(record.getTechnical()) &&!record.getTechnical().matches("^(?=.*[A-Za-z0-9])[A-Za-z0-9 &/\\-]+$")) {
 	        	    fieldErrors.put("Technical", "Only alphabets allowed");
@@ -283,7 +283,7 @@ public class WorkmenBulkUploadServiceImpl implements WorkmenBulkUploadService {
 	        	gatePassMain.setDepartment(record.getDepartment());
 	        	gatePassMain.setSubdepartment(record.getArea());
 	        	gatePassMain.setEic(record.getEICNumber());
-
+	        	gatePassMain.setUnitId(record.getUnitCode());
 	        	// ---- Job Details ----
 	        	gatePassMain.setNatureOfJob(record.getNatureOfWork());
 	        	gatePassMain.setHazardousArea(record.getHazardousArea());

@@ -742,7 +742,12 @@ textarea {
                    <a href="#" onclick="viewDoc('${txnId}', '${GatePassObj.createdBy}','aadhar')">Download Aadhar Document</a>
                 </td>
             		</tr>
-            		
+            			<tr>
+                		<td style="color:black"><spring:message code="label.appointmentDocument"/></td>
+                <td>
+                   <a href="#" onclick="viewDoc('${txnId}','${GatePassObj.createdBy }','appointment')">Download Appointment Document</a>
+                </td>
+            		</tr>
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>
