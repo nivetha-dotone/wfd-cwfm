@@ -391,7 +391,7 @@ textarea {
             <!-- <button data-target="tab3" onclick="showTabNew('tab3')">Other Information</button>
             <button data-target="tab4" onclick="showTabNew('tab4')">Wages</button> -->
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
-            <!-- <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> -->
+             <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> 
         </div>
          <div class="action-buttons" >
             <button id="saveButton" style="display:none;" type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="submitGatePass('${sessionScope.loginuser.userId}')">Save</button>

@@ -635,8 +635,15 @@ public class WorkmenController {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
     		}
     		}
-    		List<ApproverStatusDTO> approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId());
-    		 request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		
+    		if(gatePassMainObj.getOnboardingType().equals("project")) {
+    			approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.PROJECT.getStatus());
+    		}else
+    		{
+    			approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.CREATE.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers);
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -1145,7 +1152,9 @@ public class WorkmenController {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
     		}
     		}
-    		
+
+List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.CANCEL.getStatus());
+request.setAttribute("approvers", approvers);
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1208,7 +1217,8 @@ public class WorkmenController {
     		}
     		}
     		
-    		 
+    		List<ApproverStatusDTO> approvers =  workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLOCK.getStatus());
+    		request.setAttribute("approvers", approvers); 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -1271,7 +1281,9 @@ public class WorkmenController {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
     		}
     		}
-    		
+
+List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.UNBLOCK.getStatus());
+request.setAttribute("approvers", approvers);
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1336,7 +1348,9 @@ public class WorkmenController {
     		}
     		}
     		
-    		 
+
+List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLACKLIST.getStatus());
+request.setAttribute("approvers", approvers);
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -1402,7 +1416,9 @@ public class WorkmenController {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
     		}
     		}
-    		
+
+List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.DEBLACKLIST.getStatus());
+request.setAttribute("approvers", approvers);
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1917,12 +1933,13 @@ public class WorkmenController {
             }
             transactionId = workmenService.renewGatePass(gatePassMain);
             if (transactionId != null) {
+            	 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassMain.getGatePassId());
             	 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                     uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+                     uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), oldTransactionId);
                  }
                  // Upload additional files
                  if (additionalFiles != null && documentTypes != null) {
-                     uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
+                     uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), oldTransactionId);
                  }
                 return new ResponseEntity<>("contractWorkmen/renewList", HttpStatus.OK);
             }
@@ -1955,10 +1972,10 @@ public class WorkmenController {
     		 if(null != gatePassMainObj.getPhotoName()) {
     			 
            		 String profilePicFilePath =null;
-           		 if(GatePassType.CREATE.getStatus().equals(gatePassMainObj.getGatePassAction()))
+           		// if(GatePassType.CREATE.getStatus().equals(gatePassMainObj.getGatePassAction()))
            			 profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
-           		 else
-           			 profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
+           		// else
+           			 //profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
            		}
     		
@@ -2007,7 +2024,9 @@ public class WorkmenController {
 //
 //    	     // Send to JSP
 //    	     request.setAttribute("LatestDocs", latestDocs);
-    	     
+
+List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.RENEW.getStatus());
+request.setAttribute("approvers", approvers);
     	     
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);

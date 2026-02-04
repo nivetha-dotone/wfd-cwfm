@@ -392,7 +392,7 @@ textarea {
             <button data-target="tab4" onclick="showTabNew('tab4')">Wages</button>
             <button data-target="tab5" onclick="showTabNew('tab5')">Documents</button>
             <!-- <button data-target="tab6" onclick="showTabNew('tab6')">Previous Documents</button> -->
-          <!--   <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button> -->
+             <button data-target="tab6" onclick="showTabNew('tab6')">Approval Status</button>
         </div>
          <div class="action-buttons" >
          
@@ -855,85 +855,39 @@ textarea {
             
             
             
-            <%-- <div id="tab6" class="tab-content">
-            <table cellspacing="0" cellpadding="0" style="width:100%;border: 1px solid #ddd;background-color: aliceblue;">
-                   
+           <div id="tab6" class="tab-content">
+             <div class="table-scroll-wrapper">
+    <table class="approval-table"
+           cellspacing="0"
+           cellpadding="0"
+           style="width:100%; border:1px solid #ddd; background-color:aliceblue;">
+
         <thead>
-            <tr style=" border: 1px solid #ddd;">
+            <tr style="border:1px solid #ddd;">
                 <th><label class="custom-label"><spring:message code="label.role"/></label></th>
                 <th><label class="custom-label"><spring:message code="label.status"/></label></th>
                 <th><label class="custom-label"><spring:message code="label.comments"/></label></th>
                 <th><label class="custom-label"><spring:message code="label.timestamp"/></label></th>
             </tr>
         </thead>
+
         <tbody>
             <c:forEach var="approver" items="${approvers}" varStatus="status">
-                <tr style=" border: 1px solid #ddd;background-color: ${status.index % 2 == 0 ? '#f9f9f9' : '#ffffff'};">
-                    
+                <tr style="border:1px solid #ddd;
+                           background-color:${status.index % 2 == 0 ? '#f9f9f9' : '#ffffff'};">
                     <td style="color:black">${approver.userRole}</td>
-                    <td style="color:black">
-                      ${approver.status}
-                    </td >
+                    <td style="color:black">${approver.status}</td>
                     <td style="color:black">${approver.comments}</td>
-                    <td style="color:black">${approver.timestamp != null ? approver.timestamp : 'N/A'}</td>
+                    <td style="color:black">
+                        ${approver.timestamp != null ? approver.timestamp : 'N/A'}
+                    </td>
                 </tr>
             </c:forEach>
         </tbody>
-                </table>
-            </div> --%>
-            <%-- <div id="tab6" class="tab-content">
-  <div class="card-body p-3">
-        <table class="table table-bordered table-striped align-middle">
-            <thead class="table-light">
-                <tr class="text-center">
-                    <th style="width: 35%;color:black;">Document Type</th>
-                    <th style="width: 45%;color:black;">File Name</th>
-                    <th style="width: 20%;color:black;">Version</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="doc" items="${PreviousDocuments}" varStatus="loop">
-                    <c:choose>
-                        
-                        <c:when test="${loop.first or doc.DOCTYPE ne PreviousDocuments[loop.index - 1].DOCTYPE}">
-                            <tr>
-                                <td style="color:black;">${doc.DOCTYPE}</td>
-                                <td>
-                                    <a href="javascript:void(0);" 
-                                      onclick="downloadPreviousFile('${oldTransactionId}', '${doc.FILENAME}')"
-                                       class="text-primary text-decoration-underline">
-                                        ${doc.FILENAME}
-                                    </a>
-                                </td>
-                                <td style="color:black;">
-                                    <span class="badge bg-info text-dark">V${doc.VERSIONNO}</span>
-                                    <span>V${doc.VERSIONNO}</span>
-                                </td>
-                            </tr>
-                        </c:when>
 
-                        
-                        <c:otherwise>
-                            <tr>
-                                <td></td> <!-- Empty cell to visually group -->
-                                <td>
-                                    <a href="javascript:void(0);" 
-                                       onclick="downloadPreviousFile('${oldTransactionId}', '${doc.FILENAME}')"
-                                       class="text-primary text-decoration-underline">
-                                        ${doc.FILENAME}
-                                    </a>
-                                </td>
-                                <td style="color:black;"><!-- class="text-center"> -->
-                                    <span>V${doc.VERSIONNO}</span>
-                                </td>
-                            </tr>
-                        </c:otherwise>
-                    </c:choose>
-                </c:forEach>
-            </tbody>
-        </table>
-    </div>
-</div> --%>
+    </table>
+</div>
+            </div>
         </f:form>
     </div>
    

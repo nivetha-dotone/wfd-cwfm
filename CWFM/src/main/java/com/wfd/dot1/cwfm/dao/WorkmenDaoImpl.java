@@ -1157,12 +1157,12 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 	 }
 
 	@Override
-	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId) {
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId,String gatePassTypeId) {
 		 // Fetch approvers from GATEPASSAPPROVERINFO
-        List<ApproverInfo> approverList = this.getApproversByGatePassId(GatePassType.CREATE.getStatus(),unitId);
+        List<ApproverInfo> approverList = this.getApproversByGatePassId(gatePassTypeId,unitId);
 
         // Fetch approval statuses from GATEPASSAPPROVALSTATUS
-        List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(transactionId);
+        List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(transactionId,gatePassTypeId);
 
         // Map to hold approval status by User ID
         Map<String, ApprovalStatus> statusMap = approvalStatuses.stream()
@@ -1209,8 +1209,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		 return list;
 	}
 
-	private List<ApprovalStatus> getApprovalStatusByGatePassId(String transactionId) {
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getApprovalStatusOfGatePass(),transactionId);
+	private List<ApprovalStatus> getApprovalStatusByGatePassId(String transactionId,String gatePassTypeId) {
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getApprovalStatusOfGatePass(),transactionId,gatePassTypeId);
 		 List<ApprovalStatus> list = new ArrayList<ApprovalStatus>();
 		 while(rs.next()) {
 			 ApprovalStatus info=new ApprovalStatus();
