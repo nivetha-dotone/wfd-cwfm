@@ -1153,8 +1153,11 @@ public class WorkmenController {
     		}
     		}
 
-List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.CANCEL.getStatus());
-request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.CANCEL.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.CANCEL.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1217,7 +1220,10 @@ request.setAttribute("approvers", approvers);
     		}
     		}
     		
-    		List<ApproverStatusDTO> approvers =  workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLOCK.getStatus());
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.BLOCK.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLOCK.getStatus());
+    		}
     		request.setAttribute("approvers", approvers); 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1282,8 +1288,11 @@ request.setAttribute("approvers", approvers);
     		}
     		}
 
-List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.UNBLOCK.getStatus());
-request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.UNBLOCK.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.UNBLOCK.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1349,8 +1358,11 @@ request.setAttribute("approvers", approvers);
     		}
     		
 
-List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLACKLIST.getStatus());
-request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.BLACKLIST.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLACKLIST.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -1417,8 +1429,11 @@ request.setAttribute("approvers", approvers);
     		}
     		}
 
-List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.DEBLACKLIST.getStatus());
-request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.DEBLACKLIST.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.DEBLACKLIST.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -2025,8 +2040,11 @@ request.setAttribute("approvers", approvers);
 //    	     // Send to JSP
 //    	     request.setAttribute("LatestDocs", latestDocs);
 
-List<ApproverStatusDTO> approvers  = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.RENEW.getStatus());
-request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.RENEW.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.RENEW.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     	     
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
