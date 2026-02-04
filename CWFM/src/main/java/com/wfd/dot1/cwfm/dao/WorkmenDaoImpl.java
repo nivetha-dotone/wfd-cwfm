@@ -3533,6 +3533,15 @@ public GatePassMain getActiveCountDetails(String transactionId) {
 	return dto;
 }
 
-
+@Override
+public String getRenewTransactionIfExists(String gatePassId) {
+	String transactionId=null;
+	String query = "select TransactionId from GatePassTransactionMapping where gatepassId=? and GatePassTypeId='2'  order by CreatedDate desc";
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
+	if(rs.next()) {
+		transactionId = rs.getString("TransactionId");
+	}
+	return transactionId;
+}
 
 }

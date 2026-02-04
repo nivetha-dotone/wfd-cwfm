@@ -215,5 +215,7 @@ public interface WorkmenDao {
 
 	GatePassMain getActiveCountDetails(String transactionId);
 
+	String getRenewTransactionIfExists(String gatePassId);
+
 
 }

@@ -1336,6 +1336,10 @@ public class WorkmenServiceImpl implements WorkmenService{
 	    return "allow";
 	}
 
+	@Override
+	public String getRenewTransactionIfExists(String gatePassId) {
+		return workmenDao.getRenewTransactionIfExists(gatePassId);
+	}
 	
 	}
 

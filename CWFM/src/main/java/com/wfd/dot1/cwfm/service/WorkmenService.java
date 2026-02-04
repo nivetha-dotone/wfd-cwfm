@@ -140,6 +140,8 @@ public interface WorkmenService {
 
 	String saveProjectGatePass(GatePassMain gatePassMain);
 
+	String getRenewTransactionIfExists(String gatePassId);
+
 	
 
 	
