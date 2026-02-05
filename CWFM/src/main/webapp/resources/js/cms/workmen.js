@@ -1012,6 +1012,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     }
     
     function approveRejectGatePass(status,type){
+		showLoader();
 		let isValid=true;let gatePassType=1;
 		if(type === "project"){
 			gatePassType=12;
@@ -1021,6 +1022,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
         $("#error-approvercomments").show();
         alert("Comments Required in Documents");
         isValid = false;
+        hideLoader();
     }else{
 		$("#error-approvercomments").hide();
 	}
@@ -1039,21 +1041,26 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
     xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
     xhr.onload = function() {
+		hideLoader();
         if (xhr.status === 200) {
             // Handle successful response
             console.log("Data saved successfully:", xhr.responseText);
 			sessionStorage.setItem("successMessage", "Gatepass approved/rejected successfully!");
             if(type=== "regular"){
                     loadCommonList('/contractworkmen/list', 'On-Boarding List');
+                    //hideLoader();
                 }else  if(type=== "quick"){
                     loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
+                    //hideLoader();
                 }else{
 					loadCommonList('/contractworkmen/projectOnboardingList', 'Project Gatepass List');
+					//hideLoader();
 				}
         }			else if (xhr.status === 400) {  
 							       const msg = xhr.responseText.trim();
 							       console.error("Server validation failed: " + msg);
 								   showLicenseError(msg);
+								  // hideLoader();
 							       //alertap(msg); // or show in UI better
 							       //sessionStorage.setItem("errorMessage", msg);
 								   return;
@@ -1062,12 +1069,15 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
 			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
+			//hideLoader();
         }
     };
     
     xhr.onerror = function() {
+		hideLoader();
         console.error("Request failed");
 		sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
+		//hideLoader();
     };
     
     // Send the data object as a JSON string
@@ -1087,6 +1097,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     
 
 	function submitGatePass(userId,type) {
+		showLoader();
     let basicValid = true;
     let employmentValid = true;
     let otherValid = true;
@@ -1101,6 +1112,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     // Validate the files (optional)
     if (!validateFiles(aadharFile, policeFile,profilePic,appointmentFile)) {
         documentValid = false; // Stop the upload if validation fails
+        hideLoader();
     }
 
     if (!validateBasicData()) {
@@ -1244,15 +1256,19 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
         xhr.open("POST", "/CWFM/contractworkmen/saveGatePass", true);
 
         xhr.onload = function () {
+			hideLoader();
             if (xhr.status === 200) {
                 console.log("Data saved successfully:", xhr.responseText);
 				sessionStorage.setItem("successMessage", "Gatepass saved successfully!");
                 if(type=== "regular"){
                     loadCommonList('/contractworkmen/list', 'On-Boarding List');
+                    //hideLoader();
                 }else if(type=== "quick"){
                     loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
+                   // hideLoader();
                 }else{
 					loadCommonList('/contractworkmen/projectOnboardingList', 'Project Gatepass List');
+					//hideLoader();
 				}
             }else if (xhr.status === 400) {  
 				       const msg = xhr.responseText.trim();
@@ -1269,6 +1285,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
         };
 
         xhr.onerror = function () {
+			hideLoader();
             console.error("Request failed");
 			sessionStorage.setItem("errorMessage", "Failed to save Gatepass!");
         };
@@ -1461,12 +1478,14 @@ if(isValid){
 	}
 	}//eofunc
 function approveRejectCancel(status,gatePassType){
+	showLoader();
 	let isValid=true;
 	 const approvercomments = $("#approvercomments").val().trim();
    if (approvercomments === "" && status==5) {
        $("#error-approvercomments").show();
        alert("Comments Required in Documents");
        isValid = false;
+       hideLoader();
    }else{
 	$("#error-approvercomments").hide();
 }
@@ -1485,19 +1504,23 @@ if(isValid){
    xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
    xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
    xhr.onload = function() {
+	   hideLoader();
        if (xhr.status === 200) {
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
 		   sessionStorage.setItem("successMessage", "Gatepass cancel request approved/rejected successfully!");
          loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
+         //hideLoader();
        } else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
 		   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass cancel request!");
+		   //hideLoader();
        }
    };
    
    xhr.onerror = function() {
+	   hideLoader();
        console.error("Request failed");
 	   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass cancel request!");
    };
@@ -1553,12 +1576,14 @@ if(isValid){
 		}
 		}//eofunc
 	function approveRejectBlock(status,gatePassType){
+		showLoader();
 		let isValid=true;
 		 const approvercomments = $("#approvercomments").val().trim();
 	   if (approvercomments === "" && status==5 ) {
 	       $("#error-approvercomments").show();
 	       alert("Comments Required in Documents");
 	       isValid = false;
+	       hideLoader();
 	   }else{
 		$("#error-approvercomments").hide();
 	}
@@ -1577,20 +1602,24 @@ if(isValid){
 	   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
 	   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 	   xhr.onload = function() {
+		   hideLoader();
 	       if (xhr.status === 200) {
 	           // Handle successful response
 	           console.log("Data saved successfully:", xhr.responseText);
 			   sessionStorage.setItem("successMessage", "Gatepass block request approved/rejected successfully!");
 	         loadCommonList('/contractworkmen/blockListFilter', 'Block List');
+	         //hideLoader();
 	       } else {
 	           // Handle error response
 	           console.error("Error saving data:", xhr.statusText);
 			   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass block request!");
+			  // hideLoader();
 	       }
 	   };
 	   
 	   xhr.onerror = function() {
 	       console.error("Request failed");
+	       hideLoader();
 	   };
 	   
 	   // Send the data object as a JSON string
@@ -1644,12 +1673,14 @@ if(isValid){
 				}
 				}//eofunc
 		function approveRejectUnblock(status,gatePassType){
+			showLoader();
 			let isValid=true;
 			 const approvercomments = $("#approvercomments").val().trim();
 		   if (approvercomments === "" && status==5) {
 		       $("#error-approvercomments").show();
 		       alert("Comments Required in Documents");
 		       isValid = false;
+		       hideLoader();
 		   }else{
 			$("#error-approvercomments").hide();
 		}
@@ -1668,21 +1699,26 @@ if(isValid){
 		   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
 		   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 		   xhr.onload = function() {
+			   hideLoader();
 		       if (xhr.status === 200) {
 		           // Handle successful response
 		           console.log("Data saved successfully:", xhr.responseText);
 				   sessionStorage.setItem("successMessage", "Gatepass unblock approved/rejected successfully!");
 		         loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
+		         //hideLoader();
 		       } else {
 		           // Handle error response
 		           console.error("Error saving data:", xhr.statusText);
 				   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass unblock request!");
+				   //hideLoader();
 		       }
 		   };
 		   
 		   xhr.onerror = function() {
+			   hideLoader();
 		       console.error("Request failed");
 			   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass unblock request!");
+			   //hideLoader();
 		   };
 		   
 		   // Send the data object as a JSON string
@@ -1736,12 +1772,14 @@ xhr.send(JSON.stringify(data));
 	}
 	}//eofunc
 			function approveRejectBlack(status,gatePassType){
+				showLoader();
 let isValid=true;
  const approvercomments = $("#approvercomments").val().trim();
 					   if (approvercomments === "" && status==5 ) {
 					       $("#error-approvercomments").show();
 					       alert("Comments Required in Documents");
 					       isValid = false;
+					       hideLoader();
 					   }else{
 $("#error-approvercomments").hide();
 					}
@@ -1760,11 +1798,13 @@ const data = {
 					   xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
 					   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 					   xhr.onload = function() {
+						   hideLoader();
 					       if (xhr.status === 200) {
 					           // Handle successful response
 					           console.log("Data saved successfully:", xhr.responseText);
 							   sessionStorage.setItem("successMessage", "Gatepass blacklist request approved/rejected successfully!");
 					         loadCommonList('/contractworkmen/blackListFilter', 'Black List');
+					         //hideLoader();
 					       } else {
 					           // Handle error response
 					           console.error("Error saving data:", xhr.statusText);
@@ -1772,13 +1812,16 @@ const data = {
 					   };
 					   
 					   xhr.onerror = function() {
+						   hideLoader();
 					       console.error("Request failed");
 						   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass blacklist request!");
+						   //hideLoader();
 					   };
 					   
 					   // Send the data object as a JSON string
 					   xhr.send(JSON.stringify(data));
 					   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass blacklist request!");
+					   //hideLoader();
 }else{
 	//error 
 }
@@ -1828,12 +1871,14 @@ function submitDeblack(userId,gatePassType){
 				}
 				}//eofunc
 function approveRejectDeblacklist(status,gatePassType){
+	showLoader();
 			let isValid=true;
 			 const approvercomments = $("#approvercomments").val().trim();
 		if (approvercomments === "" && status==5) {
 		    $("#error-approvercomments").show();
 		    alert("Comments Required in Documents");
 		    isValid = false;
+		    hideLoader();
 		}else{
 			$("#error-approvercomments").hide();
 		}
@@ -1852,19 +1897,23 @@ function approveRejectDeblacklist(status,gatePassType){
 		xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
 		xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 		xhr.onload = function() {
+			hideLoader();
 		    if (xhr.status === 200) {
 		        // Handle successful response
 		        console.log("Data saved successfully:", xhr.responseText);
 				sessionStorage.setItem("successMessage", "Gatepass deblacklist request approved/rejected successfully!");
 		      loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
+		      //hideLoader();
 		    } else {
 		        // Handle error response
 		        console.error("Error saving data:", xhr.statusText);
 				sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass deblacklist request!");
+				//hideLoader();
 		    }
 		};
 		
 		xhr.onerror = function() {
+			hideLoader();
 		    console.error("Request failed");
 			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass deblacklist request!");
 		};
@@ -1876,6 +1925,7 @@ function approveRejectDeblacklist(status,gatePassType){
 			}
 			}//eofunc
 			function submitLostOrDamage(userId,gatePassType){
+				showLoader();
 let isValid=true;
  const comments = $("#comments").val().trim();
 if (comments === "") {
@@ -1896,19 +1946,23 @@ const data = {
 xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
 xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
 xhr.onload = function() {
+	hideLoader();
     if (xhr.status === 200) {
         // Handle successful response
         console.log("Data saved successfully:", xhr.responseText);
 		sessionStorage.setItem("successMessage", "Gatepass lost or damage request raised successfully!");
 	   loadCommonList('/contractworkmen/lostordamageFilter', 'Lost or Damage List');
+	   //hideLoader();
     } else {
         // Handle error response
         console.error("Error saving data:", xhr.statusText);
 		sessionStorage.setItem("errorMessage", "Failed to raise Gatepass lost or damage request!");
+		//hideLoader();
     }
 };
 
 xhr.onerror = function() {
+	hideLoader();
     console.error("Request failed");
 	sessionStorage.setItem("errorMessage", "Failed to raise Gatepass lost or damage request!");
 };
@@ -2550,6 +2604,7 @@ function previewImage(event, inputId, displayId) {
 										    xhr.send();
 										}
 								function draftGatePass(userId) {
+									showLoader();
 											    // ✅ Utility function for Capital Case
                                                    function toCapitalCase(str) {
                                                      return str
@@ -2634,19 +2689,22 @@ function previewImage(event, inputId, displayId) {
 										        xhr.open("POST", "/CWFM/contractworkmen/draftGatePass", true);
 
 										        xhr.onload = function () {
+													hideLoader();
 										            if (xhr.status === 200) {
 										                console.log("Data saved successfully:", xhr.responseText);
 														sessionStorage.setItem("successMessage", "Gatepass drafted successfully!");
 										                loadCommonList('/contractworkmen/list', 'On-Boarding List');
-														
+														//hideLoader();
 										            } else {
 										                console.error("Error saving data:", xhr.status, xhr.responseText);
 														sessionStorage.setItem("errorMessage", "Failed to draft Gatepass!");
 														loadCommonList('/contractworkmen/list', 'On-Boarding List');
+														//hideLoader();
 										            }
 										        };
 
 										        xhr.onerror = function () {
+													hideLoader();
 										            console.error("Request failed");
 													sessionStorage.setItem("errorMessage", "Failed to draft Gatepass!");
 													loadCommonList('/contractworkmen/list', 'On-Boarding List');
@@ -2755,6 +2813,7 @@ function redirectToWorkmenRenewEdit() {
 	xhr.send();
 }
 function renewGatePass(userId) {
+	showLoader();
     let basicValid = true;
     let employmentValid = true;
     let otherValid = true;
@@ -2768,6 +2827,7 @@ function renewGatePass(userId) {
     // Validate the files (optional)
     if (!validateFiles(aadharFile, policeFile,profilePic,appointmentFile)) {
         documentValid = false; // Stop the upload if validation fails
+        hideLoader();
     }
 
     if (!validateBasicData()) {
@@ -2892,11 +2952,12 @@ for (const [key, value] of data.entries()) {
         xhr.open("POST", "/CWFM/contractworkmen/renewGatePass", true);
 
         xhr.onload = function () {
+			hideLoader();
             if (xhr.status === 200) {
                 console.log("Data saved successfully:", xhr.responseText);
 				sessionStorage.setItem("successMessage", "Gatepass renew request raised successfully!");
                 loadCommonList('/contractworkmen/renewFilter', 'Renew List');
-				
+				//hideLoader();
             } else {
                 console.error("Error saving data:", xhr.status, xhr.responseText);
 				sessionStorage.setItem("errorMessage", "Failed to raise Gatepass renew request!");
@@ -2904,6 +2965,7 @@ for (const [key, value] of data.entries()) {
         };
 
         xhr.onerror = function () {
+			hideLoader();
             console.error("Request failed");
 			sessionStorage.setItem("errorMessage", "Failed to raise Gatepass renew request!");
         };
@@ -2916,12 +2978,14 @@ for (const [key, value] of data.entries()) {
 }
 
 function approveRejectRenew(status,gatePassType){
+	showLoader();
 	let isValid=true;
 	 const approvercomments = $("#approvercomments").val().trim();
    if (approvercomments === "" && status==5) {
        $("#error-approvercomments").show();
        alert("Comments Required in Documents");
        isValid = false;
+       hideLoader();
    }else{
 	$("#error-approvercomments").hide();
 }
@@ -2940,27 +3004,32 @@ if(isValid){
    xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
    xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
    xhr.onload = function() {
+	   hideLoader();
        if (xhr.status === 200) {
            // Handle successful response
            console.log("Data saved successfully:", xhr.responseText);
 		   sessionStorage.setItem("successMessage", "Gatepass renew request approved/rejected successfully!");
          loadCommonList('/contractworkmen/renewFilter', 'Renew List');
+         //hideLoader();
        } 		 else if (xhr.status === 400) {  
 		 							       const msg = xhr.responseText.trim();
 		 							       console.error("Server validation failed: " + msg);
 		 								   showLicenseError(msg);
 		 							       //alert(msg); // or show in UI better
 		 							       //sessionStorage.setItem("errorMessage", msg);
+		 								   //hideLoader();
 		 								   return;
 		 							   }
 	   else {
            // Handle error response
            console.error("Error saving data:", xhr.statusText);
 		   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass renew request!");
+		   //hideLoader();
        }
    };
    
    xhr.onerror = function() {
+	   hideLoader();
        console.error("Request failed");
 	   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass renew request!");
    };
@@ -3995,4 +4064,11 @@ function aadharValidation(){
 
 			     }
 				 return aadharCheckPassed;
+}
+function showLoader() {
+    document.getElementById("loaderOverlay").style.display = "flex";
+}
+
+function hideLoader() {
+    document.getElementById("loaderOverlay").style.display = "none";
 }
