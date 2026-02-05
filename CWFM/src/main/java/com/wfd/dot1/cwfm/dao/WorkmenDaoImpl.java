@@ -3500,6 +3500,7 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String 
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;

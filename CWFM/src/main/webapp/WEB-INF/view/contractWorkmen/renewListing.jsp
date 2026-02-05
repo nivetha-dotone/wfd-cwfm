@@ -194,7 +194,8 @@
 <select id="principalEmployerId" name="principalEmployerId" style="color:gray;padding:3px;" onchange="loadDepartments(this.value)">
     <option value="">Select Principal Employer</option>
     <c:forEach items="${principalEmployers}" var="pe">
-        <option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option>
+        <option value="${pe.id}" >${pe.description}</option>
+        <%-- <option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option> --%>
     </c:forEach>
 </select>
 
