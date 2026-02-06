@@ -507,7 +507,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
 	        				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
 	        gatePassMain.getUserId(),
-	        gatePassMain.getOnboardingType(),gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName()
+	        gatePassMain.getOnboardingType(),gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName(),gatePassMain.getDisability(),gatePassMain.getWorkmenType()
 	        };
 
 	}
@@ -729,6 +729,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 			dto.setOnboardingType(rs.getString("OnboardingType"));
 			dto.setLlNo(rs.getString("LLNo"));
 			dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+			dto.setDisability(rs.getString("disability"));
+			dto.setWorkmenType(rs.getString("WorkmenType"));
 			}
 		log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 		return dto;
@@ -753,7 +755,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 			    gpm.getDepartment() != null ? gpm.getDepartment() : "",
 			    gpm.getSubdepartment() != null ? gpm.getSubdepartment() : "",
 			    gpm.getTrade() != null ? gpm.getTrade() : "",
-			    gpm.getSkill() != null ? gpm.getSkill() : ""
+			    gpm.getSkill() != null ? gpm.getSkill() : "",
+			    gpm.getWorkmenType() != null ? gpm.getWorkmenType() : ""
 			};
 
 		log.info("Query to getAllGeneralMastersForGatePass "+query);
@@ -1390,7 +1393,9 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getPoliceVerificationDate()!=null?gatePassMain.getPoliceVerificationDate():" ",
 	        gatePassMain.getDot()!=null?gatePassMain.getDot():" ",
 	        gatePassMain.getUserId(),
-	        "regular",gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName()!=null?gatePassMain.getAppointmentDocName():" "
+	        "regular",gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName()!=null?gatePassMain.getAppointmentDocName():" ",
+	        	gatePassMain.getDisability()!=null?gatePassMain.getDisability():" ",
+	        			gatePassMain.getWorkmenType()!=null?gatePassMain.getWorkmenType():" "
 	    };
 	}
 public String getContractWorkmenDraftDetails() {
@@ -1550,6 +1555,9 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDraftDetails dao method "+transactionId);
 	return dto;
@@ -1610,7 +1618,7 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
         				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
-        gatePassMain.getUserId(),gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName(),transId
+        gatePassMain.getUserId(),gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName(),gatePassMain.getDisability(),gatePassMain.getWorkmenType(),transId
     };
 }
 
@@ -1710,6 +1718,9 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setDot(rs.getString("DOT"));
 		dto.setOnboardingType(rs.getString("OnboardingType"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 	return dto;
@@ -1884,6 +1895,8 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
 		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -2414,7 +2427,8 @@ public long saveIntoCMSPerson(CMSPerson person) {
         person.getIdMark(),
         person.getPanNumber(),
         person.getUpdatedBy(),
-        person.getAadharNumber()
+        person.getAadharNumber(),
+        
     };
 
     try {
@@ -2646,6 +2660,12 @@ private String mapGatePassValue(String field, GatePassMain gp) {
         case "Status":
             return gp.getGatePassStatus();  // Block / Approve etc.
 
+        case "WorkmenType":
+            return gp.getWorkmenType();
+            
+        case "PhysicallyChallenged":
+            return gp.getDisability();
+            
         default:
             return null;
     }
@@ -2730,6 +2750,9 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdForApprove(St
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -3249,7 +3272,7 @@ private Object[] prepareRenewGatePassParameters1(String transId, GatePassMain ga
         gatePassMain.getAadharDocName(),gatePassMain.getPhotoName(),gatePassMain.getBankDocName(),
         gatePassMain.getPoliceVerificationDocName(),gatePassMain.getIdProof2DocName(),gatePassMain.getMedicalDocName(),
         gatePassMain.getEducationDocName(),gatePassMain.getForm11DocName(),gatePassMain.getTrainingDocName(),gatePassMain.getOtherDocName(),
-        transId
+        gatePassMain.getAppointmentDocName(),gatePassMain.getDisability(),gatePassMain.getWorkmenType(),transId
     };
 }
 @Override
@@ -3501,6 +3524,8 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String 
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
 		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;

@@ -480,6 +480,20 @@ function initializeDatePicker() {
     }else{
 		$("#error-maritalStatus").hide();
 	}
+	const workmenType = $("#workmenType").val();
+	 if (workmenType === "") {
+        $("#error-workmenType").show();
+        isValid = false;
+    }else{
+		$("#error-workmenType").hide();
+	}
+	const disability = $("#disability").val();
+	 if (disability === "") {
+        $("#error-disability").show();
+        isValid = false;
+    }else{
+		$("#error-disability").hide();
+	}
 	const address=$("#address").val().trim();
 	const addressRegex=/^[A-Za-z0-9\s,.'-]{5,}$/;
 	if (!addressRegex.test(address)) {
@@ -995,7 +1009,13 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     
     var selectedRow = selectedCheckboxes[0].closest('tr');
     var transactionId = selectedRow.querySelector('[name="selectedWOs"]').value;
+    //var gatePassType = selectedRow.cells[7].innerText.trim(); // Adjust index if needed
+    var status = selectedRow.cells[9].innerText.trim(); // Adjust index if needed
 
+         if (status.toLowerCase() == "draft") {
+             alert("Status 'Draft' record can not View.");
+            return;
+           }
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -1069,15 +1089,15 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
 			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
-			//hideLoader();
+			hideLoader();
         }
     };
     
     xhr.onerror = function() {
-		hideLoader();
+		//hideLoader();
         console.error("Request failed");
 		sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
-		//hideLoader();
+		hideLoader();
     };
     
     // Send the data object as a JSON string
@@ -1231,6 +1251,8 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 			doj:$("#doj").val(),
 			pfApplicable:pfApplicable,
             policeVerificationDate: trimIfPresent($("#policeVerificationDate").val()),
+            disability:$("#disability").val(),
+            workmenType:$("#workmenType").val(),
 			onboardingType:type,
         };
 
@@ -1520,9 +1542,10 @@ if(isValid){
    };
    
    xhr.onerror = function() {
-	   hideLoader();
+	  // hideLoader();
        console.error("Request failed");
 	   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass cancel request!");
+	    hideLoader();
    };
    
    // Send the data object as a JSON string
@@ -1715,10 +1738,10 @@ if(isValid){
 		   };
 		   
 		   xhr.onerror = function() {
-			   hideLoader();
+			  // hideLoader();
 		       console.error("Request failed");
 			   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass unblock request!");
-			   //hideLoader();
+			   hideLoader();
 		   };
 		   
 		   // Send the data object as a JSON string
@@ -1812,10 +1835,10 @@ const data = {
 					   };
 					   
 					   xhr.onerror = function() {
-						   hideLoader();
+						   //hideLoader();
 					       console.error("Request failed");
 						   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass blacklist request!");
-						   //hideLoader();
+						   hideLoader();
 					   };
 					   
 					   // Send the data object as a JSON string
@@ -1913,9 +1936,10 @@ function approveRejectDeblacklist(status,gatePassType){
 		};
 		
 		xhr.onerror = function() {
-			hideLoader();
+			//hideLoader();
 		    console.error("Request failed");
 			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass deblacklist request!");
+			 hideLoader();
 		};
 		
 		// Send the data object as a JSON string
@@ -1962,9 +1986,10 @@ xhr.onload = function() {
 };
 
 xhr.onerror = function() {
-	hideLoader();
+	//hideLoader();
     console.error("Request failed");
 	sessionStorage.setItem("errorMessage", "Failed to raise Gatepass lost or damage request!");
+	 hideLoader();
 };
 
 // Send the data object as a JSON string
@@ -2677,7 +2702,8 @@ function previewImage(event, inputId, displayId) {
 													doj:$("#doj").val(),
 													pfApplicable:pfApplicable,
                                                     policeVerificationDate: $("#policeVerificationDate").val().trim(),
-			
+			                                        disability:$("#disability").val(),
+                                                    workmenType:$("#workmenType").val(),
 										        };
 
 										        // Serialize the JSON object to a string
@@ -2908,6 +2934,8 @@ function renewGatePass(userId) {
 			doj:$("#doj").val(),
 			pfApplicable:pfApplicable,
             policeVerificationDate: $("#policeVerificationDate").val().trim(),
+            disability:$("#disability").val(),
+            workmenType:$("#workmenType").val(),
         };
 
         // Serialize the JSON object to a string
@@ -3029,9 +3057,10 @@ if(isValid){
    };
    
    xhr.onerror = function() {
-	   hideLoader();
+	   //hideLoader();
        console.error("Request failed");
 	   sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass renew request!");
+	    hideLoader();
    };
    
    // Send the data object as a JSON string

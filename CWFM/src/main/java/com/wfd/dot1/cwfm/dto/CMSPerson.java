@@ -30,6 +30,21 @@ public class CMSPerson {
 	private String updatedDate;
 	private String updatedBy;
 	private String aadharNumber;
+	private int disability;
+	private int workmenType;
+	
+	public int getDisability() {
+		return disability;
+	}
+	public void setDisability(int disability) {
+		this.disability = disability;
+	}
+	public int getWorkmenType() {
+		return workmenType;
+	}
+	public void setWorkmenType(int workmenType) {
+		this.workmenType = workmenType;
+	}
 	public int getEmployeeId() {
 		return employeeId;
 	}

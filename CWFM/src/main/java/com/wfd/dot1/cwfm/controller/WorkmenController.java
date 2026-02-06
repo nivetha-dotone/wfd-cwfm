@@ -135,7 +135,8 @@ public class WorkmenController {
 		        "ACADEMICS", "Academics",
 		        "WAGECATEGORY", "WageCategory",
 		        "BONUSPAYOUT", "BonusPayout",
-		        "ZONE", "Zone"
+		        "ZONE", "Zone",
+		        "WORKMENTYPE","WorkmenType"
 		);
 
 		// Iterate over the attribute mappings and set the request attributes dynamically
@@ -641,6 +642,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		} else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
@@ -1163,6 +1166,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
 
@@ -1235,6 +1240,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		
@@ -1308,6 +1315,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
 
@@ -1382,6 +1391,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		
@@ -1459,6 +1470,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
 
@@ -1534,6 +1547,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		
@@ -1684,7 +1699,9 @@ public class WorkmenController {
 	        "ACADEMICS", "Academics",
 	        "WAGECATEGORY", "WageCategory",
 	        "BONUSPAYOUT", "BonusPayout",
-	        "ZONE", "Zone"
+	        "ZONE", "Zone",
+	        "WORKMENTYPE","WorkmenType"
+	        
 	);
 
 	// Iterate over the attribute mappings and set the request attributes dynamically
@@ -1847,7 +1864,8 @@ public class WorkmenController {
 	        "ACADEMICS", "Academics",
 	        "WAGECATEGORY", "WageCategory",
 	        "BONUSPAYOUT", "BonusPayout",
-	        "ZONE", "Zone"
+	        "ZONE", "Zone",
+	        "WORKMENTYPE","WorkmenType"
 	);
 
 	// Iterate over the attribute mappings and set the request attributes dynamically
@@ -2068,6 +2086,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		
@@ -2258,7 +2278,8 @@ public class WorkmenController {
 		        "ACADEMICS", "Academics",
 		        "WAGECATEGORY", "WageCategory",
 		        "BONUSPAYOUT", "BonusPayout",
-		        "ZONE", "Zone"
+		        "ZONE", "Zone",
+		        "WORKMENTYPE","WorkmenType"
 		);
 
 		// Iterate over the attribute mappings and set the request attributes dynamically
@@ -2846,7 +2867,8 @@ if (status.contains("Unique")) {
 		        "ACADEMICS", "Academics",
 		        "WAGECATEGORY", "WageCategory",
 		        "BONUSPAYOUT", "BonusPayout",
-		        "ZONE", "Zone"
+		        "ZONE", "Zone",
+		        "WORKMENTYPE","WorkmenType"
 		);
 
 		// Iterate over the attribute mappings and set the request attributes dynamically

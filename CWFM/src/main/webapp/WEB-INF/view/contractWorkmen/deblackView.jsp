@@ -543,6 +543,14 @@ textarea {
                 	<input id="maritalStatus" name="maritalStatus" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.maritalStatus }" readonly>
                 	 </td>
             </tr>
+            <tr>
+            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.disability"/></label></th>				
+				<td ><input id="disability" name="disability" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.disability }" readonly></td>
+          
+           <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenType"/></label></th>
+                            <td><input id="workmenType" name="workmenType" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.workmenType }" readonly>  </td>
+           
+            </tr>
              <tr>
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td>

@@ -864,7 +864,33 @@ label {
                 	<label id="error-maritalStatus"style="color: red;display: none;">Marital Status is required</label>
                 </td>
             </tr>
-           <tr>
+           
+                  <tr>
+                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.disability"/></label></th>				
+				<td >
+				    <select class="custom-select" id="disability"   name="disability"  >
+						<option value="" >Select Disability</option>
+						<option value="Yes" ${GatePassObj.disability eq 'Yes' ? 'selected="selected"' : ''}>Yes</option>
+						<option value="No" ${GatePassObj.disability eq 'No' ? 'selected="selected"' : ''}>No</option>
+				    </select>
+						<label id="error-disability"style="color: red;display: none;">Disability is required</label>
+						</td>
+						
+                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenType"/></label></th>
+                            <td>  
+                            <select class="custom-select"  id="workmenType" name="workmenType" >
+       								 <option value="">Please select Workmen Type</option>
+									
+        							<c:forEach var="option" items="${WorkmenType}">
+										<option value="${option.gmId}" ${GatePassObj.workmenType eq option.gmId ? 'selected="selected"' : ''}>
+										${option.gmName}</option>
+                        			</c:forEach>
+									
+    								</select>
+    								 <label id="error-workmenType"style="color: red;display: none;">Workmen Type is required</label>
+    						</td>
+                  </tr>
+                  <tr>
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td>
                 <c:if test="${empty GatePassObj.address }">
@@ -884,7 +910,8 @@ label {
     </div>
                 	<label id="error-address" style="color: red;display: none;">Please enter a valid Address</label>
                 </td>
-           </tr>
+                
+                  </tr>
         </tbody>
     </table>
    

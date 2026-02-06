@@ -533,6 +533,20 @@ public class GatePassMain {
 	public void setOldTransactionId(String oldTransactionId) {
 		this.oldTransactionId = oldTransactionId;
 	}
+	private String workmenType;
+	public String disability;
+	public String getWorkmenType() {
+		return workmenType;
+	}
+	public void setWorkmenType(String workmenType) {
+		this.workmenType = workmenType;
+	}
+	public String getDisability() {
+		return disability;
+	}
+	public void setDisability(String disability) {
+		this.disability = disability;
+	}
 	
 	}
 	
