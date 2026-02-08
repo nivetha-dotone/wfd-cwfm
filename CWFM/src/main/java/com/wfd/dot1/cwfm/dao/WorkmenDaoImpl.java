@@ -756,7 +756,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 			    gpm.getSubdepartment() != null ? gpm.getSubdepartment() : "",
 			    gpm.getTrade() != null ? gpm.getTrade() : "",
 			    gpm.getSkill() != null ? gpm.getSkill() : "",
-			    gpm.getWorkmenType() != null ? gpm.getWorkmenType() : ""
+			    gpm.getWorkmenType() != null ? gpm.getWorkmenType() : "",
+			    gpm.getReasoning() != null ? gpm.getReasoning() : ""
 			};
 
 		log.info("Query to getAllGeneralMastersForGatePass "+query);
@@ -1721,6 +1722,12 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
 		dto.setDisability(rs.getString("disability"));
 		dto.setWorkmenType(rs.getString("WorkmenType"));
+		dto.setReasoning(rs.getString("Reasoning"));
+		dto.setExitLetterDocName(rs.getString("ExitLetterDocName"));
+		dto.setFNFDocName(rs.getString("FNFDocName"));
+		dto.setFeedbackFormDocName(rs.getString("FeedbackFormDocName"));
+		dto.setRateManagerDocName(rs.getString("RateManagerDocName"));
+		dto.setLOCDocName(rs.getString("LOCDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 	return dto;
@@ -1897,6 +1904,12 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
 		dto.setDisability(rs.getString("disability"));
 		dto.setWorkmenType(rs.getString("WorkmenType"));
+		dto.setReasoning(rs.getString("Reasoning"));;
+		dto.setExitLetterDocName(rs.getString("ExitLetterDocName"));
+		dto.setFNFDocName(rs.getString("FNFDocName"));
+		dto.setFeedbackFormDocName(rs.getString("FeedbackFormDocName"));
+		dto.setRateManagerDocName(rs.getString("RateManagerDocName"));
+		dto.setLOCDocName(rs.getString("LOCDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -2753,6 +2766,12 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdForApprove(St
 		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
 		dto.setDisability(rs.getString("disability"));
 		dto.setWorkmenType(rs.getString("WorkmenType"));
+		dto.setReasoning(rs.getString("Reasoning"));
+		dto.setExitLetterDocName(rs.getString("ExitLetterDocName"));
+		dto.setFNFDocName(rs.getString("FNFDocName"));
+		dto.setFeedbackFormDocName(rs.getString("FeedbackFormDocName"));
+		dto.setRateManagerDocName(rs.getString("RateManagerDocName"));
+		dto.setLOCDocName(rs.getString("LOCDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -2816,21 +2835,26 @@ public boolean updateCmsPersonCustDataEffectiveTill(long personId) {
 public String getCustomDefIDforGPtype() {
 	return QueryFileWatcher.getQuery("GET_CUSTOMDEFID_FOR_GP_TYPE");
 }
+public String getCustomDefIDforreasoning() {
+	return QueryFileWatcher.getQuery("GET_CUSTOMDEFID_FOR_REASONING");
+}
 public String insertIntoCustData() {
 	return QueryFileWatcher.getQuery("INSERT_CUSTOM_DATA");
 }
 @Override
-public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus) {
-	String defSql = getCustomDefIDforGPtype();
+public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus,String reasoning) {
+	String defSqlGatePass  = getCustomDefIDforGPtype();
+	String defSqlReasoning  = getCustomDefIDforreasoning();
 	//String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
 	//		+ "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'GatePassType'";
 
-	Integer defId = jdbcTemplate.queryForObject(defSql, Integer.class);
-
-	if (defId == null) {
-		return false; // No definition → nothing to update
-	}
+	Integer gatePassDefId  = jdbcTemplate.queryForObject(defSqlGatePass, Integer.class);
+	Integer reasoningDefId  = jdbcTemplate.queryForObject(defSqlReasoning, Integer.class);
 	
+	if (gatePassDefId == null || reasoningDefId == null) {
+        log.error("Custom definition IDs not found");
+        return false;
+    }
 	
 	boolean result = false;
 	String sql = insertIntoCustData();
@@ -2838,10 +2862,12 @@ public boolean insertIntoCustData(String updatedBy,long personId,String gatePass
     //        + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
     //        + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
 
-   Object[] parameters = new Object[] {personId,defId,gatePassStatus,updatedBy};
+   //Object[] parameters = new Object[] {personId,gatePassDefId,gatePassStatus,updatedBy};
+	 int count1 =jdbcTemplate.update(sql,personId,gatePassDefId,gatePassStatus,updatedBy);
+	 int count2 =jdbcTemplate.update(sql,personId,reasoningDefId,reasoning,updatedBy);
    try {
-   int status = jdbcTemplate.update(sql, parameters);
-   if (status > 0) {
+   //int status = jdbcTemplate.update(sql,count1,count2);
+   if (count1 > 0 && count2>0) {
    	result=true;
    }else {
        log.warn("Failed to create GatePass action for GatePassId: " );
@@ -3571,5 +3597,36 @@ public String getRenewTransactionIfExists(String gatePassId) {
 	}
 	return transactionId;
 }
+
+@Override
+public boolean updateGatePassMainWithReasoningTab(GatePassActionDto dto,MultipartFile exitFile,MultipartFile fnfFile,
+        MultipartFile feedbackFile,MultipartFile rateManagerFile,MultipartFile locFile) {
+
+    String sql = "update GATEPASSMAIN set Reasoning=?,ExitLetterDocName=?,FNFDocName=?,FeedbackFormDocName=?,RateManagerDocName=?,LOCDocName=? where GatePassId=?";
+    try {
+
+        String exitName = (exitFile != null && !exitFile.isEmpty()) ? "exitletter" : null;
+        String fnfName = (fnfFile != null && !fnfFile.isEmpty()) ? "fnf" : null;
+        String feedbackName = (feedbackFile != null && !feedbackFile.isEmpty()) ? "feedback" : null;
+        String rateManagerName = (rateManagerFile != null && !rateManagerFile.isEmpty()) ? "ratemanager" : null;
+        String locName = (locFile != null && !locFile.isEmpty()) ? "loc" : null;
+
+        int result = jdbcTemplate.update(sql,
+                dto.getReasoning(),
+                exitName,
+                fnfName,
+                feedbackName,
+                rateManagerName,
+                locName,
+                dto.getGatePassId());
+
+        return result > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
 
 }

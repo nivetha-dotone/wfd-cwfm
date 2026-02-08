@@ -142,6 +142,9 @@ public interface WorkmenService {
 
 	String getRenewTransactionIfExists(String gatePassId);
 
+	public boolean  updateGatePassMainWithReasoningTab(GatePassActionDto dto, MultipartFile exitFile, MultipartFile fnfFile,
+			MultipartFile feedbackFile, MultipartFile rateManagerFile, MultipartFile locFile);
+
 	
 
 	

@@ -170,7 +170,7 @@ public interface WorkmenDao {
 
 	boolean updateCmsPersonCustDataEffectiveTill(long personId);
 
-	public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus);
+	public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus,String reasoning);
 
 	boolean isPersonActiveInStatusMM(long personId);
 
@@ -216,6 +216,9 @@ public interface WorkmenDao {
 	GatePassMain getActiveCountDetails(String transactionId);
 
 	String getRenewTransactionIfExists(String gatePassId);
+
+	public boolean  updateGatePassMainWithReasoningTab(GatePassActionDto dto, MultipartFile exitFile,
+			MultipartFile fnfFile, MultipartFile feedbackFile, MultipartFile rateManagerFile, MultipartFile locFile);
 
 
 }

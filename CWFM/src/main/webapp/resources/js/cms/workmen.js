@@ -1455,50 +1455,88 @@ function displayFileName1(inputId, displayId) {
         displayElement.textContent = ''; // Clear the display if no file is selected
     }
 }
-function submitCancel(userId,gatePassType){
-	let isValid=true;
-	 const comments = $("#comments").val()?.trim();
-   if (!comments ) {
-       $("#error-comments").show();
-       isValid = false;
-   }else{
-	$("#error-comments").hide();
+
+	function submitCancel(userId, gatePassType) {
+showLoader();
+    let isValid = true;
+
+    const comments = $("#comments").val().trim();
+    const reason = $("#reasonofOffboarding").val();
+
+    // Validate comments
+    if (comments === "") {
+        $("#error-comments").show();
+        isValid = false;
+    } else {
+        $("#error-comments").hide();
+    }
+
+    // Validate reasoning
+    if (reason === "") {
+        $("#error-reasonofOffboarding").show();
+        alert("Reason of Offboarding Required in Reasoning Tab");
+        hideLoader();
+        isValid = false;
+    } else {
+        $("#error-reasonofOffboarding").hide();
+    }
+
+    if (!isValid) return;
+
+    // Files
+    var exitFile = $("#exitFile")[0].files[0];
+    var fnfFile = $("#FNFFile")[0].files[0];
+    var feedbackFile = $("#feedbackFormFile")[0].files[0];
+    var rateManagerFile = $("#rateManagerFile")[0].files[0];
+    var locFile = $("#LOCFile")[0].files[0];
+
+    const formData = new FormData();
+
+    // JSON Data
+    const jsonData = {
+        createdBy: userId,
+        comments: comments,
+        transactionId: $("#transactionId").val().trim(),
+        gatePassId: $("#gatePassId").val().trim(),
+        gatePassType: gatePassType,
+        reasoning: reason
+    };
+
+    formData.append("jsonData", JSON.stringify(jsonData));
+
+    if (exitFile) formData.append("exitFile", exitFile);
+    if (fnfFile) formData.append("fnfFile", fnfFile);
+    if (feedbackFile) formData.append("feedbackFile", feedbackFile);
+    if (rateManagerFile) formData.append("rateManagerFile", rateManagerFile);
+    if (locFile) formData.append("locFile", locFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true);
+
+    // ❌ DO NOT SET Content-Type manually for FormData
+    // xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+		showLoader();
+        if (xhr.status === 200) {
+            console.log("Cancel Saved:", xhr.responseText);
+            sessionStorage.setItem("successMessage", "Gatepass cancel request raised successfully!");
+            loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
+        } else {
+            console.error("Error:", xhr.responseText);
+            sessionStorage.setItem("errorMessage", "Failed to raise Gatepass cancel request!");
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed");
+        sessionStorage.setItem("errorMessage", "Request failed!");
+        hideLoader();
+    };
+
+    xhr.send(formData);
 }
-if(isValid){
-	const data = {
-		createdBy : userId,
-		comments : $("#comments").val()?.trim(),
-		transactionId : $("#transactionId").val().trim(),
-		gatePassId : $("#gatePassId").val().trim(),
-		gatePassType : gatePassType,
-	};
-		  const xhr = new XMLHttpRequest();
-   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-   xhr.onload = function() {
-       if (xhr.status === 200) {
-           // Handle successful response
-           console.log("Data saved successfully:", xhr.responseText);
-		   sessionStorage.setItem("successMessage", "Gatepass cancel request raised successfully!");
-         loadCommonList('/contractworkmen/cancelFilter', 'Cancel List');
-       } else {
-           // Handle error response
-           console.error("Error saving data:", xhr.statusText);
-		   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass cancel request!");
-       }
-   };
-   
-   xhr.onerror = function() {
-       console.error("Request failed");
-	   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass cancel request!");
-   };
-   
-   // Send the data object as a JSON string
-   xhr.send(JSON.stringify(data));
-	}else{
-		//error 
-	}
-	}//eofunc
+
 function approveRejectCancel(status,gatePassType){
 	showLoader();
 	let isValid=true;
@@ -1554,50 +1592,86 @@ if(isValid){
 		//error 
 	}
 	}//eofunc
-	function submitBlock(userId,gatePassType){
-		let isValid=true;
-		 const comments = $("#comments").val().trim();
-	   if (comments === "") {
-	       $("#error-comments").show();
-	       isValid = false;
-	   }else{
-		$("#error-comments").hide();
-	}
-	if(isValid){
-		const data = {
-			createdBy : userId,
-			comments : $("#comments").val().trim(),
-			transactionId : $("#transactionId").val().trim(),
-			gatePassId : $("#gatePassId").val().trim(),
-			gatePassType : gatePassType,
-		};
-			  const xhr = new XMLHttpRequest();
-	   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-	   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-	   xhr.onload = function() {
-	       if (xhr.status === 200) {
-	           // Handle successful response
-	           console.log("Data saved successfully:", xhr.responseText);
-			   sessionStorage.setItem("successMessage", "Gatepass block request raised successfully!");
-	         loadCommonList('/contractworkmen/blockListFilter', 'Block List');
-	       } else {
-	           // Handle error response
-	           console.error("Error saving data:", xhr.statusText);
-			   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass block request!");
-	       }
-	   };
-	   
-	   xhr.onerror = function() {
-	       console.error("Request failed");
-		   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass block request!");
-	   };
-	   
-	   // Send the data object as a JSON string
-	   xhr.send(JSON.stringify(data));
-		}else{
-			//error 
-		}
-		}//eofunc
+	
+		function submitBlock(userId, gatePassType) {
+showLoader();
+    let isValid = true;
+
+    const comments = $("#comments").val().trim();
+    const reason = $("#reasonofOffboarding").val();
+
+    if (comments === "") {
+        $("#error-comments").show();
+        isValid = false;
+    } else {
+        $("#error-comments").hide();
+    }
+
+    if (reason === "") {
+        $("#error-reasonofOffboarding").show();
+        alert("Reason of Offboarding Required in Reasoning Tab");
+        hideLoader();
+        isValid = false;
+    } else {
+        $("#error-reasonofOffboarding").hide();
+    }
+
+    if (!isValid) return;
+
+    // Files
+    var exitFile = $("#exitFile")[0].files[0];
+    var fnfFile = $("#FNFFile")[0].files[0];
+    var feedbackFile = $("#feedbackFormFile")[0].files[0];
+    var rateManagerFile = $("#rateManagerFile")[0].files[0];
+    var locFile = $("#LOCFile")[0].files[0];
+
+    const formData = new FormData();
+
+    // JSON Data
+    const jsonData = {
+        createdBy: userId,
+        comments: comments,
+        transactionId: $("#transactionId").val().trim(),
+        gatePassId: $("#gatePassId").val().trim(),
+        gatePassType: gatePassType,
+        reasoning: reason
+    };
+
+    formData.append("jsonData", JSON.stringify(jsonData));
+
+    if (exitFile) formData.append("exitFile", exitFile);
+    if (fnfFile) formData.append("fnfFile", fnfFile);
+    if (feedbackFile) formData.append("feedbackFile", feedbackFile);
+    if (rateManagerFile) formData.append("rateManagerFile", rateManagerFile);
+    if (locFile) formData.append("locFile", locFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true);
+
+    // ❌ DO NOT SET content-type manually
+    // xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+		showLoader();
+        if (xhr.status === 200) {
+            console.log("Saved:", xhr.responseText);
+            sessionStorage.setItem("successMessage", "Gatepass block request raised successfully!");
+            loadCommonList('/contractworkmen/blockListFilter', 'Block List');
+        } else {
+            console.error("Error:", xhr.responseText);
+            sessionStorage.setItem("errorMessage", "Failed to raise Gatepass block request!");
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed");
+        sessionStorage.setItem("errorMessage", "Request failed!");
+        hideLoader();
+    };
+
+    xhr.send(formData);
+}
+
 	function approveRejectBlock(status,gatePassType){
 		showLoader();
 		let isValid=true;
@@ -1651,50 +1725,87 @@ if(isValid){
 			//error 
 		}
 		}//eofunc
-		function submitUnblock(userId,gatePassType){
-				let isValid=true;
-				 const comments = $("#comments").val().trim();
-			   if (comments === "") {
-			       $("#error-comments").show();
-			       isValid = false;
-			   }else{
-				$("#error-comments").hide();
-			}
-			if(isValid){
-				const data = {
-					createdBy : userId,
-					comments : $("#comments").val().trim(),
-					transactionId : $("#transactionId").val().trim(),
-					gatePassId : $("#gatePassId").val().trim(),
-					gatePassType : gatePassType,
-				};
-					  const xhr = new XMLHttpRequest();
-			   xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-			   xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-			   xhr.onload = function() {
-			       if (xhr.status === 200) {
-			           // Handle successful response
-			           console.log("Data saved successfully:", xhr.responseText);
-					   sessionStorage.setItem("successMessage", "Gatepass unblock request raised successfully!");
-			         loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
-			       } else {
-			           // Handle error response
-			           console.error("Error saving data:", xhr.statusText);
-					   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass unblock request!");
-			       }
-			   };
-			   
-			   xhr.onerror = function() {
-			       console.error("Request failed");
-				   sessionStorage.setItem("errorMessage", "Failed to raise Gatepass unblock request!");
-			   };
-			   
-			   // Send the data object as a JSON string
-			   xhr.send(JSON.stringify(data));
-				}else{
-					//error 
-				}
-				}//eofunc
+		
+				function submitUnblock(userId, gatePassType) {
+showLoader();
+    let isValid = true;
+
+    const comments = $("#comments").val().trim();
+    const reason = $("#reasonofOffboarding").val();
+
+    // Validate comments
+    if (comments === "") {
+        $("#error-comments").show();
+        isValid = false;
+    } else {
+        $("#error-comments").hide();
+    }
+
+    // Validate reason
+    if (reason === "") {
+        $("#error-reasonofOffboarding").show();
+        alert("Reason of Offboarding Required in Reasoning Tab");
+        hideLoader();
+        isValid = false;
+    } else {
+        $("#error-reasonofOffboarding").hide();
+    }
+
+    if (!isValid) return;
+
+    // Files
+    var exitFile = $("#exitFile")[0].files[0];
+    var fnfFile = $("#FNFFile")[0].files[0];
+    var feedbackFile = $("#feedbackFormFile")[0].files[0];
+    var rateManagerFile = $("#rateManagerFile")[0].files[0];
+    var locFile = $("#LOCFile")[0].files[0];
+
+    const formData = new FormData();
+
+    // JSON Payload
+    const jsonData = {
+        createdBy: userId,
+        comments: comments,
+        transactionId: $("#transactionId").val().trim(),
+        gatePassId: $("#gatePassId").val().trim(),
+        gatePassType: gatePassType,
+        reasoning: reason
+    };
+
+    formData.append("jsonData", JSON.stringify(jsonData));
+
+    if (exitFile) formData.append("exitFile", exitFile);
+    if (fnfFile) formData.append("fnfFile", fnfFile);
+    if (feedbackFile) formData.append("feedbackFile", feedbackFile);
+    if (rateManagerFile) formData.append("rateManagerFile", rateManagerFile);
+    if (locFile) formData.append("locFile", locFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true);
+
+    // ❌ DO NOT set Content-Type manually for FormData
+
+    xhr.onload = function () {
+		showLoader();
+        if (xhr.status === 200) {
+            console.log("Unblock saved:", xhr.responseText);
+            sessionStorage.setItem("successMessage", "Gatepass unblock request raised successfully!");
+            loadCommonList('/contractworkmen/unblockListFilter', 'Unblock List');
+        } else {
+            console.error("Error:", xhr.responseText);
+            sessionStorage.setItem("errorMessage", "Failed to raise Gatepass unblock request!");
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed");
+        sessionStorage.setItem("errorMessage", "Request failed!");
+        hideLoader();
+    };
+
+    xhr.send(formData);
+}
+
 		function approveRejectUnblock(status,gatePassType){
 			showLoader();
 			let isValid=true;
@@ -1750,50 +1861,87 @@ if(isValid){
 				//error 
 			}
 			}//eofunc
-			function submitBlack(userId,gatePassType){
-	let isValid=true;
-	 const comments = $("#comments").val().trim();
-if (comments === "") {
-    $("#error-comments").show();
-    isValid = false;
-}else{
-	$("#error-comments").hide();
-}
-if(isValid){
-	const data = {
-		createdBy : userId,
-		comments : $("#comments").val().trim(),
-		transactionId : $("#transactionId").val().trim(),
-		gatePassId : $("#gatePassId").val().trim(),
-		gatePassType : gatePassType,
-	};
-		  const xhr = new XMLHttpRequest();
-xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-xhr.onload = function() {
-    if (xhr.status === 200) {
-        // Handle successful response
-        console.log("Data saved successfully:", xhr.responseText);
-		sessionStorage.setItem("successMessage", "Gatepass blacklist request raised successfully!");
-      loadCommonList('/contractworkmen/blackListFilter', 'Black List');
+			
+	function submitBlack(userId, gatePassType) {
+showLoader();
+    let isValid = true;
+
+    const comments = $("#comments").val().trim();
+    const reason = $("#reasonofOffboarding").val();
+
+    // Validation
+    if (comments === "") {
+        $("#error-comments").show();
+        isValid = false;
     } else {
-        // Handle error response
-        console.error("Error saving data:", xhr.statusText);
-		sessionStorage.setItem("errorMessage", "Failed to raise Gatepass blacklist request!");
+        $("#error-comments").hide();
     }
-};
 
-xhr.onerror = function() {
-    console.error("Request failed");
-	sessionStorage.setItem("errorMessage", "Failed to raise Gatepass blacklist request!");
-};
+    if (reason === "") {
+        $("#error-reasonofOffboarding").show();
+        alert("Reason of Offboarding Required in Reasoning Tab");
+        hideLoader();
+        isValid = false;
+    } else {
+        $("#error-reasonofOffboarding").hide();
+    }
 
-// Send the data object as a JSON string
-xhr.send(JSON.stringify(data));
-	}else{
-		//error 
-	}
-	}//eofunc
+    if (!isValid) return;
+
+    // Files
+    var exitFile = $("#exitFile")[0]?.files[0];
+    var fnfFile = $("#FNFFile")[0]?.files[0];
+    var feedbackFile = $("#feedbackFormFile")[0]?.files[0];
+    var rateManagerFile = $("#rateManagerFile")[0]?.files[0];
+    var locFile = $("#LOCFile")[0]?.files[0];
+
+    const formData = new FormData();
+
+    // JSON Data
+    const jsonData = {
+        createdBy: userId,
+        comments: comments,
+        transactionId: $("#transactionId").val().trim(),
+        gatePassId: $("#gatePassId").val().trim(),
+        gatePassType: gatePassType,
+        reasoning: reason
+    };
+
+    formData.append("jsonData", JSON.stringify(jsonData));
+
+    if (exitFile) formData.append("exitFile", exitFile);
+    if (fnfFile) formData.append("fnfFile", fnfFile);
+    if (feedbackFile) formData.append("feedbackFile", feedbackFile);
+    if (rateManagerFile) formData.append("rateManagerFile", rateManagerFile);
+    if (locFile) formData.append("locFile", locFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true);
+
+    // ❌ DO NOT SET CONTENT TYPE manually
+    // xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+		showLoader();
+        if (xhr.status === 200) {
+            console.log("Saved:", xhr.responseText);
+            sessionStorage.setItem("successMessage", "Gatepass blacklist request raised successfully!");
+            loadCommonList('/contractworkmen/blackListFilter', 'Black List');
+        } else {
+            console.error("Error:", xhr.responseText);
+            sessionStorage.setItem("errorMessage", "Failed to raise Gatepass blacklist request!");
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed");
+        sessionStorage.setItem("errorMessage", "Request failed!");
+        hideLoader();
+    };
+
+    xhr.send(formData);
+}
+
 			function approveRejectBlack(status,gatePassType){
 				showLoader();
 let isValid=true;
@@ -1849,50 +1997,88 @@ const data = {
 	//error 
 }
 }//eofunc
-function submitDeblack(userId,gatePassType){
-				let isValid=true;
-				 const comments = $("#comments").val().trim();
-			if (comments === "") {
-			    $("#error-comments").show();
-			    isValid = false;
-			}else{
-				$("#error-comments").hide();
-			}
-			if(isValid){
-				const data = {
-					createdBy : userId,
-					comments : $("#comments").val().trim(),
-					transactionId : $("#transactionId").val().trim(),
-					gatePassId : $("#gatePassId").val().trim(),
-					gatePassType : gatePassType,
-				};
-					  const xhr = new XMLHttpRequest();
-			xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true); // Replace with your actual controller URL
-			xhr.setRequestHeader("Content-Type", "application/json"); // Set content type for JSON
-			xhr.onload = function() {
-			    if (xhr.status === 200) {
-			        // Handle successful response
-			        console.log("Data saved successfully:", xhr.responseText);
-					sessionStorage.setItem("successMessage", "Gatepass deblacklist request raised successfully!");
-			      loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
-			    } else {
-			        // Handle error response
-			        console.error("Error saving data:", xhr.statusText);
-					sessionStorage.setItem("errorMessage", "Failed to raise Gatepass deblacklist request!");
-			    }
-			};
-			
-			xhr.onerror = function() {
-			    console.error("Request failed");
-				sessionStorage.setItem("errorMessage", "Failed to raise Gatepass deblacklist request!");
-			};
-			
-			// Send the data object as a JSON string
-			xhr.send(JSON.stringify(data));
-				}else{
-					//error 
-				}
-				}//eofunc
+
+				function submitDeblack(userId, gatePassType) {
+showLoader();
+    let isValid = true;
+
+    const comments = $("#comments").val().trim();
+    const reason = $("#reasonofOffboarding").val();
+
+    // Validate comments
+    if (comments === "") {
+        $("#error-comments").show();
+        isValid = false;
+    } else {
+        $("#error-comments").hide();
+    }
+
+    // Validate reasoning
+    if (reason === "") {
+        $("#error-reasonofOffboarding").show();
+        alert("Reason of Offboarding Required in Reasoning Tab");
+        hideLoader();
+        isValid = false;
+    } else {
+        $("#error-reasonofOffboarding").hide();
+    }
+
+    if (!isValid) return;
+
+    // Files
+    var exitFile = $("#exitFile")[0].files[0];
+    var fnfFile = $("#FNFFile")[0].files[0];
+    var feedbackFile = $("#feedbackFormFile")[0].files[0];
+    var rateManagerFile = $("#rateManagerFile")[0].files[0];
+    var locFile = $("#LOCFile")[0].files[0];
+
+    const formData = new FormData();
+
+    // JSON Payload
+    const jsonData = {
+        createdBy: userId,
+        comments: comments,
+        transactionId: $("#transactionId").val().trim(),
+        gatePassId: $("#gatePassId").val().trim(),
+        gatePassType: gatePassType,
+        reasoning: reason
+    };
+
+    formData.append("jsonData", JSON.stringify(jsonData));
+
+    if (exitFile) formData.append("exitFile", exitFile);
+    if (fnfFile) formData.append("fnfFile", fnfFile);
+    if (feedbackFile) formData.append("feedbackFile", feedbackFile);
+    if (rateManagerFile) formData.append("rateManagerFile", rateManagerFile);
+    if (locFile) formData.append("locFile", locFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/CWFM/contractworkmen/gatePassAction", true);
+
+    // ❌ DO NOT SET Content-Type manually for FormData
+    // xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+		showLoader();
+        if (xhr.status === 200) {
+            console.log("Deblack saved:", xhr.responseText);
+            sessionStorage.setItem("successMessage", "Gatepass deblacklist request raised successfully!");
+            loadCommonList('/contractworkmen/deblackListFilter', 'Deblack List');
+        } else {
+            console.error("Error:", xhr.responseText);
+            sessionStorage.setItem("errorMessage", "Failed to raise Gatepass deblacklist request!");
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error("Request failed");
+        sessionStorage.setItem("errorMessage", "Request failed!");
+        hideLoader();
+    };
+
+    xhr.send(formData);
+}
+
 function approveRejectDeblacklist(status,gatePassType){
 	showLoader();
 			let isValid=true;

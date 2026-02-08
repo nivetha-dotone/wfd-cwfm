@@ -473,7 +473,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 
 	    // Step 2: Insert new CUSTDATA row
 	    if (!logAndCheck("CUSTDATA_INSERT",
-	            insertCustData(gpm.getCreatedBy(), personId, gatePassType)))
+	            insertCustData(gpm.getCreatedBy(), personId, gatePassType,gpm.getReasoning())))
 	        return false;
 
 	    // Step 3: Update StatusMM only if active
@@ -500,7 +500,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 
 	
 	
-	private boolean insertCustData(String createdBy, long personId, String gatePassType) {
+	private boolean insertCustData(String createdBy, long personId, String gatePassType,String reasoning) {
 
 	    GatePassType type = GatePassType.fromStatus(gatePassType);
 	    if (type == null) {
@@ -508,7 +508,7 @@ public class WorkmenServiceImpl implements WorkmenService{
 	        return false;
 	    }
 
-	    return workmenDao.insertIntoCustData(createdBy, personId, type.getStatus());
+	    return workmenDao.insertIntoCustData(createdBy, personId, type.getStatus(),reasoning);
 	}
 
 	private void log(String section, boolean status) {
@@ -1339,6 +1339,12 @@ public class WorkmenServiceImpl implements WorkmenService{
 	@Override
 	public String getRenewTransactionIfExists(String gatePassId) {
 		return workmenDao.getRenewTransactionIfExists(gatePassId);
+	}
+	@Override
+	public boolean  updateGatePassMainWithReasoningTab(GatePassActionDto dto, MultipartFile exitFile, MultipartFile fnfFile,
+			MultipartFile feedbackFile, MultipartFile rateManagerFile, MultipartFile locFile) {
+		return workmenDao.updateGatePassMainWithReasoningTab(dto,exitFile,fnfFile,feedbackFile,rateManagerFile,locFile);
+		
 	}
 	
 	}

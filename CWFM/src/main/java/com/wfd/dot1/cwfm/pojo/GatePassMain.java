@@ -3,7 +3,7 @@ package com.wfd.dot1.cwfm.pojo;
 import java.math.BigDecimal;
 
 public class GatePassMain {
-
+	
 	private String transactionId;
 	private String gatePassId;
 	public String getGatePassId() {
@@ -547,6 +547,57 @@ public class GatePassMain {
 	public void setDisability(String disability) {
 		this.disability = disability;
 	}
+	private String exitLetterDocName;
+	private String FNFDocName;
+	private String feedbackFormDocName;
+	private String rateManagerDocName;
+	private String LOCDocName;
+	private String reasoning;
+	public String getExitLetterDocName() {
+		return exitLetterDocName;
+	}
+	public void setExitLetterDocName(String exitLetterDocName) {
+		this.exitLetterDocName = exitLetterDocName;
+	}
+	public String getFNFDocName() {
+		return FNFDocName;
+	}
+	public void setFNFDocName(String fNFDocName) {
+		FNFDocName = fNFDocName;
+	}
+	public String getFeedbackFormDocName() {
+		return feedbackFormDocName;
+	}
+	public void setFeedbackFormDocName(String feedbackFormDocName) {
+		this.feedbackFormDocName = feedbackFormDocName;
+	}
+	public String getRateManagerDocName() {
+		return rateManagerDocName;
+	}
+	public void setRateManagerDocName(String rateManagerDocName) {
+		this.rateManagerDocName = rateManagerDocName;
+	}
+	public String getLOCDocName() {
+		return LOCDocName;
+	}
+	public void setLOCDocName(String lOCDocName) {
+		LOCDocName = lOCDocName;
+	}
+	public String getReasoning() {
+		return reasoning;
+	}
+	public void setReasoning(String reasoning) {
+		this.reasoning = reasoning;
+	}
+	private String gatePassType;
+	public String getGatePassType() {
+		return gatePassType;
+	}
+	public void setGatePassType(String gatePassType) {
+		this.gatePassType = gatePassType;
+	}
+	
+	
 	
 	}
 	

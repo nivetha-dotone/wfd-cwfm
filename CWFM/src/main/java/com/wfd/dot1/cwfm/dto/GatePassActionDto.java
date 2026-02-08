@@ -14,7 +14,17 @@ public class GatePassActionDto {
 	
 	private String gatePassStatus;
 	
+	 private String reasoning; 
 	
+
+	public String getReasoning() {
+		return reasoning;
+	}
+
+	public void setReasoning(String reasoning) {
+		this.reasoning = reasoning;
+	}
+
 	public String getGatePassType() {
 		return gatePassType;
 	}
