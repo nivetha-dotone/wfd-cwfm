@@ -293,6 +293,276 @@ label {
     color: red;
     font-weight: bold !important;
 }
+
+
+@media screen and (max-width: 768px) {
+    table,
+    tbody,
+    tr,
+    th,
+    td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    table tr {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    table th {
+        text-align: left;
+        padding: 5px 0;
+        font-weight: bold;
+        background: none;
+    }
+
+    table td {
+        padding: 5px 0;
+    }
+
+    input,
+    select,
+    textarea
+     {
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 70px;
+    }
+
+    /* button {
+        margin-top: 6px;
+    } */
+
+    label[id^="error-"],
+    #otpMessage,
+    #otpError {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+    }
+
+    #preview,
+    video,
+    canvas {
+        width: 100% !important;
+        height: auto;
+    }
+
+    div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+/* 
+    button[onclick*="openCamera"] {
+        margin-left: 0 !important;
+        margin-top: 6px;
+        width: 100%;
+    } */
+
+/* ///////////////////////////////////////// */
+    
+
+    body {
+        overflow-x: hidden;
+        font-size: 14px;
+    }
+
+    .container,
+    .main-container,
+    .content,
+    .form-container {
+        width: 100% !important;
+        padding: 10px !important;
+        margin: 0 !important;
+    }
+
+    h1, h2, h3 {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    .form-group,
+    .row {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    label {
+        font-size: 13px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100% !important;
+        font-size: 14px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+
+    button,
+    .btn {
+        width: 100%;
+        font-size: 13px;
+        padding: 3px;
+        margin-bottom: 10px;
+    }
+
+    .tabs,
+    .tab-container {
+        flex-direction: column;
+        display: block;
+    }
+
+    .tab {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    .modal,
+    .popup {
+        width: 95% !important;
+        margin: auto;
+    }
+
+    .tabs-container {
+        display: block !important;
+        width: 100%;
+    }
+
+      .tabs {
+        display: flex !important;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        /* gap: 6px;
+        padding-bottom: 6px; */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none; /* Chrome */
+    }
+
+    .tabs button {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: auto;
+        border-radius: 4px;
+    }
+    /* .action-buttons {
+        display: block !important;
+        width: 100%;
+        margin-top: 15px;
+    } */
+
+    /* .action-buttons button {
+        width: 100%;
+        margin: 5px 0;
+        padding: 10px;
+        font-size: 14px;
+        box-sizing: border-box;
+    } */
+
+    
+  input[type="date"] {
+        position: static !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+    input[type="date"] {
+        display: inline-block !important;
+    }
+      #ui-datepicker-div,
+    #ui-datepicker-div table,
+    #ui-datepicker-div thead,
+    #ui-datepicker-div tbody,
+    #ui-datepicker-div tr,
+    #ui-datepicker-div th,
+    #ui-datepicker-div td {
+        /* display: table !important; */
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    #ui-datepicker-div tr {
+        display: table-row !important;
+    }
+
+    #ui-datepicker-div th,
+    #ui-datepicker-div td {
+        display: table-cell !important;
+        padding: 4px !important;
+    }
+
+    /* Keep calendar compact */
+    #ui-datepicker-div {
+        font-size: 12px;
+        z-index: 9999 !important;
+    }
+
+     .declaration-row,
+    .declaration-row td {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .declaration-row td {
+        padding: 12px !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        white-space: normal !important;
+    }
+
+    .declaration-row input[type="checkbox"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+        vertical-align: top;
+    }
+
+    .declaration-row b {
+        display: block;
+        font-weight: 500;
+    }
+
+    #acceptError {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+    }
+    
+
+}
         
     </style>
      <%
@@ -433,6 +703,7 @@ label {
     </td>
 </tr> -->
 <tr>
+ <input id="gatePassType" name="gatePassType" style="width: 100%;height: 20px;" type="hidden" size="30" maxlength="12" value="quick" readonly>
 	<th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.transactionId"/></label></th>
     <td>
     	
@@ -754,7 +1025,7 @@ label {
 </select>                <label id="error-wc"style="color: red;display: none;">WC Policy/ESIC Reg Number is required</label>
                                 </td>
                                 
-                                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.labourLicenseNumber"/></label></th>
+                                 <th><label class="custom-label"><spring:message code="label.labourLicenseNumber"/></label></th>
                             <td><select class="custom-select" id="ll" name="llId" >
                                 <option value="">Please select Labor License Number</option>
                                 <c:forEach var="pe" items="${Wcs}">
@@ -794,7 +1065,7 @@ label {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.uanNumber"/></label></th>
                             <td>
                             <c:if test="${empty GatePassObj.uanNumber }">
-                            	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            	<input id="uanNumber" name="uanNumber" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off" inputmode="numeric" pattern="[0-9]*" value="${empty GatePassObj.uanNumber ? '000000000000' : GatePassObj.uanNumber }" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </c:if>
                             
                             <c:if test="${not empty GatePassObj.uanNumber }">
@@ -828,7 +1099,7 @@ label {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             <c:if test="${empty GatePassObj.pfNumber }">
-                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                            	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off" value="${empty GatePassObj.pfNumber ? 'New Joinee' : GatePassObj.pfNumber}" />
                             </c:if>
                             
                             <c:if test="${not empty GatePassObj.pfNumber }">
@@ -1248,13 +1519,21 @@ label {
 			</tr>
 		<tr>
 		</tr>
-      		<tr >    	
-				<td colspan="6" style="font-family: Arial, sans-serif; color: #898989; font-size: 14px; line-height: 1.5;"><b>
-				<input type="checkbox" name="acceptCheck" id="acceptCheck"  /> 
-				I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
-				</b>
-				<label id="acceptError" style="color: red;display: none;">You must accept the declaration</label></td>
-			</tr>
+      		<tr class="declaration-row">
+    <td colspan="6">
+        <label class="declaration-label">
+            <input type="checkbox" name="acceptCheck" id="acceptCheck" />
+            <span class="declaration-text">
+                I hereby certify that the details given above are true and correct to the best of my or our knowledge and belief, and nothing has been concealed herein. I or my company will take full responsibility for the conduct and behavior of the persons engaged by me or our company to work or visit premises. I/we will ensure that they are briefed on all traffic, safety, and security rules and procedures of company where they have been engaged by us for work. In case of any breach or violation of rules, regulations, safety policy, or other applicable procedures by the above person, we will be solely responsible and liable for suitable action as per company's safety and security policy
+            </span>
+        </label>
+
+        <label id="acceptError" class="declaration-error">
+            You must accept the declaration
+        </label>
+    </td>
+</tr>
+
 				<!-- <tr >
 				<td colspan="4"><input type="checkbox" name="acceptCheck" id="acceptCheck"  />
 				<label class="custom-label"> I acceptthe <u>Terms and Conditions</u></label> 
