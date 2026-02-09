@@ -33,9 +33,6 @@ import com.wfd.dot1.cwfm.pojo.MasterUser;
 import com.wfd.dot1.cwfm.pojo.Workorder;
 import com.wfd.dot1.cwfm.queries.ContractorQueryBank;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-
 @Repository
 public class ContractorDaoImpl implements ContractorDao{
 	
@@ -131,15 +128,7 @@ public class ContractorDaoImpl implements ContractorDao{
                     contractor.setContractorName(rs.getString("NAME"));
                     contractor.setContractorAddress(rs.getString("ADDRESS"));
                     contractor.setContractorCode(rs.getString("CODE"));
-                    //contractor.setMobileNumber(rs.getLong("mobilenumber"));
-                    String mobileStr = rs.getString("mobilenumber");
-
-                    if (mobileStr != null && !mobileStr.trim().isEmpty()) {
-                        contractor.setMobileNumber(Long.parseLong(mobileStr));
-                    } else {
-                        contractor.setMobileNumber(-1L); // sentinel value
-                    }
-
+                    contractor.setMobileNumber(rs.getLong("mobilenumber"));
                     contractor.setEmailaddress(rs.getString("EMAILADDRESS"));
                     contractor.setManagerAddress(rs.getString("MANAGERADDRESS"));
                     contractor.setBlocked(rs.getInt("ISBLOCKED") == 1);
@@ -160,30 +149,13 @@ public class ContractorDaoImpl implements ContractorDao{
 			wo.setWorkorderId(rs.getString("WORKORDERID"));
             wo.setSapWorkorderNumber(rs.getString("SAP_WORKORDER_NUM"));
             wo.setContractorId(rs.getString("CONTRACTORID"));
-           // wo.setValidFrom(rs.getString("VALIDFROM"));
-           // wo.setValidTo(rs.getString("VALIDDT"));
-            Timestamp fromTs = rs.getTimestamp("VALIDFROM");
-            if (fromTs != null) {
-                wo.setValidFrom(fromTs.toLocalDateTime().toLocalDate().toString());
-            }
-
-            Timestamp toTs = rs.getTimestamp("VALIDDT");
-            if (toTs != null) {
-                wo.setValidTo(toTs.toLocalDateTime().toLocalDate().toString());
-            }
+            wo.setValidFrom(rs.getString("VALIDFROM"));
+            wo.setValidTo(rs.getString("VALIDDT"));
             wo.setUnitId(rs.getString("UNITID"));
             wo.setTypeId(String.valueOf(rs.getInt("TYPEID")));
             wo.setDepId(String.valueOf(rs.getInt("DEPID")));
             wo.setSecId(String.valueOf(rs.getInt("SECID")));
             wo.setStatus(String.valueOf(rs.getInt("STATUS")));
-            wo.setClassification(rs.getString("CLASSIFICATION"));
-         // ✅ DYNAMIC ACTIVE WORKMEN COUNT
-            int activeCount = getWorkorderActiveWorkmenCount(
-                    contractorId,
-                    unitId,
-                    wo.getWorkorderId()
-            );
-            wo.setActiveWorkmenCount(activeCount);
 			woList.add(wo);
 		}
 		log.info("Exiting from getAllWorkordersBasedOnPEAndContractor dao method "+woList.size());
@@ -202,35 +174,16 @@ public class ContractorDaoImpl implements ContractorDao{
 			contr.setWcCode(rs.getString("WC_CODE"));
 			contr.setContractorId(rs.getString("CONTRACTORID"));
              contr.setUnitId(rs.getString("UNITID"));
-             //contr.setNatureOfId(rs.getInt("NATURE_OF_ID"));
-             String natureOfJobStr = rs.getString("NATURE_OF_ID");
-             if (natureOfJobStr != null && !natureOfJobStr.trim().isEmpty()) {
-                 contr.setNatureOfId(Integer.parseInt(natureOfJobStr));
-             }
-             //contr.setWcFromDtm(rs.getString("WC_FROM_DTM"));
-             //contr.setWcToDtm(rs.getString("WC_TO_DTM"));
-             Timestamp fromTs = rs.getTimestamp("WC_FROM_DTM");
-             if (fromTs != null) {
-                 contr.setWcFromDtm(fromTs.toLocalDateTime().toLocalDate().toString());
-             }
-
-             Timestamp toTs = rs.getTimestamp("WC_TO_DTM");
-             if (toTs != null) {
-                 contr.setWcToDtm(toTs.toLocalDateTime().toLocalDate().toString());
-             }
+             contr.setNatureOfId(rs.getInt("NATURE_OF_ID"));
+             contr.setWcFromDtm(rs.getString("WC_FROM_DTM"));
+             contr.setWcToDtm(rs.getString("WC_TO_DTM"));
              contr.setWcTotal(rs.getInt("WC_TOTAL"));
              contr.setDeleteSw(rs.getInt("DELETE_SW"));
              contr.setLicenceType(rs.getString("LICENCE_TYPE"));
              contr.setIsVerified(rs.getString("ISVERIFIED"));
              contr.setAttachmentNm(rs.getString("ATTACHMENTNM"));
              contr.setExtendToSubcontractor(rs.getInt("EXTENDTOSUBCONTRACTOR"));
-          // ✅ DYNAMIC ACTIVE WORKMEN COUNT
-             int activeCount = getLLActiveWorkmenCount(
-                     contractorId,
-                     principalEmployerId,
-                     contr.getWcCode()
-             );
-             contr.setActiveWorkmenCount(activeCount);
+             
             contrWcList.add(contr);
 		}
 		log.info("Exiting from getcontrsByContractorIdAndUnitIdAndLicenseType dao method "+contrWcList.size());
@@ -260,36 +213,15 @@ public class ContractorDaoImpl implements ContractorDao{
 			contr.setWcCode(rs.getString("WC_CODE"));
 			contr.setContractorId(rs.getString("CONTRACTORID"));
              contr.setUnitId(rs.getString("UNITID"));
-            // contr.setNatureOfId(rs.getInt("NATURE_OF_ID"));
-             String natureOfJobStr = rs.getString("NATURE_OF_ID");
-             if (natureOfJobStr != null && !natureOfJobStr.trim().isEmpty()) {
-                 contr.setNatureOfId(Integer.parseInt(natureOfJobStr));
-             }
-             // contr.setWcFromDtm(rs.getString("WC_FROM_DTM"));
-            // contr.setWcToDtm(rs.getString("WC_TO_DTM"));
-             Timestamp fromTs = rs.getTimestamp("WC_FROM_DTM");
-             if (fromTs != null) {
-                 contr.setWcFromDtm(fromTs.toLocalDateTime().toLocalDate().toString());
-             }
-
-             Timestamp toTs = rs.getTimestamp("WC_TO_DTM");
-             if (toTs != null) {
-                 contr.setWcToDtm(toTs.toLocalDateTime().toLocalDate().toString());
-             }
+             contr.setNatureOfId(rs.getInt("NATURE_OF_ID"));
+             contr.setWcFromDtm(rs.getString("WC_FROM_DTM"));
+             contr.setWcToDtm(rs.getString("WC_TO_DTM"));
              contr.setWcTotal(rs.getInt("WC_TOTAL"));
              contr.setDeleteSw(rs.getInt("DELETE_SW"));
              contr.setLicenceType(rs.getString("LICENCE_TYPE"));
              contr.setIsVerified(rs.getString("ISVERIFIED"));
              contr.setAttachmentNm(rs.getString("ATTACHMENTNM"));
              contr.setExtendToSubcontractor(rs.getInt("EXTENDTOSUBCONTRACTOR"));
-             
-          // ✅ DYNAMIC ACTIVE WORKMEN COUNT
-             int activeCount = getWCESICActiveWorkmenCount(
-                     contractorId,
-                     principalEmployerId,
-                     contr.getWcCode()
-             );
-             contr.setActiveWorkmenCount(activeCount);
              
             contrWcList.add(contr);
 		}
@@ -330,11 +262,7 @@ public class ContractorDaoImpl implements ContractorDao{
 		   while(rs.next()) {
 			   contreg.setModuleId(rs.getString("GMID"));
 		   }
-		   if( "Create".equalsIgnoreCase(contreg.getRequestType())) {
-			   contreg.setActionId(GatePassType.CONTRACTOREGISTRATION.getStatus());
-		   }else {
-			   contreg.setActionId(GatePassType.CONTRACTORRENEWAL.getStatus());
-		   }
+		contreg.setActionId(GatePassType.CONTRACTORRENEWAL.getStatus());
 		Object[] parameters = new Object[] {
 			    contreg.getContractorregId(),
 			    contreg.getContractorId(),
@@ -390,13 +318,8 @@ public class ContractorDaoImpl implements ContractorDao{
 
            status  = jdbcTemplate.update(query, parameters);
            if (status > 0 && "Create".equalsIgnoreCase(contreg.getRequestType())) {
-        boolean	  contExists= this.contractorExistsForPeContractor(contreg.getContractorId(),contreg.getUnitId());
-        	   if(contExists) {
-        		   updateContractorPemm(contreg);
-        	   }else {
         	    saveContractorPemm(contreg);
         	}
-           }
 
 
            return contreg.getContractorregId();
@@ -853,7 +776,6 @@ public class ContractorDaoImpl implements ContractorDao{
 	        // 🔹 Additional insert into CMSContractorWC ONLY for 'Create'
 	        if (requestType.equalsIgnoreCase("Create")) {
 	            saveContractorWC(policies, contreg);
-	            saveWorkorderLLWC(policies);
 	            System.out.println("✅ Additional policies saved in CMSContractorWC for CREATE request.");
 	        }
 
@@ -1083,10 +1005,8 @@ public class ContractorDaoImpl implements ContractorDao{
 	        policy.setDocumentNumber(rs.getString("WCCODE"));
 	        policy.setNatureOfJob(rs.getString("NATUREOFID"));
 	        policy.setCoverage(rs.getInt("WCTOTAL"));
-	        //policy.setValidFrom(rs.getString("WCFROMDTM"));
-	        //policy.setValidTo(rs.getString("WCTODTM"));
-	        policy.setValidFrom(rs.getTimestamp("WCFROMDTM") != null? rs.getTimestamp("WCFROMDTM").toLocalDateTime().toLocalDate().toString(): "");
-	        policy.setValidTo(rs.getTimestamp("WCTODTM") != null? rs.getTimestamp("WCTODTM").toLocalDateTime().toLocalDate().toString(): "");
+	        policy.setValidFrom(rs.getString("WCFROMDTM"));
+	        policy.setValidTo(rs.getString("WCTODTM"));
 	        policy.setFileName(rs.getString("ATTACHMENTNAME"));
 	        policy.setUnitId(rs.getString("UNITID"));
 	        return policy;
@@ -1106,9 +1026,7 @@ public class ContractorDaoImpl implements ContractorDao{
 	        record.setLicenseType(rs.getString("LICENCETYPE"));
 	        record.setWorkOrderNumber(rs.getString("WONUMBER"));
 	        record.setWcCode(rs.getString("WCCODE"));
-	        //record.setCreatedDtm(rs.getTimestamp("CREATEDDTM"));
-	        Timestamp createdTs = rs.getTimestamp("CREATEDDTM");
-	        record.setCreatedDtm(createdTs == null? null: Timestamp.valueOf(createdTs.toLocalDateTime().toLocalDate().atStartOfDay()));
+	        record.setCreatedDtm(rs.getTimestamp("CREATEDDTM"));
 	        record.setCreatedBy(rs.getString("CREATEDBY"));
 	        return record;
 	    });
@@ -1465,115 +1383,6 @@ public Map<String, String> getContractorPreviousDocuments(String contractorRegId
         return map;
     }, contractorRegId,requestType);
     }
-public String getAllContractorProfileDetailForReg() {
-    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTOR_PROFILE_DETAILS_FOR_REG");
-}
-@Override
-public Contractor getAllContractorProfileDetailForReg(String unitId, String contractorId) {
-	String query=getAllContractorProfileDetailForReg();
-	log.info("Query to getAllContractorBasedOnPE "+query);
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId);
-	Contractor cont = new Contractor();
-	while(rs.next()) {
-		cont.setManagerName(rs.getString("MANAGERNM"));
-		cont.setEsiwc(rs.getString("ESIWC"));
-		cont.setValidTo(rs.getString("VALIDTODT"));
-	}
-	return cont;
-}
-
-public String getLLActiveWorkmenCount() {
-    return QueryFileWatcher.getQuery("GET_LL_ACTIVE_WORKMEN_COUNT");
-}
-
-public int getLLActiveWorkmenCount(String contractorId, String unitId, String llNo) {
-    String sql =getLLActiveWorkmenCount();
-    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,contractorId,unitId,llNo);
-    return count != null ? count : 0;
-}
-
-public String getWCESICActiveWorkmenCount() {
-    return QueryFileWatcher.getQuery("GET_WCESIC_ACTIVE_WORKMEN_COUNT");
-}
-
-public int getWCESICActiveWorkmenCount(String contractorId, String unitId, String wcesic) {
-    String sql =getWCESICActiveWorkmenCount();
-    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,contractorId,unitId,wcesic);
-    return count != null ? count : 0;
-}
-
-public String getWorkorderActiveWorkmenCount() {
-    return QueryFileWatcher.getQuery("GET_WORKORDER_ACTIVE_WORKMEN_COUNT");
-}
-
-public int getWorkorderActiveWorkmenCount(String contractorId, String unitId, String workorderId) {
-    String sql =getWorkorderActiveWorkmenCount();
-    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,contractorId,unitId,workorderId);
-    return count != null ? count : 0;
-}
-
-public void saveWorkorderLLWC(List<ContractorRegistrationPolicy> policies) {
-	 String sql= "INSERT INTO CMSWORKORDER_LLWC (" +
-           "[WONUMBER],[LICENSE_NUMBER],[LICENSE_TYPE]) " +
-          "VALUES (?,?,?)";
-
-   for (ContractorRegistrationPolicy policy : policies) {
-       jdbcTemplate.update(sql,
-    		   policy.getSapWoNumber(),
-    		   policy.getDocumentNumber(),
-           policy.getDocumentType()              // LICENCE_TYPE
-    		   );
-   }
-}
-@Override
-public boolean contractorExistsForPeContractor(String contractorId, Long unitid) {
-    String sql = "select count(*)  from CMSCONTRPEMM where CONTRACTORID=? and UNITID=?";
-Integer count = jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitid);
-return count != null && count > 0;
-}
-@Override
-public void updateContractorPemm(ContractorRegistration contreg) {
-
-    String sql ="UPDATE CMSCONTRPEMM SET MANAGERNM = ?,TOTALSTRENGTH = ?,MAXNOEMP = ?,NATUREOFWORK = ?,LOCOFWORK = ?, PFNUM = ?,RCVALIDATED = ?,PERIODSTARTDT = ?,PERIODENDDT = ?, PFAPPLYDT = ? WHERE CONTRACTORID = ? AND UNITID = ?";
-
-    try {
-        jdbcTemplate.update(
-            sql,
-            contreg.getManagerName(),
-            contreg.getTotalStrength() != null ? Integer.parseInt(contreg.getTotalStrength()) : null,
-            contreg.getRcMaxEmp() != null ? Integer.parseInt(contreg.getRcMaxEmp()) : null,
-            contreg.getNatureOfWork(),
-            contreg.getLocofWork(),
-            contreg.getPfNum(),
-            (contreg.getRcVerified() != null &&
-             (contreg.getRcVerified().equalsIgnoreCase("Y")
-              || contreg.getRcVerified().equalsIgnoreCase("YES")))
-                ? "Y" : "N",
-            contreg.getContractFrom() != null ? java.sql.Date.valueOf(contreg.getContractFrom()) : null,
-            contreg.getContractTo() != null ? java.sql.Date.valueOf(contreg.getContractTo()) : null,
-            contreg.getPfApplyDate() != null ? java.sql.Date.valueOf(contreg.getPfApplyDate()) : null,
-
-            // WHERE condition values (LAST)
-            contreg.getContractorId(),
-            contreg.getUnitId()
-        );
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-
-@Override
-public ApproveRejectContRenewDto getContractorRenewComments(String contractorRegId) {
-	String sql ="select top 1 comments,ContractorRegId from CONTRENEWAPPROVALSTATUS where ContractorRegId=? order by LastUpdatedDate desc";
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(sql,contractorRegId);
-	ApproveRejectContRenewDto cont = new ApproveRejectContRenewDto();
-	while(rs.next()) {
-		cont.setComments(rs.getString("comments"));		
-		cont.setTransactionId(rs.getString("ContractorRegId"));
-	}
-	return cont;
-}
 
 }
 

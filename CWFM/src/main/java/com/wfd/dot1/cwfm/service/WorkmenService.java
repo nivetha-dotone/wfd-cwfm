@@ -62,7 +62,7 @@ public interface WorkmenService {
 
 	public List<GatePassListingDto> getWorkmenDetailBasedOnId(String gatePassId);
 
-	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId,String unitId,String gatePassTypeId);
+	public List<ApproverStatusDTO> getApprovalDetails(String gatePassId,String unitId);
 
 	public List<Contractor> getAllContractorForAdmin(String principalEmployerId);
 
@@ -137,13 +137,6 @@ public interface WorkmenService {
 	public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId);
 
 	public String saveWorkmenBulkUploadGatePass(GatePassMain gatePassMain);
-
-	String saveProjectGatePass(GatePassMain gatePassMain);
-
-	String getRenewTransactionIfExists(String gatePassId);
-
-	public boolean  updateGatePassMainWithReasoningTab(GatePassActionDto dto, MultipartFile exitFile, MultipartFile fnfFile,
-			MultipartFile feedbackFile, MultipartFile rateManagerFile, MultipartFile locFile);
 
 	
 

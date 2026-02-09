@@ -15,9 +15,8 @@ public enum GatePassType {
 	LOSTORDAMAGE("8","LOST OR DAMAGE"),
 	CANCEL("9","CANCEL"),
 	BILLVERIFICATION("10","Bill Creation"),
-	CONTRACTORRENEWAL("11","CONTRACTOR RENEWAL"),
-	PROJECT("12","PROJECT GATEPASS"),
-	CONTRACTOREGISTRATION("13","CONTRACTOR REGISTRATION");
+	CONTRACTORRENEWAL("11","CONTRACTOR RENEWAL");
+	
 	private String status;
 	private String name;
 	private GatePassType(String status, String name) {

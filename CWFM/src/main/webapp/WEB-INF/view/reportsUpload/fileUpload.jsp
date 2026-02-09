@@ -268,40 +268,6 @@ background-color: #DDF3FF; /* Light green for the table header */
     padding: 8px;
     border: 1px solid #ddd;
 }
-    #loaderOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.loader {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #ddd;
-    border-top: 6px solid #1976d2;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-.loader-text {
-    margin-top: 15px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
     
     </style>
  <%
@@ -421,7 +387,7 @@ background-color: #DDF3FF; /* Light green for the table header */
     <div onclick="loadCommonList('/data/importExport','Master Data Import')">
    <!--  <a href="#" class="return"  style="color:black;"  onclick="fileUploadTemplateSideBar()" style="margin:5px;">&#8592;</a> -->
 </div>
-<div>
+<div onclick="loadCommonList('/data/importExport','Master Data Import')">
     <a href="#"  class="btn btn-default process-footer-button-cancel ng-binding" style="margin:5px;" onclick="loadCommonList('/data/importExport','Master Data Import')">Return</a>
 </div>
 
@@ -436,16 +402,9 @@ background-color: #DDF3FF; /* Light green for the table header */
        <button onclick="uploadTemplateFile()" class="btn btn-default process-footer-button-cancel ng-binding"style="float:right;margin:3px;margin-right: 6px;">Save</button>
         <h2 style="color: darkcyan;font-size: 1rem;">Template Data</h2> 
         </div>
-        <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
     <div id="viewTableContainer">
-    <!-- <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div> -->
+    <div id="uploadMessage" style="display: none; font-weight: bold; margin-top: 10px;"></div>
     <table id="viewtable" border="1" style="width: 100%; border-collapse: collapse;">
-    <!-- Loader Overlay -->
-<div id="loaderOverlay" style="display:none;">
-    <div class="loader"></div>
-    <div class="loader-text">Saving data, please wait...</div>
-</div>
-    
         <thead>
             <tr id="tableHeaderRow">
              <th>

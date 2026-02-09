@@ -250,7 +250,7 @@ table.ControlLayout td {
                             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.emailAddress"/></label></th>
                             <td><input type="text" name="managerEmail" value="${contractor.emailaddress}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
-                            <td><input type="text" name="managerMobile"  value="${contractor.mobileNumber == -1 ? '' : contractor.mobileNumber}"  style="height: 20px;"  size="30" maxlength="30" readonly /></td>
+                            <td><input type="text" name="managerMobile" value="${contractor.mobileNumber}" style="height: 20px;"  size="30" maxlength="30" readonly /></td>
                         
                         </tr>
                         <tr>
@@ -356,7 +356,7 @@ table.ControlLayout td {
                      <td style="color:black;">${laborLicenses.wcFromDtm}</td>
                      <td style="color:black;">${laborLicenses.wcToDtm}</td>
                      <td style="color:black;">${laborLicenses.wcTotal}</td>
-                     <td style="color:black;">${laborLicenses.activeWorkmenCount}</td>
+                     <td style="color:black;">7</td>
                 </tr>
             </c:forEach>
 	<!-- <tr>
@@ -401,7 +401,7 @@ table.ControlLayout td {
                    <td style="color:black;">${contractorWCList.wcFromDtm}</td>
                    <td style="color:black;">${contractorWCList.wcToDtm}</td>
                    <td style="color:black;">${contractorWCList.wcTotal}</td>
-                   <td style="color:black;">${contractorWCList.activeWorkmenCount}</td>
+                   <td style="color:black;">7</td>
                 </tr>
             </c:forEach>
 	<!-- <tr>
@@ -462,8 +462,8 @@ table.ControlLayout td {
                       <td style="color:black;text-align:left">${workOrderList.sapWorkorderNumber}</td>
                       <td style="color:black;text-align:left">${workOrderList.validFrom}</td>
                       <td style="color:black;text-align:left">${workOrderList.validTo}</td>
-                      <td style="color:black;text-align:left">${workOrderList.activeWorkmenCount}</td>
-                      <td style="color:black;text-align:left">${workOrderList.classification}</td>
+                      <td style="color:black;text-align:left">7</td>
+                      <td style="color:black;text-align:left">Manpower Supply</td>
             
                   <%--  <td>${workOrderList.wcTotal}
                    <c:if test="${item.cType == null}">

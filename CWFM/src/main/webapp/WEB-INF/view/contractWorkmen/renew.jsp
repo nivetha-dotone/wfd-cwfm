@@ -294,40 +294,6 @@ label {
     color: red;
     font-weight: bold !important;
 }   
- #loaderOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.loader {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #ddd;
-    border-top: 6px solid #1976d2;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-.loader-text {
-    margin-top: 15px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
     </style>
      <%
     MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -447,10 +413,6 @@ label {
                     </div> 
                 </c:if>
             </div>
-               <div id="loaderOverlay" style="display:none;">
-    <div class="loader"></div>
-    <div class="loader-text">please wait...</div>
-</div>
             <div id="tab1" class="tab-content active">
     <table cellspacing="0" cellpadding="0">
         <tbody>
@@ -539,21 +501,6 @@ label {
            <label  id="error-equalNames" style="display:none;">First name cannot be the same as last name.</label>
             </tr>
             <tr>
-            
-            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.fatherHusbandName"/></label></th>
-                <td>
-                	<c:if test="${empty GatePassObj.relationName }">
-                		<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
-                	</c:if>
-                	<c:if test="${not empty GatePassObj.relationName }">
-                		<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.relationName }" readonly>
-                	</c:if>
-                	<div style="text-align: right;">
-        <span style="color: #666; font-size: 11px;"><spring:message code="label.fatherHusbandNameRegax"/></span>
-    </div>
-                	<label id="error-relationName" style="color: red;display: none;">Please enter a valid Father / Husband name</label>
-                </td>
-                
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <td>
                	<input id="dateOfBirth" name="dateOfBirth"  style="width: 100%; height: 20px;" type="text" size="30" maxlength="30" value="${not empty GatePassObj.dateOfBirth ? GatePassObj.dateOfBirth : ''}" readonly>   
@@ -563,8 +510,6 @@ label {
 					  <label id="error-dateOfBirth" style="color: red;display: none;">Please enter a valid Date Of Birth</label>
 			</td>
                
-            </tr>
-            <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.gender"/></label></th>
                 <td>
                     
@@ -577,6 +522,21 @@ label {
 						</c:forEach>
 				</select>
                     <label id="error-gender" style="color: red;display: none;">Gender is required</label>
+                </td>
+            </tr>
+            <tr>
+                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.fatherHusbandName"/></label></th>
+                <td>
+                	<c:if test="${empty GatePassObj.relationName }">
+                		<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30">
+                	</c:if>
+                	<c:if test="${not empty GatePassObj.relationName }">
+                		<input id="relationName" name="relationName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" value="${GatePassObj.relationName }" readonly>
+                	</c:if>
+                	<div style="text-align: right;">
+        <span style="color: #666; font-size: 11px;"><spring:message code="label.fatherHusbandNameRegax"/></span>
+    </div>
+                	<label id="error-relationName" style="color: red;display: none;">Please enter a valid Father / Husband name</label>
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.idMark"/></label></th>
                 <td>
@@ -616,30 +576,6 @@ label {
                 	<label id="error-maritalStatus"style="color: red;display: none;">Marital Status is required</label>
                 </td>
             </tr>
-            <tr>
-            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.disability"/></label></th>				
-				<td >
-				    <select class="custom-select" id="disability"   name="disability"  >
-						<option value="" >Select Disability</option>
-						<option value="Yes" ${GatePassObj.disability eq 'Yes' ? 'selected="selected"' : ''}>Yes</option>
-						<option value="No" ${GatePassObj.disability eq 'No' ? 'selected="selected"' : ''}>No</option>
-				    </select>
-						<label id="error-disability"style="color: red;display: none;">Disability is required</label>
-						</td>
-                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenType"/></label></th>
-                            <td>  
-                            <select class="custom-select"  id="workmenType" name="workmenType" >
-       								 <option value="">Please select Workmen Type</option>
-									
-        							<c:forEach var="option" items="${WorkmenType}">
-										<option value="${option.gmId}" ${GatePassObj.workmenType eq option.gmId ? 'selected="selected"' : ''}>
-										${option.gmName}</option>
-                        			</c:forEach>
-									
-    								</select>
-    								 <label id="error-workmenType"style="color: red;display: none;">Workmen Type is required</label>
-    						</td>
-                  </tr>
            <tr>
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
                 <td>
@@ -801,7 +737,7 @@ label {
            
                 <option value="${pe.wcId}"
                  data-code="${pe.licenceType}"
-                ${GatePassObj.wcEsicNo eq pe.wcCode ? 'selected="selected"' : ''}>
+                ${GatePassObj.wcEsicNo eq pe.wcId ? 'selected="selected"' : ''}>
                 ${pe.wcCode}
             </option>
         </c:if>
@@ -947,7 +883,7 @@ label {
                       <!-- <label id="error-pfApplicable"style="color: red;display: none;">Please check pfApplicable</label> -->
                      </td>
                         </tr>
-                        <%-- <tr>
+                        <tr>
                             <th><label class="custom-label"><spring:message code="label.pfNumber"/></label></th>
                             <td>
                             	<input id="pfNumber" name="pfNumber" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.pfNumber }" readonly>
@@ -956,8 +892,8 @@ label {
                             <td>
                             	<input id="esicNumber" name="esicNumber"  style="width: 100%;height: 20px;" type="text" value="${GatePassObj.esicNumber }" readonly>
                             	</td>
-                        </tr> --%>
-                       <%--  <tr>
+                        </tr>
+                        <tr>
                             <th><label class="custom-label"><spring:message code="label.pfApplicable"/></label></th>
                             
                             <td>
@@ -965,7 +901,7 @@ label {
                <c:if test="${GatePassObj.pfApplicable eq 'Yes'}">checked</c:if>
                disabled />
     </td>
-                        </tr> --%>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -1235,7 +1171,7 @@ label {
 
     <!--  Use Camera -->
 
-     <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="openCamera()">
+     <button type="button" onclick="openCamera()" style="margin-left:-112px; color: black; width:90px; height:21px;">
       Use Camera
     </button> 
 
@@ -1269,12 +1205,7 @@ label {
        					 	  <span id="aadharFileName" style="margin-left: 10px;color:black;"></span> 
         					<div id="aadharError"></div> <!-- Error message for Aadhar file -->
                 		</td>
-                       <td>
-                		 	<label for="appointmentFile"><span class="required-field">*</span><spring:message code="label.uploadappointmentCard"/></label>
-       					 	<input type="file" id="appointmentFile" name="appointmentFile" accept="application/pdf" onchange="displayFileName1('appointmentFile', 'appointmentFileName')">
-       					 	  <span id="appointmentFileName" style="margin-left: 10px;color:black;"></span> 
-        					<div id="appointmentError"></div> <!-- Error message for appointment file -->
-                		</td>
+
                 </tr>  		
            <tr>
                 	  <td>

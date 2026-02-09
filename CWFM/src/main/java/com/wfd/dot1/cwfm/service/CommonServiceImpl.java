@@ -3,14 +3,11 @@ package com.wfd.dot1.cwfm.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.wfd.dot1.cwfm.controller.CreateEmpFetchByGatePassAPICALL;
 import com.wfd.dot1.cwfm.dao.CommonDao;
 import com.wfd.dot1.cwfm.dto.GeneralMasterDTO;
 import com.wfd.dot1.cwfm.dto.SectionDto;
@@ -23,19 +20,12 @@ import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
 import com.wfd.dot1.cwfm.pojo.PersonOrgLevel;
 import com.wfd.dot1.cwfm.pojo.State;
 import com.wfd.dot1.cwfm.pojo.Workorder;
-import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 
 @Service
 public class CommonServiceImpl implements CommonService {
 
     @Autowired
     private CommonDao commonDAO;
-    
-    @Autowired
-	CreateEmpFetchByGatePassAPICALL api;
-    
-	private static final Logger log = LoggerFactory.getLogger(CommonServiceImpl.class);
-
 
 //    @Override
 //    public State getStateById(int stateId) {
@@ -221,27 +211,9 @@ public class CommonServiceImpl implements CommonService {
 		commonDAO.deleteGmDataById(gmId);
 		
 	}
-	
-	public String getWFDIntegration() {
-		return QueryFileWatcher.getQuery("TRADE_SKILL_WFD_INTEGRATION");
-	}
 	@Override
 	public void saveGeneralMaster(GeneralMasterDTO generalMasterDTO) {
 		commonDAO.saveGeneralMaster(generalMasterDTO);	
-		
-		
-		try {
-        	String wfdIntegration = this.getWFDIntegration();
-        	if("yes".equalsIgnoreCase(wfdIntegration)) {
-        		String tradeSkillType = commonDAO.getGMID(generalMasterDTO.getGmTypeId(), generalMasterDTO.getGmName());
-        		if(null!=tradeSkillType) {
-        			api.postSkills(Integer.parseInt(tradeSkillType));
-        		}
-        	}
-        	}catch(Exception e) {
-        		log.error(e.getLocalizedMessage());
-        	}
-
 	}
 	@Override
 	public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {

@@ -962,14 +962,8 @@ function validateRenewFormData() {
     $("#workOrderBody tr").each(function () {
         const row = $(this);
 
-		const woSelect = row.find(".woNumber");
-
-		    const woId = woSelect.val();
-		    const woName = woSelect.find("option:selected").data("woname");
-
-		    const policy = {
-		    woNumber: woId,        // existing (ID)
-		    sapWoNumber: woName,        // ⭐ NEW
+        const policy = {
+            woNumber: row.find(".woNumber").val(),
             natureOfJob: row.find(".natureOfJob").val(),
             documentType: row.find(".documentType").val(),
             documentNumber: row.find(".documentNumber").val(),
@@ -1155,23 +1149,10 @@ document.addEventListener('click', function (e) {
 		    const row = document.createElement("tr");
 
 		    // Generate the Work Order options from the global array
-		  /*  let workOrderOptions = '<option value="">Select</option>';
+		    let workOrderOptions = '<option value="">Select</option>';
 		    globalWorkOrders.forEach(workOrder => {
 		        workOrderOptions += `<option value="${workOrder.workorderId}">${workOrder.name}</option>`;
-		    });*/
-			
-			// Generate the Work Order options from the global array
-			let workOrderOptions = '<option value="">Select</option>';
-
-			globalWorkOrders.forEach(workOrder => {
-			    workOrderOptions += `
-			        <option 
-			            value="${workOrder.workorderId}" 
-			            data-woname="${workOrder.name}">
-			            ${workOrder.name}
-			        </option>`;
-			});
-
+		    });
 
 		    row.innerHTML = `
 		        <td><button type="button" class="btn btn-success addRow" style="color:blue;background-color:white;">+</button></td>
@@ -1187,7 +1168,7 @@ document.addEventListener('click', function (e) {
 		        <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
 		        <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
 		        <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
-		        <td><input type="file" class="form-control attachment" name="attachment" accept="application/pdf"/></td>
+		        <td><input type="file" class="form-control attachment" name="attachment" /></td>
 		    `;
 
 			// Clone the documentType dropdown from the first row
@@ -1227,7 +1208,7 @@ document.addEventListener('click', function (e) {
 		                const option = document.createElement("option");
 		                option.value = workOrder.workorderId;
 		                option.text = workOrder.name;
-						option.setAttribute("data-woname", workOrder.name);
+
 		                // Append the options to all work order dropdowns
 		                woSelects.forEach(select => {
 		                    select.appendChild(option);

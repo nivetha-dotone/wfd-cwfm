@@ -494,6 +494,7 @@ console.log(isValid);
 }
 
 function validateEmploymentInformation(){
+	let type = $("#gatePassType").val();
 	let isValid = true;
     const principalEmp = $("#principalEmployer").val();
      if (principalEmp === "") {
@@ -551,6 +552,7 @@ function validateEmploymentInformation(){
     }else{
 		$("#error-eic").hide();
 	}
+	if(type ==="regular" || type === "quick"){
 	 const noj = $("#natureOfJob").val().trim();
 	const nojRegex = /^(?=.*[A-Za-z]{2,})[A-Za-z\s]+$/;
     if (!nojRegex.test(noj)) {
@@ -566,13 +568,13 @@ function validateEmploymentInformation(){
     }else{
 		$("#error-wc").hide();
 	}
-	const ll = $("#ll").val();
-     if (ll === "") {
-        $("#error-ll").show();
-        isValid = false;
-    }else{
-		$("#error-ll").hide();
-	}
+	//const ll = $("#ll").val();
+    // if (ll === "") {
+     //   $("#error-ll").show();
+    //    isValid = false;
+    //}else{
+	//	$("#error-ll").hide();
+	//}
 	const ha = $("#hazardousArea").val();
      if (ha === "") {
         $("#error-hazardous").show();
@@ -688,19 +690,23 @@ function validateEmploymentInformation(){
 	}
     
 	const selectedOption = $("#wc").find(":selected");
-	const licenceType = selectedOption.data("licencetype");
+	//const licenceType = selectedOption.data("licencetype");
+	const licenceType = selectedOption.attr("data-code");
 	const esicNumber = $("#esicNumber").val().trim();
 
 	if (licenceType === "ESIC") {
-	    if (esicNumber === "") {
-	       showEsic();
-	        isValid = false;
-	    } else {
-	        $("#error-esicNumber").hide();
-	    }
-	} else {
-	    $("#error-esicNumber").hide();
-	}
+showEsic();
+    if ( esicNumber === "") {
+        $("#error-esicNumber").text("ESIC Number is required").show();
+        isValid = false;
+    } else {
+        $("#error-esicNumber").hide(); // ✅ hides properly
+    }
+
+} else {
+    $("#error-esicNumber").hide(); // ✅ hides properly
+}
+
 
 	const doj = $("#doj").val().trim();
     if (doj === "") {
@@ -708,6 +714,7 @@ function validateEmploymentInformation(){
         isValid = false;
     }else{
 		 $("#error-doj").hide();
+	}
 	}
 	return isValid;
 }
@@ -993,7 +1000,10 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     }
     
     function approveRejectGatePass(status,type){
-		let isValid=true;
+		let isValid=true;let gatePassType=1;
+		if(type === "project"){
+			gatePassType=12;
+		}
 		 const approvercomments = $("#approvercomments").val().trim();
     if (approvercomments === "" && status==5) {
         $("#error-approvercomments").show();
@@ -1011,7 +1021,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 			gatePassId : $("#gatePassId").val().trim(),
 			approverRole : $("#roleName").val().trim(),
 			roleId :$("#roleId").val().trim(),
-			gatePassType : '1',
+			gatePassType : gatePassType,
 		};
 			  const xhr = new XMLHttpRequest();
     xhr.open("POST", "/CWFM/contractworkmen/approveRejectGatePass", true); // Replace with your actual controller URL
@@ -1023,10 +1033,20 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 			sessionStorage.setItem("successMessage", "Gatepass approved/rejected successfully!");
             if(type=== "regular"){
                     loadCommonList('/contractworkmen/list', 'On-Boarding List');
-                }else{
+                }else  if(type=== "quick"){
                     loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
-                }
-        } else {
+                }else{
+					loadCommonList('/contractworkmen/projectOnboardingList', 'Project Gatepass List');
+				}
+        }			else if (xhr.status === 400) {  
+							       const msg = xhr.responseText.trim();
+							       console.error("Server validation failed: " + msg);
+								   showLicenseError(msg);
+							       //alert(msg); // or show in UI better
+							       //sessionStorage.setItem("errorMessage", msg);
+								   return;
+							   } 
+		else {
             // Handle error response
             console.error("Error saving data:", xhr.statusText);
 			sessionStorage.setItem("errorMessage", "Failed to approve/reject Gatepass!");
@@ -1047,7 +1067,10 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 		
 		
 		
-	
+		function trimIfPresent(val) {
+		    return val ? val.trim() : val;
+		}
+
 
     
 
@@ -1070,11 +1093,18 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     if (!validateBasicData()) {
         basicValid = false;
     }
-
+	if(type=== "project"){
+		if (!validateProjectEmploymentInformation()) {
+		        employmentValid = false;
+		    }
+	}else{
     if (!validateEmploymentInformation()) {
         employmentValid = false;
     }
-
+	if (!validatePfForm11Requirement()) {
+	        documentValid = false;
+	    }
+	}
 	if(type=== "regular"){
         if (!validateOtherInformation()) {
             otherValid = false;
@@ -1093,9 +1123,7 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 		$("#basic").val("0.00"); 
 		$("#otherAllowance").val("0.00"); 
 	}
-  if (!validatePfForm11Requirement()) {
-        documentValid = false;
-    }
+  
     console.log("basicValid: " + basicValid);
     console.log("employmentValid: " + employmentValid);
     console.log("otherValid: " + otherValid);
@@ -1115,24 +1143,26 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
     const firstName = toCapitalCase($("#firstName").val().trim());
     const lastName = toCapitalCase($("#lastName").val().trim());
     const relationName = toCapitalCase($("#relationName").val().trim());
-    const natureOfJob = toCapitalCase($("#natureOfJob").val().trim());
-    const emergencyName = toCapitalCase($("#emergencyName").val().trim());
     const address = toCapitalCase($("#address").val().trim());
     const idMark = toCapitalCase($("#idMark").val().trim());
-    const pfApplicable = $("#pfApplicable").is(":checked") ? "Yes" : "No";
-
+	let natureOfJob="";let emergencyName="";let pfApplicable="No";
+	if(type=== "regular" || type==="quick"){
+		 natureOfJob = toCapitalCase($("#natureOfJob").val().trim());
+		    emergencyName = toCapitalCase($("#emergencyName").val().trim());
+		    pfApplicable = $("#pfApplicable").is(":checked") ? "Yes" : "No";
+		}
     if (basicValid && employmentValid && otherValid && wagesValid && documentValid) {
         const data = new FormData();
         const jsonData = {
-			transactionId:$("#transactionId").val().trim(),
-            aadhaarNumber: $("#aadharNumber").val().trim(),
+			transactionId:trimIfPresent($("#transactionId").val()),
+            aadhaarNumber: trimIfPresent($("#aadharNumber").val()),
             firstName: firstName,
             lastName: lastName,
-            dateOfBirth: $("#dateOfBirth").val().trim(),
+            dateOfBirth:trimIfPresent( $("#dateOfBirth").val()),
             gender: $("#gender").val(),
             relationName: relationName,
             idMark: idMark,
-            mobileNumber: $("#mobileNumber").val().trim(),
+            mobileNumber: trimIfPresent($("#mobileNumber").val()),
             maritalStatus: $("#maritalStatus").val(),
             principalEmployer: $("#principalEmployer").val(),
             contractor: $("#contractor").val(),
@@ -1147,35 +1177,35 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 			llNo:$("#ll").val(),
             hazardousArea: $("#hazardousArea").val(),
             accessArea: $("#accessArea").val(),
-            uanNumber: $("#uanNumber").val().trim(),
-            healthCheckDate: $("#healthCheckDate").val().trim(),
-            pfNumber:$("#pfNumber").val().trim(),
-			esicNumber:$("#esicNumber").val().trim(),
+            uanNumber: trimIfPresent($("#uanNumber").val()),
+            healthCheckDate: trimIfPresent($("#healthCheckDate").val()),
+            pfNumber:trimIfPresent($("#pfNumber").val()),
+			esicNumber:trimIfPresent($("#esicNumber").val()),
             bloodGroup: $("#bloodGroup").val(),
             accommodation: $("#accommodation").val(),
             academic: $("#academic").val(),
             technical: $("#technical").val(),
-            ifscCode: $("#ifscCode").val().trim(),
-            accountNumber: $("#accountNumber").val().trim(),
+            ifscCode: trimIfPresent($("#ifscCode").val()),
+            accountNumber: trimIfPresent($("#accountNumber").val()),
             emergencyName: emergencyName,
-            emergencyNumber: $("#emergencyNumber").val().trim(),
+            emergencyNumber: trimIfPresent($("#emergencyNumber").val()),
             wageCategory: $("#wageCategory").val(),
             bonusPayout: $("#bonusPayout").val(),
             pfCap: $("#pfCap").val(),
             zone: $("#zone").val(),
-            basic: $("#basic").val().trim(),
-            da: $("#da").val().trim(),
-            hra: $("#hra").val().trim(),
-            washingAllowance: $("#washingAllowance").val().trim(),
-            otherAllowance: $("#otherAllowance").val().trim(),
-            uniformAllowance: $("#uniformAllowance").val().trim(),
+            basic: trimIfPresent($("#basic").val()),
+            da: trimIfPresent($("#da").val()),
+            hra: trimIfPresent($("#hra").val()),
+            washingAllowance: trimIfPresent($("#washingAllowance").val()),
+            otherAllowance:trimIfPresent( $("#otherAllowance").val()),
+            uniformAllowance: trimIfPresent($("#uniformAllowance").val()),
             userId: userId,
             gatePassAction: "save",
-            comments: $("#comments").val().trim(),
+            comments: trimIfPresent($("#comments").val()),
 			address: address,
 			doj:$("#doj").val(),
 			pfApplicable:pfApplicable,
-            policeVerificationDate: $("#policeVerificationDate").val().trim(),
+            policeVerificationDate: trimIfPresent($("#policeVerificationDate").val()),
 			onboardingType:type,
         };
 
@@ -1205,9 +1235,11 @@ const policeVerificationDate = $("#policeVerificationDate").val().trim();
 				sessionStorage.setItem("successMessage", "Gatepass saved successfully!");
                 if(type=== "regular"){
                     loadCommonList('/contractworkmen/list', 'On-Boarding List');
-                }else{
+                }else if(type=== "quick"){
                     loadCommonList('/contractworkmen/quickOnboardingList', 'Quick Onboarding List');
-                }
+                }else{
+					loadCommonList('/contractworkmen/projectOnboardingList', 'Project Gatepass List');
+				}
             }else if (xhr.status === 400) {  
 				       const msg = xhr.responseText.trim();
 				       console.error("Server validation failed: " + msg);
@@ -3151,78 +3183,119 @@ function validatePfForm11Requirement() {
     return true;
 }
 
-let streams;
 
-  function previewImages(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.getElementById("preview");
-        img.src = e.target.result;
-        img.style.display = "block";
-      };
-      reader.readAsDataURL(file);
 
-      // ✅ Show file name
-      document.getElementById("fileNameDisplay").textContent = file.name;
+
+
+let cameraStream = null;
+
+function previewImage(event, inputId, fileNameSpanId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById("preview");
+    const fileNameSpan = document.getElementById(fileNameSpanId);
+
+    preview.innerHTML = "";
+    fileNameSpan.textContent = "";
+
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    fileNameSpan.textContent = file.name;
+
+    if (inputId === "mobileCameraInput") {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("imageFile").files = dt.files;
     }
-  }
 
-  function openCamera() {
+    if (!file.type.startsWith("image/")) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.maxWidth = "100%";
+        img.style.maxHeight = "100%";
+        preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+}
+
+function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function openCamera() {
+
+    if (isMobileDevice()) {
+        document.getElementById("mobileCameraInput").click();
+        return;
+    }
+
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(s => {
-        streams = s;
-        const video = document.getElementById("webcam");
-        video.srcObject = streams;
-        video.style.display = "block";
-        document.getElementById("cameraButtons").style.display = "flex";
-        //document.getElementById("cameraButtons").style.gap = "5px";
-      })
-      .catch(err => {
-        alert("Camera access denied.");
-        console.error(err);
-      });
-  }
+        .then(stream => {
+            cameraStream = stream;
+            const video = document.getElementById("webcam");
+            video.srcObject = stream;
 
-  function captureImage() {
-    const video = document.getElementById("webcam");
-    const canvas = document.getElementById("canvas");
-    const previewDiv = document.getElementById("preview");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    canvas.toBlob(function(blob) {
-        // Create a File object with a dummy name
-        const file = new File([blob], "captured_profile.png", { type: "image/png" });
-
-        // Set this file into a hidden input (or use FormData later)
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        document.getElementById("imageFile").files = dataTransfer.files;
-
-        // Preview image
-        const imageUrl = URL.createObjectURL(blob);
-        previewDiv.innerHTML = `<img src="${imageUrl}" alt="Captured Image" style="max-width: 100%; max-height: 100%;">`;
-
-        // Show filename under preview
-        document.getElementById("imageFileName").textContent = file.name;
-
-        closeCamera();
-    }, "image/png");
+            video.onloadedmetadata = () => {   
+                video.play();
+                video.style.display = "block";
+                document.getElementById("cameraButtons").style.display = "block";
+            };
+        })
+        .catch(() => {
+            alert("Camera not available or permission denied");
+        });
 }
 
 
 
-  function closeCamera() {
-    if (streams) {
-      streams.getTracks().forEach(track => track.stop());
+function captureImage() {
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("canvas");
+
+    if (video.videoWidth === 0) {
+        alert("Camera still loading... Try again.");
+        return;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(blob => {
+        const file = new File([blob], "camera-image.jpg", { type: "image/jpeg" });
+
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("imageFile").files = dt.files;
+
+        previewImage(
+            { target: document.getElementById("imageFile") },
+            "imageFile",
+            "imageFileName"
+        );
+
+        closeCamera();
+    }, "image/jpeg", 0.95);
+}
+
+function closeCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
     }
     document.getElementById("webcam").style.display = "none";
     document.getElementById("cameraButtons").style.display = "none";
-  }
+}
+
+
+
+
   
   function goBackToonboardingList() {
     	 loadCommonList('/contractworkmen/list', 'On-Boarding List');
@@ -3669,8 +3742,9 @@ function showEsic() {
     document.getElementById("esicNumber").required = true;
     document.getElementById("esicNumberSection").style.display = "";
     document.getElementById("esicRequiredStar").style.display = "";
-	document.getElementById("error-esicNumber").style.display = "";
-	$("#error-esicNumber").show();
+	//document.getElementById("error-esicNumber").style.display = "";
+	$("#error-esicNumber").hide();
+	
 }
 
 function hideEsic() {
@@ -3775,3 +3849,82 @@ function searchGatePassReportBasedOnPE() {
 						       link.click();
 						       document.body.removeChild(link);
 						   }
+						   
+						   function redirectToWorkmenProjectAdd() {
+						   console.log("redirectToWorkmenProjectAdd called");
+						       // Fetch the content of add.jsp using AJAX
+						       var xhr = new XMLHttpRequest();
+						       xhr.onreadystatechange = function() {
+						           if (xhr.readyState == 4 && xhr.status == 200) {
+						               // Update the mainContent element with the fetched content
+						               document.getElementById("mainContent").innerHTML = xhr.responseText;
+						   			setDateRange();
+						           }
+						       };
+						       xhr.open("GET", "/CWFM/contractworkmen/projectOnboardingCreation", true);
+						       xhr.send();
+						   }
+						   function goBackToProjectOnboardingList() {
+						      	 loadCommonList('/contractworkmen/projectOnboardingList', 'Project Gatepass List');
+						      }
+							  function validateProjectEmploymentInformation(){
+							  	let isValid = true;
+							      const principalEmp = $("#principalEmployer").val();
+							       if (principalEmp === "") {
+							          $("#error-principalEmployer").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-principalEmployer").hide();
+							  	}
+							  	const cont = $("#contractor").val();
+							       if (cont === "") {
+							          $("#error-contractor").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-contractor").hide();
+							  	}
+							  	const wo = $("#workorder").val();
+							       if (wo === "") {
+							          $("#error-workorder").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-workorder").hide();
+							  	}
+							  	const trade = $("#trade").val();
+							       if (trade === "") {
+							          $("#error-trade").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-trade").hide();
+							  	}
+							  	const skill = $("#skill").val();
+							       if (skill === "") {
+							          $("#error-skill").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-skill").hide();
+							  	}
+							  	const dept = $("#department").val();
+							       if (dept === "") {
+							          $("#error-department").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-department").hide();
+							  	}
+							  	const subdept = $("#subdepartment").val();
+							       if (subdept === "") {
+							          $("#error-area").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-area").hide();
+							  	}
+							  	const eic = $("#eic").val();
+							       if (eic === "") {
+							          $("#error-eic").show();
+							          isValid = false;
+							      }else{
+							  		$("#error-eic").hide();
+							  	}
+							  	 
+							  	return isValid;
+							  }	

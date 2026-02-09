@@ -354,7 +354,7 @@ table.ControlLayout td {
                     <td style="color:black;text-align:center">${item.validFrom }</td >
                     <td style="color:black;text-align:center">${item.validTo}</td>
                     <td style="color:black;text-align:center">
-                     <a href="#" onclick="viewContractorFile('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${item.fileName }')">${item.fileName}</a>
+                     <a href="#" onclick="downloadContractorDoc('${principalEmployer.contractorregId}','${principalEmployer.createdBy }','${item.fileName }')">${item.fileName}</a>
                
                      </td>
                     

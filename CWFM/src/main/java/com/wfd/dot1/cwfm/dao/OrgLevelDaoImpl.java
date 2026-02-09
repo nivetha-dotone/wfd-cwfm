@@ -119,13 +119,13 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 	    return QueryFileWatcher.getQuery("GET_ALL_PRINCIPALEMPLOYER");
 	}
  public String getAllContractors() {
-	    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTORS_FOR_ORGLEVEL");
+	    return QueryFileWatcher.getQuery("GET_ALL_CONTRACTORS_FOR ORGLEVEL");
 	}
  public String getGeneralMasters() {
 	    return QueryFileWatcher.getQuery("GET_GENERALMASTERS_FOR_ORGLEVEL");
 	}
  public String getAllWorkorders() {
-	    return QueryFileWatcher.getQuery("GET_ALL_WORKORDERS_FOR_ORGLEVEL");
+	    return QueryFileWatcher.getQuery("GET_ALL_WORKORDERS_FOR ORGLEVEL");
 	}
  
     @Override
@@ -427,17 +427,14 @@ public class OrgLevelDaoImpl implements OrgLevelDao {
 			
 			@Override
 			public List<Contractor> getContractors() {
-				List<Contractor> contList= new ArrayList<Contractor>();
 				String sql=getAllContractors();
 			    //String sql = "SELECT CODE, NAME FROM CMSCONTRACTOR";
-				 SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
-				    while(rs.next()) {
+			    return jdbcTemplate.query(sql, (rs, rowNum) -> {
 			        Contractor c = new Contractor();
 			        c.setVendorCode(rs.getString("CODE"));
 			        c.setContractorName(rs.getString("NAME"));
-			        contList.add(c);
-				    }
-			        return contList;
+			        return c;
+			    });
 			}
 			@Override
 			public List<CmsGeneralMaster> getGeneralMasters(String type) {

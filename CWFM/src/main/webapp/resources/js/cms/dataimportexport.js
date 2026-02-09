@@ -308,12 +308,6 @@ selectAllCheckbox.addEventListener("change", function () {
 
 selectAllTh.appendChild(selectAllCheckbox);
 tableHeaderRow.appendChild(selectAllTh);
-// ⬇️ Serial Number header
-const slNoTh = document.createElement("th");
-slNoTh.style.border = "1px solid #ddd";
-slNoTh.style.padding = "8px";
-slNoTh.textContent = "S.No";
-tableHeaderRow.appendChild(slNoTh);
 
 // ➡️ Real data headers (not including checkbox)
 headers.forEach(header => {
@@ -339,13 +333,7 @@ for (let i = 0; i < 9; i++) {
 
     selectTd.appendChild(rowCheckbox);
     tr.appendChild(selectTd);
-    
-// ⬇️ Serial number column
-    const slNoTd = document.createElement("td");
-    slNoTd.style.border = "1px solid #ddd";
-    slNoTd.style.textAlign = "center";
-    slNoTd.textContent = i + 1; // 👈 auto increment
-    tr.appendChild(slNoTd);
+
     // real editable cells
     headers.forEach(() => {
         const td = document.createElement("td");
@@ -426,7 +414,6 @@ document.getElementById("fileInput").addEventListener("change", function () {
 });
 
 function uploadTemplateFile() {
-	showLoader();
     const templateType = document.getElementById("templateType").value;
 
     // detect manual table data
@@ -477,19 +464,16 @@ function uploadTemplateFile() {
 
         setTimeout(() => messageDiv.style.display = "none", 4000);
         if (result.data?.errorData?.length) {
-			 hideLoader(); 
             renderErrors(result.data.errorData);
             return;
         }
         if (result.data?.successData?.length) {
-			 hideLoader(); 
             renderUploadedData(result.data.successData, templateType);
         }
         closeFileSidebar();
          renderErrors([], null);
     })
     .catch(err => {
-		 hideLoader(); 
         console.error("Network/Server error:", err);
         alert("Server error. Please try again later.");
     });
@@ -502,14 +486,23 @@ document.addEventListener("input", function (e) {
 });
 
     function renderUploadedData(data, templateType) {
-const tableBody = document.getElementById("tableBody");
-    const tableHeaderRow = document.getElementById("tableHeaderRow");
+        const tableBody = document.getElementById("tableBody");
+        const tableHeaderRow = document.getElementById("tableHeaderRow");
+        tableBody.innerHTML = "";
+        tableHeaderRow.innerHTML = "";
 
-    tableBody.innerHTML = "";
-    tableHeaderRow.innerHTML = "";
-
-    let headers = [];
-    let fieldMap = [];
+        /*if (!data || data.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 10;
+            td.textContent = "No data found.";
+            tr.appendChild(td);
+            tableBody.appendChild(tr);
+            return;
+        }
+*/
+        let headers = [];
+        let fieldMap = [];
 
         if (templateType === "Data-General Master") {
             headers = ["GM Name", "GM Description", "GM Type ID"];
@@ -547,33 +540,11 @@ const tableBody = document.getElementById("tableBody");
             headers = ["Plant Code","Department","Sub Department"];
             fieldMap = ["plantCode","department","subDepartment"];
         }
-       // const checkTh = document.createElement("th");
-       // checkTh.style.border = "1px solid #ddd";
-       // checkTh.innerHTML = `<input type="checkbox" id="selectAll">`;
-       // tableHeaderRow.appendChild(checkTh);
+        const checkTh = document.createElement("th");
+        checkTh.style.border = "1px solid #ddd";
+        checkTh.innerHTML = `<input type="checkbox" id="selectAll">`;
+        tableHeaderRow.appendChild(checkTh);
     
-     const checkAllTh = document.createElement("th");
-    checkAllTh.style.border = "1px solid #ddd";
-    checkAllTh.style.padding = "8px";
-
-    const checkAll = document.createElement("input");
-    checkAll.type = "checkbox";
-
-    checkAll.addEventListener("change", function () {
-        document.querySelectorAll(".rowCheck").forEach(cb => {
-            cb.checked = checkAll.checked;
-        });
-    });
-
-    checkAllTh.appendChild(checkAll);
-    tableHeaderRow.appendChild(checkAllTh);
-
-    // 🔢 Serial No
-    const slTh = document.createElement("th");
-    slTh.textContent = "S.No";
-    slTh.style.border = "1px solid #ddd";
-    slTh.style.padding = "8px";
-    tableHeaderRow.appendChild(slTh);
     
         headers.forEach(header => {
             const th = document.createElement("th");
@@ -582,55 +553,36 @@ const tableBody = document.getElementById("tableBody");
             th.textContent = header;
             tableHeaderRow.appendChild(th);
         });
- 
+   
+const safe = v => (v ?? "");
 
- const safe = v => (v ?? "");
-
-    data.forEach((row, index) => {
-
+      data.forEach(row => {
         const tr = document.createElement("tr");
-
-        // ☑ Row Checkbox
-        const cbTd = document.createElement("td");
-        cbTd.style.border = "1px solid #ddd";
-        cbTd.style.textAlign = "left";
-
+        //  ➜ checkbox column
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.className = "rowCheck";
 
-        cb.addEventListener("change", () => {
-            const all = document.querySelectorAll(".rowCheck");
-            const checked = document.querySelectorAll(".rowCheck:checked");
-            checkAll.checked = all.length === checked.length;
-        });
-
+        const cbTd = document.createElement("td");
         cbTd.appendChild(cb);
         tr.appendChild(cbTd);
 
-        // 🔢 Serial Number
-        const slTd = document.createElement("td");
-        slTd.textContent = index + 1;
-        slTd.style.border = "1px solid #ddd";
-        slTd.style.textAlign = "center";
-        tr.appendChild(slTd);
-
-        // 📌 Data cells
-        fieldMap.forEach(field => {
-            const td = document.createElement("td");
-            td.contentEditable = true;
-            td.dataset.field = field;
-            td.style.border = "1px solid #ddd";
-            td.style.padding = "8px";
-            td.textContent = safe(row[field]);
-
-            td.addEventListener("input", () => tableEdited = true);
-
-            tr.appendChild(td);
+    fieldMap.forEach(field => {
+        const td = document.createElement("td");
+        td.contentEditable = "true";        // ✅ editable
+        td.dataset.field = field;           // track field
+        td.style.border = "1px solid #ddd";
+        td.style.padding = "8px";
+        td.textContent = safe(row[field]);
+        td.addEventListener("input", () => {
+            tableEdited = true;             // ✅ mark edited
         });
 
-        tableBody.appendChild(tr);
+        tr.appendChild(td);
+
     });
+    tableBody.appendChild(tr);
+});
     }       
 
 function previewFileData() {
@@ -728,31 +680,19 @@ function renderPreviewData(data) {
     const body = document.getElementById("tableBody");
     body.innerHTML = "";
 
-    data.forEach((row, index) => {
+    data.forEach(row => {
         const tr = document.createElement("tr");
 
-        /* 1️⃣ Checkbox column */
-        const cbTd = document.createElement("td");
-        //cbTd.style.textAlign = "center";
-        cbTd.style.border = "1px solid #ddd";
-
+        // checkbox column
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.className = "rowCheck";
 
+        const cbTd = document.createElement("td");
         cbTd.appendChild(cb);
         tr.appendChild(cbTd);
 
-        /* 2️⃣ Serial Number column */
-        const slNoTd = document.createElement("td");
-        slNoTd.textContent = index + 1;   // 🔥 S.No
-        slNoTd.style.textAlign = "center";
-        slNoTd.style.border = "1px solid #ddd";
-        slNoTd.style.fontWeight = "600";
-
-        tr.appendChild(slNoTd);
-
-        /* 3️⃣ Data columns */
+        // data columns
         Object.values(row).forEach(val => {
             const td = document.createElement("td");
             td.contentEditable = "true";
@@ -771,64 +711,43 @@ function renderPreviewData(data) {
     tableEdited = false;
 }
 
-
 function buildCsvFromTable() {
 
-    const headerCells = Array.from(
-        document.querySelectorAll("#tableHeaderRow th")
-    );
+    const headerCells = Array.from(document.querySelectorAll("#tableHeaderRow th"));
     const rows = document.querySelectorAll("#tableBody tr");
 
     if (!headerCells.length) {
         throw new Error("No table headers found");
     }
 
-    /* 1️⃣ Detect columns to SKIP (Checkbox + S.No) */
-    const skipCols = [];
+    //  detect checkbox column(s)
+    const checkboxCols = headerCells
+        .map((th, idx) => th.querySelector('input[type="checkbox"]') ? idx : -1)
+        .filter(idx => idx !== -1);
 
-    headerCells.forEach((th, idx) => {
-        const text = th.innerText.trim().toLowerCase();
-
-        // checkbox header OR serial number header
-        if (
-            th.querySelector('input[type="checkbox"]') ||
-            text === "s.no" ||
-            text === "sno" ||
-            text === "serial no"
-        ) {
-            skipCols.push(idx);
-        }
-    });
-
-    /* 2️⃣ CSV HEADERS (excluding skipped columns) */
+    //  CSV HEADERS  (ignore checkbox col)
     const headers = headerCells
-        .filter((_, idx) => !skipCols.includes(idx))
+        .filter((_, idx) => !checkboxCols.includes(idx))
         .map(th => th.innerText.trim());
 
     let csv = headers.join(",") + "\n";
 
-    /* 3️⃣ CSV ROWS */
+    //  CSV ROWS  (ignore checkbox col)
     rows.forEach(tr => {
         const tds = Array.from(tr.querySelectorAll("td"));
 
-        const rowData = tds
-            .filter((_, idx) => !skipCols.includes(idx))
+        const row = tds
+            .filter((_, idx) => !checkboxCols.includes(idx))
             .map(td => `"${td.innerText.trim().replace(/"/g, '""')}"`);
 
-        // ✅ skip completely empty rows
-        const isEmpty = rowData
-            .join("")
-            .replace(/"/g, "")
-            .trim() === "";
-
-        if (!isEmpty) {
-            csv += rowData.join(",") + "\n";
+        // skip blank rows
+        if (row.join("").replace(/"/g, "").trim() !== "") {
+            csv += row.join(",") + "\n";
         }
     });
 
     return csv;
 }
-
 
 function getHeadersByTemplate(selectedText) {
     switch (selectedText.toLowerCase()) {
@@ -875,25 +794,21 @@ function getHeadersByTemplate(selectedText) {
     
     
 // SELECT-ALL — works for dynamically added rows too
-// ✅ Select All / Unselect All (dynamic tables safe)
-document.addEventListener("click", function (e) {
+  document.addEventListener("change", function (e) {
 
-    if (e.target && e.target.id === "selectAll") {
+    if (e.target.id === "selectAll") {
 
-        const isChecked = e.target.checked;
+        const checked = e.target.checked;
 
         document
             .querySelectorAll("#tableBody .rowCheck")
-            .forEach(cb => cb.checked = isChecked);
+            .forEach(cb => cb.checked = checked);
     }
 });
-
-
 
 function deleteSelectedRows() {
 
     const rows = document.querySelectorAll("#tableBody tr");
-
     rows.forEach(tr => {
         const cb = tr.querySelector(".rowCheck");
         if (cb && cb.checked) {
@@ -902,59 +817,30 @@ function deleteSelectedRows() {
         }
     });
 
-    // 🔢 Re-number serial numbers after delete
-    updateSerialNumbers();
-
-    // ⛔ reset select-all checkbox
-    const selectAll = document.querySelector("#tableHeaderRow input[type='checkbox']");
+    // reset select-all checkbox
+    const selectAll = document.getElementById("selectAll");
     if (selectAll) selectAll.checked = false;
 }
-
-/* ===== Recalculate S.No ===== */
-function updateSerialNumbers() {
-    document.querySelectorAll("#tableBody tr").forEach((tr, index) => {
-        // checkbox = td[0], serial = td[1]
-        const slTd = tr.children[1];
-        if (slTd) {
-            slTd.textContent = index + 1;
-        }
-    });
-}
-
 
 function insertRow() {
 
     const table = document.getElementById("viewtable");
     const tbody = document.getElementById("tableBody");
     const totalCols = table.querySelectorAll("thead tr th").length;
-
     const tr = document.createElement("tr");
 
-    /* 1️⃣ Checkbox column */
+    // checkbox cell
     const chkTd = document.createElement("td");
-    chkTd.style.border = "1px solid #ddd";
-   // chkTd.style.textAlign = "left";
-
     const chk = document.createElement("input");
     chk.type = "checkbox";
+     chk.style.border = "1px solid #ddd";
+    //chk.style.textAlign = "center";
     chk.className = "rowCheck";
-
     chkTd.appendChild(chk);
     tr.appendChild(chkTd);
 
-    /* 2️⃣ Serial Number column */
-    const slNoTd = document.createElement("td");
-    slNoTd.style.border = "1px solid #ddd";
-    slNoTd.style.textAlign = "center";
-
-    // auto serial number = existing rows + 1
-    slNoTd.textContent = tbody.rows.length + 1;
-
-    tr.appendChild(slNoTd);
-
-    /* 3️⃣ Editable data columns */
-    // subtract 2 because checkbox + S.No already added
-    for (let i = 0; i < totalCols - 2; i++) {
+    // editable cells
+    for (let i = 1; i < totalCols; i++) {
         const td = document.createElement("td");
         td.contentEditable = "true";
         td.style.border = "1px solid #ddd";
@@ -963,25 +849,4 @@ function insertRow() {
     }
 
     tbody.appendChild(tr);
-}
-document.addEventListener("click", function (e) {
-
-    if (e.target && e.target.classList.contains("rowCheck")) {
-
-        const all = document.querySelectorAll("#tableBody .rowCheck");
-        const checked = document.querySelectorAll("#tableBody .rowCheck:checked");
-        const selectAll = document.getElementById("selectAll");
-
-        if (selectAll) {
-            selectAll.checked = all.length === checked.length;
-        }
-    }
-});
-
-function showLoader() {
-    document.getElementById("loaderOverlay").style.display = "flex";
-}
-
-function hideLoader() {
-    document.getElementById("loaderOverlay").style.display = "none";
 }

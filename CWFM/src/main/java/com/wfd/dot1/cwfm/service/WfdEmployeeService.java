@@ -4,6 +4,7 @@ package com.wfd.dot1.cwfm.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfd.dot1.cwfm.dto.EmployeeRequestDTO;
+import com.wfd.dot1.cwfm.dto.PunchRequestDTO;
 import com.wfd.dot1.cwfm.dto.UpdateEmployeeRequestDTO;
 import com.wfd.dot1.cwfm.util.QueryFileWatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,61 @@ public class WfdEmployeeService {
     public String getUpateEmpWFD() {
         return QueryFileWatcher.getQuery("UpdateEmpWFD");
     }
+
+     public String getUpdatePUNCHEMPWFD() {
+        return QueryFileWatcher.getQuery("UpdatePUNCHEMPWFD");
+    }
+
+    public String addEmployeePunchFace(PunchRequestDTO dto) {
+
+        try {
+            // 1️⃣ Convert DTO → JSON
+            String jsonBody = objectMapper.writeValueAsString(dto);
+
+            // 2️⃣ Get access token
+            String accessToken = wfdAuthService.getAccessToken();
+
+            // 3️⃣ Prepare headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(accessToken);
+
+            HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+
+            // 4️⃣ API URL
+            String url = getHostName() + getUpdatePUNCHEMPWFD();
+
+            // 5️⃣ Call WFD API
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            // 6️⃣ Handle SUCCESS
+            if (response.getStatusCode().is2xxSuccessful()) {
+
+//                // 👉 Optional: parse response if needed
+//                String responseBody = response.getBody();
+
+//                // 7️⃣ Update local DB / WFD sync table
+//                updatePunchStatusInDb(dto, responseBody);
+
+                return "and also in updated in WFD system";
+            }
+
+            // 8️⃣ Handle unexpected status
+            throw new RuntimeException(
+                    "WFD API failed with status: " + response.getStatusCode()
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating punch in WFD API", e);
+        }
+    }
+
+
 
     public String createEmployee(EmployeeRequestDTO dto){
         try {

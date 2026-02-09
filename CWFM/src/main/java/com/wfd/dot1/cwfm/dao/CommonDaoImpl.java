@@ -1,6 +1,5 @@
 package com.wfd.dot1.cwfm.dao;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -563,8 +562,7 @@ public class CommonDaoImpl implements CommonDao {
 		    public void saveGeneralMaster(GeneralMasterDTO generalMasterDTO) {
 			 String query = savegeneralmaster();
 		        jdbcTemplate.update(query, generalMasterDTO.getGmTypeId(), generalMasterDTO.getGmName(), generalMasterDTO.getGmDescription(),"System Admin");
-		   
-		 }
+		    }
 		
 		 @Override
 		    public boolean checkDuplicateRoleRight(Long roleId, Long pageId) {
@@ -870,16 +868,4 @@ public class CommonDaoImpl implements CommonDao {
 		        return gm;
 		    });
 }
-		@Override
-		public String getGMID(Long gmtypeId,String gmName) {
-			String result=null;
-			String query ="SELECT gm.GMID FROM CmsGeneralMaster gm "
-					+ " INNER JOIN CMSGMType gmt ON gm.gmTypeId = gmt.gmTypeId "
-					+ " WHERE gmt.gmType in('SKILL','TRADE') and gm.GMTYPEID=? and gm.ISACTIVE=1 and gm.GMNAME=?  ";
-			 SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gmtypeId,gmName);
-			 while(rs.next()) {
-				result =String.valueOf( rs.getInt("GMID"));
-				}
-			 return result;
-		}
 }

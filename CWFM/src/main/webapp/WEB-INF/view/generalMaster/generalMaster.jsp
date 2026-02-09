@@ -227,9 +227,8 @@ function editRow(gmId) {
             <input type="hidden" name="gmTypeId" id="gmTypeId" value="${param.gmTypeId}">
             <input type="hidden" id="existingMasterValues" value="${existingMasterValues.join(',')}">
          <!--  <div id="error-gmMaster" style="display: none; color: red; font-weight: bold;"></div>   -->
-          <!-- <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div> -->
+          <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
     </div>
-    <div id="formErrorMessage" class="error-message" style="display: none; color: red; font-weight: bold;"></div>
 </div>
     <h4 style="color:gray;margin-left:5px;">Existing General Masters</h4>
     <table id="gmTable" class="no-dt">

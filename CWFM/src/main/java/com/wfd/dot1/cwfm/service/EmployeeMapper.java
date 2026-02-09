@@ -1,15 +1,16 @@
 package com.wfd.dot1.cwfm.service;
 
-import com.wfd.dot1.cwfm.dto.EmployeeRequestDTO;
-import com.wfd.dot1.cwfm.dto.GatePassToOnBoard;
-import com.wfd.dot1.cwfm.dto.SkillProLevelDateDTO;
-import com.wfd.dot1.cwfm.dto.UpdateEmployeeRequestDTO;
+import com.wfd.dot1.cwfm.dto.*;
 import com.wfd.dot1.cwfm.pojo.GatePassMain;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 @Service
@@ -165,6 +166,81 @@ public class EmployeeMapper  {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    public String punchMatched(FaceLogFetchDto faceLogFetchDto){
+        try{
+
+
+            if(faceLogFetchDto!=null){
+
+                PunchRequestDTO punchRequestDTO =new PunchRequestDTO();
+
+                PunchRequestDTO.DoDTO doDTO=new PunchRequestDTO.DoDTO();
+
+                PunchRequestDTO.PunchesDTO punchesDTO= new PunchRequestDTO.PunchesDTO();
+
+                PunchRequestDTO.AddedPunchDTO addedPunchDTO= new PunchRequestDTO.AddedPunchDTO();
+                List<PunchRequestDTO.AddedPunchDTO> addedPunchDTOList = new ArrayList<>();
+
+                addedPunchDTO.setPunchDtm(faceLogFetchDto.getPunchDtm());
+
+
+                PunchRequestDTO.EmployeeDTO employeeDTO= new PunchRequestDTO.EmployeeDTO();
+                employeeDTO.setQualifier(faceLogFetchDto.getPersonNum());
+                addedPunchDTO.setEmployee(employeeDTO);
+
+
+                addedPunchDTOList.add(addedPunchDTO);
+
+
+                punchesDTO.setAdded(addedPunchDTOList);
+                doDTO.setPunches(punchesDTO);
+
+
+
+
+                PunchRequestDTO.WhereDTO whereDTO= new PunchRequestDTO.WhereDTO();
+                PunchRequestDTO.DateRangeDTO dateRangeDTO =
+                        new PunchRequestDTO.DateRangeDTO();
+
+                LocalDate punchDate = LocalDate.parse(
+                        faceLogFetchDto.getPunchDtm(),
+                        DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                );
+
+                String formattedDate = punchDate.toString(); // yyyy-MM-dd
+
+                dateRangeDTO.setStartDate(formattedDate);
+                dateRangeDTO.setEndDate(formattedDate);
+                whereDTO.setEmployee(employeeDTO);
+
+                whereDTO.setDateRange(dateRangeDTO);
+                punchRequestDTO.setDoObj(doDTO);
+                punchRequestDTO.setWhere(whereDTO);
+
+
+                String s = wfdEmployeeService.addEmployeePunchFace(punchRequestDTO);
+
+
+                return s;
+
+            }else
+            {
+                return  "Punch not get for WFD";
+            }
+
+
+
+
+
+
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public EmployeeRequestDTO gatePassEmpDto(String GatePassId ){

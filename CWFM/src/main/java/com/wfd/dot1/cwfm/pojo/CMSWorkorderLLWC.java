@@ -22,15 +22,6 @@ public class CMSWorkorderLLWC {
 		this.licenseType = licenseType;
 	}
 	
-	private String licenseNumber;
-
-	public String getLicenseNumber() {
-		return licenseNumber;
-	}
-
-	public void setLicenseNumber(String licenseNumber) {
-		this.licenseNumber = licenseNumber;
-	}
 	
 	
 }

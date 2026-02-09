@@ -537,11 +537,10 @@ label {
                    
         <tbody>
              <c:forEach var="report" items="${kronosReports}">
-            <tr><td><label  style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;"><span class="required-field">*</span>${report.reportName}</label></td>
-            <td><input type="file" name="kronosFile_${report.id}" id="kronosFile_${report.id}" accept="application/pdf" onchange="showFileNameBill(this, '${report.id}')"/>
+            <tr><td><label  style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;">${report.reportName}</label></td>
+            <td><input type="file" name="kronosFile_${report.id}" id="kronosFile_${report.id}" onchange="showFileNameBill(this, '${report.id}')"/>
         	<span id="fileName_${report.id}" style="margin-left:10px;color: black;"></span></td></tr>
         </c:forEach>
-            <label id="error-kronosFile" style="color:red; display:none; margin-top:8px;">All Kronos reports are mandatory</label>
             
 			
            
@@ -553,12 +552,10 @@ label {
                    
             <tbody>
             	<c:forEach var="stat" items="${statutoryReports}">
-           <tr><td> <label  style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;"><span class="required-field">*</span>${stat.attachmentName}</label></td>
-            <td><input type="file" name="statutoryFile_${stat.id}" id="statutoryFile_${stat.id}" accept="application/pdf" onchange="showFileNameBill0(this, '${stat.id}')"/>
+           <tr><td> <label  style="font-size: 100%;font-weight: bold;padding;8px;color: #898989;">${stat.attachmentName}</label></td>
+            <td><input type="file" name="statutoryFile_${stat.id}" id="statutoryFile_${stat.id}" onchange="showFileNameBill0(this, '${stat.id}')"/>
         	<span id="statfileName_${stat.id}" style="margin-left:10px;color: black;"></span></td></tr>
         </c:forEach>
-        <label id="error-statutoryFile" style="color:red; display:none; margin-top:8px;">All Statutory attachments are mandatory</label>
-        
 			</tbody>
                 </table>
                 

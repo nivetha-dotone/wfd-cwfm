@@ -128,7 +128,7 @@ function addRowContNew() {
         <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" /></td>
         <td><input type="date" class="form-control validFrom" name="validFrom" min="${today}" /></td>
         <td><input type="date" class="form-control validTo" name="validTo" min="${today}" /></td>
-        <td><input type="file" class="form-control attachment" name="attachment" accept="application/pdf" /></td>
+        <td><input type="file" class="form-control attachment" name="attachment" /></td>
 		<td><input type="checkbox" class="form-control panIndia" name="panIndia" /></td>
 		<td><input type="checkbox" class="form-control subApplicable" name="subApplicable" /></td>
     `;
@@ -514,18 +514,8 @@ function populateTab3Data(contractorId, unitId, vendorCode, contractorregId) {
 function saveWorkOrderInfo() {
     const selectedWOs = Array.from(document.getElementById("selectedWorkOrders").options)
         .map(opt => opt.value);
-        
-        if (!selectedWOs || selectedWOs.length === 0) {
-        alert("Please select at least one Work Order.");
-        return; // ⛔ stop execution
-    }
     const licenseId = 		Array.from(document.getElementById("selectedLicense").options)
 		        .map(opt => opt.value);
-		        
-		        if (!licenseId || licenseId.length === 0) {
-        alert("Please select at least one License.");
-        return; // ⛔ stop execution
-    }
     const contractorRegId = document.getElementById("contractorregId").value;
 	const selectedOption = $("#vendorCodeId option:selected");
 	const contractorId =  selectedOption.val();

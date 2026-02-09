@@ -88,9 +88,9 @@ public interface WorkmenDao {
 
 	public int getDOTTYpe(String principalEmployer);
 
-	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId, String llNo);
+	Map<String, LocalDate> getValidityDates(String workOrderId, String wcId);
 
-	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId,String gatePassTypeId);
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId);
 
 	public List<Contractor> getAllContractorForAdmin(String unitId);
 
@@ -170,7 +170,7 @@ public interface WorkmenDao {
 
 	boolean updateCmsPersonCustDataEffectiveTill(long personId);
 
-	public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus,String reasoning);
+	public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus);
 
 	boolean isPersonActiveInStatusMM(long personId);
 
@@ -197,7 +197,7 @@ public interface WorkmenDao {
 
 	int getLLDeploymentCountByUnitId(String unitId);
 
-	Map<String, Object> licenseExistsAndCount(String unitId, String contractorId, String workorderId, String licenseType,
+	int licenseExistsAndCount(String unitId, String contractorId, String workorderId, String licenseType,
 			String licenseId);
 
 	public List<GatePassListingDto> getGatePassUnblockDeblackListingDetails(String unitId, String deptId, String userId,
@@ -212,13 +212,5 @@ public interface WorkmenDao {
 	public String checkAadharUniqueness(String aadharNumber, String gatePassId, String transactionId) ;
 
 	GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String gatePassId);
-
-	GatePassMain getActiveCountDetails(String transactionId);
-
-	String getRenewTransactionIfExists(String gatePassId);
-
-	public boolean  updateGatePassMainWithReasoningTab(GatePassActionDto dto, MultipartFile exitFile,
-			MultipartFile fnfFile, MultipartFile feedbackFile, MultipartFile rateManagerFile, MultipartFile locFile);
-
 
 }
