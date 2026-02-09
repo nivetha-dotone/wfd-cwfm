@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renew List</title>
+    <title>Project Gatepass List</title>
     <script src="resources/js/cms/workmen.js"></script>
 
 
@@ -195,7 +195,6 @@
     <option value="">Select Principal Employer</option>
     <c:forEach items="${principalEmployers}" var="pe">
         <option value="${pe.id}" >${pe.description}</option>
-        <%-- <option value="${pe.id}" <c:if test="${principalEmployers.size() == 1}">selected</c:if>>${pe.description}</option> --%>
     </c:forEach>
 </select>
 
@@ -203,25 +202,32 @@
 <select id="deptId" name="deptId" style="color:gray;padding:3px;">
     <option value="">Select Department</option>
 </select>
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchRenew()">Search</button>
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding"  onclick="searchGatePassBasedOnPE('project')">Search</button>
+
   </div>
     <div>
-     <c:if test="${UserPermission.addRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewEdit()">Add</button>
-      </c:if>
-       <c:if test="${UserPermission.viewRights eq 1 }">
-        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenRenewView()">View</button>
-        
-        </c:if>
-        <c:if test="${UserPermission.exportRights eq 1 }">
-        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportCSVFormat()">Export</button>
-   </c:if>
+    <c:if test="${UserPermission.addRights eq 1 }">
+         <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenProjectAdd()">Add</button> 
+     </c:if>
+    
+  
+     <c:if test="${UserPermission.viewRights eq 1 }">
+        <button type="submit" class="btn btn-default process-footer-button-cancel ng-binding" onclick="redirectToWorkmenView()">View</button>
+
+     </c:if>
+       <c:if test="${UserPermission.exportRights eq 1 }">
+        <button type="button" class="btn btn-default process-footer-button-cancel ng-binding" onclick="exportToCSV()">Export</button>
+    	</c:if>
+
     </div>
 </div>
 
      <form id="updateForm" action="/CWFM/workorders/update" method="POST" >
      <div id="messageDiv" style="font-weight: bold; margin-top: 10px;"></div>
+    
+     
                          <div class="table-container">
+                        
     <table id="workmenTable"  cellspacing="0" cellpadding="0" >
         <thead>
 <tr >
@@ -235,16 +241,16 @@
 					<%-- <th class="header-text"  onclick="sortTable(3)"><spring:message code="label.lastName"/><span id="sortIndicatorManagerName" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(4)"><spring:message code="label.gender"/><span id="sortIndicatorManagerAddr" class="sort-indicator sort-asc">&#x25B2;</span></th>
 					<th class="header-text"  onclick="sortTable(5)"><spring:message code="label.dateOfBirth"/><span id="sortIndicatorBusinessType" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                     --%><th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc"></span></th>
+                    --%> <th class="header-text"  onclick="sortTable(6)"><spring:message code="label.aadharNumber"/><span id="sortIndicatorMaxWorkmen" class="sort-indicator sort-asc"></span></th>
                     <th class="header-text"  onclick="sortTable(7)"><spring:message code="label.contractorName"/><span id="sortIndicatorMaxCntrWorkmen" class="sort-indicator sort-asc"></span></th>
-                   <%--  <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
-                   --%>  <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc"></span></th> 
-                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.TransactionType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc"></span></th> 
-                       <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc"></span></th>
+                   <%--  <th class="header-text"  onclick="sortTable(8)"><spring:message code="label.vendorCode"/><span id="sortIndicatorBocwApp" class="sort-indicator sort-asc">&#x25B2;</span></th> --%>
+                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.unitName"/><span id="sortIndicatorIsmwApp" class="sort-indicator sort-asc">&#x25B2;</span></th>
+                    <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.TransactionType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc"></span></th> 
+                     <th class="header-text"  onclick="sortTable(9)"><spring:message code="label.gatePassType"/><span id="sortIndicatorCode" class="sort-indicator sort-asc"></span></th> 
                     <th class="header-text"  onclick="sortTable(10)"><spring:message code="label.status"/><span id="sortIndicatorOrganization" class="sort-indicator sort-asc"></span></th> 
             </tr>
         </thead>
-         <c:if test="${GatePassListingDto.size()>0 }">
+        <c:if test="${GatePassListingDto.size()>0 }">
         <tbody>
             <c:forEach items="${GatePassListingDto}" var="wo" >
             <tr>
@@ -273,12 +279,14 @@
     
                         </form>
                          </div>
-                         <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
+                        <%--  <c:if test="${principalEmployers.size() == 1 && Dept.size() == 1}">
     <script>
         setTimeout(function () {
-            searchRenew();
+            searchGatePassBasedOnPE('quick');
         }, 10); // Delay ensures DOM is rendered after innerHTML
     </script>
-    </c:if>
+    
+</c:if>
+                          --%>
 </body>
 </html>

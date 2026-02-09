@@ -34,7 +34,7 @@
         background-color: #f8f8f8;
         flex-wrap: wrap;
         gap: 10px;
-        margin-left: 92%;
+        margin-left: 95%;
         margin-top: 2%;
     }
 
@@ -378,6 +378,7 @@
         .controls-container {
             flex-direction: column;
             align-items: stretch;
+                    margin-left: 83%;
         }
 
         .search-box {

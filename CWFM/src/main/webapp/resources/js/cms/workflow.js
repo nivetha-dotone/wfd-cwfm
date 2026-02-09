@@ -330,7 +330,7 @@ function saveWorkflow() {
     const moduleActionsMap = {
         "WORKMEN ONBOARDING": [
             "CREATE", "BLOCK", "UNBLOCK", "BLACKLIST",
-            "DEBLACKLIST", "RENEW", "CANCEL"
+            "DEBLACKLIST", "RENEW", "CANCEL","PROJECT GATEPASS"
         ],
         "CONTRACTOR RENEWAL": ["CONTRACTOR RENEWAL"],
         "BILL VERIFICATION": ["Bill Creation"]

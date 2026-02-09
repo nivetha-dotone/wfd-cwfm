@@ -135,7 +135,8 @@ public class WorkmenController {
 		        "ACADEMICS", "Academics",
 		        "WAGECATEGORY", "WageCategory",
 		        "BONUSPAYOUT", "BonusPayout",
-		        "ZONE", "Zone"
+		        "ZONE", "Zone",
+		        "WORKMENTYPE","WorkmenType"
 		);
 
 		// Iterate over the attribute mappings and set the request attributes dynamically
@@ -373,6 +374,7 @@ public class WorkmenController {
     public String uploadDocuments( MultipartFile aadharFile,
                                          MultipartFile policeFile,
                                          MultipartFile profilePic,
+                                         MultipartFile appointmentFile,
                                          String userId,
                                          String gatePassId) {
 
@@ -403,6 +405,11 @@ public class WorkmenController {
             	String profilePicPath = directoryPath +profilePic.getOriginalFilename();
             	saveFile(profilePic,profilePicPath);
             }
+            //Save appointment PDF
+            if (!appointmentFile.isEmpty()) {
+                String appointmentFilePath = directoryPath + "appointment.pdf";
+                saveFile(appointmentFile, appointmentFilePath);
+            }
 
             // Return success message
             return "success";
@@ -427,6 +434,7 @@ public class WorkmenController {
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "appointmentFile", required = false) MultipartFile appointmentFile,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -448,6 +456,7 @@ public class WorkmenController {
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
             gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
+            gatePassMain.setAppointmentDocName(appointmentFile!=null && !appointmentFile.isEmpty() ? "appointment":"");
          // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
@@ -470,8 +479,13 @@ public class WorkmenController {
             }
             }
             
+            if("project".equals(gatePassMain.getOnboardingType())) {
+            	transactionId = workmenService.saveProjectGatePass(gatePassMain);
+            }else {
+            	transactionId = workmenService.saveGatePass(gatePassMain);
+            }
             
-            transactionId = workmenService.saveGatePass(gatePassMain);
+            
             if (transactionId != null) {
             	if (transactionId.contains("mandatory") || transactionId.contains("exceeded")) {
             		//if user wants we can draft the record
@@ -486,7 +500,7 @@ public class WorkmenController {
                      //       .body(new ObjectMapper().writeValueAsString(errorResponse));
                 }else {
                 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                    uploadDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
+                    uploadDocuments(aadharFile, policeFile,profilePic,appointmentFile ,String.valueOf(user.getUserId()), transactionId);
                 }
                 // Upload additional files
                 if (additionalFiles != null && documentTypes != null) {
@@ -542,9 +556,17 @@ public class WorkmenController {
 			MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
 			List<GatePassListingDto> listDto = new ArrayList<GatePassListingDto>();
 			if(user.getRoleName().toUpperCase().equals(UserRole.CONTRACTORSUPERVISOR.getName())){
+				if("project".equals(type)) {
+					listDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.PROJECT.getStatus(),type);
+				}else {
     			listDto= workmenService.getGatePassListingDetails(principalEmployerId,deptId,String.valueOf(user.getUserId()),GatePassType.CREATE.getStatus(),type);
+				}
     		}else {	
-			listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
+    			if("project".equals(type)) {
+    				listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.PROJECT.getStatus(),type);
+				}else {
+					listDto = workmenService.getGatePassListingForApprovers(principalEmployerId,deptId,user,GatePassType.CREATE.getStatus(),type);
+    		}
     		}	
 				if (listDto.isEmpty()) {
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -621,18 +643,29 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		} else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
-    		List<ApproverStatusDTO> approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId());
-    		 request.setAttribute("approvers", approvers);
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		
+    		if(gatePassMainObj.getOnboardingType().equals("project")) {
+    			approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.PROJECT.getStatus());
+    		}else
+    		{
+    			approvers = workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.CREATE.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers);
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
     	log.info("Exiting from viewIndividualContractWorkmenDetails: "+transactionId);
     	if(gatePassMainObj.getOnboardingType().equals("regular"))
     		return "contractWorkmen/view";
-    	else
+    	else if(gatePassMainObj.getOnboardingType().equals("quick"))
     		return "contractWorkmen/quickOnboardingView";
+    	else
+    		return "contractWorkmen/projectOnboardingView";
     }
     @PostMapping("/approveRejectGatePass")
     public ResponseEntity<String> approveRejectGatePass(@RequestBody ApproveRejectGatePassDto dto,HttpServletRequest request,HttpServletResponse response) {
@@ -647,6 +680,9 @@ public class WorkmenController {
          try {
         	 result = workmenService.approveRejectGatePass(dto);
          	if(null!=result) {
+         		if (result.contains("mandatory") || result.contains("exceeded")) {
+                    return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+                }
          		return new ResponseEntity<>(result,HttpStatus.OK);
          	}
          	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -671,9 +707,11 @@ public class WorkmenController {
 
             // Determine file path
             String filePath;
-            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") ||
+            if (docType.equals("aadhar") || docType.equals("police") || docType.equals("bank") || docType.equals("appointment")||
                 docType.equals("training") || docType.equals("other") || docType.equals("id2") ||
-                docType.equals("medical") || docType.equals("education") || docType.equals("form11")) {
+                docType.equals("medical") || docType.equals("education") || docType.equals("form11")
+                || docType.equals("exitletter")|| docType.equals("fnf")|| docType.equals("feedback")
+                || docType.equals("ratemanager")|| docType.equals("loc")) {
                 filePath = ROOT_DIRECTORY + userId + "/" + transactionId + "/" + docType + ".pdf";
             } else {
                 filePath = ROOT_DIRECTORY + userId + "/" + transactionId + "/" + docType;
@@ -744,51 +782,142 @@ public class WorkmenController {
     }
     
     
+//    @PostMapping("/gatePassAction")
+//    public ResponseEntity<String> gatePassAction(@RequestBody GatePassActionDto dto,HttpServletRequest request,HttpServletResponse response) {
+//    	String result=null; 
+//    	try {
+//             ObjectMapper objectMapper = new ObjectMapper();
+//             String gatePassActionDto = objectMapper.writeValueAsString(dto);
+//             log.info("Received gatePassActionDto JSON: {}", gatePassActionDto);
+//         } catch (Exception e) {
+//             log.error("Error converting gatePassActionDto to JSON", e);
+//         }
+//         try {
+//        	 result = workmenService.gatePassAction(dto);
+//         	if(null!=result) {
+//         		
+//         		if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
+//            		result="contractWorkmen/view";
+//            	}else if(dto.getGatePassType().equals(GatePassType.CANCEL.getStatus()))
+//            	{
+//            		result="contractWorkmen/cancelView";
+//            	}else if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus()))
+//            	{
+//            		result="contractWorkmen/blockView";
+//            	}else if(dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()))
+//            	{
+//            		result="contractWorkmen/unblockView";
+//            	}else if(dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus()))
+//            	{
+//            		result="contractWorkmen/blackView";
+//            	}else if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()))
+//            	{
+//            		result="contractWorkmen/deblackView";
+//            	}else if(dto.getGatePassType().equals(GatePassType.LOSTORDAMAGE.getStatus()))
+//            	{
+//            		result="contractWorkmen/lostView";
+//            	}else if(dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
+//            		result="contractWorkmen/renewView";
+//            	}
+//         		return new ResponseEntity<>(result,HttpStatus.OK);
+//         	}
+//         	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//         } catch (Exception e) {
+//             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                                  .body("Error saving data: " + e.getMessage());
+//         } 
+//    }
     @PostMapping("/gatePassAction")
-    public ResponseEntity<String> gatePassAction(@RequestBody GatePassActionDto dto,HttpServletRequest request,HttpServletResponse response) {
-    	String result=null; 
-    	try {
-             ObjectMapper objectMapper = new ObjectMapper();
-             String gatePassActionDto = objectMapper.writeValueAsString(dto);
-             log.info("Received gatePassActionDto JSON: {}", gatePassActionDto);
-         } catch (Exception e) {
-             log.error("Error converting gatePassActionDto to JSON", e);
-         }
-         try {
+    public ResponseEntity<String> gatePassAction(
+            @RequestParam("jsonData") String jsonData,
+            @RequestParam(value = "exitFile", required = false) MultipartFile exitFile,
+            @RequestParam(value = "fnfFile", required = false) MultipartFile fnfFile,
+            @RequestParam(value = "feedbackFile", required = false) MultipartFile feedbackFile,
+            @RequestParam(value = "rateManagerFile", required = false) MultipartFile rateManagerFile,
+            @RequestParam(value = "locFile", required = false) MultipartFile locFile,
+            HttpServletRequest request, HttpServletResponse response) {
+    	HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+        String result = null;
+        GatePassActionDto dto = null;
+        GatePassMain gatePassMain = null;
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            // Parse JSON into DTO (for workflow)
+            dto = mapper.readValue(jsonData, GatePassActionDto.class);
+
+            // Parse JSON into GatePassMain (for DB entity)
+            gatePassMain = mapper.readValue(jsonData, GatePassMain.class);
+
+            log.info("Received DTO: {}", dto);
+            log.info("Received GatePassMain: {}", gatePassMain);
+
+            // Set created by
+           // User user = (User) request.getSession().getAttribute("user");
+           // gatePassMain.setCreatedBy(String.valueOf(user.getUserId()));
+
+            // ===== SET DOCUMENT FLAGS / NAMES =====
+            gatePassMain.setExitLetterDocName(exitFile != null && !exitFile.isEmpty() ? "exitletter": "");
+            gatePassMain.setFNFDocName(fnfFile != null && !fnfFile.isEmpty() ? "fnf" : "");
+            gatePassMain.setFeedbackFormDocName(feedbackFile != null && !feedbackFile.isEmpty() ? "feedback" : "");
+            gatePassMain.setRateManagerDocName(rateManagerFile != null && !rateManagerFile.isEmpty() ? "ratemanager" : "");
+            gatePassMain.setLOCDocName(locFile != null && !locFile.isEmpty() ? "loc" : "");
+
+       
+        	
+        	 // ===== SAVE GATEPASSMAIN ENTITY =====
+        	boolean status = workmenService.updateGatePassMainWithReasoningTab(dto,exitFile,fnfFile,feedbackFile,rateManagerFile,locFile);
+        	 if (status) {
+        		 uploadReasoningDocuments(exitFile, fnfFile,feedbackFile,rateManagerFile ,locFile,String.valueOf(user.getUserId()), dto.getTransactionId());
+        	 }
+        	 else{
+        		 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                         .body("Failed to update GatePassMain");
+             }
+
         	 result = workmenService.gatePassAction(dto);
-         	if(null!=result) {
-         		
-         		if(dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
-            		result="contractWorkmen/view";
-            	}else if(dto.getGatePassType().equals(GatePassType.CANCEL.getStatus()))
-            	{
-            		result="contractWorkmen/cancelView";
-            	}else if(dto.getGatePassType().equals(GatePassType.BLOCK.getStatus()))
-            	{
-            		result="contractWorkmen/blockView";
-            	}else if(dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus()))
-            	{
-            		result="contractWorkmen/unblockView";
-            	}else if(dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus()))
-            	{
-            		result="contractWorkmen/blackView";
-            	}else if(dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus()))
-            	{
-            		result="contractWorkmen/deblackView";
-            	}else if(dto.getGatePassType().equals(GatePassType.LOSTORDAMAGE.getStatus()))
-            	{
-            		result="contractWorkmen/lostView";
-            	}else if(dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
-            		result="contractWorkmen/renewView";
-            	}
-         		return new ResponseEntity<>(result,HttpStatus.OK);
-         	}
-         	return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-         } catch (Exception e) {
-             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                  .body("Error saving data: " + e.getMessage());
-         } 
+        	 
+       	if(null!=result) {
+       		
+                if (dto.getGatePassType().equals(GatePassType.CREATE.getStatus())) {
+                    result = "contractWorkmen/view";
+
+                } else if (dto.getGatePassType().equals(GatePassType.CANCEL.getStatus())) {
+                    result = "contractWorkmen/cancelView";
+
+                } else if (dto.getGatePassType().equals(GatePassType.BLOCK.getStatus())) {
+                    result = "contractWorkmen/blockView";
+
+                } else if (dto.getGatePassType().equals(GatePassType.UNBLOCK.getStatus())) {
+                    result = "contractWorkmen/unblockView";
+
+                } else if (dto.getGatePassType().equals(GatePassType.BLACKLIST.getStatus())) {
+                    result = "contractWorkmen/blackView";
+
+                } else if (dto.getGatePassType().equals(GatePassType.DEBLACKLIST.getStatus())) {
+                    result = "contractWorkmen/deblackView";
+
+                } else if (dto.getGatePassType().equals(GatePassType.LOSTORDAMAGE.getStatus())) {
+                    result = "contractWorkmen/lostView";
+
+                } else if (dto.getGatePassType().equals(GatePassType.RENEW.getStatus())) {
+                    result = "contractWorkmen/renewView";
+                }
+
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        } catch (Exception e) {
+            log.error("Error saving data", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error saving data: " + e.getMessage());
+        }
     }
+
     
     @GetMapping("/blockListFilter")
    	public String blockListFilter(HttpServletRequest request, HttpServletResponse response) {
@@ -1093,6 +1222,11 @@ public class WorkmenController {
     		 request.setAttribute("mode", mode);
     		 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
     		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 String renewTrans = workmenService.getRenewTransactionIfExists(gatePassId);
+    		 if(null!=renewTrans) {
+    			 oldTransactionId=renewTrans;
+    			 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 }
     		 if(null != gatePassMainObj.getPhotoName()) {
 
 
@@ -1126,9 +1260,34 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
+    		}else if("CAN".equals(gmType)) {
+    	    	gatePassMainObj.setReasoning(generalMaster.getGmName());
     		}
     		}
-    		
+    		List<CmsGeneralMaster> gmLists = workmenService.getAllGeneralMaster();
+
+    		// Grouping the CmsGeneralMaster objects by gmType
+    		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmLists.stream()
+    		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+    		// Define the types and their corresponding request attribute names
+    		Map<String, String> attributeMapping = Map.of(
+    		        "CAN","can"
+    		);
+
+    		// Iterate over the attribute mappings and set the request attributes dynamically
+    		attributeMapping.forEach((type, attributeName) -> {
+    		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+    		    request.setAttribute(attributeName, gmList1);
+    		});
+
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.CANCEL.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.CANCEL.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1158,6 +1317,11 @@ public class WorkmenController {
     		 request.setAttribute("mode", mode);
     		// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
     		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 String renewTrans = workmenService.getRenewTransactionIfExists(gatePassId);
+    		 if(null!=renewTrans) {
+    			 oldTransactionId=renewTrans;
+    			 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 }
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1188,10 +1352,34 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
+    		}else if("BLK".equals(gmType)) {
+    	    	gatePassMainObj.setReasoning(generalMaster.getGmName());
     		}
     		}
-    		
-    		 
+    		List<CmsGeneralMaster> gmLists = workmenService.getAllGeneralMaster();
+
+    		// Grouping the CmsGeneralMaster objects by gmType
+    		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmLists.stream()
+    		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+    		// Define the types and their corresponding request attribute names
+    		Map<String, String> attributeMapping = Map.of(
+    		        "BLK","blk"
+    		);
+
+    		// Iterate over the attribute mappings and set the request attributes dynamically
+    		attributeMapping.forEach((type, attributeName) -> {
+    		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+    		    request.setAttribute(attributeName, gmList1);
+    		});
+
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.BLOCK.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLOCK.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -1221,6 +1409,11 @@ public class WorkmenController {
     		 request.setAttribute("mode", mode);
     		// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
     		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 String renewTrans = workmenService.getRenewTransactionIfExists(gatePassId);
+    		 if(null!=renewTrans) {
+    			 oldTransactionId=renewTrans;
+    			 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 }
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1252,9 +1445,36 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
+    		}else if("UBLK".equals(gmType)) {
+    	    	gatePassMainObj.setReasoning(generalMaster.getGmName());
     		}
     		}
+    		List<CmsGeneralMaster> gmLists = workmenService.getAllGeneralMaster();
+
+    		// Grouping the CmsGeneralMaster objects by gmType
+    		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmLists.stream()
+    		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+    		// Define the types and their corresponding request attribute names
+    		Map<String, String> attributeMapping = Map.of(
+    		        "UBLK","ublk"
+    		);
+
+    		// Iterate over the attribute mappings and set the request attributes dynamically
+    		attributeMapping.forEach((type, attributeName) -> {
+    		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+    		    request.setAttribute(attributeName, gmList1);
+    		});
+
     		
+
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.UNBLOCK.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.UNBLOCK.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1285,6 +1505,11 @@ public class WorkmenController {
     		 request.setAttribute("mode", mode);
     		// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
     		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 String renewTrans = workmenService.getRenewTransactionIfExists(gatePassId);
+    		 if(null!=renewTrans) {
+    			 oldTransactionId=renewTrans;
+    			 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 }
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1316,10 +1541,35 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
+    		}else if("BL".equals(gmType)) {
+    	    	gatePassMainObj.setReasoning(generalMaster.getGmName());
     		}
     		}
+    		List<CmsGeneralMaster> gmLists = workmenService.getAllGeneralMaster();
+
+    		// Grouping the CmsGeneralMaster objects by gmType
+    		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmLists.stream()
+    		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+    		// Define the types and their corresponding request attribute names
+    		Map<String, String> attributeMapping = Map.of(
+    		        "BL","bl"
+    		);
+
+    		// Iterate over the attribute mappings and set the request attributes dynamically
+    		attributeMapping.forEach((type, attributeName) -> {
+    		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+    		    request.setAttribute(attributeName, gmList1);
+    		});
     		
-    		 
+
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.BLACKLIST.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.BLACKLIST.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
     	}
@@ -1352,6 +1602,11 @@ public class WorkmenController {
     		 request.setAttribute("mode", mode);
     		 //String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
     		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 String renewTrans = workmenService.getRenewTransactionIfExists(gatePassId);
+    		 if(null!=renewTrans) {
+    			 oldTransactionId=renewTrans;
+    			 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 }
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1383,9 +1638,34 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
+    		}else if("DBL".equals(gmType)) {
+    	    	gatePassMainObj.setReasoning(generalMaster.getGmName());
     		}
     		}
-    		
+    		List<CmsGeneralMaster> gmLists = workmenService.getAllGeneralMaster();
+
+    		// Grouping the CmsGeneralMaster objects by gmType
+    		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmLists.stream()
+    		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+    		// Define the types and their corresponding request attribute names
+    		Map<String, String> attributeMapping = Map.of(
+    		        "DBL","dbl"
+    		);
+
+    		// Iterate over the attribute mappings and set the request attributes dynamically
+    		attributeMapping.forEach((type, attributeName) -> {
+    		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+    		    request.setAttribute(attributeName, gmList1);
+    		});
+
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.DEBLACKLIST.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.DEBLACKLIST.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     		 
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -1417,6 +1697,11 @@ public class WorkmenController {
     		 request.setAttribute("mode", mode);
     		 //String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
     		 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 String renewTrans = workmenService.getRenewTransactionIfExists(gatePassId);
+    		 if(null!=renewTrans) {
+    			 oldTransactionId=renewTrans;
+    			 gatePassMainObj.setOldTransactionId(oldTransactionId);
+    		 }
     		 if(null != gatePassMainObj.getPhotoName()) {
            		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
@@ -1448,6 +1733,8 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		
@@ -1489,6 +1776,7 @@ public class WorkmenController {
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "appointmentFile", required = false) MultipartFile appointmentFile,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -1510,7 +1798,8 @@ public class WorkmenController {
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
             gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
-         // Mapping document types to their corresponding setter methods
+            gatePassMain.setAppointmentDocName(appointmentFile!=null && !appointmentFile.isEmpty() ? "appointment":"");
+            // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
             docTypeSetterMap.put("Id2", gatePassMain::setIdProof2DocName);
@@ -1596,7 +1885,9 @@ public class WorkmenController {
 	        "ACADEMICS", "Academics",
 	        "WAGECATEGORY", "WageCategory",
 	        "BONUSPAYOUT", "BonusPayout",
-	        "ZONE", "Zone"
+	        "ZONE", "Zone",
+	        "WORKMENTYPE","WorkmenType"
+	        
 	);
 
 	// Iterate over the attribute mappings and set the request attributes dynamically
@@ -1759,7 +2050,8 @@ public class WorkmenController {
 	        "ACADEMICS", "Academics",
 	        "WAGECATEGORY", "WageCategory",
 	        "BONUSPAYOUT", "BonusPayout",
-	        "ZONE", "Zone"
+	        "ZONE", "Zone",
+	        "WORKMENTYPE","WorkmenType"
 	);
 
 	// Iterate over the attribute mappings and set the request attributes dynamically
@@ -1841,10 +2133,15 @@ public class WorkmenController {
 
 	 request.setAttribute("Subdept", subdepSet);
 	 String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassId);
-	 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(oldTransactionId, user.getUserId());
+	 if(null != gatePassMainObj.getPhotoName()) {
+   		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+   		 request.setAttribute("imagePath", profilePicFilePath);
+   		}
+		 
+	 //List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(oldTransactionId, user.getUserId());
 
      // ✅ Pass versioned documents to JSP
-     request.setAttribute("PreviousDocuments", allVersionedDocs);
+     //request.setAttribute("PreviousDocuments", allVersionedDocs);
 
 
     return "contractWorkmen/renew";
@@ -1856,6 +2153,7 @@ public class WorkmenController {
             @RequestParam(value = "aadharFile", required = false) MultipartFile aadharFile,
             @RequestParam(value = "policeFile", required = false) MultipartFile policeFile,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+            @RequestParam(value = "appointmentFile", required = false) MultipartFile appointmentFile,
             @RequestParam(value = "additionalFiles", required = false) List<MultipartFile> additionalFiles,
             @RequestParam(value = "documentTypes", required = false) List<String> documentTypes,
             HttpServletRequest request, HttpServletResponse response) {
@@ -1877,6 +2175,7 @@ public class WorkmenController {
             gatePassMain.setAadharDocName(aadharFile != null && !aadharFile.isEmpty() ? "aadhar":"");
             gatePassMain.setPoliceVerificationDocName(policeFile!=null && !policeFile.isEmpty() ? "police":"");
             gatePassMain.setPhotoName(profilePic!=null && !profilePic.isEmpty()?profilePic.getOriginalFilename():"");
+            gatePassMain.setAppointmentDocName(appointmentFile!=null && !appointmentFile.isEmpty() ? "appointment":"");
          // Mapping document types to their corresponding setter methods
             Map<String, Consumer<String>> docTypeSetterMap = new HashMap<>();
             docTypeSetterMap.put("Bank", gatePassMain::setBankDocName);
@@ -1900,18 +2199,15 @@ public class WorkmenController {
             }
             transactionId = workmenService.renewGatePass(gatePassMain);
             if (transactionId != null) {
-                if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty()) {
-                	//uploadRenewDocuments(aadharFile, policeFile,profilePic, String.valueOf(user.getUserId()), transactionId);
-                }
-                // Upload additional files
-                if (additionalFiles != null && documentTypes != null) {
-                	//uploadRenewAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
-                }  
-                    // ✅ ADD THIS NEW LINE
-                String filePath = ROOT_DIRECTORY + user.getUserId() + "/" + transactionId + "/";
-                    workmenService.saveRenewedDocuments(transactionId, String.valueOf(user.getUserId()), aadharFile, policeFile, profilePic, additionalFiles, documentTypes,filePath);
 
-                
+            	// String oldTransactionId=workmenDao.getTransactionIdByGatePassId(gatePassMain.getGatePassId());
+            	 if (aadharFile != null && !aadharFile.isEmpty() && policeFile!=null && !policeFile.isEmpty() && appointmentFile!=null && !appointmentFile.isEmpty()) {
+                     uploadDocuments(aadharFile, policeFile,profilePic,appointmentFile, String.valueOf(user.getUserId()), transactionId);
+                 }
+                 // Upload additional files
+                 if (additionalFiles != null && documentTypes != null) {
+                     uploadAdditionalDocuments(additionalFiles, documentTypes, String.valueOf(user.getUserId()), transactionId);
+                 }
                 return new ResponseEntity<>("contractWorkmen/renewList", HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -1941,7 +2237,12 @@ public class WorkmenController {
     		 
     		 
     		 if(null != gatePassMainObj.getPhotoName()) {
-           		 String profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+    			 
+           		 String profilePicFilePath =null;
+           		 if(GatePassType.CREATE.getStatus().equals(gatePassMainObj.getGatePassAction()))
+           			 profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + oldTransactionId + "/" +gatePassMainObj.getPhotoName();
+           		 else
+           			 profilePicFilePath =  "/imageinline/"+user.getUserId()+"/" + transactionId + "/" +gatePassMainObj.getPhotoName();
            		 request.setAttribute("imagePath", profilePicFilePath);
            		}
     		
@@ -1971,26 +2272,33 @@ public class WorkmenController {
     	    	gatePassMainObj.setTrade(generalMaster.getGmName());
     	    } else if("SKILL".equals(gmType)) {
     	    	gatePassMainObj.setSkill(generalMaster.getGmName());
+    		}else if("WORKMENTYPE".equals(gmType)) {
+    	    	gatePassMainObj.setWorkmenType(generalMaster.getGmName());
     		}
     		}
     		
     		 // ✅ Pass versioned documents to JSP
-    		 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
-    	     request.setAttribute("PreviousDocuments", allVersionedDocs);
-    	     
-    	     List<Map<String, Object>> renewDocsList=workmenDao.getRenewalDocs(transactionId);
-    	     Map<String, String> latestDocs = new HashMap<>();
+//    		 List<Map<String, Object>> allVersionedDocs = workmenService.getAllVersionedDocuments(transactionId, user.getUserId());
+//    	     request.setAttribute("PreviousDocuments", allVersionedDocs);
+//    	     
+//    	     List<Map<String, Object>> renewDocsList=workmenDao.getRenewalDocs(transactionId);
+//    	     Map<String, String> latestDocs = new HashMap<>();
+//
+//    	     for (Map<String, Object> doc : renewDocsList) {
+//    	         String docType = doc.get("DOCTYPE").toString();   // PHOTO
+//    	         String fileName = doc.get("FILENAME").toString(); // photo_V2.jpg
+//
+//    	         latestDocs.put(docType, fileName);  // Store latest version filename
+//    	     }
+//
+//    	     // Send to JSP
+//    	     request.setAttribute("LatestDocs", latestDocs);
 
-    	     for (Map<String, Object> doc : renewDocsList) {
-    	         String docType = doc.get("DOCTYPE").toString();   // PHOTO
-    	         String fileName = doc.get("FILENAME").toString(); // photo_V2.jpg
-
-    	         latestDocs.put(docType, fileName);  // Store latest version filename
-    	     }
-
-    	     // Send to JSP
-    	     request.setAttribute("LatestDocs", latestDocs);
-    	     
+    		List<ApproverStatusDTO> approvers = new ArrayList<ApproverStatusDTO>();
+    		if(gatePassMainObj.getGatePassAction().equals(GatePassType.RENEW.getStatus())) {
+    			approvers=	workmenService.getApprovalDetails(transactionId,gatePassMainObj.getUnitId(),GatePassType.RENEW.getStatus());
+    		}
+    		request.setAttribute("approvers", approvers); 
     	     
     	}catch(Exception e) {
     		log.error("Error getting workmen details ", e);
@@ -2156,7 +2464,8 @@ public class WorkmenController {
 		        "ACADEMICS", "Academics",
 		        "WAGECATEGORY", "WageCategory",
 		        "BONUSPAYOUT", "BonusPayout",
-		        "ZONE", "Zone"
+		        "ZONE", "Zone",
+		        "WORKMENTYPE","WorkmenType"
 		);
 
 		// Iterate over the attribute mappings and set the request attributes dynamically
@@ -2652,6 +2961,9 @@ public class WorkmenController {
     	}
     }
     
+    public String getVerhoeffConfig() {
+		return QueryFileWatcher.getQuery("VERHOEFF_CONFIG");
+	}
     @RequestMapping(value = "/checkAadharExistsCreation", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, String> checkAadharExistsCreation(
@@ -2662,17 +2974,150 @@ public class WorkmenController {
         String status = workmenService.checkAadharUniqueness(aadharNumber, gatePassId, transactionId);
 if (status.contains("Unique")) {
 	
+	String config = this.getVerhoeffConfig();
+	if("yes".equalsIgnoreCase(config)) {
 	  boolean valid = VerhoeffAlgorithm.validateVerhoeff(aadharNumber); 
 	  if(!valid)
 	  { 
 		  status = "Invalid"; 
 		  }
+	}
 	 
 }
         Map<String, String> result = new HashMap<>();
         result.put("status", status);   // "Unique", "Exists_Gatepass_Draft", etc.
 
         return result;
+    }
+
+    
+    //projectOnboardingList
+    @GetMapping("/projectOnboardingList")
+    public String projectOnboardingList(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+		MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+
+		
+		List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	
+    	List<PrincipalEmployer> listDto =new ArrayList<PrincipalEmployer>();
+        CMSRoleRights rr =new CMSRoleRights();
+        rr = commonService.hasPageActionPermissionForRole(user.getRoleId(), "/contractworkmen/projectOnboardingList");
+   	    listDto = peService.getAllPrincipalEmployer(user.getUserAccount());
+   	    request.setAttribute("UserPermission", rr);
+    	request.setAttribute("principalEmployers", peList);
+    	  //request.setAttribute("Dept", departments);
+    	  
+		return "contractWorkmen/projectOnboardingList";
+	}
+    
+    @GetMapping("/projectOnboardingCreation")
+    public String projectOnboardingCreation(HttpServletRequest request,HttpServletResponse response) {
+	
+		HttpSession session = request.getSession(false); // Use `false` to avoid creating a new session
+        MasterUser user = (MasterUser) (session != null ? session.getAttribute("loginuser") : null);
+    	log.info("Entered into projectOnboardingCreation"+user.getUserId());
+    	
+    	String transactionId= workmenService.generateTransactionId();
+    	request.setAttribute("transactionId", transactionId);
+    	
+    	List<PersonOrgLevel> orgLevel = commonService.getPersonOrgLevelDetails(user.getUserAccount());
+    	Map<String,List<PersonOrgLevel>> groupedByLevelDef = orgLevel.stream()
+    			.collect(Collectors.groupingBy(PersonOrgLevel::getLevelDef));
+    	List<PersonOrgLevel> peList = groupedByLevelDef.getOrDefault("Principal Employer", new ArrayList<>());
+    	//List<PersonOrgLevel> departments = groupedByLevelDef.getOrDefault("Dept", new ArrayList<>());
+    	//List<PersonOrgLevel> subdepartments = groupedByLevelDef.getOrDefault("Area", new ArrayList<>());
+    	request.setAttribute("PrincipalEmployer", peList);
+    	  //request.setAttribute("Dept", departments);
+         // request.setAttribute("Subdept", subdepartments);
+          
+        //Skills
+		//List<Skill> skillList = workmenService.getAllSkill();
+		//request.setAttribute("Skills", skillList);
+		
+		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMaster();
+
+		// Grouping the CmsGeneralMaster objects by gmType
+		Map<String, List<CmsGeneralMaster>> groupedByGmType = gmList.stream()
+		        .collect(Collectors.groupingBy(CmsGeneralMaster::getGmType));
+
+		// Define the types and their corresponding request attribute names
+		Map<String, String> attributeMapping = Map.of(
+		        "GENDER", "GenderOptions",
+		        "BLOODGROUP", "BloodGroup",
+		        "ACCESSAREA", "AccessArea",
+		        "ACADEMICS", "Academics",
+		        "WAGECATEGORY", "WageCategory",
+		        "BONUSPAYOUT", "BonusPayout",
+		        "ZONE", "Zone",
+		        "WORKMENTYPE","WorkmenType"
+		);
+
+		// Iterate over the attribute mappings and set the request attributes dynamically
+		attributeMapping.forEach((type, attributeName) -> {
+		    List<CmsGeneralMaster> gmList1 = groupedByGmType.getOrDefault(type, new ArrayList<>());
+		    request.setAttribute(attributeName, gmList1);
+		});
+        return "contractWorkmen/projectOnboarding";
+    }
+    public String uploadReasoningDocuments(
+            MultipartFile exitFile,
+            MultipartFile fnfFile,
+            MultipartFile feedbackFile,
+            MultipartFile rateManagerFile,
+            MultipartFile locFile,
+            String userId,
+            String gatePassId) {
+
+        String directoryPath = ROOT_DIRECTORY + userId + "/" + gatePassId + "/";
+
+        try {
+            // Create directory if not exists
+            Path path = Paths.get(directoryPath);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+
+            // Save Exit Letter
+            if (exitFile != null && !exitFile.isEmpty()) {
+                String exitFilePath = directoryPath + "exitletter.pdf";
+                saveFile(exitFile, exitFilePath);
+            }
+
+            // Save FNF
+            if (fnfFile != null && !fnfFile.isEmpty()) {
+                String fnfFilePath = directoryPath + "fnf.pdf";
+                saveFile(fnfFile, fnfFilePath);
+            }
+
+            // Save Feedback
+            if (feedbackFile != null && !feedbackFile.isEmpty()) {
+                String feedbackFilePath = directoryPath + "feedback.pdf";
+                saveFile(feedbackFile, feedbackFilePath);
+            }
+
+            // Save Rate Manager
+            if (rateManagerFile != null && !rateManagerFile.isEmpty()) {
+                String rateManagerFilePath = directoryPath + "ratemanager.pdf";
+                saveFile(rateManagerFile, rateManagerFilePath);
+            }
+
+            // Save LOC
+            if (locFile != null && !locFile.isEmpty()) {
+                String locFilePath = directoryPath + "loc.pdf";
+                saveFile(locFile, locFilePath);
+            }
+
+            return "success";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "failed";
+        }
     }
 
     }

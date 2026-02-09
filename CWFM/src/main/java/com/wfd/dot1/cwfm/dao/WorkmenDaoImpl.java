@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -451,10 +451,10 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	}
 
 	private Object[] prepareGatePassParameters(String transId, GatePassMain gatePassMain) {
-		
+		String gatePassType = gatePassMain.getOnboardingType().equals("project")?GatePassType.PROJECT.getStatus():GatePassType.CREATE.getStatus();
 	    return new Object[]{
 	    		transId," ",
-	        GatePassType.CREATE.getStatus(),
+	    		gatePassType,
 	        gatePassMain.getGatePassStatus(),
 	        gatePassMain.getAadhaarNumber(),
 	        gatePassMain.getFirstName(),
@@ -507,7 +507,7 @@ public class WorkmenDaoImpl implements WorkmenDao{
 	        		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
 	        				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
 	        gatePassMain.getUserId(),
-	        gatePassMain.getOnboardingType(),gatePassMain.getLlNo()
+	        gatePassMain.getOnboardingType(),gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName(),gatePassMain.getDisability(),gatePassMain.getWorkmenType()
 	        };
 
 	}
@@ -548,6 +548,8 @@ public class WorkmenDaoImpl implements WorkmenDao{
 				dto.setGatePassType("Cancel");
 			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassType("Lost/Damage");
+			}else if(gatePassType.equals(GatePassType.PROJECT.getStatus())) {
+				dto.setGatePassType("Project Gatepass");
 			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -586,7 +588,7 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		List<GatePassListingDto> listDto= new ArrayList<GatePassListingDto>();
 		SqlRowSet rs =null;
 		String query=null;
-		int workflowTypeId = this.getWorkFlowTypeId(unitId, "1");
+		int workflowTypeId = this.getWorkFlowTypeId(unitId, gatePassTypeId);
 		
 		if(workFlowType == WorkFlowType.SEQUENTIAL.getWorkFlowTypeId()) {
 			query=this.getAllGatePassForSquential();
@@ -627,6 +629,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 				dto.setGatePassType("Cancel");
 			}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 				dto.setGatePassType("Lost/Damage");
+			}else if(gatePassType.equals(GatePassType.PROJECT.getStatus())) {
+				dto.setGatePassType("Project Gatepass");
 			}
 			String status =rs.getString("GatePassStatus");
 			if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -724,7 +728,10 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 			dto.setDot(rs.getString("DOT"));
 			dto.setOnboardingType(rs.getString("OnboardingType"));
 			dto.setLlNo(rs.getString("LLNo"));
-		}
+			dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+			dto.setDisability(rs.getString("disability"));
+			dto.setWorkmenType(rs.getString("WorkmenType"));
+			}
 		log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 		return dto;
 	}
@@ -737,15 +744,22 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		log.info("Entering into getAllGeneralMastersForGatePass dao method ");
 		List<CmsGeneralMaster> gmList= new ArrayList<CmsGeneralMaster>();
 		String query = getAllCmsGeneralMasterForGatePass();
-		Object[] obj = new Object[] {gpm.getGender()!=null?gpm.getGender():' ',
-				gpm.getBloodGroup()!=null?gpm.getBloodGroup():' ',
-						gpm.getAccessArea()!=null?gpm.getAccessArea():' ',
-								gpm.getAcademic()!=null?gpm.getAcademic():' ',
-										gpm.getZone()!=null?gpm.getZone():' ',
-												gpm.getWageCategory()!=null?gpm.getWageCategory():' ',gpm.getBonusPayout()!=null?gpm.getBonusPayout():' ',
-														gpm.getDepartment()!=null?gpm.getDepartment():' ',gpm.getSubdepartment()!=null?gpm.getSubdepartment():' ',
-															gpm.getTrade()!=null?gpm.getTrade():' ',gpm.getSkill()!=null?gpm.getSkill():' '
-																	};
+		Object[] obj = new Object[] {
+			    gpm.getGender() != null ? gpm.getGender() : "",
+			    gpm.getBloodGroup() != null ? gpm.getBloodGroup() : "",
+			    gpm.getAccessArea() != null ? gpm.getAccessArea() : "",
+			    gpm.getAcademic() != null ? gpm.getAcademic() : "",
+			    gpm.getZone() != null ? gpm.getZone() : "",
+			    gpm.getWageCategory() != null ? gpm.getWageCategory() : "",
+			    gpm.getBonusPayout() != null ? gpm.getBonusPayout() : "",
+			    gpm.getDepartment() != null ? gpm.getDepartment() : "",
+			    gpm.getSubdepartment() != null ? gpm.getSubdepartment() : "",
+			    gpm.getTrade() != null ? gpm.getTrade() : "",
+			    gpm.getSkill() != null ? gpm.getSkill() : "",
+			    gpm.getWorkmenType() != null ? gpm.getWorkmenType() : "",
+			    gpm.getReasoning() != null ? gpm.getReasoning() : ""
+			};
+
 		log.info("Query to getAllGeneralMastersForGatePass "+query);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query,obj);
 		while(rs.next()) {
@@ -1135,10 +1149,10 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		return QueryFileWatcher.getQuery("GET_VALIDITY_OF_WO_WC");
 	}
 	@Override
-	 public Map<String, LocalDate> getValidityDates(String workOrderId, String wcId) {
+	 public Map<String, LocalDate> getValidityDates(String workOrderId, String wcId,String llNo) {
 		 Map<String, LocalDate> validityDates = new HashMap<>();
 		 String query = getValidityOfWoWc();
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(query,workOrderId,wcId);
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(query,workOrderId,wcId,llNo);
 		 while(rs.next()) {
 			 LocalDate validTill = rs.getDate("validTill").toLocalDate();
              String source = rs.getString("source");
@@ -1148,12 +1162,12 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 	 }
 
 	@Override
-	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId) {
+	public List<ApproverStatusDTO> getApprovalDetails(String transactionId,String unitId,String gatePassTypeId) {
 		 // Fetch approvers from GATEPASSAPPROVERINFO
-        List<ApproverInfo> approverList = this.getApproversByGatePassId(GatePassType.CREATE.getStatus(),unitId);
+        List<ApproverInfo> approverList = this.getApproversByGatePassId(gatePassTypeId,unitId);
 
         // Fetch approval statuses from GATEPASSAPPROVALSTATUS
-        List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(transactionId);
+        List<ApprovalStatus> approvalStatuses = this.getApprovalStatusByGatePassId(transactionId,gatePassTypeId);
 
         // Map to hold approval status by User ID
         Map<String, ApprovalStatus> statusMap = approvalStatuses.stream()
@@ -1200,8 +1214,8 @@ public int getWorkFlowTypeId(String unitId, String actionId) {
 		 return list;
 	}
 
-	private List<ApprovalStatus> getApprovalStatusByGatePassId(String transactionId) {
-		 SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getApprovalStatusOfGatePass(),transactionId);
+	private List<ApprovalStatus> getApprovalStatusByGatePassId(String transactionId,String gatePassTypeId) {
+		 SqlRowSet rs = jdbcTemplate.queryForRowSet(this.getApprovalStatusOfGatePass(),transactionId,gatePassTypeId);
 		 List<ApprovalStatus> list = new ArrayList<ApprovalStatus>();
 		 while(rs.next()) {
 			 ApprovalStatus info=new ApprovalStatus();
@@ -1380,7 +1394,9 @@ private Object[] prepareGatePassDraftParameters(String transId, GatePassMain gat
 	        gatePassMain.getPoliceVerificationDate()!=null?gatePassMain.getPoliceVerificationDate():" ",
 	        gatePassMain.getDot()!=null?gatePassMain.getDot():" ",
 	        gatePassMain.getUserId(),
-	        "regular",gatePassMain.getLlNo()
+	        "regular",gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName()!=null?gatePassMain.getAppointmentDocName():" ",
+	        	gatePassMain.getDisability()!=null?gatePassMain.getDisability():" ",
+	        			gatePassMain.getWorkmenType()!=null?gatePassMain.getWorkmenType():" "
 	    };
 	}
 public String getContractWorkmenDraftDetails() {
@@ -1540,13 +1556,15 @@ public GatePassMain getIndividualContractWorkmenDraftDetails(String transactionI
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDraftDetails dao method "+transactionId);
 	return dto;
 }
 
 private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePassMain) {
-	
     return new Object[]{
     		
         gatePassMain.getGatePassAction(),
@@ -1601,7 +1619,7 @@ private Object[] prepareGatePassParameters1(String transId, GatePassMain gatePas
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
         				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
-        gatePassMain.getUserId(),gatePassMain.getLlNo(),transId
+        gatePassMain.getUserId(),gatePassMain.getLlNo(),gatePassMain.getAppointmentDocName(),gatePassMain.getDisability(),gatePassMain.getWorkmenType(),transId
     };
 }
 
@@ -1701,6 +1719,15 @@ public GatePassMain getIndividualContractWorkmenDetailsByTransId(String transact
 		dto.setDot(rs.getString("DOT"));
 		dto.setOnboardingType(rs.getString("OnboardingType"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
+		dto.setReasoning(rs.getString("Reasoning"));
+		dto.setExitLetterDocName(rs.getString("ExitLetterDocName"));
+		dto.setFNFDocName(rs.getString("FNFDocName"));
+		dto.setFeedbackFormDocName(rs.getString("FeedbackFormDocName"));
+		dto.setRateManagerDocName(rs.getString("RateManagerDocName"));
+		dto.setLOCDocName(rs.getString("LOCDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
 	return dto;
@@ -1874,6 +1901,15 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassId(String gateP
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
+		dto.setReasoning(rs.getString("Reasoning"));;
+		dto.setExitLetterDocName(rs.getString("ExitLetterDocName"));
+		dto.setFNFDocName(rs.getString("FNFDocName"));
+		dto.setFeedbackFormDocName(rs.getString("FeedbackFormDocName"));
+		dto.setRateManagerDocName(rs.getString("RateManagerDocName"));
+		dto.setLOCDocName(rs.getString("LOCDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -1925,6 +1961,8 @@ public List<GatePassListingDto> getGatePassActionListingForApprovers(String role
 			dto.setGatePassType("Cancel");
 		}else if(gatePassType.equals(GatePassType.LOSTORDAMAGE.getStatus())) {
 			dto.setGatePassType("Lost/Damage");
+		}else if(gatePassType.equals(GatePassType.RENEW.getStatus())) {
+			dto.setGatePassType("Renew");
 		}
 		String status =rs.getString("GatePassStatus");
 		if(status.equals(GatePassStatus.APPROVALPENDING.getStatus())) {
@@ -2402,7 +2440,8 @@ public long saveIntoCMSPerson(CMSPerson person) {
         person.getIdMark(),
         person.getPanNumber(),
         person.getUpdatedBy(),
-        person.getAadharNumber()
+        person.getAadharNumber(),
+        
     };
 
     try {
@@ -2634,6 +2673,12 @@ private String mapGatePassValue(String field, GatePassMain gp) {
         case "Status":
             return gp.getGatePassStatus();  // Block / Approve etc.
 
+        case "WorkmenType":
+            return gp.getWorkmenType();
+            
+        case "PhysicallyChallenged":
+            return gp.getDisability();
+            
         default:
             return null;
     }
@@ -2718,6 +2763,15 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdForApprove(St
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
+		dto.setReasoning(rs.getString("Reasoning"));
+		dto.setExitLetterDocName(rs.getString("ExitLetterDocName"));
+		dto.setFNFDocName(rs.getString("FNFDocName"));
+		dto.setFeedbackFormDocName(rs.getString("FeedbackFormDocName"));
+		dto.setRateManagerDocName(rs.getString("RateManagerDocName"));
+		dto.setLOCDocName(rs.getString("LOCDocName"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
@@ -2781,21 +2835,26 @@ public boolean updateCmsPersonCustDataEffectiveTill(long personId) {
 public String getCustomDefIDforGPtype() {
 	return QueryFileWatcher.getQuery("GET_CUSTOMDEFID_FOR_GP_TYPE");
 }
+public String getCustomDefIDforreasoning() {
+	return QueryFileWatcher.getQuery("GET_CUSTOMDEFID_FOR_REASONING");
+}
 public String insertIntoCustData() {
 	return QueryFileWatcher.getQuery("INSERT_CUSTOM_DATA");
 }
 @Override
-public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus) {
-	String defSql = getCustomDefIDforGPtype();
+public boolean insertIntoCustData(String updatedBy,long personId,String gatePassStatus,String reasoning) {
+	String defSqlGatePass  = getCustomDefIDforGPtype();
+	String defSqlReasoning  = getCustomDefIDforreasoning();
 	//String defSql = "SELECT CSTMDEFID FROM CMSPERSONCUSTOMDATADEFINITION "
 	//		+ "WHERE ISACTIVE = 1 AND CSTMDEFNAME = 'GatePassType'";
 
-	Integer defId = jdbcTemplate.queryForObject(defSql, Integer.class);
-
-	if (defId == null) {
-		return false; // No definition → nothing to update
-	}
+	Integer gatePassDefId  = jdbcTemplate.queryForObject(defSqlGatePass, Integer.class);
+	Integer reasoningDefId  = jdbcTemplate.queryForObject(defSqlReasoning, Integer.class);
 	
+	if (gatePassDefId == null || reasoningDefId == null) {
+        log.error("Custom definition IDs not found");
+        return false;
+    }
 	
 	boolean result = false;
 	String sql = insertIntoCustData();
@@ -2803,10 +2862,12 @@ public boolean insertIntoCustData(String updatedBy,long personId,String gatePass
     //        + "(EMPLOYEEID, CSTMDEFID, CUSTOMDATATEXT, EFFECTIVEFROM, EFFECTIVETILL, CREATEDTM, UPDATEDTM, UPDATEDBY) "
     //        + "VALUES (?, ?, ?, CONVERT(date, GETDATE()), '3000-01-01', GETDATE(), GETDATE(), ?)";
 
-   Object[] parameters = new Object[] {personId,defId,gatePassStatus,updatedBy};
+   //Object[] parameters = new Object[] {personId,gatePassDefId,gatePassStatus,updatedBy};
+	 int count1 =jdbcTemplate.update(sql,personId,gatePassDefId,gatePassStatus,updatedBy);
+	 int count2 =jdbcTemplate.update(sql,personId,reasoningDefId,reasoning,updatedBy);
    try {
-   int status = jdbcTemplate.update(sql, parameters);
-   if (status > 0) {
+   //int status = jdbcTemplate.update(sql,count1,count2);
+   if (count1 > 0 && count2>0) {
    	result=true;
    }else {
        log.warn("Failed to create GatePass action for GatePassId: " );
@@ -2954,7 +3015,7 @@ public int getActiveWorkmenCount(String unitId,String contractorId,String gatePa
 	
 	
 	int activeCount = 0;
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,contractorId,unitId,gatePassType);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId);
 	if(rs.next()) {
 		activeCount = rs.getInt("ActiveEmployeeCount");
 	}
@@ -3025,31 +3086,78 @@ public String getLLlicenseExistsAndCount() {
 public String getWCESIClicenseExistsAndCount() {
 	return QueryFileWatcher.getQuery("GET_WC_ESIC_LICENSE_EXISTS_COUNT");
 }
+//@Override
+//public int licenseExistsAndCount(String unitId,String contractorId,String workorderId,String licenseType,String licenseId) {
+//	String query=null;
+//	if(licenseType.equals("LL")) {
+//		 query = getLLlicenseExistsAndCount() ;
+//		
+//	}else {
+//		 query = getWCESIClicenseExistsAndCount() ;
+//	}
+//	int licenseCount=0;
+//	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId,licenseId);
+//	if(rs.next()) {
+//		licenseCount = rs.getInt("WC_TOTAL");
+//	}
+//	return licenseCount;
+//}
+
 @Override
-public int licenseExistsAndCount(String unitId,String contractorId,String workorderId,String licenseType,String licenseId) {
-	String query=null;
-	if(licenseType.equals("LL")) {
-		 query = getLLlicenseExistsAndCount() ;
-		//query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
-		//		+ "  from CMSCONTRACTOR_WC ccwc \r\n"
-		//		+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
-		//		+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
-		//		+ "  and ccwc.LICENCE_TYPE='LL' and ccwc.WCID=? ";
-	}else {
-		 query = getWCESIClicenseExistsAndCount() ;
-	// query = " select ccwc.WCID,ccwc.WC_CODE,ccwc.LICENCE_TYPE,ccwc.WC_TOTAL \r\n"
-	//		+ "  from CMSCONTRACTOR_WC ccwc \r\n"
-	//		+ "  join CMSWORKORDER cmswo on cmswo.UNITID=ccwc.UNITID and cmswo.CONTRACTORID=ccwc.CONTRACTORID\r\n"
-	//		+ "  where ccwc.UNITID=? and ccwc.CONTRACTORID=? and cmswo.WORKORDERID=?  AND ccwc.WC_TO_DTM > GETDATE()\r\n"
-	//		+ "  and ccwc.LICENCE_TYPE in ('WC','ESIC')  and ccwc.WCID=? ";
-	}
-	int licenseCount=0;
-	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,unitId,contractorId,workorderId,licenseId);
-	if(rs.next()) {
-		licenseCount = rs.getInt("WC_TOTAL");
-	}
-	return licenseCount;
+public Map<String, Object> licenseExistsAndCount(
+        String unitId,
+        String contractorId,
+        String workorderId,
+        String licenseType,
+        String licenseId) {
+	  String query = null;
+	  if(licenseType.equals("LL")) {
+			 query = getLLlicenseExistsAndCount() ;
+			
+		}else {
+			 query = getWCESIClicenseExistsAndCount() ;
+		}
+    Map<String, Object> result = new HashMap<>();
+
+    // ---------- IMPORTANT: Handle LL not mapped ----------
+    if ("LL".equals(licenseType) &&
+        (licenseId == null || licenseId.trim().isEmpty())) {
+
+        result.put("exists", false);
+        result.put("count", 0);
+        result.put("expiryDate", null);
+        return result;
+    }
+
+  
+
+    SqlRowSet rs = jdbcTemplate.queryForRowSet(
+            query,
+            licenseType,
+            unitId,
+            contractorId,
+            workorderId,
+            licenseId
+    );
+
+    boolean exists = false;
+    int count = 0;
+    Date expiryDate = null;
+
+    if (rs.next()) {
+        exists = rs.getInt("LICENSE_EXISTS") == 1;
+        count = rs.getInt("WC_TOTAL");
+        expiryDate = rs.getDate("WC_TO_DTM");
+    }
+
+    result.put("exists", exists);
+    result.put("count", count);
+    result.put("expiryDate", expiryDate);
+
+    return result;
 }
+
+
 public String selectMaxVesionFromGatepass() {
 	return QueryFileWatcher.getQuery("GET_MAX_VERSION_DOCS_FROM_GATEPASS");
 }
@@ -3186,7 +3294,11 @@ private Object[] prepareRenewGatePassParameters1(String transId, GatePassMain ga
         gatePassMain.getComments()!=null?gatePassMain.getComments():"",
         		gatePassMain.getAddress()!=null?gatePassMain.getAddress():"",
         				gatePassMain.getDoj(),gatePassMain.getPfApplicable(),gatePassMain.getPoliceVerificationDate(),gatePassMain.getDot(),
-        gatePassMain.getUserId(),gatePassMain.getLlNo(),transId
+        gatePassMain.getUserId(),gatePassMain.getLlNo(),
+        gatePassMain.getAadharDocName(),gatePassMain.getPhotoName(),gatePassMain.getBankDocName(),
+        gatePassMain.getPoliceVerificationDocName(),gatePassMain.getIdProof2DocName(),gatePassMain.getMedicalDocName(),
+        gatePassMain.getEducationDocName(),gatePassMain.getForm11DocName(),gatePassMain.getTrainingDocName(),gatePassMain.getOtherDocName(),
+        gatePassMain.getAppointmentDocName(),gatePassMain.getDisability(),gatePassMain.getWorkmenType(),transId
     };
 }
 @Override
@@ -3437,9 +3549,84 @@ public GatePassMain getIndividualContractWorkmenDetailsByGatePassIdRenew(String 
 		dto.setPoliceVerificationDate(rs.getString("policeverificationDate"));
 		dto.setDot(rs.getString("DOT"));
 		dto.setLlNo(rs.getString("LLNo"));
+		dto.setAppointmentDocName(rs.getString("AppointmentDocName"));
+		dto.setDisability(rs.getString("disability"));
+		dto.setWorkmenType(rs.getString("WorkmenType"));
 	}
 	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+gatePassId);
 	return dto;
 }
+
+@Override
+public GatePassMain getActiveCountDetails(String transactionId) {
+	log.info("Entering into getIndividualContractWorkmenDetails dao method ");
+	GatePassMain dto = null;
+	String query = "SELECT gpm.UnitId,gpm.ContractorId,gpm.WorkorderId,\r\n"
+			+ " gpm.WcEsicNo,gpm.LLNo,gpm.EsicNumber\r\n"
+			+ " FROM GATEPASSMAIN gpm \r\n"
+			+ " where  gpm.TransactionId=?"
+			+ " union "
+			+ " SELECT gpm.UnitId,gpm.ContractorId,gpm.WorkorderId,"
+			+ "	gpm.WcEsicNo,gpm.LLNo,gpm.EsicNumber"
+			+ "	FROM GATEPASSMAIN gpm "
+			+ " join GatePassTransactionMapping gptm on gptm.GatePassId = gpm.GatePassId"
+			+ " where gptm.TransactionId=? and gptm.GatePassTypeId='2' ";
+	log.info("Query to getIndividualContractWorkmenDetails "+query);
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,transactionId,transactionId);
+	if(rs.next()) {
+		dto = new GatePassMain();
+		dto.setTransactionId(transactionId);
+		dto.setPrincipalEmployer(rs.getString("UnitId"));
+		dto.setContractor(rs.getString("ContractorId"));
+		dto.setWorkorder(rs.getString("WorkorderId"));
+		dto.setWcEsicNo(rs.getString("WcEsicNo"));
+		dto.setLlNo(rs.getString("LLNo"));
+		dto.setEsicNumber(rs.getString("EsicNumber"));
+	}
+	log.info("Exiting from getIndividualContractWorkmenDetails dao method "+transactionId);
+	return dto;
+}
+
+@Override
+public String getRenewTransactionIfExists(String gatePassId) {
+	String transactionId=null;
+	String query = "select TransactionId from GatePassTransactionMapping where gatepassId=? and GatePassTypeId='2'  order by CreatedDate desc";
+	SqlRowSet rs = jdbcTemplate.queryForRowSet(query,gatePassId);
+	if(rs.next()) {
+		transactionId = rs.getString("TransactionId");
+	}
+	return transactionId;
+}
+
+@Override
+public boolean updateGatePassMainWithReasoningTab(GatePassActionDto dto,MultipartFile exitFile,MultipartFile fnfFile,
+        MultipartFile feedbackFile,MultipartFile rateManagerFile,MultipartFile locFile) {
+
+    String sql = "update GATEPASSMAIN set Reasoning=?,ExitLetterDocName=?,FNFDocName=?,FeedbackFormDocName=?,RateManagerDocName=?,LOCDocName=? where GatePassId=?";
+    try {
+
+        String exitName = (exitFile != null && !exitFile.isEmpty()) ? "exitletter" : null;
+        String fnfName = (fnfFile != null && !fnfFile.isEmpty()) ? "fnf" : null;
+        String feedbackName = (feedbackFile != null && !feedbackFile.isEmpty()) ? "feedback" : null;
+        String rateManagerName = (rateManagerFile != null && !rateManagerFile.isEmpty()) ? "ratemanager" : null;
+        String locName = (locFile != null && !locFile.isEmpty()) ? "loc" : null;
+
+        int result = jdbcTemplate.update(sql,
+                dto.getReasoning(),
+                exitName,
+                fnfName,
+                feedbackName,
+                rateManagerName,
+                locName,
+                dto.getGatePassId());
+
+        return result > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
 
 }

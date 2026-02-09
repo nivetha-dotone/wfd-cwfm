@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.math.BigDecimal;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -476,7 +478,8 @@ public class FileUploadController {
                 Map<String, Object> row = new LinkedHashMap<>();
 
                 for (int i = 0; i < headers.length; i++) {
-                    row.put(headers[i], values.length > i ? values[i] : "");
+                    String rawValue = values.length > i ? values[i] : "";
+                    row.put(headers[i], normalizeNumber(rawValue));
                 }
                 rows.add(row);
             }
@@ -485,6 +488,25 @@ public class FileUploadController {
         }
 
         return rows; // ⚠️ NO DB SAVE
+    }
+    private static final Pattern SCI_NOTATION =
+            Pattern.compile("[-+]?\\d+(\\.\\d+)?[eE][-+]?\\d+");
+
+    private String normalizeNumber(String value) {
+        if (value == null || value.isBlank()) {
+            return value;
+        }
+
+        value = value.trim();
+
+        // Check scientific notation
+        if (SCI_NOTATION.matcher(value).matches()) {
+            return new BigDecimal(value)
+                    .toPlainString()
+                    .replaceAll("\\.0$", ""); // remove .0 if exists
+        }
+
+        return value;
     }
 
     }

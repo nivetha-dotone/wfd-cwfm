@@ -348,7 +348,7 @@ label {
             <tr>
               <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorName"/></label></th>
                 <td>
-                	<input id="contractorNameId" name="contractorName" style="width: 100%;height: 20px; text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="contractorNameId" name="contractorName" style="width: 100%;height: 20px; text-transform: capitalize;" type="text" size="30" maxlength="30" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" autocomplete="off">
                 	<div style="text-align: right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.firstNameRegax"/></span>
        </div>
@@ -376,7 +376,7 @@ label {
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.mobileNumber"/></label></th>
                 <td>
-                	<input id="mobileId" name="mobile" style="width: 100%;height: 20px;" type="text" size="10" maxlength="10" autocomplete="off">
+                	<input id="mobileId" name="mobile" style="width: 100%;height: 20px;" type="text" size="10"  inputmode="numeric" pattern="[0-9]*" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')"  autocomplete="off">
                 	<div style="text-align: right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.mobileNumberRegax"/></span>
        </div>
@@ -388,7 +388,7 @@ label {
              <tr>
            	   <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.contractorAadhar"/></label></th>
                 <td>
-                	<input id="aadharId" name="aadhar" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" autocomplete="off">
+                	<input id="aadharId" name="aadhar" style="width: 100%;height: 20px;" type="text" size="30" maxlength="12" inputmode="numeric" pattern="[0-9]*" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')" autocomplete="off">                	
                 	<div style="text-align: right;">
         <span style="color: #666; font-size: 11px;"><spring:message code="label.aadharNumberRegax"/></span>
     </div>
@@ -447,7 +447,7 @@ label {
                 </td>
                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.natureOfWork"/></label></th>
                 <td>
-                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="natureOfWorkId" name="natureOfWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" autocomplete="off">
                 	<div style="text-align: right;">
                                     <span style="color: #666; font-size: 11px;"><spring:message code="label.natureOfJobRegax"/></span>
                                 </div>
@@ -458,7 +458,7 @@ label {
            <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.managerName"/></label></th>
                 <td>
-                	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="managerNameId" name="managerName" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" autocomplete="off">
                 	<div style="text-align: right;">
                                     <span style="color: #666; font-size: 11px;"><spring:message code="label.managerNameRegax"/></span>
                                 </div>
@@ -466,7 +466,7 @@ label {
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.locationOfWork"/></label></th>
                 <td>
-                	<input id="locofWorkId" name="locofWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="locofWorkId" name="locofWork" style="width: 100%;height: 20px;text-transform: capitalize;" type="text" size="30" maxlength="30" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" autocomplete="off">
                 	<div style="text-align: right;">
                                     <span style="color: #666; font-size: 11px;"><spring:message code="label.locationOfWorkRegax"/></span>
                                 </div>
@@ -477,7 +477,7 @@ label {
             <tr>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.totalStrength"/></label></th>
                 <td>
-                	<input id="totalStrengthId" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="totalStrengthId" name="totalStrength" style="width: 100%;height: 20px;" type="text" size="30" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')"  maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
                                     <span style="color: #666; font-size: 11px;"><spring:message code="label.totalStrengthRegax"/></span>
                                 </div>
@@ -485,7 +485,7 @@ label {
                 </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.rcMaxEmployees"/></label></th>
                 <td>
-                	<input id="rcMaxEmpId" name="rcMaxEmp" style="width: 100%;height: 20px;" type="text" size="30" maxlength="30" autocomplete="off">
+                	<input id="rcMaxEmpId" name="rcMaxEmp" style="width: 100%;height: 20px;" type="text" size="30" inputmode="numeric" pattern="[0-9]*"  oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="30" autocomplete="off">
                 	<div style="text-align: right;">
                                     <span style="color: #666; font-size: 11px;"><spring:message code="label.rcMaxEmployeesRegax"/></span>
                                 </div>
@@ -603,7 +603,7 @@ label {
         <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" autocomplete="off"/></td>
         <td><input type="date" class="form-control validFrom" name="validFrom" autocomplete="off"/></td>
         <td><input type="date" class="form-control validTo" name="validTo" autocomplete="off"/></td>
-        <td><input type="file" class="form-control attachment" name="attachment" autocomplete="off"/></td>
+        <td><input type="file" class="form-control attachment" name="attachment" accept="application/pdf" autocomplete="off"/></td>
     </tr>
 </tbody>
       

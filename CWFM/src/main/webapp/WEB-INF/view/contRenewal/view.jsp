@@ -4,7 +4,9 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+    <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -547,7 +549,7 @@ label {
                     <td style="color:#2c2c2c;text-align:center">${item.validFrom }</td >
                     <td style="color:#2c2c2c;text-align:center">${item.validTo}</td>
                     <td style="color:#2c2c2c;text-align:center">
-                     ${item.fileName}
+                    <a href="#" onclick="viewContractorFile('${contractor.contractorregId}','${contractor.createdBy }','${item.fileName }')">${item.fileName}</a>
                      </td>
                     </tr>
                 </c:forEach>
@@ -575,8 +577,11 @@ label {
                         <td><input type="text" value="${ll.workOrderNumber}" readonly></td>
                         <td><input type="text" value="${ll.licenseType}" readonly></td>
                         <td><input type="text" value="${ll.wcCode}" readonly></td>
-                       
-                        <td><input type="text" value="${ll.createdDtm}" readonly></td>
+                        <td>
+                         <c:if test="${not empty ll.createdDtm}">
+                           <input type="text" value="<fmt:formatDate value='${ll.createdDtm}' pattern='yyyy-MM-dd'/>" readonly>
+                         </c:if>
+                        </td>
                     </tr>
                 </c:forEach>
             </tbody>
@@ -584,23 +589,84 @@ label {
     </div>
     
     <div id="tab5" class="tab-content">
-            <div class="Panel">
+            <%-- <div class="Panel">
             
             <table class="ControlLayout" cellspacing="0" cellpadding="0">
 		<tbody>
 		<tr>
-				
-				 <% if (user != null && !"Contractor Supervisor".equals(roleName)) { %>
+				<c:if test="${ not empty comments.comments}">
+        <tr>
+        <th><label class="custom-label"><spring:message code="label.approveComment"/></label></th>
+        <td>
+        <textarea id="approvercomments" name="approvercomments" readonly>${comments.comments}</textarea>
+        </td>
+        </tr>
+        </c:if>
+				 <% if (user != null && !"Contractor".equals(roleName)) { %>
 				 <th><label class="custom-label"><spring:message code="label.approveComment"/></label></th>
 				<td><textarea id="approvercomments"  name="approvercomments" placeholder="Type here..."></textarea>
 				<label id="error-approvercomments" style="color: red;display: none;">Comments is required</label>
 				</td>
 				<% } %>
+				
+				
 			</tr>
 		</tbody>
  </table> 
 	
+</div> --%>
+
+<div class="Panel">
+    <table class="ControlLayout" cellspacing="0" cellpadding="0">
+        <tbody>
+
+           <c:choose>
+
+    
+    <c:when test="${roleName eq 'Contractor'}">
+        <tr>
+            <th>
+                <label class="custom-label">
+                    <spring:message code="label.approveComment"/>
+                </label>
+            </th>
+            <td>
+                <textarea id="approvercomments"
+                          name="approvercomments"
+                          readonly>
+                    <c:out value="${comments.comments}" default=""/>
+                </textarea>
+            </td>
+        </tr>
+    </c:when>
+
+    
+    <c:otherwise>
+        <tr>
+            <th>
+                <label class="custom-label">
+                    <spring:message code="label.approveComment"/>
+                </label>
+            </th>
+            <td>
+                <textarea id="approvercomments"
+                          name="approvercomments"
+                          placeholder="Type here..."></textarea>
+
+                <label id="error-approvercomments"
+                       style="color:red; display:none;">
+                    Comments is required
+                </label>
+            </td>
+        </tr>
+    </c:otherwise>
+
+</c:choose>
+
+        </tbody>
+    </table>
 </div>
+
 </div>
 <div id="tab4" class="tab-content">
   <div class="card-body p-3">

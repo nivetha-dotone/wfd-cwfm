@@ -296,6 +296,8 @@ public class ContractorRenewalController {
 	            List<CMSContractorRegistrationLLWC> llwcRecords = contrService.getLLWC(contractorRegId);
 	            request.setAttribute("llwcRecords", llwcRecords);
 	            
+	            ApproveRejectContRenewDto comments = contrService.getContractorRenewComments(contractorRegId);
+	            request.setAttribute("comments", comments);
 	         // ✅ Pass versioned documents to JSP
 	         //   List<Map<String, Object>> allVersionedDocs = contrService.getAllContractorVersionedDocuments(contractorRegId, user.getUserId(),contractor.getRequestType());
 	          //  request.setAttribute("PreviousDocuments", allVersionedDocs);

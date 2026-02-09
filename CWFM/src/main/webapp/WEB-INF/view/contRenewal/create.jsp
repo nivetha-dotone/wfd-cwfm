@@ -584,7 +584,7 @@ label {
             
                  <option value="">Please select Document Type</option>
                                 <c:forEach var="doc" items="${DocumentType}">
-                					<option value="${doc.gmId}">${doc.gmName}</option>
+                					<option value="${doc.gmName}">${doc.gmName}</option>
             					</c:forEach>
                                 </select>
         </td>
@@ -592,7 +592,7 @@ label {
         <td><input type="number" class="form-control coverage" name="coverage" min="0" step="1" autocomplete="off"/></td>
         <td><input type="date" class="form-control validFrom" name="validFrom" autocomplete="off"/></td>
         <td><input type="date" class="form-control validTo" name="validTo" autocomplete="off"/></td>
-        <td><input type="file" class="form-control attachment" name="attachment" autocomplete="off"/></td>
+        <td><input type="file" class="form-control attachment" name="attachment" accept="application/pdf" autocomplete="off"/></td>
         <td><input type="checkbox" class="form-control panIndia" name="panIndia" /></td>
          <td><input type="checkbox" class="form-control subApplicable" name="subApplicable" /></td>
     </tr>

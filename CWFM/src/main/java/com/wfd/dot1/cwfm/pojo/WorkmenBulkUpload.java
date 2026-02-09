@@ -80,7 +80,14 @@ public class WorkmenBulkUpload {
 	private String accessArea;
 	private String esicNumber;
     private String unitCode;
-    private String organizationName;
+    private String unitId;
+    public String getUnitId() {
+		return unitId;
+	}
+	public void setUnitId(String unitId) {
+		this.unitId = unitId;
+	}
+	private String organizationName;
     private String EICNumber;	
     private String ECnumber;
 	private String uanNumber;

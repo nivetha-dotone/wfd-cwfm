@@ -10,8 +10,11 @@ import java.sql.Types;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Repository;
 import com.wfd.dot1.cwfm.dto.MinimumWageDTO;
 import com.wfd.dot1.cwfm.pojo.CMSContrPemm;
 import com.wfd.dot1.cwfm.pojo.CMSSubContractor;
+import com.wfd.dot1.cwfm.pojo.CMSWorkorderLLWC;
 import com.wfd.dot1.cwfm.pojo.CMSWorkorderLN;
 import com.wfd.dot1.cwfm.pojo.CmsContractorWC;
 import com.wfd.dot1.cwfm.pojo.CmsGeneralMaster;
@@ -377,8 +381,8 @@ public class FileUploadDaoImpl implements FileUploadDao {
 	        wc.getWcCode(),
 	        wc.getWcFromDtm(),
 	        wc.getWcToDtm(),
-	        wc.getWcTotal()
-	        //wc.getLicenceType() // if this should be NULL, pass `null` here
+	        wc.getWcTotal(),
+	        wc.getLicenceType() // if this should be NULL, pass `null` here
 	    );
 	}
 
@@ -826,7 +830,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getAadhaarNumber(),
 						 staging.getFirstName(),
 						 staging.getLastName(),
-						 staging.getDateOfBirth(),
+						 parseSqlDate(staging.getDateOfBirth()),
 						 staging.getGender(),
 						 staging.getRelationName(),
 						 staging.getIdMark(),
@@ -845,7 +849,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getHazardousArea(),
 						 staging.getAccessArea(),
 						 staging.getUanNumber(),
-						 staging.getHealthCheckDate(),
+						 parseSqlDate(staging.getHealthCheckDate()),
 						 staging.getBloodGroup(),
 						 staging.getAccommodation(),
 						 staging.getAcademic(),
@@ -855,10 +859,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getEmergencyNumber(),
 						 staging.getEmergencyName(),
 						 staging.getAddress(),
-						 staging.getDoj(),
+						 parseSqlDate(staging.getDoj()),
 						 staging.getPfNumber(),
 						 staging.getEsicNumber(),
-						 staging.getPoliceVerificationDate(),
+						 parseSqlDate(staging.getPoliceVerificationDate()),
 						 staging.getSpecializationName(),
 						 staging.getLLnumber(),
 						 staging.getPfApplicable(),
@@ -882,7 +886,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getAadhaarNumber(),
 						 staging.getFirstName(),
 						 staging.getLastName(),
-						 staging.getDateOfBirth(),
+						 parseSqlDate( staging.getDateOfBirth()),
 						 staging.getGender(),
 						 staging.getRelationName(),
 						 staging.getIdMark(),
@@ -901,7 +905,7 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getHazardousArea(),
 						 staging.getAccessArea(),
 						 staging.getUanNumber(),
-						 staging.getHealthCheckDate(),
+						 parseSqlDate(staging.getHealthCheckDate()),
 						 staging.getBloodGroup(),
 						 staging.getAccommodation(),
 						 staging.getAcademic(),
@@ -911,10 +915,10 @@ public class FileUploadDaoImpl implements FileUploadDao {
 						 staging.getEmergencyNumber(),
 						 staging.getEmergencyName(),
 						 staging.getAddress(),
-						 staging.getDoj(),
+						 parseSqlDate(staging.getDoj()),
 						 staging.getPfNumber(),
 						 staging.getEsicNumber(),
-						 staging.getPoliceVerificationDate(),
+						 parseSqlDate(staging.getPoliceVerificationDate()),
 						 staging.getSpecializationName(),
 						 staging.getLLnumber(),
 						 staging.getPfApplicable(),
@@ -1395,20 +1399,23 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		    );
 		}
 		@Override
-		public boolean wcExists(Long contractorId, Long unitId,String wcCode) {
-		    String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR_WC WHERE CONTRACTORID=? AND UNITID=? and WC_CODE=?";
-		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitId,wcCode) > 0;
+		public boolean wcExists(Long contractorId, Long unitId,String wcCode,String licenceType) {
+		    String sql = "SELECT COUNT(*) FROM CMSCONTRACTOR_WC WHERE CONTRACTORID=? AND UNITID=? and WC_CODE=? AND LICENCE_TYPE = ?";
+		    return jdbcTemplate.queryForObject(sql, Integer.class, contractorId, unitId,wcCode,licenceType) > 0;
 		}
 		@Override
 		public void updatewc(CmsContractorWC wc) {
 		    jdbcTemplate.update(
-		        "UPDATE CMSCONTRACTOR_WC SET WC_CODE=?, WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0 WHERE CONTRACTORID=? AND UNITID=?",
-		        wc.getWcCode(),
+		        "UPDATE CMSCONTRACTOR_WC SET  WC_FROM_DTM=?, WC_TO_DTM=?, WC_TOTAL=?,DELETE_SW=0 WHERE CONTRACTORID=? AND UNITID=? AND WC_CODE=? AND LICENCE_TYPE=?",
+		        
 		        wc.getWcFromDtm(),
 		        wc.getWcToDtm(),
 		        wc.getWcTotal(),
 		        wc.getContractorId(),
-		        wc.getUnitId()
+		        wc.getUnitId(),
+		        wc.getWcCode(),
+		        wc.getLicenceType()
+		        
 		    );
 		}
 		@Override
@@ -1426,6 +1433,177 @@ public class FileUploadDaoImpl implements FileUploadDao {
 		        c.getUnitId()
 		    );
 		}
+		@Override
+		public void saveWorkorderLLWC(CMSWorkorderLLWC llwc) {
+		    String sql = "INSERT INTO CMSWORKORDER_LLWC(WONUMBER, LICENSE_NUMBER, LICENSE_TYPE)VALUES (?, ?, ?)";
+		    jdbcTemplate.update(sql,llwc.getWorkorderNumber(),llwc.getLicenseNumber(),llwc.getLicenseType());
+		}
+
+		@Override
+		public void updateWorkorderLLWC(CMSWorkorderLLWC llwc) {
+
+		    String sql = "UPDATE CMSWORKORDER_LLWC SET LICENSE_NUMBER = ? WHERE WONUMBER = ? AND LICENSE_TYPE = ?";
+		    jdbcTemplate.update(sql,llwc.getLicenseNumber(),llwc.getWorkorderNumber(),llwc.getLicenseType());
+		}
+
+		@Override
+		public boolean llwcExists(String workOrderNumber, String licenseType,String license) {
+
+		    String sql = "SELECT COUNT(1)FROM CMSWORKORDER_LLWC WHERE WONUMBER = ? AND LICENSE_TYPE = ? and LICENSE_NUMBER=?";
+		    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,workOrderNumber,licenseType,license);
+		    return count != null && count > 0;
+		}
+
+		@Override
+		public boolean isLicenseMappedToOtherContractor(Long contractorId,String licenseNumber,String licenseType) {
+
+		    String sql = "SELECT COUNT(1)FROM CMSCONTRACTOR_WC WHERE WC_CODE = ? AND LICENCE_TYPE = ? AND CONTRACTORID != ?";
+		    Integer count = jdbcTemplate.queryForObject(sql,Integer.class,licenseNumber,licenseType,contractorId);
+
+		    return count != null && count > 0;
+		}
+		@Override
+		public boolean codeExistsInOrgLevelEntry(String contractorCode, long orgLevelDefId) {
+			String sql=existsInOrgLevelEntry();
+			   // String sql = "SELECT COUNT(*) FROM ORGLEVELENTRY WHERE NAME = ? AND ORGLEVELDEFID = ?";
+			    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, contractorCode, orgLevelDefId);
+			    return count != null && count > 0;
+		}
+		@Override
+		public boolean codeExistsInOrgLevelEntry(List<Contractor> list, long orgLevelDefId) {
+
+		    if (list == null || list.isEmpty()) {
+		        return false;
+		    }
+
+		    List<String> contractorCodes = list.stream()
+		            .map(Contractor::getContractorCode)
+		            .filter(Objects::nonNull)
+		            .distinct()
+		            .toList();
+
+		    if (contractorCodes.isEmpty()) {
+		        return false;
+		    }
+
+		    String placeholders = contractorCodes.stream()
+		            .map(c -> "?")
+		            .collect(Collectors.joining(","));
+
+		    String sql =
+		        "SELECT COUNT(*) " +
+		        "FROM ORGLEVELENTRY " +
+		        "WHERE ORGLEVELDEFID = ? " +
+		        "AND NAME IN (" + placeholders + ")";
+
+		    List<Object> params = new ArrayList<>();
+		    params.add(orgLevelDefId);
+		    params.addAll(contractorCodes);
+
+		    Integer count = jdbcTemplate.queryForObject(
+		            sql,
+		            params.toArray(),
+		            Integer.class
+		    );
+
+		    return count != null && count > 0;
+		}
+		@Override
+		public boolean workorderExists(String workOrder, String contractorCode, String plantCode,String item,String lines,String lineNumber) {
+			    String sql = "select COUNT(*) from KTC_WORKORDER_STAGING_ON_REQ where WORKORDER_NUM=? and VENDOR_CODE=? and UNIT_CODE=? and ITEM_NUM=? and SVC_LN_ITEM_DEL=? and SVC_LN_ITEM_NUM=? ";
+		    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, workOrder, contractorCode,plantCode,item,lines,lineNumber);
+		    return count != null && count > 0;
+		}
+		@Override
+		public void updateWorkorderToStaging(KTCWorkorderStaging w) {
+			String sql =
+				    "UPDATE KTC_WORKORDER_STAGING_ON_REQ SET " +
+				    " SVC_LN_ITEM_DEL = ?, " +
+				    " SVC_NUM = ?, " +
+				    " SVC_LN_ITEM_NAME = ?, " +
+				    " DELV_COMPLETION_SW = ?, " +
+				    " ITEM_CHANGED_ON_DATE = ?, " +
+				    " VENDOR_NAME = ?, " +
+				    " VENDOR_ADDRESS = ?, " +
+				    " BLOCKED_PO = ?, " +
+				    " WORKORDER_VALID_FROM = ?, " +
+				    " WORKORDER_VALID_TO = ?, " +
+				    " SAP_WORKORDER_TYPE = ?, " +
+				    " SEC_NAME = ?, " +
+				    " DEPT_NAME = ?, " +
+				    " GL_CODE = ?, " +
+				    " COST_CENTRE_CODE = ?, " +
+				    " JOB_NAME = ?, " +
+				    " RATE = ?, " +
+				    " QTY = ?, " +
+				    " UOM = ?, " +
+				    " WORKORDER_RELEASED_SW = ?, " +
+				    " PM_WORKORDER_NUM = ?, " +
+				    " WBS_ELEMENT = ?, " +
+				    " QTY_COMPLETED = ?, " +
+				    " WORKORDER_RELEASED_DATE = ?, " +
+				    " SERVICE_ENTRY_CREATE_DATE = ?, " +
+				    " SERVICE_ENTRY_UPDATED_DATE = ?, " +
+				    " PURCHASE_ORG_LEVEL = ?, " +
+				    " COMPANY_CODE = ?, " +
+				    " RECORD_UPDATED_ON = ?, " +
+				    " RECORD_STATUS = ? " +
+				    "WHERE WORKORDER_NUM = ? " +
+				    "  AND ITEM_NUM = ? " +
+				    "  AND SVC_LN_ITEM_NUM = ? " +
+				    "  AND VENDOR_CODE = ? " +
+				    "  AND UNIT_CODE = ?";
+
+		    jdbcTemplate.update(sql,
+		        /* SET values */
+		        w.getLine(),
+		        w.getServiceCode(),
+		        w.getShortText(),
+		        w.getDeliveryCompletion(),
+		        parseSqlDate(w.getItemChangedON()),
+
+		        w.getVendorName(),
+		        w.getVendorAddress(),
+		        w.getBlockedVendor(),
+
+		        parseSqlDate(w.getWorkOrderValiditiyFrom()),
+		        parseSqlDate(w.getWorkOrderValiditiyTo()),
+		        w.getWorkOrderType(),
+
+		        w.getSectionCode(),
+		        w.getDepartmentCode(),
+		        w.getGLCode(),
+		        w.getCostCenter(),
+
+		        w.getNatureofJob(),
+		        parseBigDecimal(w.getRateUnit()),
+		        parseBigDecimal(w.getQuantity()),
+		        w.getBaseUnitofMeasure(),
+
+		        w.getWorkOrderReleased(),
+		        w.getPMOrderNo(),
+		        w.getWBSElement(),
+		        parseBigDecimal(w.getQtyCompleted()),
+
+		        parseSqlDate(w.getWorkOrderReleaseDate()),
+		        parseSqlDate(w.getServiceEntryCreatedDate()),
+		        parseSqlDate(w.getServiceEntryUpdatedDate()),
+
+		        w.getPurchaseOrgLevel(),
+		        w.getCompanycode(),
+
+		        new Timestamp(System.currentTimeMillis()),
+		        "UPDATED",
+
+		        /* WHERE values (VERY IMPORTANT) */
+		        w.getWorkOrderNumber(),
+		        w.getItem(),
+		        w.getLineNumber(),
+		        w.getVendorCode(),
+		        w.getPlantcode()
+		    );
+		}
+
 
 	}
 

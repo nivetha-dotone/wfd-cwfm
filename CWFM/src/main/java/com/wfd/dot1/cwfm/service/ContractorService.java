@@ -96,6 +96,10 @@ public interface ContractorService {
 	public String approveRejectContRenew(ApproveRejectContRenewDto dto);
 
 	public List<Map<String, Object>> getAllContractorVersionedDocuments(String contractorRegId, Integer userId, String requestType);
+
+	public Contractor getAllContractorProfileDetailForReg(String unitId, String contractorId);
+
+	public ApproveRejectContRenewDto getContractorRenewComments(String contractorRegId);
 	   
 	}
 

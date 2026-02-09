@@ -174,6 +174,24 @@ public class Workorder {
 	public void setUom(String uom) {
 		this.uom = uom;
 	}
+private int activeWorkmenCount;
 	
+	public int getActiveWorkmenCount() {
+		return activeWorkmenCount;
+	}
+
+	public void setActiveWorkmenCount(int activeCount) {
+		this.activeWorkmenCount = activeCount;
+	}
+	
+	private String classification;
+
+
+	public String getClassification() {
+		return classification;
+	}
+	public void setClassification(String classification) {
+		this.classification = classification;
+	}
 	
 }

@@ -110,6 +110,14 @@ public interface ContractorDao {
 
 	public Map<String, String> getContractorPreviousDocuments(String contractorRegId, String requestType);
 
+	public Contractor getAllContractorProfileDetailForReg(String unitId, String contractorId);
+
+	public void updateContractorPemm(ContractorRegistration reg);
+
+	public boolean contractorExistsForPeContractor(String contractorId, Long unitId);
+
+	public ApproveRejectContRenewDto getContractorRenewComments(String contractorRegId);
+
 	   
 	}
 

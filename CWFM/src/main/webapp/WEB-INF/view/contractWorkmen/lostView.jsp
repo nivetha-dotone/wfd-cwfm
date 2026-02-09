@@ -279,6 +279,40 @@ textarea {
             width: 300px; /* Optional width */
             height: 150px; /* Optional height */
         }
+         #loaderOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #ddd;
+    border-top: 6px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-text {
+    margin-top: 15px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
     </style>
      <%
     	MasterUser user = (MasterUser) session.getAttribute("loginuser");
@@ -409,6 +443,10 @@ textarea {
                     </div> 
                 </c:if>
             </div>
+            <div id="loaderOverlay" style="display:none;">
+    <div class="loader"></div>
+    <div class="loader-text">please wait...</div>
+</div>
             <div id="tab1" class="tab-content active">
             <table cellspacing="0" cellpadding="0">
             <tr><td>
@@ -470,21 +508,21 @@ textarea {
           
             </tr>
             <tr>
+             <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.fatherHusbandName"/></label></th>
+                <td>
+                	<input id="relationName" name="relationName" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.relationName }" readonly>
+                </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.dateOfBirth"/></label></th>
                <td>
     				<input id="dateOfBirth" name="dateOfBirth" class="datetimepickerformat" style="width: 100%; height: 20px;" type="text" value="${GatePassObj.dateOfBirth}" readonly >
 			</td>
                
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.gender"/></label></th>
+            </tr>
+            <tr>
+                  <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.gender"/></label></th>
                 <td>
                 	<input id="gender" name="gender" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.gender }" readonly>
                      </td>
-            </tr>
-            <tr>
-                <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.fatherHusbandName"/></label></th>
-                <td>
-                	<input id="relationName" name="relationName" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.relationName }" readonly>
-                </td>
                 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.idMark"/></label></th>
                 <td>
                 	<input id="idMark" name="idMark" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.idMark }" readonly>
@@ -499,6 +537,14 @@ textarea {
                 <td>
                 	<input id="maritalStatus" name="maritalStatus" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.maritalStatus }" readonly>
                 	 </td>
+            </tr>
+            <tr>
+            <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.disability"/></label></th>				
+				<td ><input id="disability" name="disability" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.disability }" readonly></td>
+          
+           <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.workmenType"/></label></th>
+                            <td><input id="workmenType" name="workmenType" style="width: 100%;height: 20px;" type="text" value="${GatePassObj.workmenType }" readonly>  </td>
+           
             </tr>
              <tr>
            	 <th><label class="custom-label"><span class="required-field">*</span><spring:message code="label.address"/></label></th>
@@ -715,7 +761,12 @@ textarea {
                    <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}','${GatePassObj.createdBy }','aadhar')">Download Aadhar</a>
                 </td>
             		</tr>
-            		
+            			<tr>
+                		<td style="color:black"><spring:message code="label.appointmentDocument"/></td>
+                <td>
+                   <a href="#" onclick="viewDoc('${GatePassObj.oldTransactionId}','${GatePassObj.createdBy }','appointment')">Download Appointment Document</a>
+                </td>
+            		</tr>
             		<tr>
                 		<td style="color:black"><spring:message code="label.policeVerificationDocument"/></td>
                 <td>

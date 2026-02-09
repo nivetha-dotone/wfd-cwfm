@@ -306,6 +306,7 @@ td{
                             background-color: #f0f0f0;
                         }
 
+
                         .pagination button.active {
                             background-color: #eef0f3;
                             color: #333232;
@@ -565,7 +566,7 @@ td{
 
                             .hr-modal-content {
                                 width: 95%;
-                                margin: 1% auto;
+                                margin: 18% auto;
                             }
 
                             .hr-update-buttons {
@@ -595,6 +596,40 @@ td{
                                 min-height: 300px;
                             }
                         }
+
+
+                        .btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.66666667;
+  border-radius: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.btn-default {
+  color: var(--zed_sys_color_action_enabled);
+  border-color: var(--zed_sys_color_action_enabled);
+  background-color: var(--zed_sys_color_background);
+}
+
+.btn:hover,
+.btn:focus {
+  color: var(--zed_sys_color_action_hover);
+  border-color: var(--zed_sys_color_focus);
+}
                     </style>
                 </head>
 
@@ -777,9 +812,9 @@ td{
                                         placeholder="Enter your remark here..." rows="4"></textarea>
                                 </div>
                                 <div class="hr-update-buttons">
-                                    <button type="button" class="hr-btn hr-btn-success"
+                                    <button type="button" class=".btn btn-default"
                                         onclick="hrUpdateRequest()">Update Request</button>
-                                    <button type="button" class="hr-btn" onclick="hrCloseModal()">Cancel</button>
+                                    <button type="button" class=".btn btn-default" onclick="hrCloseModal()">Cancel</button>
                                 </div>
                             </div>
                         </div>
