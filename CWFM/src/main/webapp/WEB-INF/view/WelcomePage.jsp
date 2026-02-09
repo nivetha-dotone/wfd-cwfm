@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,35 +31,71 @@
     <script src="https://cdn.jsdelivr.net/gh/surepassio/surepass-digiboost-web-sdk@latest/index.min.js"></script>
     
  <link rel="stylesheet" type="text/css" href="resources/css/cms/dashboard.css" />  
-         <script src="resources/js/cms/requestorList.js"></script>
+        <script src="resources/js/cms/requestorList.js"></script>
         <script src="resources/js/cms/plantZoneMappingList.js"></script>  
-     <script src="resources/js/cms/requestorHRList.js"></script>
-     <script src="resources/js/cms/principalEmployer.js"></script>
-    <script src="resources/js/cms/contractor.js"></script>
-    <script src="resources/js/cms/workorder.js"></script>
-       <script src="resources/js/cms/workmen.js"></script>
-    <script src="resources/js/cms/report.js"></script>
-     <script src="resources/js/cms/bill.js"></script>
-    <script src="resources/js/cms/plantZoneMappingForm.js"></script>
-      <script src="resources/js/cms/workflow.js"></script>
+      
+<script src="resources/js/cms/mblRegister.js"></script>
+<script src="resources/js/cms/mblPunch.js"></script>
 
-<script src="resources/js/cms/users.js"></script>
-        <script src="resources/js/cms/dataimportexport.js"></script>
-
+        <script src="resources/js/cms/requestorHRList.js"></script>
+        <script src="resources/js/cms/principalEmployer.js"></script>
+        <script src="resources/js/cms/contractor.js"></script>
+        <script src="resources/js/cms/workorder.js"></script>
+        <script src="resources/js/cms/workmen.js"></script>
+        <script src="resources/js/cms/report.js"></script>
+        <script src="resources/js/cms/bill.js"></script>
+        <script src="resources/js/cms/plantZoneMappingForm.js"></script>
+        <script src="resources/js/cms/workflow.js"></script>
+        <script src="resources/js/cms/users.js"></script>
+        <script src="resources/js/cms/dataimportexport.js"></script>     
         <script src="resources/js/cms/requestor.js"></script>
         <script src="resources/js/cms/export.js"></script>
         <script src="resources/js/cms/contRenewal.js"></script>
         <script src="resources/js/cms/dashboard.js"></script>
-
-      <script src="resources/js/cms/export.js"></script>
-       <script src="resources/js/cms/contRenewal.js"></script>
-       <script src="resources/js/cms/dashboard.js"></script>
+        <script src="resources/js/cms/export.js"></script>
+        <script src="resources/js/cms/contRenewal.js"></script>
+        <script src="resources/js/cms/dashboard.js"></script>
         <script src="resources/js/cms/dottype.js"></script>
- <script src="resources/js/cms/unitDeptMapping.js"></script>
+        <script src="resources/js/cms/unitDeptMapping.js"></script>
+           
+
 
     <script>
-    var contextPath = '<%= request.getContextPath() %>';
-  
+
+function isRealMobileDevice() {
+    return (
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) &&
+        'ontouchstart' in window &&
+        navigator.maxTouchPoints > 1
+    );
+}
+
+
+function applyMobilePunchRestriction() {
+
+    const punchBtn = document.getElementById("punchBtn");
+    const preview = document.getElementById("preview");
+
+    // If HTML not yet rendered, exit safely
+    if (!punchBtn || !preview) {
+        console.warn("Punch elements not found yet");
+        return;
+    }
+
+    if (!isRealMobileDevice()) {
+        punchBtn.style.display = "none";
+        preview.innerHTML =
+            "<div style='color:red;font-weight:bold;padding:10px'>" +
+            "Mobile Punch works only on a real mobile device." +
+            "</div>";
+    } else {
+        punchBtn.style.display = "inline-block";
+        preview.innerHTML = "";
+    }
+}
+
+
+    var contextPath = '<%= request.getContextPath() %>';  
     const today = new Date();
    
 	const currentYear = today.getFullYear();
@@ -2824,9 +2861,7 @@ table.dataTable {
     background-color: #004d40;
 }
 
-.top-nav .dropdown:hover .dropdown-content {
-    display: block;
-}
+
 
 /* Side Navigation Bar Styles */
 .main-menu {
@@ -3009,34 +3044,194 @@ table th {
 .navmenu.show {
     left: 0;
 }
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .top-nav, .main-menu {
+@media (min-width: 769px) {
+    .top-nav .dropdown:hover .dropdown-content {
         display: block;
-    }
-
-    .top-nav {
-        position: relative;
-        height: auto;
-    }
-
-    .main-menu {
-        width: 100%;
-        height: auto;
-        position: static;
-        display: block;
-    }
-
-    .main-menu.expanded {
-        width: 100%;
-    }
-
-    .main-menu .nav-icon {
-        font-size: 18px;
-        margin-right: 10px;
     }
 }
+
+@media (max-width: 768px) {
+
+        .top-nav {
+            height: 56px;
+            padding: 0 8px;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        .left-icons {
+            flex: 0 0 auto;
+            gap: 6px;
+        }
+
+        .hamburger-btn,
+        .home-btn {
+            font-size: 18px;
+            padding: 4px;
+        }
+
+        .top-nav .heading {
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 35%;
+            margin: 0;
+            flex: 1;
+            text-align: center;
+        }
+
+        .role-label {
+            display: none;
+        }
+
+        .role-dropdown {
+            flex: 0 0 auto;
+            max-width: 110px;
+        }
+
+        .role-select {
+            font-size: 12px;
+            padding: 4px 6px;
+            height: 28px;
+        }
+
+        .top-nav .dropdown {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .top-nav .dropdown .user-name {
+            display: none; 
+        }
+
+        .top-nav .dropdown .initials-icon {
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            font-size: 13px;
+        }
+
+        /* Logo */
+        .top-nav .logo.dot1 {
+            height: 22px;
+        }
+
+     .top-nav .dropdown-content {
+        display: none;
+        position: fixed;              
+        top: 56px;                    
+        right: 8px;
+        background-color: rgb(0, 81, 81);
+        min-width: 160px;
+        z-index: 99999;               
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        border-radius: 6px;
+    }
+
+    .top-nav .dropdown.open .dropdown-content {
+        display: block;
+    }
+
+    .initials-icon {
+        cursor: pointer;
+        user-select: none;
+    }
+
+
+        #sidebarMenu {
+            position: fixed;
+            /* top: 56px;              
+            left: 0;
+            width: 85%;
+            max-width: 320px;
+            /* height: calc(100vh - 56px); */
+            background: #ffffff;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #sidebarMenu.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            position: sticky;
+            top: 0;
+            background: #005151;
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            font-size: 22px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .sidebar-menu,
+        #adminMenu {
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li,
+        #adminMenu li {
+            list-style: none;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .sidebar-menu .nav-link,
+        #adminMenu .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #333;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-icon {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .sub-menu {
+            padding-left: 15px;
+            background: #f7f7f7;
+        }
+
+        .sub-menu li a {
+            display: block;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .arrow-up,
+        .arrow-down {
+            width: 12px;
+            height: auto;
+        }
+                
+    }
+
+
+
+
 
 .active {
     background-color: #004d40;
@@ -3638,6 +3833,9 @@ background:white;
             window.onload = function() {
                 changeRole('${selectedRole}', '${selectedRoleName}');
             };
+
+
+
         </script>
     </c:when>
 </c:choose>
@@ -3818,22 +4016,21 @@ background:white;
     </c:when>
 </c:choose>
 
+<div class="dropdown">
+    <span class="initials-icon" onclick="toggleUserDropdown(event)">
+        <c:out value="${sessionScope.userInitials}" />
+    </span>
 
-    <div class="dropdown">
-        <span class="initials-icon">
-            <c:out value="${sessionScope.userInitials}" />
-        </span>
-        <span class="user-name">
-            <c:out value="${sessionScope.loginuser.firstName}" /> 
-            <c:out value="${sessionScope.loginuser.lastName}" />
-        </span>
+    <span class="user-name">
+        <c:out value="${sessionScope.loginuser.firstName}" /> 
+        <c:out value="${sessionScope.loginuser.lastName}" />
+    </span>
 
-        <div class="dropdown-content">
-        
-            <a href="#" onclick="loadChangePassword()">Change Password</a>
-            <a href="#" onclick="loadLogout()">Logout</a>
-        </div>
+    <div class="dropdown-content">
+        <a href="#" onclick="loadChangePassword()">Change Password</a>
+        <a href="#" onclick="loadLogout()">Logout</a>
     </div>
+</div>
 
     <img src="resources/img/Dot1.png" alt="Dot1 Logo" class="logo dot1">
 </div>
@@ -3947,7 +4144,26 @@ function toggleSubMenu(id){
 }
 </script>
     <script>
-   
+
+function toggleUserDropdown(event) {
+    event.stopPropagation();
+    const dropdown = event.currentTarget.closest('.dropdown');
+    dropdown.classList.toggle('open');
+}
+
+document.addEventListener('click', function () {
+    document.querySelectorAll('.dropdown.open').forEach(d => {
+        d.classList.remove('open');
+    });
+});
+// Close dropdown when clicking outside
+document.addEventListener('click', function () {
+    document.querySelectorAll('.dropdown.open').forEach(d => {
+        d.classList.remove('open');
+    });
+});
+
+
  // Function to toggle the General Management submenu
     function toggleGeneralManagementSubMenu(linkElement) {
         const submenuId = 'general-management-sub-menu'; // ID of the General Management submenu
