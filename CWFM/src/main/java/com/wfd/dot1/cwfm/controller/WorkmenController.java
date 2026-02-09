@@ -617,7 +617,6 @@ public class WorkmenController {
        		}
     		 
     		//Get All GeneralMaster
-
     		List<CmsGeneralMaster> gmList = workmenService.getAllGeneralMasterForGatePass(gatePassMainObj);
     		for (CmsGeneralMaster generalMaster : gmList) {
     		    String gmType = generalMaster.getGmType();

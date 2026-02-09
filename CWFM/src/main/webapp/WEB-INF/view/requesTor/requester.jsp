@@ -6,7 +6,7 @@
                     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
                         <!DOCTYPE html>
                         <html>
-                            
+
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,8 @@
                                 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
                             <link rel="stylesheet" type="text/css" href="resources/css/cmsstyles.css">
                             <!-- <script src="resources/js/cms/principalEmployer.js"></script>
-                            <script src="resources/js/cms/contractor.js"></script>-->
+                            <script src="resources/js/cms/contractor.js"></script>
+                            <script src="resources/js/cms/workmen.js"></script> -->
                             <script src="resources/js/cms/requestor.js"></script>
                             <title>Requester Form</title>
                             <style>
@@ -571,8 +572,7 @@
                                                                 <span class="required-field">*</span>
                                                                 <spring:message code="label.department" />
                                                             </label></th>
-                                                        <td>
-                                                            <select class="custom-select" style="width: 231px;" id="department"
+                                                        <td><select class="custom-select" style="width: 231px;" id="department"
                                                                 name="departmentId">
                                                                 <option value="">Please select Department</option>
                                                                 <c:forEach var="dept" items="${departments}">
